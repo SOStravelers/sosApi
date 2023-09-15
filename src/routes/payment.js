@@ -1,13 +1,15 @@
-import  Router  from "express";
-import { aprovedOrder, createOrder } from "../controllers/payment.js";
-const router = Router();
-export default router;
+import Router from "express";
 
-router.post(
-    "/newOrder",
-    createOrder
-);
-router.post(
-    "/approvedOrder",
-    aprovedOrder
-);
+import {
+  aprovedOrder,
+  createOrder,
+  stripeCreatePaymentIntent,
+} from "../controllers/payment.js";
+
+const router = Router();
+
+router.post("/newOrder", createOrder);
+router.post("/approvedOrder", aprovedOrder);
+router.post("/stripe/payment-intents", stripeCreatePaymentIntent);
+
+export default router;
