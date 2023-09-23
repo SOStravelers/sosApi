@@ -110,11 +110,6 @@ router.get(
         required: true,
         type: "string",
       },
-      {
-        param_key: "body",
-        required: true,
-        type: "object",
-      },
     ],
     "query"
   ),
