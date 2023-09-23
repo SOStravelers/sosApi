@@ -31,8 +31,8 @@ import {
   deleteById,
   profilePhoto,
   galleryPhoto,
-  findByName,
   getBusinesByService,
+  findbusinessbyname,
 } from "../controllers/user.js";
 
 //Create user/worker/business
@@ -120,7 +120,7 @@ router.get(
   ),
   getUsers
 );
-//get business account by service
+//get business accounts by service with paginate
 router.get(
   "/businessbyservice",
   validateParams(
@@ -130,14 +130,24 @@ router.get(
         required: true,
         type: "string",
       },
+      {
+        param_key: "page",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
     ],
     "query"
   ),
   getBusinesByService
 );
-
+//get business acounts by name with paginate
 router.get(
-  "/findbyname",
+  "/findbusinessbyname",
   validateParams(
     [
       {
@@ -146,14 +156,19 @@ router.get(
         type: "string",
       },
       {
-        param_key: "type",
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
         required: false,
         type: "string",
       },
     ],
     "query"
   ),
-  findByName
+  findbusinessbyname
 );
 
 router.get(

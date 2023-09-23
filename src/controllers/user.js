@@ -30,7 +30,6 @@ const fakeReq = {
     // ...
   },
 };
-
 function procesarNombre(nombre) {
   const partes = nombre.split(" "); // Dividir el string en partes utilizando el espacio como separador
 
@@ -43,7 +42,65 @@ function procesarNombre(nombre) {
     return [nombre];
   }
 }
-//Registro de usuario
+//----FUNCTIONS ROUTES----//
+//Create user personal/workers/business
+export const create = async (req, res, next) => {
+  console.log("---CREATE NEW USER-WORKER-BUSINESS---");
+  let user = new User(req.body);
+  user.email = user.email.toLowerCase().trim();
+  User.findOne({ email: user.email }).exec(async (err, theUser) => {
+    if (theUser) {
+      let error = createError(409, "This email is already in use");
+      return res.status(409).json(error);
+    } else {
+      user.type = req.body.type || "personal";
+      user.personalData.name.first =
+        user.personalData.name.first.charAt(0).toUpperCase() +
+        user.personalData.name.first.slice(1).toLowerCase().trim();
+      user.personalData.name.last =
+        user.personalData.name.last.charAt(0).toUpperCase() +
+        user.personalData.name.last.slice(1).toLowerCase().trim();
+
+      if (user.password) {
+        user.password = User.hash(user.password);
+      }
+      if (user.username && user.username.length > 0) {
+        let exists = await User.findOne({
+          username: user.username,
+        }).exec();
+        if (exists) {
+          // user.username= mongoose.Types.ObjectId()
+          user.username = user.email
+            .toLowerCase()
+            .trim()
+            .replace(/@/g, "_")
+            .replace(".", "_");
+        } else {
+          user.username = user.username.toLowerCase().trim();
+        }
+      } else {
+        user.username = user.email
+          .toLowerCase()
+          .trim()
+          .replace(/@/g, "_")
+          .replace(".", "_");
+      }
+      try {
+        console.log("saving...", user);
+        const newUser = await user.save();
+        console.log("el item", newUser);
+        res.json(newUser);
+        // user.save((err, item) => {
+        //   if (err) next(err);
+        //   res.send("hola")
+        // });
+      } catch (err) {
+        next(err);
+      }
+    }
+  });
+};
+//Register user
 export const registerEmail = async (req, res, next) => {
   console.log(
     "============= REGISTER NEW USER AND CREATE TOKEN   ============="
@@ -122,7 +179,7 @@ export const registerEmail = async (req, res, next) => {
     }
   });
 };
-//Login de usuario
+//Login user by email
 export const loginEmail = async (req, res, next) => {
   console.log(
     "============= LOGIN USER BY EMAIL AND REFRESH TOKEN   ============="
@@ -164,63 +221,6 @@ export const loginEmail = async (req, res, next) => {
       });
     });
 };
-//Crear usuario/workers/business
-export const create = async (req, res, next) => {
-  console.log("---CREATE NEW USER-WORKER-BUSINESS---");
-  let user = new User(req.body);
-  user.email = user.email.toLowerCase().trim();
-  User.findOne({ email: user.email }).exec(async (err, theUser) => {
-    if (theUser) {
-      let error = createError(409, "This email is already in use");
-      return res.status(409).json(error);
-    } else {
-      user.type = req.body.type || "personal";
-      user.personalData.name.first =
-        user.personalData.name.first.charAt(0).toUpperCase() +
-        user.personalData.name.first.slice(1).toLowerCase().trim();
-      user.personalData.name.last =
-        user.personalData.name.last.charAt(0).toUpperCase() +
-        user.personalData.name.last.slice(1).toLowerCase().trim();
-
-      if (user.password) {
-        user.password = User.hash(user.password);
-      }
-      if (user.username && user.username.length > 0) {
-        let exists = await User.findOne({
-          username: user.username,
-        }).exec();
-        if (exists) {
-          // user.username= mongoose.Types.ObjectId()
-          user.username = user.email
-            .toLowerCase()
-            .trim()
-            .replace(/@/g, "_")
-            .replace(".", "_");
-        } else {
-          user.username = user.username.toLowerCase().trim();
-        }
-      } else {
-        user.username = user.email
-          .toLowerCase()
-          .trim()
-          .replace(/@/g, "_")
-          .replace(".", "_");
-      }
-      try {
-        console.log("saving...", user);
-        const newUser = await user.save();
-        console.log("el item", newUser);
-        res.json(newUser);
-        // user.save((err, item) => {
-        //   if (err) next(err);
-        //   res.send("hola")
-        // });
-      } catch (err) {
-        next(err);
-      }
-    }
-  });
-};
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
   console.log("---GET USERS---");
@@ -250,7 +250,6 @@ export const getUsers = async (req, res, next) => {
 export const getBusinesByService = async (req, res, next) => {
   console.log("---GET BUSINESS BY SERVICE---", req.query);
   let body = {};
-  const serviceObjectId = mongoose.Types.ObjectId(body.id);
   Object.assign(body, req.query);
   try {
     const options = {
@@ -271,6 +270,53 @@ export const getBusinesByService = async (req, res, next) => {
     next(error);
   }
 };
+//Obtener usuarios business con paginate por nombre
+export const findbusinessbyname = async (req, res, next) => {
+  console.log("---FIND BUSINESS BY NAME---");
+  let body = {};
+  Object.assign(body, req.query);
+  body.name = decodeURIComponent(body.name);
+  console.log("query", body);
+  const options = {
+    page: body.page || 1,
+    limit: body.limit || 10,
+  };
+  let query = {
+    $and: [
+      {
+        $or: [
+          {
+            "businessData.name": {
+              $regex: body.name,
+              $options: "i",
+            },
+          },
+        ],
+      },
+      {
+        type: "business",
+      },
+      {
+        isActive: "true",
+      },
+    ],
+  };
+  console.log(query["$and"][0]["$or"][0]);
+  try {
+    User.paginate(query, options, (err, users) => {
+      console.log(users);
+      if (err) {
+        let error = createError(400, "not users found");
+        console.log(error);
+        return res.status(400).json(error);
+      } else {
+        res.status(200).send(users);
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
   console.log("---GET USER BY ID---");
@@ -288,7 +334,7 @@ export const getById = async (req, res, next) => {
     }
   });
 };
-//update usuario
+//Actualizar data de un usuario por ID
 export const updateOne = (req, res, next) => {
   console.log("---UPDATE USER---");
   let data = req.body;
@@ -310,7 +356,7 @@ export const updateOne = (req, res, next) => {
     }
   });
 };
-//Actualizar data de un usuario
+//Eliminar usuario por ID
 export const deleteById = (req, res, next) => {
   console.log("---DELETE USER---");
   User.findOneAndRemove({
@@ -431,49 +477,6 @@ export const galleryPhoto = async (req, res, next) => {
       .catch((err) => {
         console.error(err);
       });
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const findByName = async (req, res, next) => {
-  console.log("---FIND USER BY NAME---");
-  let body = {};
-  Object.assign(body, req.query);
-  body.name = decodeURIComponent(body.name);
-  console.log("query", body);
-  let query = {
-    $and: [
-      {
-        $or: [
-          {
-            "businessData.name": {
-              $regex: body.name,
-              $options: "i",
-            },
-          },
-        ],
-      },
-      {
-        type: "bussines",
-      },
-      {
-        isActive: "false",
-      },
-    ],
-  };
-  console.log(query);
-  try {
-    User.find(query, (err, users) => {
-      console.log(users);
-      if (err) {
-        let error = createError(400, "not users found");
-        console.log(error);
-        return res.status(400).json(error);
-      } else {
-        res.status(200).send(users);
-      }
-    });
   } catch (err) {
     next(err);
   }
