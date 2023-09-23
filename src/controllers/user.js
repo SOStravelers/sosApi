@@ -170,50 +170,60 @@ export const loginEmail = async (req, res, next) => {
 };
 //Crear usuario
 export const create = async (req, res, next) => {
-  console.log("---CREATE NEW USER---");
+  console.log("---CREATE NEW USER-WORKER-BUSINESS---");
   let user = new User(req.body);
-  console.log("user", user);
-  user.type = req.body.type || "personal";
-  user.name.first =
-    user.name.first.charAt(0).toUpperCase() +
-    user.name.first.slice(1).toLowerCase().trim();
-  user.name.last =
-    user.name.last.charAt(0).toUpperCase() +
-    user.name.last.slice(1).toLowerCase().trim();
   user.email = user.email.toLowerCase().trim();
-  if (user.username && user.username.length > 0) {
-    let exists = await User.findOne({
-      username: user.username,
-    }).exec();
-    if (exists) {
-      // user.username= mongoose.Types.ObjectId()
-      user.username = user.email
-        .toLowerCase()
-        .trim()
-        .replace(/@/g, "_")
-        .replace(".", "_");
+  User.findOne({ email: user.email }).exec(async (err, theUser) => {
+    if (theUser) {
+      let error = createError(409, "This email is already in use");
+      return res.status(409).json(error);
     } else {
-      user.username = user.username.toLowerCase().trim();
+      user.type = req.body.type || "personal";
+      user.personalData.name.first =
+        user.personalData.name.first.charAt(0).toUpperCase() +
+        user.personalData.name.first.slice(1).toLowerCase().trim();
+      user.personalData.name.last =
+        user.personalData.name.last.charAt(0).toUpperCase() +
+        user.personalData.name.last.slice(1).toLowerCase().trim();
+
+      if (user.password) {
+        user.password = User.hash(user.password);
+      }
+      if (user.username && user.username.length > 0) {
+        let exists = await User.findOne({
+          username: user.username,
+        }).exec();
+        if (exists) {
+          // user.username= mongoose.Types.ObjectId()
+          user.username = user.email
+            .toLowerCase()
+            .trim()
+            .replace(/@/g, "_")
+            .replace(".", "_");
+        } else {
+          user.username = user.username.toLowerCase().trim();
+        }
+      } else {
+        user.username = user.email
+          .toLowerCase()
+          .trim()
+          .replace(/@/g, "_")
+          .replace(".", "_");
+      }
+      try {
+        console.log("saving...", user);
+        const newUser = await user.save();
+        console.log("el item", newUser);
+        res.json(newUser);
+        // user.save((err, item) => {
+        //   if (err) next(err);
+        //   res.send("hola")
+        // });
+      } catch (err) {
+        next(err);
+      }
     }
-  } else {
-    user.username = user.email
-      .toLowerCase()
-      .trim()
-      .replace(/@/g, "_")
-      .replace(".", "_");
-  }
-  try {
-    console.log("saving...", user);
-    const newUser = await user.save();
-    console.log("el item", newUser);
-    res.json(newUser);
-    // user.save((err, item) => {
-    //   if (err) next(err);
-    //   res.send("hola")
-    // });
-  } catch (err) {
-    next(err);
-  }
+  });
 };
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
@@ -439,3 +449,48 @@ export const galleryPhoto = async (req, res, next) => {
     next(err);
   }
 };
+
+export const findByName = async (req, res, next) => {
+  console.log("---FIND USER BY NAME---");
+  let body = {};
+  Object.assign(body, req.query);
+  body.name = decodeURIComponent(body.name);
+  console.log("query", body);
+  let query = {
+    $and: [
+      {
+        $or: [
+          {
+            "businessData.name": {
+              $regex: body.name,
+              $options: "i",
+            },
+          },
+        ],
+      },
+      {
+        type: "bussines",
+      },
+      {
+        isActive: "false",
+      },
+    ],
+  };
+  console.log(query);
+  try {
+    User.find(query, (err, users) => {
+      console.log(users);
+      if (err) {
+        let error = createError(400, "not users found");
+        console.log(error);
+        return res.status(400).json(error);
+      } else {
+        res.status(200).send(users);
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createBusinessAccount = async (req, res, next) => {};

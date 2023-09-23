@@ -20,18 +20,27 @@ const upload = multer({
   limits,
   fileFilter,
 });
-import { create, registerEmail, loginEmail, getById, getUsers, updateOne, activateMany, getUsersByService, deleteById, profilePhoto, galleryPhoto } from "../controllers/user.js";
+import {
+  create,
+  registerEmail,
+  loginEmail,
+  getById,
+  getUsers,
+  updateOne,
+  activateMany,
+  getUsersByService,
+  deleteById,
+  profilePhoto,
+  galleryPhoto,
+  findByName,
+} from "../controllers/user.js";
+
 router.post(
   "/",
   validateParams(
     [
       {
-        param_key: "name",
-        required: true,
-        type: "object",
-      },
-      {
-        param_key: "password",
+        param_key: "email",
         required: true,
         type: "string",
       },
@@ -86,18 +95,18 @@ router.post(
 );
 
 router.get(
-    "/all",
-    // validateParams(
-    //   [
-    //     {
-    //       param_key: "body",
-    //       required: true,
-    //       type: "object",
-    //     },
-    //   ],
-    //   "query"
-    // ),
-    getUsers
+  "/all",
+  // validateParams(
+  //   [
+  //     {
+  //       param_key: "body",
+  //       required: true,
+  //       type: "object",
+  //     },
+  //   ],
+  //   "query"
+  // ),
+  getUsers
 );
 
 router.get(
@@ -116,87 +125,109 @@ router.get(
 );
 
 router.get(
-"/:id",
-validateParams(
+  "/findbyname",
+  validateParams(
     [
-    {
+      {
+        param_key: "name",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "type",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  findByName
+);
+
+router.get(
+  "/:id",
+  validateParams(
+    [
+      {
         param_key: "id",
         required: true,
         type: "string",
-    },
+      },
     ],
     "params"
-),
-getById
+  ),
+  getById
 );
 
 router.put(
-    "/:id",
-    validateParams(
-      [
-        {
-          param_key: "id",
-          required: true,
-          type: "string",
-        },
-      ],
-      "params"
-    ),
-    validateParams(
-      [
-        {
-          param_key: "name",
-          required: false,
-          type: "object",
-        },
-      ],
-      "body"
-    ),
-    updateOne
+  "/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "name",
+        required: false,
+        type: "object",
+      },
+    ],
+    "body"
+  ),
+  updateOne
 );
 
 router.put(
-    "/active/many",
-    validateParams(
-      [
-        {
-          param_key: "users",
-          required: true,
-          type: "array",
-        },
-      ],
-      "body"
-    ),
-    activateMany
+  "/active/many",
+  validateParams(
+    [
+      {
+        param_key: "users",
+        required: true,
+        type: "array",
+      },
+    ],
+    "body"
+  ),
+  activateMany
 );
 router.delete(
   "/:id",
   validateParams(
-      [
+    [
       {
-          param_key: "id",
-          required: true,
-          type: "string",
+        param_key: "id",
+        required: true,
+        type: "string",
       },
-      ],
-      "params"
+    ],
+    "params"
   ),
   deleteById
 );
-// SUBIR ARCHIVOS FOTO DE PERFIL 
+// SUBIR ARCHIVOS FOTO DE PERFIL
 router.post("/profile/photo", upload.single("file"), profilePhoto);
 // SUBIR ARCHIVOS FOTOS DE GALERIA
-router.post("/profile/gallery/:number",
-validateParams(
-  [
-    {
-      param_key: "number",
-      required: true,
-      type: "string",
-    },
-  ],
-  "params"
-),
-upload.single("file"), 
-galleryPhoto);
+router.post(
+  "/profile/gallery/:number",
+  validateParams(
+    [
+      {
+        param_key: "number",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  upload.single("file"),
+  galleryPhoto
+);
 export default router;
