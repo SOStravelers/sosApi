@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import Jimp from "jimp";
+import mongoose from "mongoose";
 import { AwsUploadFile } from "../services/aws_s3.js";
 import fs from "fs";
 import path from "path";
@@ -115,11 +116,6 @@ export const registerEmail = async (req, res, next) => {
           refresh_token: refreshTokenGen(userRefresh, refreshTime),
           user: newUser,
         });
-
-        // user.save((err, item) => {
-        //   if (err) next(err);
-        //   res.send("hola")
-        // });
       } catch (err) {
         next(err);
       }
@@ -168,7 +164,7 @@ export const loginEmail = async (req, res, next) => {
       });
     });
 };
-//Crear usuario
+//Crear usuario/workers/business
 export const create = async (req, res, next) => {
   console.log("---CREATE NEW USER-WORKER-BUSINESS---");
   let user = new User(req.body);
@@ -250,41 +246,29 @@ export const getUsers = async (req, res, next) => {
     next(err);
   }
 };
-//Obtener usuarios con paginate por tipos y activados
-export const getUsersByService = async (req, res, next) => {
-  console.log("---GET USERS BY SERVICE---");
+//Obtener usuarios business con paginate por servicios
+export const getBusinesByService = async (req, res, next) => {
+  console.log("---GET BUSINESS BY SERVICE---", req.query);
   let body = {};
+  const serviceObjectId = mongoose.Types.ObjectId(body.id);
   Object.assign(body, req.query);
-  console.log("query", body);
-  const populate = [
-    {
-      path: "personalData.service",
-      // select: "isActive name  email phone creator user imgUrl emails type",
-    },
-  ];
-  let options = {
-    populate,
-    // select,
-    page: body.page || 1,
-    limit: body.limit || 50,
-    sort: { updatedAt: -1 },
-  };
-  let query = {
-    personalData: {
-      service: "",
-    },
-  };
-  body.type ? (query.type = body.type) : "";
-  body.isActive ? (query.isActive = body.isActive) : "";
-  body.service ? (query.personalData.service = body.service) : "";
-  console.log("la query", query);
   try {
-    User.paginate(query, options, (err, items) => {
-      if (err) return next(err);
-      res.send(items);
-    });
-  } catch (err) {
-    next(err);
+    const options = {
+      page: body.page || 1,
+      limit: body.limit || 10,
+    };
+
+    const query = {
+      "businessData.services": { $in: [body.id] }, // Filtra por la ID del servicio en el array
+      isActive: true, // Condición isActive=true
+      type: "business", // Condición type="business"
+    };
+    console.log("query", query);
+    const result = await User.paginate(query, options);
+    res.send(result);
+  } catch (error) {
+    console.error("Error al buscar usuarios:", error);
+    next(error);
   }
 };
 //Obtener usuario por ID
@@ -304,7 +288,7 @@ export const getById = async (req, res, next) => {
     }
   });
 };
-//Borrar usuario
+//update usuario
 export const updateOne = (req, res, next) => {
   console.log("---UPDATE USER---");
   let data = req.body;
@@ -353,6 +337,7 @@ export const activateMany = (req, res, next) => {
   });
   // res.send("buena")
 };
+//crear o cambiar foto de perfil worker
 export const profilePhoto = async (req, res, next) => {
   try {
     console.log("---UPLOAD PROFILE FOTO---");
@@ -399,6 +384,7 @@ export const profilePhoto = async (req, res, next) => {
     next(err);
   }
 };
+//crear o cambiar fotos de galeria worker
 export const galleryPhoto = async (req, res, next) => {
   try {
     console.log("---UPLOAD GALLERY FOTO---");
@@ -492,5 +478,3 @@ export const findByName = async (req, res, next) => {
     next(err);
   }
 };
-
-export const createBusinessAccount = async (req, res, next) => {};

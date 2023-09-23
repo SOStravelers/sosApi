@@ -28,13 +28,14 @@ import {
   getUsers,
   updateOne,
   activateMany,
-  getUsersByService,
   deleteById,
   profilePhoto,
   galleryPhoto,
   findByName,
+  getBusinesByService,
 } from "../controllers/user.js";
 
+//Create user/worker/business
 router.post(
   "/",
   validateParams(
@@ -44,12 +45,17 @@ router.post(
         required: true,
         type: "string",
       },
+      {
+        param_key: "password",
+        required: true,
+        type: "string",
+      },
     ],
     "body"
   ),
   create
 );
-
+//register user
 router.post(
   "/register",
   validateParams(
@@ -74,6 +80,7 @@ router.post(
   ),
   registerEmail
 );
+//login user by email
 router.post(
   "/loginEmail",
   validateParams(
@@ -93,35 +100,40 @@ router.post(
   ),
   loginEmail
 );
-
+//get users by type and isActive
 router.get(
   "/all",
-  // validateParams(
-  //   [
-  //     {
-  //       param_key: "body",
-  //       required: true,
-  //       type: "object",
-  //     },
-  //   ],
-  //   "query"
-  // ),
-  getUsers
-);
-
-router.get(
-  "/findService/:bodyParams",
   validateParams(
     [
       {
-        param_key: "bodyParams",
+        param_key: "type",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "body",
+        required: true,
+        type: "object",
+      },
+    ],
+    "query"
+  ),
+  getUsers
+);
+//get business account by service
+router.get(
+  "/businessbyservice",
+  validateParams(
+    [
+      {
+        param_key: "id",
         required: true,
         type: "string",
       },
     ],
     "query"
   ),
-  getUsersByService
+  getBusinesByService
 );
 
 router.get(
