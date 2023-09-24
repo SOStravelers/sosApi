@@ -258,7 +258,8 @@ export const getBusinesByService = async (req, res, next) => {
     };
 
     const query = {
-      "businessData.services": { $in: [body.id] }, // Filtra por la ID del servicio en el array
+      "businessData.services.service": body.id, // Filtra por la ID del servicio en el array
+      "businessData.services.isActive": true, // Filtra por la ID del servicio en el array
       isActive: true, // Condición isActive=true
       type: "business", // Condición type="business"
     };
@@ -298,6 +299,12 @@ export const findbusinessbyname = async (req, res, next) => {
       },
       {
         isActive: "true",
+      },
+      {
+        "businessData.services.isActive": true,
+      },
+      {
+        "businessData.services.id": body.service,
       },
     ],
   };

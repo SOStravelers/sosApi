@@ -1,119 +1,182 @@
-
 import Schedule from "../models/schedule.js";
+import Service from "../models/service.js";
+import Subservice from "../models/subservice.js";
 import mongoose from "mongoose";
-import { notFoundError, createError, missingData, duplicateData } from "../config/error.js";
-import { time30Min, time45Min, time1Hour, time1Hour30, time2Hour } from "../lib/time.js";
+import {
+  notFoundError,
+  createError,
+  missingData,
+  duplicateData,
+} from "../config/error.js";
+import {
+  time30Min,
+  time45Min,
+  time1Hour,
+  time1Hour30,
+  time2Hour,
+} from "../lib/time.js";
 
+//--------------------FUNCIONES EXTERNAS--------------------
+// Función para convertir una hora en minutos
 
+function convertirHoraAMinutos(hora) {
+  const [hh, mm] = hora.split(":");
+  const amPm = hora.slice(-2);
+  const hhInt = parseInt(hh, 10);
+  const mmInt = parseInt(mm, 10);
+
+  if (!isNaN(hhInt) && !isNaN(mmInt)) {
+    if (amPm === "PM") {
+      if (hhInt === 12) {
+        return 720; // Convertir "12:00 PM" a 720 minutos
+      } else {
+        return (hhInt + 12) * 60 + mmInt;
+      }
+    } else if (amPm === "AM") {
+      if (hhInt === 12) {
+        return mmInt; // Convertir "12:00 AM" a 0 minutos
+      } else {
+        return hhInt * 60 + mmInt;
+      }
+    }
+  }
+
+  return NaN; // Devolver NaN si la entrada no es válida
+}
+// Función para formatear minutos como HH:MM AM/PM
+function formatearMinutosAHora(minutos) {
+  const hh = Math.floor(minutos / 60) % 12 || 12;
+  const mm = minutos % 60;
+  const amPm = minutos < 720 ? "AM" : "PM";
+  return `${hh.toString().padStart(2, "0")}:${mm
+    .toString()
+    .padStart(2, "0")} ${amPm}`;
+}
+//--------------------FUNCIONES DE RUTAS--------------------
 //Crear horario
 export const create = async (req, res, next) => {
-  console.log("---CREATE NEW SCHEDULE---")
+  console.log("---CREATE NEW SCHEDULE---");
   let schedule = new Schedule(req.body);
-  schedule.times.monday=req.body.monday
-  schedule.times.tuesday=req.body.tuesday
-  schedule.times.wednesday=req.body.wednesday
-  schedule.times.thursday=req.body.thursday
-  schedule.times.friday=req.body.friday
-  schedule.times.saturday=req.body.saturday
-  schedule.times.sunday=req.body.sunday
-  try{ 
-    console.log("saving...", schedule)
-    const newSchedule= await schedule.save()
-    console.log("nuevo horario", newSchedule)
-    res.json(newSchedule)
-  }
-  catch(err){
+  try {
+    console.log("saving...", schedule);
+    const newSchedule = await schedule.save();
+    console.log("nuevo horario", newSchedule);
+    res.json(newSchedule);
+  } catch (err) {
     //console.log("El error: ",err.errors.hotel.properties.message)
-    next(err)
+    next(err);
   }
 };
-//Obtener horarios por hotel y si estan activos 
-export const getSchedules= async (req, res, next) => {
-    console.log('---GET SCHEDULES---')
-    let body={}
-    Object.assign(body, req.query);
-    console.log("query", body)
-    const populate = [
-        {
-          path: "hotel",
-        //   select: "isActive name  email phone creator user imgUrl emails type",
-        }
-      ];
-    let options = {
-      populate,
-      // select,
-      page:body.page||1,
-      limit:body.limit||50,
-      sort:{ updatedAt: -1 },
+//Obtener horarios por hotel y si estan activos
+export const scheduleBusinessbyService = async (req, res, next) => {
+  console.log("---GET SCHEDULES BUSINESS BY SERVICE---");
+  let body = {};
+  Object.assign(body, req.query);
+  console.log("query", body);
+  let horario = await Schedule.findOne({
+    creator: body.id,
+    service: body.service,
+    isActive: true,
+  });
+  let subService = await Subservice.findOne({
+    _id: body.subService,
+    isActive: true,
+  });
+  console.log("duracion servicio", subService.duration);
+  // Obtén la fecha y hora actual en GMT-3 (hora de Brasilia, Brasil)
+  var fechaActualBrasil = new Date().toLocaleString("en-US", {
+    timeZone: "America/Sao_Paulo",
+  });
+  // Convierte la fecha y hora actual en una fecha de JavaScript
+  var fechaHoraBrasil = new Date(fechaActualBrasil);
+  console.log("BRASIL", fechaHoraBrasil);
+  // Obtén solo la fecha (elimina la hora y los minutos) en GMT-3
+  // Comparar las dos fechas
+  let fechaActual = fechaHoraBrasil;
+  let horas = [];
+  for (var i = 1; i <= 14; i++) {
+    let date = fechaActual;
+    let day = fechaActual.getDay();
+    //console.log("EL DIA", day, date);
+    var scheduleNew = [];
+    for (let intervalo of horario.schedules[day].intervals) {
+      // console.log("inicio", intervalo.startTime, intervalo.endTime);
+      const startTimeMinutes = convertirHoraAMinutos(intervalo.startTime);
+      const endTimeMinutes = convertirHoraAMinutos(intervalo.endTime);
+      // console.log("min", startTimeMinutes, endTimeMinutes);
+      let currentTimeMinutes = startTimeMinutes;
+      const incrementoMinutos = 60; // Cambia esto para definir el incremento deseado
+
+      // Imprimir valores desde startTime hasta endTime con incremento personalizado
+      while (currentTimeMinutes < endTimeMinutes) {
+        const currentTime = formatearMinutosAHora(currentTimeMinutes);
+        //console.log(currentTime);
+        scheduleNew.push(currentTime);
+
+        // Agregar el incremento deseado a los minutos
+        currentTimeMinutes += incrementoMinutos;
+      }
     }
-    let query={}
-    body.isActive?query.isActive=body.isActive:""
-    body.hotel?query.hotel=body.hotel:""
-    try{
-      Schedule.paginate(
-        query,
-        options,
-        (err, items) => {
-          if (err) return next(err);
-          res.send(items);
-        }
-      );
-    }
-    catch (err) {
-      next(err);
-    }
+    let fecha = date.toISOString().split("T")[0];
+    let enviar = {
+      day: day,
+      horas: fecha,
+      intervals: scheduleNew,
+    };
+    console.log(enviar);
+    horas.push(enviar);
+    fechaActual.setDate(fechaActual.getDate() + 1);
+    console.log("nueva fecha", fechaActual);
+  }
+
+  res.send({ horas });
 };
 //Obtener usuario por ID
-export const getById= async (req, res, next) => {
-console.log('---GET SCHEDULE BY ID---')
-Schedule.findOne({ _id: req.params.id })
-    .exec((err, schedule) => {
-      if (err) next(err);
-        schedule.populate(
-            [
-                {
-                    path: "hotel",
-                //   select: "isActive name  email phone creator user imgUrl emails type",
-                }
-            ]
-        )
-        if (err) return next(err);
-        if (schedule) {
-        res.send(schedule)
-        } else {
-        return next(createError(404, req.lg.user.notFound));
-        }
-    });
+export const getById = async (req, res, next) => {
+  console.log("---GET SCHEDULE BY ID---");
+  Schedule.findOne({ _id: req.params.id }).exec((err, schedule) => {
+    if (err) next(err);
+    schedule.populate([
+      {
+        path: "hotel",
+        //   select: "isActive name  email phone creator user imgUrl emails type",
+      },
+    ]);
+    if (err) return next(err);
+    if (schedule) {
+      res.send(schedule);
+    } else {
+      return next(createError(404, req.lg.user.notFound));
+    }
+  });
 };
 //Actualizar data de un usuario
 export const updateOne = (req, res, next) => {
-    console.log('---UPDATE SCHEDULE---')
-    let data = req.body;
-    Schedule.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      data,
-      {
-        new: true,
-      }
-    )
-      .exec((err, schedule) => {
-        if (err) return next(err);
-        res.send(schedule);
-      });
-}
+  console.log("---UPDATE SCHEDULE---");
+  let data = req.body;
+  Schedule.findOneAndUpdate(
+    {
+      _id: req.params.id,
+    },
+    data,
+    {
+      new: true,
+    }
+  ).exec((err, schedule) => {
+    if (err) return next(err);
+    res.send(schedule);
+  });
+};
 //Activar o desactivar multiples usuarios
 export const activateMany = (req, res, next) => {
-    console.log("---ACTIVATE MANY SCHEDULE---")
-    console.log(req.body)
-    Schedule.updateMany(
-      { _id: { $in: req.body.schedules } },
-      { isActive: req.body.isActive?req.body.isActive:true }
-    )
-    .exec((err, data) => {
-      if (err) next(err);
-      res.send(data);
-    });
-    // res.send("buena")
+  console.log("---ACTIVATE MANY SCHEDULE---");
+  console.log(req.body);
+  Schedule.updateMany(
+    { _id: { $in: req.body.schedules } },
+    { isActive: req.body.isActive ? req.body.isActive : true }
+  ).exec((err, data) => {
+    if (err) next(err);
+    res.send(data);
+  });
+  // res.send("buena")
 };

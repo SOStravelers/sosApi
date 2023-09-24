@@ -160,12 +160,17 @@ router.get(
         required: false,
         type: "string",
       },
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
     ],
     "query"
   ),
   findbusinessbyname
 );
-
+//Obtener un usuario por id
 router.get(
   "/:id",
   validateParams(
@@ -180,7 +185,7 @@ router.get(
   ),
   getById
 );
-
+//Actualizar un usuario por id
 router.put(
   "/:id",
   validateParams(
@@ -205,7 +210,7 @@ router.put(
   ),
   updateOne
 );
-
+//Activar varios usuarios
 router.put(
   "/active/many",
   validateParams(
@@ -220,6 +225,7 @@ router.put(
   ),
   activateMany
 );
+//Eliminar un usuario por id
 router.delete(
   "/:id",
   validateParams(

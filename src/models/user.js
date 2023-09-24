@@ -73,10 +73,7 @@ const userSchema = new Schema(
       },
       services: [
         {
-          id: {
-            type: String,
-            ref: "Service",
-          },
+          id: { type: String, ref: "Service" },
           subServices: Array({
             type: String,
             ref: "SubServices",
@@ -106,10 +103,13 @@ const userSchema = new Schema(
           },
         },
       },
-      services: Array({
-        type: String,
-        ref: "services",
-      }),
+      services: [
+        {
+          service: { type: String, ref: "Service" },
+          isActive: { type: Boolean, default: true },
+          schedule: { type: String, ref: "Schedule" },
+        },
+      ],
     },
     paymentData: {},
     currency: { type: String, ref: "Currency" },
