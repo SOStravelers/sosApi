@@ -16,24 +16,24 @@ const decodeFunc = (token) => {
 const encodeFunc = (toSing, expiresIn) => {
   return jwt.sign(toSing, envar().SECRET, { expiresIn });
 };
-const accessToken = (user, tokenFresh = false,time) => {
-  console.log("llego aqui")
-  let tiempo = time?time:"1d"
-  return encodeFunc({ ...user, tokenFresh },tiempo);
+const accessToken = (user, tokenFresh = false, time) => {
+  console.log("llego aqui");
+  let tiempo = time ? time : "3d";
+  return encodeFunc({ ...user, tokenFresh }, tiempo);
 };
 const tokenEmailFunction = (user, tokenFresh = false) => {
   return encodeFunc({ ...user, tokenFresh }, "15min");
-}; 
+};
 
 // export the functions to decoded, encoded and generate accessToken
 export const decode = decodeFunc;
 export const encode = encodeFunc;
 export const accessTokenGen = accessToken;
-export const tokenEmail=tokenEmailFunction;
+export const tokenEmail = tokenEmailFunction;
 
 // export the functions to generate refresh_token and get access with the refresh_token
-export const refreshTokenGen = (user,time) => {
-  let tiempo = time?time:"30d"
+export const refreshTokenGen = (user, time) => {
+  let tiempo = time ? time : "30d";
   return encodeFunc(user, tiempo);
 };
 export const getTokenByRefresh = (refresh) => {
@@ -64,9 +64,7 @@ export const isAuthOptional = async (req, res, next) => {
       decoded = decodeFunc(req.access_token);
 
       let authUser = await User.findOne({ _id: decoded._id })
-        .select(
-          "isActive name username emails imgUrl "
-        )
+        .select("isActive name username emails imgUrl ")
         // .populate("scope.id", "name id _id")
         .exec();
 
@@ -88,50 +86,47 @@ export const isAuthOptional = async (req, res, next) => {
     next();
   }
 };
-export const renewToken = async (req,res,next)=>{
-  console.log("renew tokens",req.body)
+export const renewToken = async (req, res, next) => {
+  console.log("renew tokens", req.body);
   req.access_token = req.headers.authorization;
-  const accessTime = req.body.accessTime?req.body.accessTime:"1d"
-  const refreshTime = req.body.refreshTime?req.body.refreshTime:"30d"
+  const accessTime = req.body.accessTime ? req.body.accessTime : "1d";
+  const refreshTime = req.body.refreshTime ? req.body.refreshTime : "30d";
   if (typeof req.access_token !== "undefined" && req.access_token !== "") {
     let decoded = decodeFunc(req.access_token);
     let authUser;
-    console.log(decoded)
-    if(!decoded.tokenFresh){
+    console.log(decoded);
+    if (!decoded.tokenFresh) {
       try {
-        console.log('perro',decoded)
+        console.log("perro", decoded);
         authUser = await User.findOne({ _id: decoded._id })
           .select("username _id")
           .exec();
-        console.log('authUser',authUser)
+        console.log("authUser", authUser);
         authUser.id = authUser._id.toString();
-        
-        let userRefresh ={
+
+        let userRefresh = {
           _id: authUser._id,
-        }
-        console.log("refresh", userRefresh)
+        };
+        console.log("refresh", userRefresh);
         res.json({
-          access_token: accessTokenGen(authUser, true,accessTime),
+          access_token: accessTokenGen(authUser, true, accessTime),
           refresh_token: refreshTokenGen(userRefresh, refreshTime),
-        })
-      } 
-      catch (err) {
+        });
+      } catch (err) {
         let isTokenError = decoded.name === "TokenExpiredError" ? true : false;
         if (isTokenError) {
-          let error = createError(401,"The token has expired.");
+          let error = createError(401, "The token has expired.");
           return res.status(401).json(error);
         } else {
-          let error = createError(401,"Not authorized.");
+          let error = createError(401, "Not authorized.");
           return res.status(401).json(error);
         }
       }
-    }
-    else{
+    } else {
       res.status(401).send({
         msg: "token not valid",
       });
     }
-    
   } else if (req.method === "OPTIONS" || req.query.outside) {
     console.log(req.query);
     next();
@@ -140,15 +135,15 @@ export const renewToken = async (req,res,next)=>{
       msg: "Not authorized, client must send an access token.",
     });
   }
-}
+};
 export const isAuth = async (req, res, next) => {
-  console.log("validate auth")
+  console.log("validate auth");
   req.access_token = req.headers.authorization;
   if (typeof req.access_token !== "undefined" && req.access_token !== "") {
     let decoded = decodeFunc(req.access_token);
     let authUser;
     try {
-      console.log(decoded)
+      console.log(decoded);
       authUser = await User.findOne({ _id: decoded._id })
         .select("isActive isActive name username email imgUrl")
         // .populate([
@@ -168,10 +163,10 @@ export const isAuth = async (req, res, next) => {
       let isTokenError = decoded.name === "TokenExpiredError" ? true : false;
 
       if (isTokenError) {
-        let error = createError(401,"The token has expired.");
+        let error = createError(401, "The token has expired.");
         return res.status(401).json(error);
       } else {
-        let error = createError(401,"Not authorized.");
+        let error = createError(401, "Not authorized.");
         return res.status(401).json(error);
       }
     }
@@ -186,32 +181,31 @@ export const isAuth = async (req, res, next) => {
   }
 };
 export const isAdmin = async (req, res, next) => {
-  console.log("validate admin")
+  console.log("validate admin");
   req.access_token = req.headers.authorization;
   if (typeof req.access_token !== "undefined" && req.access_token !== "") {
     let decoded = decodeFunc(req.access_token);
     let authUser;
     try {
-      console.log("vamos bien")
-      console.log(decoded)
+      console.log("vamos bien");
+      console.log(decoded);
       authUser = await User.findOne({ _id: decoded._id })
         .select("isAdminUser _id isActive name username ")
         .exec();
-      console.log(authUser)
-      if(authUser._id && authUser.isAdminUser){
+      console.log(authUser);
+      if (authUser._id && authUser.isAdminUser) {
         next();
-      }
-      else{
-        let error = createError(401,"Dont have access");
+      } else {
+        let error = createError(401, "Dont have access");
         return res.status(401).json(error);
       }
     } catch (err) {
       let isTokenError = decoded.name === "TokenExpiredError" ? true : false;
       if (isTokenError) {
-        let error = createError(401,"The token has expired.");
+        let error = createError(401, "The token has expired.");
         return res.status(401).json(error);
       } else {
-        let error = createError(401,"Not authorized.");
+        let error = createError(401, "Not authorized.");
         return res.status(401).json(error);
       }
     }

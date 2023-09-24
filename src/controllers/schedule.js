@@ -90,8 +90,6 @@ export const scheduleBusinessbyService = async (req, res, next) => {
   // Convierte la fecha y hora actual en una fecha de JavaScript
   var fechaHoraBrasil = new Date(fechaActualBrasil);
   console.log("BRASIL", fechaHoraBrasil);
-  // Obtén solo la fecha (elimina la hora y los minutos) en GMT-3
-  // Comparar las dos fechas
   let fechaActual = fechaHoraBrasil;
   let horas = [];
   for (var i = 1; i <= 14; i++) {
@@ -107,13 +105,13 @@ export const scheduleBusinessbyService = async (req, res, next) => {
       let currentTimeMinutes = startTimeMinutes;
       const incrementoMinutos = 60; // Cambia esto para definir el incremento deseado
 
-      // Imprimir valores desde startTime hasta endTime con incremento personalizado
       while (currentTimeMinutes < endTimeMinutes) {
         const currentTime = formatearMinutosAHora(currentTimeMinutes);
+
+        //-----Aqui vendria parte de ver si existen bookings en ese horario
         //console.log(currentTime);
         scheduleNew.push(currentTime);
 
-        // Agregar el incremento deseado a los minutos
         currentTimeMinutes += incrementoMinutos;
       }
     }
@@ -123,10 +121,8 @@ export const scheduleBusinessbyService = async (req, res, next) => {
       horas: fecha,
       intervals: scheduleNew,
     };
-    console.log(enviar);
     horas.push(enviar);
     fechaActual.setDate(fechaActual.getDate() + 1);
-    console.log("nueva fecha", fechaActual);
   }
 
   res.send({ horas });
