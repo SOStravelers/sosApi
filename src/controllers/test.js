@@ -1,10 +1,27 @@
+import {
+  testEmailAWS,
+  sendTemplate,
+  createTemplate,
+  deleteTemplate,
+  updateTemplate,
+  createTemplateFile,
+  sendEmailPaymentConfirmation,
+} from "../services/aws_ses_test.js";
 
-import {testEmailAWS,sendTemplate,createTemplate, deleteTemplate, updateTemplate, createTemplateFile} from '../services/aws_ses_test.js'
-export const sendTestEmail = async (req, res, next) => {
-    console.log("--EMAIL TEST AWS--");
-    testEmailAWS();
-    res.send("email sent");
+export const sendEmailConfirmation = async (req, res, _) => {
+  const data = req.body;
+  sendEmailPaymentConfirmation(data);
+  const response = {
+    message: "Email confirmation send",
   };
+  res.send(response);
+};
+
+export const sendTestEmail = async (req, res, next) => {
+  console.log("--EMAIL TEST AWS--");
+  testEmailAWS();
+  res.send("email sent");
+};
 
 export const createTestTemplate = async (req, res, next) => {
   console.log("--NEW TEMPLATE AWS--");
