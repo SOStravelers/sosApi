@@ -63,6 +63,24 @@ const templateParams = {
       "Este es un correo de prueba actuzalizado usando un template de AWS SES. Tu edad es {{age}}.", // Cuerpo del correo en texto plano con una variable {{age}}
   },
 };
+export const testEmailAWS = async (file) => {
+  console.log("entrando1");
+  // Create an object and upload it to the Amazon S3 bucket.
+  try {
+    // Crear el comando para enviar el correo electrónico
+    const command = new SendEmailCommand(params);
+    // Ejecutar el comando usando el cliente de SES
+    SES.send(command, (err, data) => {
+      if (err) {
+        console.error(err); // Mostrar el error si ocurre
+      } else {
+        console.log(data); // Mostrar la respuesta de AWS si tiene éxito
+      }
+    });
+  } catch (err) {
+    console.log("Error", err);
+  }
+};
 // Crear el comando para crear el template
 export const createTemplate = async (file) => {
   console.log("entrando2", templateParams);
@@ -173,6 +191,40 @@ export const deleteTemplate = async (file) => {
 
     // Ejecutar el comando usando el cliente de SES
     SES.send(deleteCommand, (err, data) => {
+      if (err) {
+        console.error(err); // Mostrar el error si ocurre
+      } else {
+        console.log(data); // Mostrar la respuesta de AWS si tiene éxito
+      }
+    });
+  } catch (err) {
+    console.log("Error", err);
+  }
+};
+
+export const sendEmailPaymentConfirmation = async (data) => {
+  const params = {
+    Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS
+    Destination: {
+      ToAddresses: [data.email], // Lista de destinatarios
+      // CcAddresses: [envar().SES_EMAIL_AUTH], // Lista de copias
+      //BccAddresses: ["copiaoculta@example.com"], // Lista de copias ocultas
+    },
+    Message: {
+      Subject: {
+        Data: "¡Gracias por tu compra!",
+      },
+      Body: {
+        Text: {
+          Data: `Usuario: ${data.name}\nServicie: ${data.service}\nSubservice: ${data.subService}\nWorker: ${data.worker}\nDate: ${data.date}\nHour: ${data.hour}\n`,
+        },
+      },
+    },
+  };
+
+  try {
+    const command = new SendEmailCommand(params);
+    SES.send(command, (err, data) => {
       if (err) {
         console.error(err); // Mostrar el error si ocurre
       } else {
