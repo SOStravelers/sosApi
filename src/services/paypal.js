@@ -96,16 +96,6 @@ export const captureOrder = async (data) => {
         // "PayPal-Mock-Response": '{"mock_application_codes": "INTERNAL_SERVER_ERROR"}'
       },
     });
-    sendEmailPaymentConfirmation({
-      name: "Alberto Sanchez Martinez",
-      email: "albersanmar4@gmail.com",
-      service: "Haircut",
-      subService: "Mal Beard Cut",
-      hostel: "El Misti Hostel",
-      worker: "Nicle Rodriguez",
-      date: "2023-09-25",
-      hour: "16:00",
-    });
     return response; // Si esperas recibir datos JSON como respuesta
   } catch (error) {
     // Manejar errores aquí

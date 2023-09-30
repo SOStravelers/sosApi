@@ -1,12 +1,18 @@
 //import { sendMailTest } from "../lib/mailer.js";
 import { notFoundError, createError, missingData } from "../config/error.js";
 import Booking from "../models/booking.js";
+import { sendEmailPaymentConfirmation } from "../services/aws_ses_test.js";
 
 //Crear booking
 export const create = async (req, res, next) => {
   console.log("---CREATE NEW BOOKING---");
 
-  let booking = new Booking(req.body);
+  const emailData = req.body.emailData;
+
+  const bookingData = req.body;
+  bookingData.emailData = null;
+
+  let booking = new Booking(bookingData);
   console.log("booking", booking);
   let query = {
     $and: [
@@ -34,6 +40,9 @@ export const create = async (req, res, next) => {
     console.log("no existe");
     try {
       const newBooking = await booking.save();
+
+      if (emailData) sendEmailPaymentConfirmation(emailData);
+
       console.log("nueva reserva", newBooking);
       res.send({ booking: newBooking, msg: "new Document" });
     } catch (err) {
