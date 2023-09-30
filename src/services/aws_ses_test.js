@@ -33,7 +33,6 @@ const params = {
     },
   },
 };
-//NO UTILIZAR
 
 // Definir los parámetros del template prueba
 const templateParams = {
