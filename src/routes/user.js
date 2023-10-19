@@ -33,6 +33,7 @@ import {
   galleryPhoto,
   getBusinesByService,
   findbusinessbyname,
+  loginGoogle,
 } from "../controllers/user.js";
 
 //Create user/worker/business
@@ -99,6 +100,31 @@ router.post(
     "body"
   ),
   loginEmail
+);
+//login user by email
+router.post(
+  "/loginGoogle",
+  validateParams(
+    [
+      {
+        param_key: "name",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "email",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "image",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  loginGoogle
 );
 //get users by type and isActive
 router.get(

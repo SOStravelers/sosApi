@@ -15,7 +15,7 @@ const userSchema = new Schema(
       select: false,
       trim: true,
       minlength: 6,
-      required: [true, "Password requiere"],
+      // required: [true, "Password requiere"],
     },
     username: { type: String, unique: true },
     email: { type: String, unique: true },
@@ -38,6 +38,10 @@ const userSchema = new Schema(
     lastLogin: {
       type: Date,
       default: new Date(),
+    },
+    lastLoginType: {
+      type: String,
+      enum: ["email", "google", "other"],
     },
     about: { type: String, default: "" },
     language: {

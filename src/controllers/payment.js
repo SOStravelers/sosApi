@@ -22,6 +22,7 @@ export const stripeCreatePaymentIntent = async (req, res, next) => {
   console.log("--CREATE PAYMENT INTENT--");
   const data = req.body;
   const paymentIntent = await createPaymentIntent(data);
+  console.log(paymentIntent);
   const response = {
     paymentIntent: { client_secret: paymentIntent.client_secret },
   };

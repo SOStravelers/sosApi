@@ -1,9 +1,17 @@
 import User from "../models/user.js";
 import Jimp from "jimp";
 import mongoose from "mongoose";
+
 import { AwsUploadFile } from "../services/aws_s3.js";
 import fs from "fs";
 import path from "path";
+
+import axios from "axios";
+import sharp from "sharp";
+import { promisify } from "util";
+import stream from "stream";
+const pipeline = promisify(stream.pipeline);
+
 import { notFoundError, createError, missingData } from "../config/error.js";
 import {
   getTokenByRefresh,
@@ -13,6 +21,24 @@ import {
   decode,
 } from "../config/auth.js";
 import staticDir from "../config/staticPath.js";
+
+async function downloadAndConvertToBuffer(url) {
+  try {
+    // Descargar la imagen desde la URL
+    const response = await axios.get(url, {
+      responseType: "arraybuffer",
+    });
+    // Crear un array de buffers a partir del Uint8Array
+    const buffers = [Buffer.from(response.data.buffer)];
+
+    // Utilizar Buffer.concat con el array de buffers
+    const imageBuffer = Buffer.concat(buffers);
+
+    return imageBuffer;
+  } catch (error) {
+    console.error("Error al descargar y convertir la imagen:", error);
+  }
+}
 
 // TESTING IMAGENES//
 const imagePath = path.join(staticDir, "img", "casa.jpeg");
@@ -203,6 +229,7 @@ export const loginEmail = async (req, res, next) => {
         return res.status(404).json(error);
       }
       user.lastLogin = Date.now();
+      user.lastLoginType = "email";
       user.save(async (err, user) => {
         if (err) next(err);
         delete user.password;
@@ -221,6 +248,103 @@ export const loginEmail = async (req, res, next) => {
       });
     });
 };
+
+export const loginGoogle = async (req, res, next) => {
+  console.log(
+    "============= LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN   ============="
+  );
+  let { email, name, image } = req.body;
+  email = email.toLowerCase().trim();
+  try {
+    User.findOne({ email }).exec(async (err, user) => {
+      if (err) return next(err);
+      let newValue = false;
+      if (!user) {
+        console.log("nuevo");
+        newValue = true;
+        user = new User();
+        user.email = email;
+        var partes = name.split(" ");
+        var names = [partes[0], partes.slice(1).join(" ")];
+        user.personalData.name.first = names[0];
+        user.personalData.name.last = names[1];
+        !user.type ? (user.type = "personal") : "";
+        user.username = user.email
+          .toLowerCase()
+          .trim()
+          .replace(/@/g, "_")
+          .replace(".", "_");
+      }
+      !user.img.imgUrl ? (user.img.imgUrl = image) : "";
+      user.lastLogin = Date.now();
+      user.lastLoginType = "google";
+      user.isActive = true;
+      user.isValidate = true;
+      if (newValue) {
+        console.log("new");
+        try {
+          const newUser = await user.save();
+          console.log("Usuario:", user);
+
+          let userToCreateToken = {
+            _id: newUser._id,
+            username: newUser.username,
+          };
+
+          let userRefresh = {
+            _id: newUser._id,
+          };
+
+          res.json({
+            access_token: accessTokenGen(userToCreateToken, true),
+            refresh_token: refreshTokenGen(userRefresh),
+            user: newUser,
+          });
+        } catch (error) {
+          if (error.code === 11000) {
+            // Manejar el error de documento duplicado
+            res.status(409).json({ error: "El usuario ya existe." });
+          } else {
+            // Manejar otros errores
+            next(error);
+          }
+        }
+      } else {
+        let buffer = await downloadAndConvertToBuffer(user.img.imgUrl);
+        console.log("buffer", buffer);
+        let resp = await AwsUploadFile({
+          fileName: `users/${user._id}/profile/${user._id}.png`,
+          buffer: buffer,
+        });
+        if (resp.results.$metadata.httpStatusCode == 200) {
+          user.img.imgUrl = resp.url;
+          let newUser = await User.findByIdAndUpdate(user._id, user, {
+            new: true,
+          }).exec();
+          console.log("respuesta", newUser);
+          delete newUser.password;
+          // USER (TO CREATE TOKEN)
+          let userToCreateToken = {
+            _id: newUser._id,
+            username: newUser.username,
+          };
+          res.status(200).json({
+            msg: "login success",
+            access_token: accessTokenGen(userToCreateToken, true),
+            refresh_token: refreshTokenGen(userToCreateToken),
+            user: newUser,
+          });
+        } else {
+          let error = createError(400, "Create error");
+          return res.status(400).json(error);
+        }
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
   console.log("---GET USERS---");
