@@ -316,28 +316,26 @@ export const loginGoogle = async (req, res, next) => {
           fileName: `users/${user._id}/profile/${user._id}.png`,
           buffer: buffer,
         });
-        if (resp.results.$metadata.httpStatusCode == 200) {
+        if (resp && resp.results.$metadata.httpStatusCode == 200) {
           user.img.imgUrl = resp.url;
-          let newUser = await User.findByIdAndUpdate(user._id, user, {
-            new: true,
-          }).exec();
-          console.log("respuesta", newUser);
-          delete newUser.password;
-          // USER (TO CREATE TOKEN)
-          let userToCreateToken = {
-            _id: newUser._id,
-            username: newUser.username,
-          };
-          res.status(200).json({
-            msg: "login success",
-            access_token: accessTokenGen(userToCreateToken, true),
-            refresh_token: refreshTokenGen(userToCreateToken),
-            user: newUser,
-          });
-        } else {
-          let error = createError(400, "Create error");
-          return res.status(400).json(error);
         }
+
+        let newUser = await User.findByIdAndUpdate(user._id, user, {
+          new: true,
+        }).exec();
+        console.log("respuesta", newUser);
+        delete newUser.password;
+        // USER (TO CREATE TOKEN)
+        let userToCreateToken = {
+          _id: newUser._id,
+          username: newUser.username,
+        };
+        res.status(200).json({
+          msg: "login success",
+          access_token: accessTokenGen(userToCreateToken, true),
+          refresh_token: refreshTokenGen(userToCreateToken),
+          user: newUser,
+        });
       }
     });
   } catch (err) {
