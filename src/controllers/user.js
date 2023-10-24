@@ -557,7 +557,7 @@ export const profilePhoto = async (req, res, next) => {
         let name = file.originalname.slice(0, lastIndex);
         let ext = file.originalname.slice(lastIndex + 1);
         let resp = await AwsUploadFile({
-          fileName: `users/${req.user._id}/profile/${"req.user._id"}.${ext}`,
+          fileName: `users/${req.user._id}/profile/${req.user._id}.${ext}`,
           buffer: imagenReducida,
         });
         console.log("respuesta", resp);
