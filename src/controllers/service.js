@@ -1,5 +1,7 @@
 import Service from "../models/service.js";
 import mongoose from "mongoose";
+import { AwsUploadFile } from "../services/aws_s3.js";
+import Jimp from "jimp";
 import {
   notFoundError,
   createError,
@@ -100,7 +102,8 @@ export const activateMany = (req, res, next) => {
 export const uploadIconService = async (req, res, next) => {
   try {
     console.log("---UPLOAD ICON SERVICE---");
-    console.log("gato", req.file, req.body);
+    console.log("gato", req.file, req.query);
+    
     let file = req.file ? req.file : fakeReq.file;
     Jimp.read(file.buffer)
       .then(async (image) => {
@@ -113,15 +116,15 @@ export const uploadIconService = async (req, res, next) => {
         let name = file.originalname.slice(0, lastIndex);
         let ext = file.originalname.slice(lastIndex + 1);
         let resp = await AwsUploadFile({
-          fileName: `subservices/icons/${code}.${ext}`,
+          fileName: `subservices/icons/${req.query.code}.${ext}`,
           buffer: imagenReducida,
         });
         console.log("respuesta", resp);
 
         if (resp.results.$metadata.httpStatusCode == 200) {
-          if ((type = "service")) {
+          if (req.query.type == "service") {
             let service = await Service.findByIdAndUpdate(
-              id,
+              req.query.id,
               {
                 imgUrl: resp.url,
               },
@@ -133,7 +136,7 @@ export const uploadIconService = async (req, res, next) => {
               .exec();
             console.log("respuesta", service);
             res.send(service);
-          } else if ((type = "subservice")) {
+          } else if (req.query.type == "subservice") {
             let subservice = await Subservice.findByIdAndUpdate(
               id,
               {

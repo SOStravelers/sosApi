@@ -40,6 +40,27 @@ async function downloadAndConvertToBuffer(url) {
   }
 }
 
+async function n64tobuffer(data) {
+  console.log("n64buffer");
+  // Supongamos que 'data' es la cadena base64 que recibes de la solicitud
+  // Extraer el formato MIME de la cadena base64
+  const matches = data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+
+  if (matches.length !== 3) {
+    return null; // Formato no válido
+  }
+
+  const mimeType = matches[1];
+  const base64Data = matches[2];
+
+  // Decodificar la cadena base64 en un buffer de datos binarios
+  const binaryData = Buffer.from(base64Data, "base64");
+
+  // Guarda la imagen en el servidor, por ejemplo, con un nombre único
+  const fileName = "imagen." + mimeType.split("/")[1]; // Usa la extensión del MIME
+  return binaryData;
+}
+
 // TESTING IMAGENES//
 const imagePath = path.join(staticDir, "img", "casa.jpeg");
 const imageBuffer = fs.readFileSync(imagePath);
@@ -254,6 +275,7 @@ export const loginGoogle = async (req, res, next) => {
     "============= LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN   ============="
   );
   let { email, name, image } = req.body;
+  console.log("IMAGE", image);
   email = email.toLowerCase().trim();
   try {
     User.findOne({ email }).exec(async (err, user) => {
@@ -310,20 +332,23 @@ export const loginGoogle = async (req, res, next) => {
           }
         }
       } else {
-        let buffer = await downloadAndConvertToBuffer(user.img.imgUrl);
-        console.log("buffer", buffer);
-        let resp = await AwsUploadFile({
-          fileName: `users/${user._id}/profile/${user._id}.png`,
-          buffer: buffer,
-        });
-        if (resp && resp.results.$metadata.httpStatusCode == 200) {
-          user.img.imgUrl = resp.url;
-        }
+        // let buffer = await downloadAndConvertToBuffer(image);
+        // console.log("buffer", buffer);
+        // let lastIndex = image.lastIndexOf(".");
+        // let name = image.slice(0, lastIndex);
+        // let ext = image.slice(lastIndex + 1);
+        // console.log("perro", `users/${user._id}/profile/${user._id}.png`);
+        // let resp = await AwsUploadFile({
+        //   fileName: `users/${user._id}/profile/${user._id}.png`,
+        //   buffer: buffer,
+        // });
+        // if (resp && resp.results.$metadata.httpStatusCode == 200) {
+        //   user.img.imgUrl = resp.url;
+        // }
 
         let newUser = await User.findByIdAndUpdate(user._id, user, {
           new: true,
         }).exec();
-        console.log("respuesta", newUser);
         delete newUser.password;
         // USER (TO CREATE TOKEN)
         let userToCreateToken = {
@@ -450,7 +475,6 @@ export const findbusinessbyname = async (req, res, next) => {
 export const getById = async (req, res, next) => {
   console.log("---GET USER BY ID---");
   User.findOne({ _id: req.params.id }).exec((err, user) => {
-    console.log(err, user);
     if (err) {
       let error = createError(400, "Invalid ID format");
       console.log(error);
@@ -465,13 +489,13 @@ export const getById = async (req, res, next) => {
 };
 //Actualizar data de un usuario por ID
 export const updateOne = (req, res, next) => {
-  console.log("---UPDATE USER---");
-  let data = req.body;
+  console.log("---UPDATE USER---", req.body);
+  let { user } = req.body;
   User.findOneAndUpdate(
     {
       _id: req.params.id,
     },
-    data,
+    user,
     {
       new: true,
     }
@@ -516,10 +540,14 @@ export const activateMany = (req, res, next) => {
 export const profilePhoto = async (req, res, next) => {
   try {
     console.log("---UPLOAD PROFILE FOTO---");
-    console.log("gato", req.file);
     let file = req.file ? req.file : fakeReq.file;
-    Jimp.read(file.buffer)
+    let elbuffer = await n64tobuffer(req.body.file);
+    console.log("elbuffer", elbuffer);
+    // console.log(file);
+    // Jimp.read(file.buffer)
+    Jimp.read(elbuffer)
       .then(async (image) => {
+        console.log("imafen", image);
         image
           .resize(320, Jimp.AUTO) // resize
           .quality(70); // set JPEG quality
