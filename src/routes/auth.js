@@ -24,7 +24,7 @@ router.get(
 );
 // Verificación de codigo para validar email
 router.post(
-  "/verifyCode/:id",
+  "/verifycode/:id",
   validateParams(
     [
       {

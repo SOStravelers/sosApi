@@ -1,6 +1,6 @@
 import {
-  testEmailAWS,
-  sendTemplate,
+  exampleEmail,
+  sendTemplateExample,
   createTemplate,
   deleteTemplate,
   updateTemplate,
@@ -20,7 +20,7 @@ export const sendEmailConfirmation = async (req, res, _) => {
 
 export const sendTestEmail = async (req, res, next) => {
   console.log("--EMAIL TEST AWS--");
-  testEmailAWS();
+  exampleEmail();
   res.send("email sent");
 };
 
@@ -56,7 +56,7 @@ export const getTemplateFile = async (req, res, next) => {
 
 export const sendTestTemplate = async (req, res, next) => {
   console.log("--SEND TEMPLATE AWS--");
-  sendTemplate();
+  sendTemplatExamplee();
   res.send("templated sent");
 };
 

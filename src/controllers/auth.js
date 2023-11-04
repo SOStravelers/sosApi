@@ -2,12 +2,7 @@ import User from "../models/user.js";
 import mongoose from "mongoose";
 import envar from "../config/envar.js";
 import { sendEmailTemplate } from "../services/aws_ses_test.js";
-import {
-  notFoundError,
-  createError,
-  missingData,
-  duplicateData,
-} from "../config/error.js";
+import { createError } from "../config/error.js";
 
 const generarNumero4Digitos = () => {
   const numero = Math.floor(1000 + Math.random() * 9000);
@@ -21,11 +16,11 @@ export const sendValidationCode = async (req, res, next) => {
     const user = await User.findById(id).exec();
     if (!user) {
       let error = createError(409, "User not found or invalid credentials");
-      res.status(409).json(error);
+      res.status(404).json(error);
     } else {
       const code = generarNumero4Digitos();
       const digitosArray = Array.from(String(code), Number);
-      const expTime = 3;
+      const expTime = 5;
       const date = new Date();
       console.log(date);
       const updatedUser = await User.findOneAndUpdate(
@@ -72,24 +67,49 @@ export const sendValidationCode = async (req, res, next) => {
 
 //obtener los subservicios por servicio
 export const verifyValidationCode = async (req, res, next) => {
-  console.log("---GET SUBSERVICES BY SERVICE---");
-  let options = {
-    // populate,
-    select: "name ",
-    page: Number(req.query.page) || 1,
-    limit: Number(req.query.limit) || 50,
-    sort: { updatedAt: -1 },
-  };
-  let query = {};
-  query.isActive = true;
-  query.service = req.query.id;
-  console.log(query);
   try {
-    Subservice.paginate(query, options, (err, items) => {
-      if (err) return next(err);
-      res.send(items);
-    });
+    console.log("verify code", req.body.code);
+    const number = req.body.code;
+    const id = req.params.id;
+    const user = await User.findById(id).exec();
+    if (!user) {
+      let error = createError(404, "User not found or invalid credentials");
+      res.status(404).json(error);
+    } else {
+      const diferenciaEnMilisegundos = new Date() - user.validation.time;
+      const diferenciaEnMinutos = diferenciaEnMilisegundos / 60000;
+      console.log(diferenciaEnMinutos);
+      if (
+        diferenciaEnMinutos < user.validation.expTime &&
+        number == user.validation.code
+      ) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: user._id },
+          {
+            isValidate: true,
+            isActive: true,
+          },
+          { new: true }
+        ).select("isActive isValidate email personalData _id");
+
+        if (!updatedUser) {
+          let error = createError(500, "Internal Server Error");
+          res.status(500).json(error);
+        }
+
+        // Realiza cualquier operación adicional aquí, como la conexión a SES AWS
+        res.send(updatedUser);
+      } else {
+        let error = createError(
+          400,
+          "Authentication failed: Incorrect or expired code"
+        );
+        res.status(400).json(error);
+      }
+    }
   } catch (err) {
-    next(err);
+    console.log(err);
+    let error = createError(500, "Internal Server Error");
+    res.status(500).json(error);
   }
 };
