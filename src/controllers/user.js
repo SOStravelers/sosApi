@@ -540,7 +540,7 @@ export const activateMany = (req, res, next) => {
 export const profilePhoto = async (req, res, next) => {
   try {
     console.log("---UPLOAD PROFILE FOTO---");
-    let file = req.file ? req.file : fakeReq.file;
+    //let file = req.file ? req.file : fakeReq.file;
     let elbuffer = await n64tobuffer(req.body.file);
     console.log("elbuffer", elbuffer);
     // console.log(file);
@@ -598,8 +598,10 @@ export const galleryPhoto = async (req, res, next) => {
     if (!paramsNumber || paramsNumber >= 7 || paramsNumber == NaN) {
       paramsNumber = 1;
     }
-    let file = req.file ? req.file : fakeReq.file;
-    Jimp.read(file.buffer)
+    //let file = req.file ? req.file : fakeReq.file;
+    let elbuffer = await n64tobuffer(req.body.file);
+    //Jimp.read(file.buffer)
+    Jimp.read(elbuffer)
       .then(async (image) => {
         image
           .resize(320, Jimp.AUTO) // resize
@@ -613,10 +615,21 @@ export const galleryPhoto = async (req, res, next) => {
           buffer: imagenReducida,
         });
         if (resp.results.$metadata.httpStatusCode == 200) {
-          let user = await User.findByIdAndUpdate(
+          let user = await User.findOne({
+            _id: req.user._id.toString(),
+          }).select("img");
+          const gallery = user.img.gallery;
+          // if (paramsNumber <= gallery.length) {
+
+          // } else {
+          //   gallery.push(resp.url);
+          // }
+          gallery[paramsNumber] = resp.url;
+
+          let updateUser = await User.findByIdAndUpdate(
             req.user._id,
             {
-              "img.imgUrl": resp.url,
+              "img.gallery": gallery,
             },
             {
               new: true,
@@ -625,7 +638,7 @@ export const galleryPhoto = async (req, res, next) => {
             .select("img")
             .exec();
           console.log("respuesta", user);
-          res.send(user);
+          res.send(updateUser);
         } else {
           let error = createError(400, "Create error");
           return res.status(400).json(error);

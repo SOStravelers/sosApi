@@ -8,6 +8,7 @@ const limits = {
   fileSize: filesConfig.profile.maxsize,
 };
 const fileFilter = (req, file, cb) => {
+  console.log("filters");
   let formats = ["image/jpg", "image/jpeg", "image/png", "image/svg"];
   if (!formats.includes(file.mimetype)) {
     cb(createError(400, "Illegal file format."), false);
@@ -101,7 +102,7 @@ router.post(
   ),
   loginEmail
 );
-//login user by email
+//login user by google
 router.post(
   "/loginGoogle",
   validateParams(

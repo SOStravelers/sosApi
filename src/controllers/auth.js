@@ -129,8 +129,8 @@ export const createPassword = async (req, res, next) => {
         {
           password: encryptPassword,
           isActive: true,
-          "user.security.hasPassword": true,
-          "user.security.updatedAt": new Date(),
+          "security.hasPassword": true,
+          "security.updatedAt": new Date(),
         },
         { new: true } // Opcional: para obtener el documento actualizado como resultado
       ).select("isActive isValidate security email personalData _id img");
@@ -144,11 +144,11 @@ export const createPassword = async (req, res, next) => {
         username: updatedUser.username,
       };
       let userRefresh = {
-        _id: updatedUserupdatedUser._id,
+        _id: updatedUser._id,
       };
       res.json({
-        access_token: accessTokenGen(userToCreateToken, true, accessTime),
-        refresh_token: refreshTokenGen(userRefresh, refreshTime),
+        access_token: accessTokenGen(userToCreateToken, true),
+        refresh_token: refreshTokenGen(userToCreateToken),
         user: updatedUser,
       });
     }

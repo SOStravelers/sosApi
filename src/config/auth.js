@@ -143,21 +143,13 @@ export const isAuth = async (req, res, next) => {
     let decoded = decodeFunc(req.access_token);
     let authUser;
     try {
-      console.log(decoded);
+      console.log("try");
       authUser = await User.findOne({ _id: decoded._id })
-        .select("isActive isActive name username email imgUrl")
-        // .populate([
-        //   {
-        //     path: "scope.id",
-        //     select: "name id _id",
-        //   },
-        //   {
-        //     path: "sections",
-        //   },
-        // ])
+        .select("isActive security isValidate name username email imgUrl")
         .exec();
       authUser.id = authUser._id.toString();
       req.user = authUser;
+      console.log(req.user);
       next();
     } catch (err) {
       let isTokenError = decoded.name === "TokenExpiredError" ? true : false;

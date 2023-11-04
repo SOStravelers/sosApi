@@ -44,7 +44,7 @@ const userSchema = new Schema(
     img: {
       imgUrl: { type: String, default: "" },
       coverImg: { type: String, default: "" },
-      gallery: { type: Array },
+      gallery: { type: Array, default: [] },
     },
     updatedAt: {
       type: Date,
