@@ -22,6 +22,16 @@ const userSchema = new Schema(
       expTime: { type: Number },
       time: Date,
     },
+    security: {
+      updatedAt: {
+        type: Date,
+        default: new Date(),
+      },
+      hasPassword: {
+        type: Boolean,
+        default: false,
+      },
+    },
     username: { type: String, unique: true },
     email: { type: String, unique: true },
     isAdminUser: { type: Boolean },

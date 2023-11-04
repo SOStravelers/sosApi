@@ -3,12 +3,12 @@ import mongoose from "mongoose";
 import envar from "../config/envar.js";
 import { sendEmailTemplate } from "../services/aws_ses_test.js";
 import { createError } from "../config/error.js";
+import { refreshTokenGen, accessTokenGen } from "../config/auth.js";
 
 const generarNumero4Digitos = () => {
   const numero = Math.floor(1000 + Math.random() * 9000);
   return numero;
 };
-
 // envia correo con codigo de validación por tiempo definido
 export const sendValidationCode = async (req, res, next) => {
   try {
@@ -64,8 +64,7 @@ export const sendValidationCode = async (req, res, next) => {
     }
   }
 };
-
-//obtener los subservicios por servicio
+//validar codigo para validar correo
 export const verifyValidationCode = async (req, res, next) => {
   try {
     console.log("verify code", req.body.code);
@@ -90,7 +89,7 @@ export const verifyValidationCode = async (req, res, next) => {
             isActive: true,
           },
           { new: true }
-        ).select("isActive isValidate email personalData _id");
+        ).select("isActive isValidate security email personalData _id");
 
         if (!updatedUser) {
           let error = createError(500, "Internal Server Error");
@@ -106,6 +105,72 @@ export const verifyValidationCode = async (req, res, next) => {
         );
         res.status(400).json(error);
       }
+    }
+  } catch (err) {
+    console.log(err);
+    let error = createError(500, "Internal Server Error");
+    res.status(500).json(error);
+  }
+};
+// función para crear contraseña para usuario que no tienen creada
+export const createPassword = async (req, res, next) => {
+  try {
+    console.log("createPassword");
+    const id = req.params.id;
+    const newPassword = req.body.password;
+    if (!newPassword) {
+      let error = createError(400, "a field is missing");
+      res.status(404).json(error);
+      throw err;
+    } else {
+      const encryptPassword = await User.hash(newPassword);
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: id }, // Filtro para encontrar el usuario por su ID
+        {
+          password: encryptPassword,
+          isActive: true,
+          "user.security.hasPassword": true,
+          "user.security.updatedAt": new Date(),
+        },
+        { new: true } // Opcional: para obtener el documento actualizado como resultado
+      ).select("isActive isValidate security email personalData _id img");
+
+      if (!updatedUser) {
+        let error = createError(500, "Internal Server Error");
+        res.status(500).json(error);
+      }
+      let userToCreateToken = {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+      };
+      let userRefresh = {
+        _id: updatedUserupdatedUser._id,
+      };
+      res.json({
+        access_token: accessTokenGen(userToCreateToken, true, accessTime),
+        refresh_token: refreshTokenGen(userRefresh, refreshTime),
+        user: updatedUser,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    let error = createError(500, "Internal Server Error");
+    res.status(500).json(error);
+  }
+};
+//Función para encontrar usuario por email
+export const findByEmail = async (req, res, next) => {
+  try {
+    var text = decodeURIComponent(req.params.email);
+    const email = text.trim().toLowerCase();
+    let user = await User.findOne({
+      email: email,
+    }).select("isActive isValidate security email personalData _id");
+    if (!user) {
+      let error = createError(404, "email not found");
+      res.status(404).json(error);
+    } else {
+      res.send(user);
     }
   } catch (err) {
     console.log(err);
