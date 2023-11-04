@@ -624,7 +624,7 @@ export const galleryPhoto = async (req, res, next) => {
           // } else {
           //   gallery.push(resp.url);
           // }
-          gallery[paramsNumber] = resp.url;
+          gallery[paramsNumber - 1] = resp.url;
 
           let updateUser = await User.findByIdAndUpdate(
             req.user._id,
