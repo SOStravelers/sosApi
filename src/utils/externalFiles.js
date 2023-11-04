@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import staticDir from "../config/staticPath";
+import staticDir from "../config/staticPath.js";
 
 export const n64tobuffer = async (data) => {
   console.log("n64buffer");
