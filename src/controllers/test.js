@@ -5,6 +5,7 @@ import {
   deleteTemplate,
   updateTemplate,
   createTemplateFile,
+  getTemplate,
   sendEmailPaymentConfirmation,
 } from "../services/aws_ses_test.js";
 
@@ -31,8 +32,26 @@ export const createTestTemplate = async (req, res, next) => {
 
 export const createTestTemplateFile = async (req, res, next) => {
   console.log("--NEW TEMPLATE FILE HTML AWS--");
-  createTemplateFile();
+  const params = req.body;
+  createTemplateFile(params);
   res.send("new template created");
+};
+
+export const getTemplateFile = async (req, res, next) => {
+  try {
+    console.log("--GET TEMPLATE AWS SES--");
+    const name = req.body.name;
+    const response = await getTemplate(name);
+    res.send(response.Template);
+  } catch (err) {
+    if (err instanceof Error) {
+      res
+        .status(err.$metadata.httpStatusCode)
+        .json({ error: err.Error.message });
+    } else {
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  }
 };
 
 export const sendTestTemplate = async (req, res, next) => {

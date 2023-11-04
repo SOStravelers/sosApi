@@ -1,6 +1,7 @@
 import express from "express";
 const routes = express.Router();
 import booking from "./booking.js";
+import auth from "./auth.js";
 import service from "./service.js";
 import subservice from "./subservice.js";
 import test from "./test.js";
@@ -18,6 +19,7 @@ routes.get("/isAuth", isAuth, (req, res) => {
 routes.post("/renew", renewToken);
 
 routes.use("/bookings", booking);
+routes.use("/auth", auth);
 routes.use("/bookingAuth", isAuth, booking);
 routes.use("/boookingAdmin", isAuth, isAdmin, booking);
 

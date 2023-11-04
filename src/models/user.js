@@ -17,6 +17,11 @@ const userSchema = new Schema(
       minlength: 6,
       // required: [true, "Password requiere"],
     },
+    validation: {
+      code: { type: Number },
+      expTime: { type: Number },
+      time: Date,
+    },
     username: { type: String, unique: true },
     email: { type: String, unique: true },
     isAdminUser: { type: Boolean },
