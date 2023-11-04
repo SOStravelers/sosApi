@@ -9,16 +9,11 @@ import {
 } from "@aws-sdk/client-ses";
 import { SES } from "./awsClient.js";
 import envar from "../config/envar.js";
-import fs from "fs";
-import staticDir from "../config/staticPath.js";
+import { templateHtml } from "../utils/externalFiles.js";
 
-const filePath = (nameTemplate) => {
-  return path.join(staticDir, `../public/templatesHtml/${nameTemplate}.html`);
-};
-const templateHtml = (nameTemplate) => {
-  return fs.readFileSync(filePath(nameTemplate), "utf8");
-};
-
+//-------------------------------------------------------------------------------
+//-----------------------Testing-------------------------------------------------
+//-------------------------------------------------------------------------------
 // Definir los parámetros del correo electrónico
 const exampleParams = {
   Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS
@@ -63,7 +58,6 @@ const templateExampleParams = {
       "Este es un correo de prueba actuzalizado usando un template de AWS SES. Tu edad es {{age}}.", // Cuerpo del correo en texto plano con una variable {{age}}
   },
 };
-
 // Crear el comando para crear el template
 export const createTemplate = async (file) => {
   console.log("entrando2", templateParams);
@@ -85,7 +79,6 @@ export const createTemplate = async (file) => {
 };
 
 export const sendTemplateExample = async (file) => {
-  console.log("sendTemplate");
   try {
     // Definir los parámetros del correo electrónico usando el template
     const emailParams = {
@@ -116,7 +109,7 @@ export const sendTemplateExample = async (file) => {
 };
 
 //-------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------
+//---------------------Funciones-------------------------------------------------
 //-------------------------------------------------------------------------------
 
 // Crear el comando para crear el template desde un archivo html desde otra carpeta
@@ -178,7 +171,6 @@ export const sendEmailTemplate = async (params) => {
     throw err;
   }
 };
-
 // Crear el comando para actualizar el template
 export const updateTemplate = async (file) => {
   console.log("entrando5");
@@ -229,7 +221,6 @@ export const deleteTemplate = async (file) => {
     console.log("Error", err);
   }
 };
-
 export const sendEmailPaymentConfirmation = async (data) => {
   const params = {
     Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS

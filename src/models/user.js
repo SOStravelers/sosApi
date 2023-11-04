@@ -19,6 +19,7 @@ const userSchema = new Schema(
     },
     validation: {
       code: { type: Number },
+      urlcode: { type: String },
       expTime: { type: Number },
       time: Date,
     },

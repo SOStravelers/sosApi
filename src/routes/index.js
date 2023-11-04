@@ -9,7 +9,12 @@ import payment from "./payment.js";
 import user from "./user.js";
 import notification from "./notification.js";
 import schedule from "./schedule.js";
-import { isAuth, isAdmin, isAuthOptional, renewToken } from "../config/auth.js";
+import {
+  isAuth,
+  isAdmin,
+  isAuthOptional,
+  renewToken,
+} from "../middleware/auth.js";
 
 routes.get("/isAuth", isAuth, (req, res) => {
   res.statusMessage = "authenticated";

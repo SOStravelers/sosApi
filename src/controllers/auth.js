@@ -1,14 +1,13 @@
 import User from "../models/user.js";
-import mongoose from "mongoose";
 import envar from "../config/envar.js";
 import { sendEmailTemplate } from "../services/aws_ses_test.js";
 import { createError } from "../config/error.js";
-import { refreshTokenGen, accessTokenGen } from "../config/auth.js";
+import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
+import {
+  generarNumero4Digitos,
+  generarCodigoAleatorio,
+} from "../utils/code.js";
 
-const generarNumero4Digitos = () => {
-  const numero = Math.floor(1000 + Math.random() * 9000);
-  return numero;
-};
 // envia correo con codigo de validación por tiempo definido
 export const sendValidationCode = async (req, res, next) => {
   try {
@@ -177,4 +176,9 @@ export const findByEmail = async (req, res, next) => {
     let error = createError(500, "Internal Server Error");
     res.status(500).json(error);
   }
+};
+export const recoveryPassEmail = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+  } catch (err) {}
 };

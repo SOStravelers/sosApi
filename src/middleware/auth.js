@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 // import mainConfig from '../main';
 
-import envar from "./envar.js";
+import envar from "../config/envar.js";
 import User from "../models/user.js";
-import { createError } from "./error.js";
+import { createError } from "../config/error.js";
 
 // funcs to decoded, encoded and generate accessToken
 const decodeFunc = (token) => {
@@ -44,18 +44,6 @@ export const getTokenByRefresh = (refresh) => {
   delete payload.jti;
   return accessToken(payload);
 };
-
-// export const isAuth = (req, res, next) => {
-//   if (req.isAuthenticated() || req.method === "OPTIONS" || req.headers.authorization === "postmanvn4b4s3") {
-//     // if (req.isAuthenticated()) {
-//     next();
-//   } else {
-//     res.status(403).send({
-//       msg: "Not authorized."
-//     });
-//   }
-// };
-
 export const isAuthOptional = async (req, res, next) => {
   req.access_token = req.headers.authorization;
   if (typeof req.access_token !== "undefined" && req.access_token !== "") {

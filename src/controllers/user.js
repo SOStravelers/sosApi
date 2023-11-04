@@ -1,95 +1,14 @@
 import User from "../models/user.js";
 import Jimp from "jimp";
-import mongoose from "mongoose";
 
+import { n64tobuffer } from "../utils/externalFiles.js";
 import { AwsUploadFile } from "../services/aws_s3.js";
-import fs from "fs";
-import path from "path";
-
-import axios from "axios";
-import sharp from "sharp";
-import { promisify } from "util";
-import stream from "stream";
-const pipeline = promisify(stream.pipeline);
+import { procesarNombre } from "../utils/data.js";
+import { fakeReq } from "../utils/externalFiles.js";
 
 import { notFoundError, createError, missingData } from "../config/error.js";
-import {
-  getTokenByRefresh,
-  refreshTokenGen,
-  accessTokenGen,
-  tokenEmail,
-  decode,
-} from "../config/auth.js";
-import staticDir from "../config/staticPath.js";
+import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 
-async function downloadAndConvertToBuffer(url) {
-  try {
-    // Descargar la imagen desde la URL
-    const response = await axios.get(url, {
-      responseType: "arraybuffer",
-    });
-    // Crear un array de buffers a partir del Uint8Array
-    const buffers = [Buffer.from(response.data.buffer)];
-
-    // Utilizar Buffer.concat con el array de buffers
-    const imageBuffer = Buffer.concat(buffers);
-
-    return imageBuffer;
-  } catch (error) {
-    console.error("Error al descargar y convertir la imagen:", error);
-  }
-}
-
-async function n64tobuffer(data) {
-  console.log("n64buffer");
-  // Supongamos que 'data' es la cadena base64 que recibes de la solicitud
-  // Extraer el formato MIME de la cadena base64
-  const matches = data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-
-  if (matches.length !== 3) {
-    return null; // Formato no válido
-  }
-
-  const mimeType = matches[1];
-  const base64Data = matches[2];
-
-  // Decodificar la cadena base64 en un buffer de datos binarios
-  const binaryData = Buffer.from(base64Data, "base64");
-
-  // Guarda la imagen en el servidor, por ejemplo, con un nombre único
-  const fileName = "imagen." + mimeType.split("/")[1]; // Usa la extensión del MIME
-  return binaryData;
-}
-
-// TESTING IMAGENES//
-const imagePath = path.join(staticDir, "img", "casa.jpeg");
-const imageBuffer = fs.readFileSync(imagePath);
-// Convierte la imagen en base64
-const base64Image = imageBuffer.toString("base64");
-// Crea un objeto simulado de solicitud (req) con la imagen base64
-const fakeReq = {
-  file: {
-    buffer: Buffer.from(base64Image, "base64"), // Convierte la base64 de nuevo a un buffer
-    originalname: "sostravel.jpg", // Establece un nombre de archivo de prueba
-  },
-  // Otras propiedades de req que puedas necesitar para tu función
-  body: {
-    // ...
-  },
-};
-function procesarNombre(nombre) {
-  const partes = nombre.split(" "); // Dividir el string en partes utilizando el espacio como separador
-
-  if (partes.length > 2) {
-    // Si hay más de dos partes, unir las partes después de la primera
-    const restoDelNombre = partes.slice(1).join(" ");
-    return [partes[0], restoDelNombre];
-  } else {
-    // Si no hay más de dos partes, devolver el nombre original
-    return [nombre];
-  }
-}
-//----FUNCTIONS ROUTES----//
 //Create user personal/workers/business
 export const create = async (req, res, next) => {
   console.log("---CREATE NEW USER-WORKER-BUSINESS---");
@@ -332,20 +251,6 @@ export const loginGoogle = async (req, res, next) => {
           }
         }
       } else {
-        // let buffer = await downloadAndConvertToBuffer(image);
-        // console.log("buffer", buffer);
-        // let lastIndex = image.lastIndexOf(".");
-        // let name = image.slice(0, lastIndex);
-        // let ext = image.slice(lastIndex + 1);
-        // console.log("perro", `users/${user._id}/profile/${user._id}.png`);
-        // let resp = await AwsUploadFile({
-        //   fileName: `users/${user._id}/profile/${user._id}.png`,
-        //   buffer: buffer,
-        // });
-        // if (resp && resp.results.$metadata.httpStatusCode == 200) {
-        //   user.img.imgUrl = resp.url;
-        // }
-
         let newUser = await User.findByIdAndUpdate(user._id, user, {
           new: true,
         }).exec();
@@ -540,10 +445,9 @@ export const activateMany = (req, res, next) => {
 export const profilePhoto = async (req, res, next) => {
   try {
     console.log("---UPLOAD PROFILE FOTO---");
-    //let file = req.file ? req.file : fakeReq.file;
+    let file = req.file ? req.file : fakeReq.file;
     let elbuffer = await n64tobuffer(req.body.file);
     console.log("elbuffer", elbuffer);
-    // console.log(file);
     // Jimp.read(file.buffer)
     Jimp.read(elbuffer)
       .then(async (image) => {
@@ -590,15 +494,14 @@ export const profilePhoto = async (req, res, next) => {
 //crear o cambiar fotos de galeria worker
 export const galleryPhoto = async (req, res, next) => {
   try {
-    console.log("---UPLOAD GALLERY FOTO---");
-    console.log("params", req.params.number);
+    console.log("---UPLOAD GALLERY FOTO---", req.params.number);
     console.log("gato", req.file);
     let paramsNumber = Number(req.params.number);
     //VALIDACION PARA SOLO SUBIR UN MAXIMO DE 6 FOTOS
     if (!paramsNumber || paramsNumber >= 7 || paramsNumber == NaN) {
       paramsNumber = 1;
     }
-    //let file = req.file ? req.file : fakeReq.file;
+    let file = req.file ? req.file : fakeReq.file;
     let elbuffer = await n64tobuffer(req.body.file);
     //Jimp.read(file.buffer)
     Jimp.read(elbuffer)
@@ -649,5 +552,52 @@ export const galleryPhoto = async (req, res, next) => {
       });
   } catch (err) {
     next(err);
+  }
+};
+
+// función para crear contraseña para usuario que no tienen creada
+export const changePassword = async (req, res, next) => {
+  try {
+    console.log("createPassword");
+    const id = req.params.id;
+    const newPassword = req.body.password;
+    if (!newPassword) {
+      let error = createError(400, "a field is missing");
+      res.status(404).json(error);
+      throw err;
+    } else {
+      const encryptPassword = await User.hash(newPassword);
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: id }, // Filtro para encontrar el usuario por su ID
+        {
+          password: encryptPassword,
+          isActive: true,
+          "security.hasPassword": true,
+          "security.updatedAt": new Date(),
+        },
+        { new: true } // Opcional: para obtener el documento actualizado como resultado
+      ).select("isActive isValidate security email personalData _id img");
+
+      if (!updatedUser) {
+        let error = createError(500, "Internal Server Error");
+        res.status(500).json(error);
+      }
+      let userToCreateToken = {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+      };
+      let userRefresh = {
+        _id: updatedUser._id,
+      };
+      res.json({
+        access_token: accessTokenGen(userToCreateToken, true),
+        refresh_token: refreshTokenGen(userToCreateToken),
+        user: updatedUser,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    let error = createError(500, "Internal Server Error");
+    res.status(500).json(error);
   }
 };
