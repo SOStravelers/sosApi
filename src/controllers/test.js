@@ -7,7 +7,7 @@ import {
   createTemplateFile,
   getTemplate,
   sendEmailPaymentConfirmation,
-} from "../services/aws_ses_test.js";
+} from "../services/aws_ses.js";
 
 export const sendEmailConfirmation = async (req, res, _) => {
   const data = req.body;
@@ -56,7 +56,7 @@ export const getTemplateFile = async (req, res, next) => {
 
 export const sendTestTemplate = async (req, res, next) => {
   console.log("--SEND TEMPLATE AWS--");
-  sendTemplatExamplee();
+  sendTemplateExample();
   res.send("templated sent");
 };
 

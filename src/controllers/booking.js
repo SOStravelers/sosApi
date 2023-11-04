@@ -1,7 +1,7 @@
 //import { sendMailTest } from "../lib/mailer.js";
 import { notFoundError, createError, missingData } from "../config/error.js";
 import Booking from "../models/booking.js";
-import { sendEmailPaymentConfirmation } from "../services/aws_ses_test.js";
+import { sendEmailPaymentConfirmation } from "../services/aws_ses.js";
 
 //Crear booking
 export const create = async (req, res, next) => {

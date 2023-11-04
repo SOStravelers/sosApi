@@ -1,6 +1,6 @@
 import envar from "../config/envar.js";
 import axios from "axios";
-import { sendEmailPaymentConfirmation } from "./aws_ses_test.js";
+import { sendEmailPaymentConfirmation } from "./aws_ses.js";
 
 export const generateAccessToken = async () => {
   console.log("generate token paypal");

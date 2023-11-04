@@ -1,6 +1,6 @@
 import User from "../models/user.js";
 import envar from "../config/envar.js";
-import { sendEmailTemplate } from "../services/aws_ses_test.js";
+import { sendEmailTemplate } from "../services/aws_ses.js";
 import { createError } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 import {
