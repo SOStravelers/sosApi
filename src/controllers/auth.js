@@ -453,3 +453,29 @@ export const findByEmail = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+//Obtener usuarios con paginate por tipos y activados
+export const getUsers = async (req, res, next) => {
+  console.log("---GET USERS---");
+  let body = {};
+  Object.assign(body, req.query);
+  console.log("query", body);
+  let options = {
+    // populate,
+    // select,
+    page: body.page || 1,
+    limit: body.limit || 10,
+    sort: { updatedAt: -1 },
+  };
+  let query = {};
+  body.type ? (query.type = body.type) : "";
+  body.isActive ? (query.isActive = body.isActive) : "";
+  try {
+    User.paginate(query, options, (err, items) => {
+      if (err) return next(err);
+      res.send(items);
+    });
+  } catch (err) {
+    next(err);
+  }
+};

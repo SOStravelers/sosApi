@@ -12,6 +12,7 @@ import {
   findByEmail,
   sendValidationCode,
   verifyValidationCode,
+  getUsers,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -203,5 +204,21 @@ router.post(
     "body"
   ),
   findByEmail
+);
+
+//get users by type and isActive
+router.get(
+  "/all",
+  validateParams(
+    [
+      {
+        param_key: "type",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getUsers
 );
 export default router;
