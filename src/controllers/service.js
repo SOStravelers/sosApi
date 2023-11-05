@@ -97,13 +97,17 @@ export const activateMany = (req, res, next) => {
   // res.send("buena")
 };
 
-//upload icon
-
 export const uploadIconService = async (req, res, next) => {
   try {
-    console.log("---UPLOAD ICON SERVICE---");
-    console.log("gato", req.file, req.query);
-    
+    console.log("---UPLOAD ICON SERVICE/SUBSERVICE---", req.query);
+    const id = req.query.id;
+    const type = req.query.type;
+    if (type != "service" && type != "subservice") {
+      let err = createError(400, "type not valid");
+      next(err);
+      return res.status(404).json(err);
+    }
+    console.log("buffer", req.file);
     let file = req.file ? req.file : fakeReq.file;
     Jimp.read(file.buffer)
       .then(async (image) => {
@@ -116,10 +120,9 @@ export const uploadIconService = async (req, res, next) => {
         let name = file.originalname.slice(0, lastIndex);
         let ext = file.originalname.slice(lastIndex + 1);
         let resp = await AwsUploadFile({
-          fileName: `subservices/icons/${req.query.code}.${ext}`,
+          fileName: `icons/${type}/${id}.${ext}`,
           buffer: imagenReducida,
         });
-        console.log("respuesta", resp);
 
         if (resp.results.$metadata.httpStatusCode == 200) {
           if (req.query.type == "service") {
@@ -134,7 +137,6 @@ export const uploadIconService = async (req, res, next) => {
             )
               .select("imgUrl")
               .exec();
-            console.log("respuesta", service);
             res.send(service);
           } else if (req.query.type == "subservice") {
             let subservice = await Subservice.findByIdAndUpdate(
@@ -148,20 +150,23 @@ export const uploadIconService = async (req, res, next) => {
             )
               .select("imgUrl")
               .exec();
-            console.log("respuesta", subservice);
-            res.send(service);
-          } else {
-            res.send(resp.url);
+            res.send(subservice);
           }
-        } else {
-          let error = createError(400, "Create error");
-          return res.status(400).json(error);
         }
       })
       .catch((err) => {
-        console.error(err);
+        next(err);
+        if (err instanceof Error && err.$metadata) {
+          res
+            .status(err.$metadata.httpStatusCode)
+            .json({ error: err.Error.message });
+        } else {
+          next(err);
+          res.status(500).json({ error: "Internal Server Error" });
+        }
       });
   } catch (err) {
     next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

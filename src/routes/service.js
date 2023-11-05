@@ -125,11 +125,6 @@ router.post(
         required: false,
         type: "string",
       },
-      {
-        param_key: "code",
-        required: true,
-        type: "string",
-      },
     ],
     "query"
   ),

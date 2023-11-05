@@ -114,41 +114,37 @@ export const findbusinessbyname = async (req, res, next) => {
 };
 
 //Actualizar data de un usuario por ID
-export const updateOne = (req, res, next) => {
-  console.log("---UPDATE USER---", req.body);
-  let { user } = req.body;
-  User.findOneAndUpdate(
-    {
-      _id: req.params.id,
-    },
-    user,
-    {
-      new: true,
-    }
-  ).exec((err, user) => {
-    if (err) {
-      let error = createError(400, "Invalid ID format");
-      console.log(error);
-      return res.status(400).json(error);
-    } else {
-      res.send(user);
-    }
-  });
+export const updateOne = async (req, res, next) => {
+  try {
+    console.log("---UPDATE USER---", req.body);
+    let { user } = req.body;
+    let newUser = await User.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      user,
+      {
+        new: true,
+      }
+    ).exec();
+    res.send(newUser);
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 //Eliminar usuario por ID
-export const deleteById = (req, res, next) => {
-  console.log("---DELETE USER---");
-  User.findOneAndRemove({
-    _id: req.params.id,
-  }).exec((err, user) => {
-    if (err) {
-      let error = createError(400, "Invalid ID format");
-      console.log(error);
-      return res.status(400).json(error);
-    } else {
-      res.send({ user, message: "user deleted" });
-    }
-  });
+export const deleteById = async (req, res, next) => {
+  try {
+    console.log("---DELETE USER---");
+    let removeUser = await User.findOneAndRemove({
+      _id: req.params.id,
+    }).exec();
+    res.send({ removeUser, message: "user deleted" });
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 //Activar o desactivar multiples usuarios
 export const activateMany = (req, res, next) => {
@@ -206,7 +202,9 @@ export const profilePhoto = async (req, res, next) => {
         }
       })
       .catch((err) => {
-        console.error(err);
+        next(err);
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
       });
   } catch (err) {
     next(err);
@@ -261,18 +259,20 @@ export const galleryPhoto = async (req, res, next) => {
           )
             .select("img")
             .exec();
-          console.log("respuesta", user);
           res.send(updateUser);
         } else {
-          let error = createError(400, "Create error");
-          return res.status(400).json(error);
+          let error = createError(500, "Error while saving data");
+          return res.status(500).json(error);
         }
       })
       .catch((err) => {
-        console.error(err);
+        next(err);
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
       });
   } catch (err) {
     next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 // función para crear contraseña para usuario que no tienen creada
@@ -288,11 +288,10 @@ export const hasPassword = async (req, res, next) => {
       res.send({ hasPassword: false });
     }
   } catch (err) {
-    let error = createError(500, "Internal Server Error");
-    res.status(500).json(error);
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 // función para crear contraseña para usuario que no tienen creada
 export const changePassword = async (req, res, next) => {
   try {
@@ -300,52 +299,44 @@ export const changePassword = async (req, res, next) => {
     const newPassword = req.body.newPassword;
     const currentPassword = req.body.currentPassword;
     if (!newPassword) {
-      let error = createError(400, "a field is missing");
-      res.status(404).json(error);
-      throw err;
-    } else {
-      const validPass = await User.validPassword(
-        req.user._id.toString(),
-        currentPassword
-      );
-      console.log("valid", validPass);
-      if (!validPass) {
-        let error = createError(400, "current password wrong");
-        res.status(400).json(error);
-      } else {
-        const encryptPassword = await User.hash(newPassword);
-        const updatedUser = await User.findOneAndUpdate(
-          { _id: req.user._id.toString() }, // Filtro para encontrar el usuario por su ID
-          {
-            password: encryptPassword,
-            isActive: true,
-            "security.hasPassword": true,
-            "security.updatedAt": new Date(),
-          },
-          { new: true } // Opcional: para obtener el documento actualizado como resultado
-        ).select("isActive isValidate security email personalData _id img");
-
-        if (!updatedUser) {
-          let error = createError(500, "Internal Server Error");
-          res.status(500).json(error);
-        }
-        let userToCreateToken = {
-          _id: updatedUser._id,
-          username: updatedUser.username,
-        };
-        let userRefresh = {
-          _id: updatedUser._id,
-        };
-        res.json({
-          access_token: accessTokenGen(userToCreateToken, true),
-          refresh_token: refreshTokenGen(userRefresh),
-          user: updatedUser,
-        });
-      }
+      let err = createError(400, "a field is missing");
+      next(err);
+      return res.status(404).json(err);
     }
+    const validPass = await User.validPassword(
+      req.user._id.toString(),
+      currentPassword
+    );
+    if (!validPass) {
+      let err = createError(400, "current password wrong");
+      next(err);
+      return res.status(400).json(err);
+    }
+    const encryptPassword = await User.hash(newPassword);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.user._id.toString() }, // Filtro para encontrar el usuario por su ID
+      {
+        password: encryptPassword,
+        isActive: true,
+        "security.hasPassword": true,
+        "security.updatedAt": new Date(),
+      },
+      { new: true } // Opcional: para obtener el documento actualizado como resultado
+    ).select("isActive isValidate security email personalData _id img");
+    let userToCreateToken = {
+      _id: updatedUser._id,
+      username: updatedUser.username,
+    };
+    let userRefresh = {
+      _id: updatedUser._id,
+    };
+    res.json({
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userRefresh),
+      user: updatedUser,
+    });
   } catch (err) {
-    console.log(err);
-    let error = createError(500, "Internal Server Error");
-    res.status(500).json(error);
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
