@@ -8,7 +8,7 @@ export const addFavorite = async (req, res, next) => {
     console.log("add favorite");
     let receptor = await User.findById(req.params.id);
     let favorite = await Favorite.findOne({
-      petitioner: req.user._id.toString(),
+      emisor: req.user._id.toString(),
       receptor: req.params.id,
     });
     if (!receptor) {
@@ -21,7 +21,7 @@ export const addFavorite = async (req, res, next) => {
       res.status(404).json(err);
     } else {
       let newFavorite = new Favorite({
-        petitioner: req.user._id.toString(),
+        emisor: req.user._id.toString(),
         receptor: req.params.id,
       });
       await newFavorite.save();
@@ -38,7 +38,7 @@ export const deleteFavorite = async (req, res, next) => {
     console.log("delete favorite");
     let receptor = await User.findById(req.params.id);
     let favorite = await Favorite.findOne({
-      petitioner: req.user._id.toString(),
+      emisor: req.user._id.toString(),
       receptor: req.params.id,
     });
     if (!receptor) {
@@ -51,7 +51,7 @@ export const deleteFavorite = async (req, res, next) => {
       res.status(404).json(err);
     } else {
       await Favorite.findOneAndDelete({
-        petitioner: req.user._id.toString(),
+        emisor: req.user._id.toString(),
         receptor: req.params.id,
       });
       res.send({ message: "deleted success" });
@@ -65,7 +65,7 @@ export const deleteFavorite = async (req, res, next) => {
 export const getFavorites = async (req, res, next) => {
   try {
     let favorites = await Favorite.find({
-      petitioner: req.user._id.toString(),
+      emisor: req.user._id.toString(),
     }).populate({
       path: "receptor",
       select: "_id img personalData workerData email", // Lista de campos que deseas seleccionar

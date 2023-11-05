@@ -7,7 +7,7 @@ import paginateConfig from "../config/paginate.js";
 const favoriteSchema = new Schema(
   {
     isActive: { type: Boolean },
-    petitioner: { type: String, ref: "User" },
+    emisor: { type: String, ref: "User" },
     receptor: { type: String, ref: "User" },
     type: {
       type: String,

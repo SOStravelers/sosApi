@@ -119,7 +119,10 @@ export const registerEmail = async (req, res, next) => {
         .replace(/@/g, "_")
         .replace(".", "_");
     }
-    const newUser = await user.save();
+    await user.save();
+    const newUser = await User.findOne({ email: user.email }).select(
+      "about email img language personalData username workerData _id security.hasPassword"
+    );
     console.log("el item", newUser);
     let userToCreateToken = {
       _id: newUser._id,
@@ -167,16 +170,20 @@ export const loginEmail = async (req, res, next) => {
     user.lastLogin = Date.now();
     user.lastLoginType = "email";
     await user.save();
-    delete user.password;
+    const newUser = await User.findOne({ email: user.email }).select(
+      "about email img language personalData username workerData _id security.hasPassword"
+    );
+    delete newUser.password;
+
     let userToCreateToken = {
-      _id: user._id,
-      username: user.username,
+      _id: newUser._id,
+      username: newUser.username,
     };
     res.send({
       msg: "login success",
       access_token: accessTokenGen(userToCreateToken, true),
       refresh_token: refreshTokenGen(userToCreateToken),
-      user,
+      user: newUser,
     });
   } catch (err) {
     next(err);
@@ -219,8 +226,10 @@ export const loginGoogle = async (req, res, next) => {
       if (newValue) {
         console.log("new");
         try {
-          const newUser = await user.save();
-          console.log("Usuario:", user);
+          await user.save();
+          const newUser = await User.findOne({ email: user.email }).select(
+            "about email img language personalData username workerData _id security.hasPassword"
+          );
 
           let userToCreateToken = {
             _id: newUser._id,
