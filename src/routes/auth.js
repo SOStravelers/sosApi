@@ -105,9 +105,9 @@ router.post(
   ),
   loginGoogle
 );
-//Obtener un usuario por id
+// //Obtener un usuario por id
 router.get(
-  "/:id",
+  "/user/:id",
   validateParams(
     [
       {
@@ -205,7 +205,6 @@ router.post(
   ),
   findByEmail
 );
-
 //get users by type and isActive
 router.get(
   "/all",
