@@ -61,3 +61,18 @@ export const deleteFavorite = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getFavorites = async (req, res, next) => {
+  try {
+    let favorites = await Favorite.find({
+      petitioner: req.user._id.toString(),
+    }).populate({
+      path: "receptor",
+      select: "_id img personalData workerData email", // Lista de campos que deseas seleccionar
+    });
+    res.send(favorites);
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

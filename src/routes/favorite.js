@@ -1,7 +1,11 @@
 import Router from "express";
 const router = Router();
 import validateParams from "../middleware/validate.js";
-import { addFavorite, deleteFavorite } from "../controllers/favorite.js";
+import {
+  addFavorite,
+  deleteFavorite,
+  getFavorites,
+} from "../controllers/favorite.js";
 
 //añadir a favorito
 router.get(
@@ -33,5 +37,7 @@ router.get(
   ),
   deleteFavorite
 );
+//obtener todos mis favoritos
+router.get("/getAll", getFavorites);
 
 export default router;
