@@ -121,7 +121,7 @@ router.get(
 );
 //Envia codigo de validacion
 router.get(
-  "/sendCode/:id",
+  "/sendCode/template",
   validateParams(
     [
       {
@@ -129,8 +129,13 @@ router.get(
         required: true,
         type: "string",
       },
+      {
+        param_key: "email",
+        required: true,
+        type: "string",
+      },
     ],
-    "params"
+    "query"
   ),
   sendValidationCode
 );

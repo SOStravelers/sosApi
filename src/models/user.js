@@ -153,6 +153,7 @@ User.hash = (password) => {
   return bcrypt.hashSync(password, salt, null);
 };
 User.validPassword = async (id, password) => {
+  console.log("passss");
   const user = await User.findById(id, "password").exec();
   let valid = false;
   try {

@@ -7,6 +7,7 @@ import subservice from "./subservice.js";
 import test from "./test.js";
 import payment from "./payment.js";
 import user from "./user.js";
+import favorite from "./favorite.js";
 import admin from "./admin.js";
 import notification from "./notification.js";
 import schedule from "./schedule.js";
@@ -39,6 +40,8 @@ routes.use("/subservices", subservice);
 routes.use("/notification", notification);
 
 routes.use("/schedules", schedule);
+
+routes.use("/favorites", isAuth, favorite);
 
 routes.use("/tests", test);
 

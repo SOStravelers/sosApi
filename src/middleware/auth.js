@@ -125,19 +125,17 @@ export const renewToken = async (req, res, next) => {
   }
 };
 export const isAuth = async (req, res, next) => {
-  console.log("validate auth");
+  console.log("-validate auth-");
   req.access_token = req.headers.authorization;
   if (typeof req.access_token !== "undefined" && req.access_token !== "") {
     let decoded = decodeFunc(req.access_token);
     let authUser;
     try {
-      console.log("try");
       authUser = await User.findOne({ _id: decoded._id })
         .select("isActive security isValidate name username email imgUrl")
         .exec();
       authUser.id = authUser._id.toString();
       req.user = authUser;
-      console.log(req.user);
       next();
     } catch (err) {
       let isTokenError = decoded.name === "TokenExpiredError" ? true : false;

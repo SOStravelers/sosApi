@@ -275,46 +275,73 @@ export const galleryPhoto = async (req, res, next) => {
     next(err);
   }
 };
+// función para crear contraseña para usuario que no tienen creada
+export const hasPassword = async (req, res, next) => {
+  try {
+    console.log("hasPass");
+    let user = await User.findOne({
+      _id: req.user._id.toString(),
+    }).select("security");
+    if (user.security && user.security.hasPassword) {
+      res.send({ hasPassword: true });
+    } else {
+      res.send({ hasPassword: false });
+    }
+  } catch (err) {
+    let error = createError(500, "Internal Server Error");
+    res.status(500).json(error);
+  }
+};
 
 // función para crear contraseña para usuario que no tienen creada
 export const changePassword = async (req, res, next) => {
   try {
-    console.log("createPassword");
-    const id = req.params.id;
-    const newPassword = req.body.password;
+    console.log("changePassword");
+    const newPassword = req.body.newPassword;
+    const currentPassword = req.body.currentPassword;
     if (!newPassword) {
       let error = createError(400, "a field is missing");
       res.status(404).json(error);
       throw err;
     } else {
-      const encryptPassword = await User.hash(newPassword);
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: id }, // Filtro para encontrar el usuario por su ID
-        {
-          password: encryptPassword,
-          isActive: true,
-          "security.hasPassword": true,
-          "security.updatedAt": new Date(),
-        },
-        { new: true } // Opcional: para obtener el documento actualizado como resultado
-      ).select("isActive isValidate security email personalData _id img");
+      const validPass = await User.validPassword(
+        req.user._id.toString(),
+        currentPassword
+      );
+      console.log("valid", validPass);
+      if (!validPass) {
+        let error = createError(400, "current password wrong");
+        res.status(400).json(error);
+      } else {
+        const encryptPassword = await User.hash(newPassword);
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: req.user._id.toString() }, // Filtro para encontrar el usuario por su ID
+          {
+            password: encryptPassword,
+            isActive: true,
+            "security.hasPassword": true,
+            "security.updatedAt": new Date(),
+          },
+          { new: true } // Opcional: para obtener el documento actualizado como resultado
+        ).select("isActive isValidate security email personalData _id img");
 
-      if (!updatedUser) {
-        let error = createError(500, "Internal Server Error");
-        res.status(500).json(error);
+        if (!updatedUser) {
+          let error = createError(500, "Internal Server Error");
+          res.status(500).json(error);
+        }
+        let userToCreateToken = {
+          _id: updatedUser._id,
+          username: updatedUser.username,
+        };
+        let userRefresh = {
+          _id: updatedUser._id,
+        };
+        res.json({
+          access_token: accessTokenGen(userToCreateToken, true),
+          refresh_token: refreshTokenGen(userRefresh),
+          user: updatedUser,
+        });
       }
-      let userToCreateToken = {
-        _id: updatedUser._id,
-        username: updatedUser.username,
-      };
-      let userRefresh = {
-        _id: updatedUser._id,
-      };
-      res.json({
-        access_token: accessTokenGen(userToCreateToken, true),
-        refresh_token: refreshTokenGen(userToCreateToken),
-        user: updatedUser,
-      });
     }
   } catch (err) {
     console.log(err);

@@ -67,125 +67,121 @@ export const create = async (req, res, next) => {
 };
 //Register user
 export const registerEmail = async (req, res, next) => {
-  console.log(
-    "============= REGISTER NEW USER AND CREATE TOKEN   ============="
-  );
-  console.log(req.body);
-  const accessTime = req.body.accessTime ? req.body.accessTime : "1d";
-  const refreshTime = req.body.refreshTime ? req.body.refreshTime : "30d";
-  req.body.accessTime ? delete req.body.accessTime : "";
-  req.body.refreshTime ? delete req.body.refreshTime : "";
-  let theEmail = req.body.email.toLowerCase().trim();
-  User.findOne({ email: theEmail }).exec(async (err, theUser) => {
+  try {
+    console.log("==== REGISTER NEW USER AND CREATE TOKEN   ========");
+    console.log(req.body);
+    const accessTime = req.body.accessTime ? req.body.accessTime : "1d";
+    const refreshTime = req.body.refreshTime ? req.body.refreshTime : "30d";
+    req.body.accessTime ? delete req.body.accessTime : "";
+    req.body.refreshTime ? delete req.body.refreshTime : "";
+    let theEmail = req.body.email.toLowerCase().trim();
+    let theUser = await User.findOne({ email: theEmail }).exec();
     if (theUser) {
-      let error = createError(409, "This email is already in use");
-      return res.status(409).json(error);
+      let err = createError(409, "This email is already in use");
+      next(err);
+      return res.status(409).json(err);
+    }
+    let user = new User(req.body);
+    if (req.body.password) {
+      user.password = User.hash(req.body.password);
+    }
+    user.type = req.body.type || "personal";
+    let name = procesarNombre(req.body.name);
+    console.log("name", name);
+    if (name.length > 1) {
+      user.personalData.name.first =
+        name[0].charAt(0).toUpperCase() + name[0].slice(1).toLowerCase().trim();
+      user.personalData.name.last =
+        name[1].charAt(0).toUpperCase() + name[1].slice(1).toLowerCase().trim();
     } else {
-      let user = new User(req.body);
-      if (req.body.password) {
-        user.password = User.hash(req.body.password);
-      }
-      user.type = req.body.type || "personal";
-      let name = procesarNombre(req.body.name);
-      console.log("name", name);
-      if (name.length > 1) {
-        user.personalData.name.first =
-          name[0].charAt(0).toUpperCase() +
-          name[0].slice(1).toLowerCase().trim();
-        user.personalData.name.last =
-          name[1].charAt(0).toUpperCase() +
-          name[1].slice(1).toLowerCase().trim();
-      } else {
-        user.personalData.name.first =
-          name[0].charAt(0).toUpperCase() +
-          name[0].slice(1).toLowerCase().trim();
-      }
-      user.email = theEmail;
-      if (user.username && user.username.length > 0) {
-        let exists = await User.findOne({
-          username: user.username,
-        }).exec();
-        if (exists) {
-          // user.username= mongoose.Types.ObjectId()
-          user.username = user.email
-            .toLowerCase()
-            .trim()
-            .replace(/@/g, "_")
-            .replace(".", "_");
-        } else {
-          user.username = user.username.toLowerCase().trim();
-        }
-      } else {
+      user.personalData.name.first =
+        name[0].charAt(0).toUpperCase() + name[0].slice(1).toLowerCase().trim();
+    }
+    user.email = theEmail;
+    if (user.username && user.username.length > 0) {
+      let exists = await User.findOne({
+        username: user.username,
+      }).exec();
+      if (exists) {
+        // user.username= mongoose.Types.ObjectId()
         user.username = user.email
           .toLowerCase()
           .trim()
           .replace(/@/g, "_")
           .replace(".", "_");
+      } else {
+        user.username = user.username.toLowerCase().trim();
       }
-      try {
-        console.log("saving...", user);
-        const newUser = await user.save();
-        console.log("el item", newUser);
-        let userToCreateToken = {
-          _id: newUser._id,
-          username: newUser.username,
-        };
-        let userRefresh = {
-          _id: newUser._id,
-        };
-        res.json({
-          access_token: accessTokenGen(userToCreateToken, true, accessTime),
-          refresh_token: refreshTokenGen(userRefresh, refreshTime),
-          user: newUser,
-        });
-      } catch (err) {
-        next(err);
-      }
+    } else {
+      user.username = user.email
+        .toLowerCase()
+        .trim()
+        .replace(/@/g, "_")
+        .replace(".", "_");
     }
-  });
+    const newUser = await user.save();
+    console.log("el item", newUser);
+    let userToCreateToken = {
+      _id: newUser._id,
+      username: newUser.username,
+    };
+    let userRefresh = {
+      _id: newUser._id,
+    };
+    res.json({
+      access_token: accessTokenGen(userToCreateToken, true, accessTime),
+      refresh_token: refreshTokenGen(userRefresh, refreshTime),
+      user: newUser,
+    });
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 //Login user by email
 export const loginEmail = async (req, res, next) => {
-  console.log(
-    "============= LOGIN USER BY EMAIL AND REFRESH TOKEN   ============="
-  );
-  let { email, password } = req.body;
-  email = email.toLowerCase().trim();
-  User.findOne({ email })
-    // .populate("users")
-    .exec(async (err, user) => {
-      if (err) return next(err);
-      if (!user) {
-        let error = createError(401, "User not found or invalid credentials");
-        return res.status(401).json(error);
-      }
-      const isValid =
-        typeof password !== "undefined"
-          ? await User.validPassword(user._id.toString(), password)
-          : false;
-      if (!isValid) {
-        let error = createError(404, "User not found or invalid credentials");
-        return res.status(404).json(error);
-      }
-      user.lastLogin = Date.now();
-      user.lastLoginType = "email";
-      user.save(async (err, user) => {
-        if (err) next(err);
-        delete user.password;
-        // USER (TO CREATE TOKEN)
-        let userToCreateToken = {
-          _id: user._id,
-          username: user.username,
-        };
-        console.log(user);
-        res.status(200).json({
-          msg: "login success",
-          access_token: accessTokenGen(userToCreateToken, true),
-          refresh_token: refreshTokenGen(userToCreateToken),
-          user,
-        });
-      });
+  try {
+    console.log("==== LOGIN USER BY EMAIL AND REFRESH TOKEN   ====");
+    let { email, password } = req.body;
+    email = email.toLowerCase().trim();
+    let user = await User.findOne({ email }).exec();
+    if (!user) {
+      let err = createError(401, "User not found or invalid credentials");
+      next(err);
+      return res.status(401).json(err);
+    }
+    if (!user.security.hasPassword) {
+      let err = createError(400, "has Not password");
+      next(err);
+      return res.status(400).json(err);
+    }
+    const isValid =
+      typeof password !== "undefined"
+        ? await User.validPassword(user._id.toString(), password)
+        : false;
+    if (!isValid) {
+      let err = createError(401, "User not found or invalid credentialsss");
+      next(err);
+      return res.status(401).json(err);
+    }
+    user.lastLogin = Date.now();
+    user.lastLoginType = "email";
+    await user.save();
+    delete user.password;
+    let userToCreateToken = {
+      _id: user._id,
+      username: user.username,
+    };
+    res.send({
+      msg: "login success",
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userToCreateToken),
+      user,
     });
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 //login y registro por google
 export const loginGoogle = async (req, res, next) => {
@@ -290,54 +286,56 @@ export const getById = async (req, res, next) => {
 // envia correo con codigo de validación por tiempo definido
 export const sendValidationCode = async (req, res, next) => {
   try {
-    const id = req.params.id;
+    const { id, email } = req.query;
+    console.log("buena", id, email);
     const user = await User.findById(id).exec();
     if (!user) {
-      let error = createError(409, "User not found or invalid credentials");
-      res.status(404).json(error);
-    } else {
-      const code = generarNumero4Digitos();
-      const digitosArray = Array.from(String(code), Number);
-      const expTime = 5;
-      const date = new Date();
-      console.log(date);
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: user._id }, // Filtro para encontrar el usuario por su ID
-        {
-          "validation.code": code,
-          "validation.expTime": expTime,
-          "validation.time": date,
-        },
-        { new: true } // Opcional: para obtener el documento actualizado como resultado
-      );
-
-      if (!updatedUser) {
-        res.status(500).json({ error: "Error al actualizar el usuario" });
-      }
-      const params = {
-        Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS
-        Destination: {
-          ToAddresses: [user.email], // Lista de destinatarios
-          CcAddresses: [envar().SES_EMAIL_AUTH], // Lista de copias
-        },
-        Template: "validationCode", // Nombre del template a usar
-        TemplateData: JSON.stringify({
-          number1: digitosArray[0],
-          number2: digitosArray[1],
-          number3: digitosArray[2],
-          number4: digitosArray[3],
-        }),
-      };
-      await sendEmailTemplate(params);
-      res.send({ msg: "code sent" });
+      let err = createError(404, "User not found or invalid credentials");
+      next(err);
+      return res.status(404).json(err);
     }
+    const code = generarNumero4Digitos();
+    const urlCode = generarCodigoAleatorio(30);
+    const digitosArray = Array.from(String(code), Number);
+    const expTime = 5;
+    const date = new Date();
+    console.log(date);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id }, // Filtro para encontrar el usuario por su ID
+      {
+        "validation.code": code,
+        "validation.urlcode": urlCode,
+        "validation.expTime": expTime,
+        "validation.time": date,
+      },
+      { new: true } // Opcional: para obtener el documento actualizado como resultado
+    );
+
+    const params = {
+      Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS
+      Destination: {
+        ToAddresses: [updatedUser.email], // Lista de destinatarios
+        CcAddresses: [envar().SES_EMAIL_AUTH], // Lista de copias
+      },
+      Template: "validationCode", // Nombre del template a usar
+      SubjectPart: "wena",
+      TemplateData: JSON.stringify({
+        number1: digitosArray[0],
+        number2: digitosArray[1],
+        number3: digitosArray[2],
+        number4: digitosArray[3],
+      }),
+    };
+    await sendEmailTemplate(params);
+    res.send({ msg: "code sent" });
   } catch (err) {
-    console.log(err);
+    next(err);
     if (err instanceof Error && err.$metadata) {
       res
         .status(err.$metadata.httpStatusCode)
         .json({ error: err.Error.message });
     } else {
+      next(err);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
@@ -350,44 +348,39 @@ export const verifyValidationCode = async (req, res, next) => {
     const id = req.params.id;
     const user = await User.findById(id).exec();
     if (!user) {
-      let error = createError(404, "User not found or invalid credentials");
-      res.status(404).json(error);
+      let err = createError(404, "User not found or invalid credentials");
+      next(err);
+      return res.status(404).json(err);
+    }
+    const diferenciaEnMilisegundos = new Date() - user.validation.time;
+    const diferenciaEnMinutos = diferenciaEnMilisegundos / 60000;
+    console.log(diferenciaEnMinutos);
+    if (
+      diferenciaEnMinutos < user.validation.expTime &&
+      number == user.validation.code
+    ) {
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: user._id },
+        {
+          isValidate: true,
+          isActive: true,
+        },
+        { new: true }
+      ).select("isActive isValidate security email personalData _id");
+
+      // Realiza cualquier operación adicional aquí, como la conexión a SES AWS
+      res.send(updatedUser);
     } else {
-      const diferenciaEnMilisegundos = new Date() - user.validation.time;
-      const diferenciaEnMinutos = diferenciaEnMilisegundos / 60000;
-      console.log(diferenciaEnMinutos);
-      if (
-        diferenciaEnMinutos < user.validation.expTime &&
-        number == user.validation.code
-      ) {
-        const updatedUser = await User.findOneAndUpdate(
-          { _id: user._id },
-          {
-            isValidate: true,
-            isActive: true,
-          },
-          { new: true }
-        ).select("isActive isValidate security email personalData _id");
-
-        if (!updatedUser) {
-          let error = createError(500, "Internal Server Error");
-          res.status(500).json(error);
-        }
-
-        // Realiza cualquier operación adicional aquí, como la conexión a SES AWS
-        res.send(updatedUser);
-      } else {
-        let error = createError(
-          400,
-          "Authentication failed: Incorrect or expired code"
-        );
-        res.status(400).json(error);
-      }
+      let error = createError(
+        400,
+        "Authentication failed: Incorrect or expired code"
+      );
+      next(err);
+      return res.status(400).json(error);
     }
   } catch (err) {
-    console.log(err);
-    let error = createError(500, "Internal Server Error");
-    res.status(500).json(error);
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 // función para crear contraseña para usuario que no tienen creada
@@ -395,69 +388,59 @@ export const createPassword = async (req, res, next) => {
   try {
     console.log("createPassword");
     const id = req.params.id;
-    const newPassword = req.body.password;
+    const newPassword = req.body.password.trim();
     if (!newPassword) {
-      let error = createError(400, "a field is missing");
-      res.status(404).json(error);
-      throw err;
-    } else {
-      const encryptPassword = await User.hash(newPassword);
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: id }, // Filtro para encontrar el usuario por su ID
-        {
-          password: encryptPassword,
-          isActive: true,
-          "security.hasPassword": true,
-          "security.updatedAt": new Date(),
-        },
-        { new: true } // Opcional: para obtener el documento actualizado como resultado
-      ).select("isActive isValidate security email personalData _id img");
-
-      if (!updatedUser) {
-        let error = createError(500, "Internal Server Error");
-        res.status(500).json(error);
-      }
-      let userToCreateToken = {
-        _id: updatedUser._id,
-        username: updatedUser.username,
-      };
-      let userRefresh = {
-        _id: updatedUser._id,
-      };
-      res.json({
-        access_token: accessTokenGen(userToCreateToken, true),
-        refresh_token: refreshTokenGen(userToCreateToken),
-        user: updatedUser,
-      });
+      let err = createError(400, "a field is missing");
+      next(err);
+      return res.status(404).json(err);
     }
+    const encryptPassword = await User.hash(newPassword);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: id }, // Filtro para encontrar el usuario por su ID
+      {
+        password: encryptPassword,
+        isActive: true,
+        "security.hasPassword": true,
+        "security.updatedAt": new Date(),
+      },
+      { new: true } // Opcional: para obtener el documento actualizado como resultado
+    ).select("isActive isValidate security email personalData _id img");
+
+    let userToCreateToken = {
+      _id: updatedUser._id,
+      username: updatedUser.username,
+    };
+    let userRefresh = {
+      _id: updatedUser._id,
+    };
+    res.json({
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userRefresh),
+      user: updatedUser,
+    });
   } catch (err) {
-    console.log(err);
-    let error = createError(500, "Internal Server Error");
-    res.status(500).json(error);
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 //Función para encontrar usuario por email
 export const findByEmail = async (req, res, next) => {
   try {
-    var text = decodeURIComponent(req.params.email);
+    console.log("findByEmail");
+    var text = decodeURIComponent(req.body.email);
     const email = text.trim().toLowerCase();
     let user = await User.findOne({
       email: email,
     }).select("isActive isValidate security email personalData _id");
     if (!user) {
-      let error = createError(404, "email not found");
-      res.status(404).json(error);
+      let err = createError(404, "email not found");
+      next(err);
+      return res.status(404).json(err);
     } else {
       res.send(user);
     }
   } catch (err) {
-    console.log(err);
-    let error = createError(500, "Internal Server Error");
-    res.status(500).json(error);
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-};
-export const recoveryPassEmail = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-  } catch (err) {}
 };

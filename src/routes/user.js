@@ -30,6 +30,8 @@ import {
   galleryPhoto,
   getBusinesByService,
   findbusinessbyname,
+  changePassword,
+  hasPassword,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -103,6 +105,28 @@ router.get(
   findbusinessbyname
 );
 
+//verficar si tiene contraseña
+router.get("/haspass", hasPassword);
+//cambiar contraseña
+router.post(
+  "/changepass",
+  validateParams(
+    [
+      {
+        param_key: "currentPassword",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "newPassword",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  changePassword
+);
 //Actualizar un usuario por id
 router.put(
   "/:id",
