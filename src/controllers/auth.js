@@ -283,19 +283,63 @@ export const loginGoogle = async (req, res, next) => {
 };
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
-  console.log("---GET USER BY ID---");
-  User.findOne({ _id: req.params.id }).exec((err, user) => {
-    if (err) {
-      let error = createError(400, "Invalid ID format");
-      console.log(error);
-      return res.status(400).json(error);
-    } else if (user) {
-      res.send(user);
+  try {
+    console.log("---GET USER BY ID---", req.params.id);
+    const user = await User.findOne({ _id: req.params.id }).select(
+      "about email img language personalData username workerData _id security.hasPassword"
+    );
+    console.log(user);
+    if (!user) {
+      let err = createError(404, "User not found");
+      next(err);
+      return res.status(404).json(err);
     } else {
-      let error = createError(404, "User not found");
-      return res.status(401).json(error);
+      res.send(user);
     }
-  });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+// función para crear contraseña para usuario que no tienen creada
+export const createPassword = async (req, res, next) => {
+  try {
+    console.log("createPassword");
+    const id = req.params.id;
+    const newPassword = req.body.password.trim();
+    if (!newPassword) {
+      let err = createError(400, "a field is missing");
+      next(err);
+      return res.status(404).json(err);
+    }
+    const encryptPassword = await User.hash(newPassword);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: id }, // Filtro para encontrar el usuario por su ID
+      {
+        password: encryptPassword,
+        isActive: true,
+        "security.hasPassword": true,
+        "security.updatedAt": new Date(),
+      },
+      { new: true } // Opcional: para obtener el documento actualizado como resultado
+    ).select("isActive isValidate security email personalData _id img");
+
+    let userToCreateToken = {
+      _id: updatedUser._id,
+      username: updatedUser.username,
+    };
+    let userRefresh = {
+      _id: updatedUser._id,
+    };
+    res.json({
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userRefresh),
+      user: updatedUser,
+    });
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 // envia correo con codigo de validación por tiempo definido
 export const sendValidationCode = async (req, res, next) => {
@@ -397,46 +441,7 @@ export const verifyValidationCode = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-// función para crear contraseña para usuario que no tienen creada
-export const createPassword = async (req, res, next) => {
-  try {
-    console.log("createPassword");
-    const id = req.params.id;
-    const newPassword = req.body.password.trim();
-    if (!newPassword) {
-      let err = createError(400, "a field is missing");
-      next(err);
-      return res.status(404).json(err);
-    }
-    const encryptPassword = await User.hash(newPassword);
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: id }, // Filtro para encontrar el usuario por su ID
-      {
-        password: encryptPassword,
-        isActive: true,
-        "security.hasPassword": true,
-        "security.updatedAt": new Date(),
-      },
-      { new: true } // Opcional: para obtener el documento actualizado como resultado
-    ).select("isActive isValidate security email personalData _id img");
 
-    let userToCreateToken = {
-      _id: updatedUser._id,
-      username: updatedUser.username,
-    };
-    let userRefresh = {
-      _id: updatedUser._id,
-    };
-    res.json({
-      access_token: accessTokenGen(userToCreateToken, true),
-      refresh_token: refreshTokenGen(userRefresh),
-      user: updatedUser,
-    });
-  } catch (err) {
-    next(err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
 //Función para encontrar usuario por email
 export const findByEmail = async (req, res, next) => {
   try {
