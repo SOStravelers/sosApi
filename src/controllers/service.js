@@ -1,4 +1,5 @@
 import Service from "../models/service.js";
+import Subservice from "../models/subservice.js";
 import mongoose from "mongoose";
 import { AwsUploadFile } from "../services/aws_s3.js";
 import Jimp from "jimp";
@@ -8,7 +9,6 @@ import {
   missingData,
   duplicateData,
 } from "../config/error.js";
-import Subservice from "../models/subservice.js";
 
 //Crear Servicio
 export const create = async (req, res, next) => {
@@ -174,6 +174,32 @@ export const uploadIconService = async (req, res, next) => {
       });
   } catch (err) {
     next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const serviceAndSubservice = async (req, res, next) => {
+  try {
+    console.log("---GET ALL SERVICES WITH SUBSERVICE---", req.query);
+    let services = await Service.find({}).select("_id name");
+    if (services.length > 0) {
+      let result = [];
+      for (let [index, service] of services.entries()) {
+        console.log(service._id.toString());
+        let subservices = await Subservice.find({
+          service: service._id.toString(),
+        }).select("_id name");
+        let serviceWithSubservices = {
+          _id: service._id,
+          name: service.name,
+          subservices: subservices,
+        };
+        result.push(serviceWithSubservices);
+      }
+      res.send(result);
+    }
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

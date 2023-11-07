@@ -93,13 +93,12 @@ const userSchema = new Schema(
       },
       services: [
         {
-          id: { type: String, ref: "Service", default: null },
+          id: { type: String, ref: "Service" },
           subServices: Array({
             type: String,
             ref: "SubServices",
-            default: [],
           }),
-          gallery: { type: Array, default: [] },
+          gallery: { type: Array },
         },
       ],
     },

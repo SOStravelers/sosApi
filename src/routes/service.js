@@ -11,6 +11,7 @@ import {
   updateOne,
   activateMany,
   uploadIconService,
+  serviceAndSubservice,
 } from "../controllers/service.js";
 
 const limits = {
@@ -82,6 +83,7 @@ router.get(
   ),
   getById
 );
+router.get("/all/andsubservices", serviceAndSubservice);
 router.put(
   "/:id",
   validateParams(
