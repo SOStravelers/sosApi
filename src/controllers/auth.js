@@ -11,60 +11,62 @@ import {
 
 //Create user personal/workers/business
 export const create = async (req, res, next) => {
-  console.log("---CREATE NEW USER-WORKER-BUSINESS---");
-  let user = new User(req.body);
-  user.email = user.email.toLowerCase().trim();
-  User.findOne({ email: user.email }).exec(async (err, theUser) => {
+  try {
+    console.log("---CREATE NEW USER-WORKER-BUSINESS---");
+    let user = new User(req.body);
+    user.email = user.email.toLowerCase().trim();
+    const theUser = await User.findOne({ email: user.email }).exec();
     if (theUser) {
-      let error = createError(409, "This email is already in use");
-      return res.status(409).json(error);
-    } else {
-      user.type = req.body.type || "personal";
+      let err = createError(409, "This email is already in use");
+      next(err);
+      return res.status(409).json(err);
+    }
+    user.type = req.body.type || "personal";
+    let name = procesarNombre(req.body.name);
+    if (name.length > 1) {
       user.personalData.name.first =
-        user.personalData.name.first.charAt(0).toUpperCase() +
-        user.personalData.name.first.slice(1).toLowerCase().trim();
+        name[0].charAt(0).toUpperCase() + name[0].slice(1).toLowerCase().trim();
       user.personalData.name.last =
-        user.personalData.name.last.charAt(0).toUpperCase() +
-        user.personalData.name.last.slice(1).toLowerCase().trim();
+        name[1].charAt(0).toUpperCase() + name[1].slice(1).toLowerCase().trim();
+    } else {
+      user.personalData.name.first =
+        name[0].charAt(0).toUpperCase() + name[0].slice(1).toLowerCase().trim();
+    }
 
-      if (user.password) {
-        user.password = User.hash(user.password);
-      }
-      if (user.username && user.username.length > 0) {
-        let exists = await User.findOne({
-          username: user.username,
-        }).exec();
-        if (exists) {
-          // user.username= mongoose.Types.ObjectId()
-          user.username = user.email
-            .toLowerCase()
-            .trim()
-            .replace(/@/g, "_")
-            .replace(".", "_");
-        } else {
-          user.username = user.username.toLowerCase().trim();
-        }
-      } else {
+    if (user.password) {
+      user.password = User.hash(user.password);
+      user.isActive = true;
+      user.security.hasPassword = true;
+      user.security.updatedAt = new Date();
+    }
+    if (user.username && user.username.length > 0) {
+      let exists = await User.findOne({
+        username: user.username,
+      }).exec();
+      if (exists) {
+        // user.username= mongoose.Types.ObjectId()
         user.username = user.email
           .toLowerCase()
           .trim()
           .replace(/@/g, "_")
           .replace(".", "_");
+      } else {
+        user.username = user.username.toLowerCase().trim();
       }
-      try {
-        console.log("saving...", user);
-        const newUser = await user.save();
-        console.log("el item", newUser);
-        res.json(newUser);
-        // user.save((err, item) => {
-        //   if (err) next(err);
-        //   res.send("hola")
-        // });
-      } catch (err) {
-        next(err);
-      }
+    } else {
+      user.username = user.email
+        .toLowerCase()
+        .trim()
+        .replace(/@/g, "_")
+        .replace(".", "_");
     }
-  });
+    console.log("saving user...");
+    const newUser = await user.save();
+    res.json(newUser);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 //Register user
 export const registerEmail = async (req, res, next) => {
@@ -85,10 +87,12 @@ export const registerEmail = async (req, res, next) => {
     let user = new User(req.body);
     if (req.body.password) {
       user.password = User.hash(req.body.password);
+      user.isActive = true;
+      user.security.hasPassword = true;
+      user.security.updatedAt = new Date();
     }
     user.type = req.body.type || "personal";
     let name = procesarNombre(req.body.name);
-    console.log("name", name);
     if (name.length > 1) {
       user.personalData.name.first =
         name[0].charAt(0).toUpperCase() + name[0].slice(1).toLowerCase().trim();
@@ -454,7 +458,6 @@ export const findByEmail = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
   console.log("---GET USERS---");

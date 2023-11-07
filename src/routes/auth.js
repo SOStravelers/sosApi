@@ -30,6 +30,11 @@ router.post(
         required: true,
         type: "string",
       },
+      {
+        param_key: "name",
+        required: true,
+        type: "string",
+      },
     ],
     "body"
   ),
