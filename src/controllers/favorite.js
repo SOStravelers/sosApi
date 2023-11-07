@@ -4,8 +4,8 @@ import { createError } from "../config/error.js";
 
 //Añadir usuario a favorito
 export const addFavorite = async (req, res, next) => {
+  console.log("--- ADD FAVORITE ---");
   try {
-    console.log("add favorite");
     let receptor = await User.findById(req.params.id);
     let favorite = await Favorite.findOne({
       emisor: req.user._id.toString(),
@@ -34,8 +34,8 @@ export const addFavorite = async (req, res, next) => {
 };
 //Eliminar usuario a favorito
 export const deleteFavorite = async (req, res, next) => {
+  console.log("--- DELETE FAVORITE ---");
   try {
-    console.log("delete favorite");
     let receptor = await User.findById(req.params.id);
     let favorite = await Favorite.findOne({
       emisor: req.user._id.toString(),
@@ -61,8 +61,9 @@ export const deleteFavorite = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
+//Obtener todos los favoritos de un usuario
 export const getFavorites = async (req, res, next) => {
+  console.log("--- GET ALL FAVORITES ---");
   try {
     let favorites = await Favorite.find({
       emisor: req.user._id.toString(),

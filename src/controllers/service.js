@@ -12,13 +12,11 @@ import {
 
 //Crear Servicio
 export const create = async (req, res, next) => {
-  console.log("---CREATE NEW SERVICE---", req.user);
-  let service = new Service(req.body);
-  service.name = req.body.name.toLowerCase();
-  service.creator = req.body.user;
-
+  console.log("--- CREATE NEW SERVICE ---");
   try {
-    console.log("saving...", service);
+    let service = new Service(req.body);
+    service.name = req.body.name.toLowerCase();
+    service.creator = req.body.user;
     const newService = await service.save();
     console.log("nuevo servicio", newService);
     res.json(newService);
@@ -27,14 +25,14 @@ export const create = async (req, res, next) => {
     return res.status(400).send({
       status: 400,
       err: err,
-      result: `Duplicate data ${service.name}`,
+      result: `Duplicate data ${req.body.name.toLowerCase()}`,
     });
   }
 };
 //Obtener servicios con paginate por tipos y activados
 export const getServices = async (req, res, next) => {
+  console.log("--- GET SERVICES ---");
   try {
-    console.log("---GET SERVICES---");
     let body = {};
     Object.assign(body, req.query);
     console.log("query", body);
@@ -47,7 +45,6 @@ export const getServices = async (req, res, next) => {
     let query = {};
     body.isActive ? (query.isActive = body.isActive) : "";
     Service.paginate(query, options, (err, items) => {
-      if (err) return next(err);
       res.send(items);
     });
   } catch (err) {
@@ -105,8 +102,8 @@ export const activateMany = (req, res, next) => {
 };
 
 export const uploadIconService = async (req, res, next) => {
+  console.log("--- UPLOAD ICON SERVICE/SUBSERVICE ---", req.query);
   try {
-    console.log("---UPLOAD ICON SERVICE/SUBSERVICE---", req.query);
     const id = req.query.id;
     const type = req.query.type;
     if (type != "service" && type != "subservice") {
@@ -177,10 +174,9 @@ export const uploadIconService = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 export const serviceAndSubservice = async (req, res, next) => {
+  console.log("--- GET ALL SERVICES WITH SUBSERVICE ---", req.query);
   try {
-    console.log("---GET ALL SERVICES WITH SUBSERVICE---", req.query);
     let services = await Service.find({}).select("_id name");
     if (services.length > 0) {
       let result = [];
