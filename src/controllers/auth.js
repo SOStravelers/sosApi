@@ -11,8 +11,8 @@ import {
 
 //Create user personal/workers/business
 export const create = async (req, res, next) => {
+  console.log("--- CREATE NEW USER-WORKER-BUSINESS ---");
   try {
-    console.log("---CREATE NEW USER-WORKER-BUSINESS---");
     let user = new User(req.body);
     user.email = user.email.toLowerCase().trim();
     const theUser = await User.findOne({ email: user.email }).exec();
@@ -64,12 +64,13 @@ export const create = async (req, res, next) => {
     const newUser = await user.save();
     res.json(newUser);
   } catch (err) {
-    console.log(err);
+    next(err);
     res.status(500).json({ message: "Internal server error." });
   }
 };
 //Register user
 export const registerEmail = async (req, res, next) => {
+  console.log("--- REGISTER NEW USER AND CREATE TOKEN ---");
   try {
     console.log("==== REGISTER NEW USER AND CREATE TOKEN   ========");
     console.log(req.body);
@@ -142,14 +143,14 @@ export const registerEmail = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    console.log(err);
+    next(err);
     res.status(500).json({ message: "Internal server error." });
   }
 };
 //Login user by email
 export const loginEmail = async (req, res, next) => {
+  console.log("--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---");
   try {
-    console.log("==== LOGIN USER BY EMAIL AND REFRESH TOKEN   ====");
     let { email, password } = req.body;
     email = email.toLowerCase().trim();
     let user = await User.findOne({ email }).exec();
@@ -191,100 +192,87 @@ export const loginEmail = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    console.log(err);
+    next(err);
     res.status(500).json({ message: "Internal server error." });
   }
 };
 //login y registro por google
 export const loginGoogle = async (req, res, next) => {
-  console.log(
-    "============= LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN   ============="
-  );
-  let { email, name, image } = req.body;
-  console.log("IMAGE", image);
-  email = email.toLowerCase().trim();
+  console.log("--- LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN ---");
   try {
-    User.findOne({ email }).exec(async (err, user) => {
-      if (err) return next(err);
-      let newValue = false;
-      if (!user) {
-        console.log("nuevo");
-        newValue = true;
-        user = new User();
-        user.email = email;
-        var partes = name.split(" ");
-        var names = [partes[0], partes.slice(1).join(" ")];
-        user.personalData.name.first = names[0];
-        user.personalData.name.last = names[1];
-        !user.type ? (user.type = "personal") : "";
-        user.username = user.email
-          .toLowerCase()
-          .trim()
-          .replace(/@/g, "_")
-          .replace(".", "_");
-      }
-      !user.img.imgUrl ? (user.img.imgUrl = image) : "";
-      user.lastLogin = Date.now();
-      user.lastLoginType = "google";
-      user.isActive = true;
-      user.isValidate = true;
-      if (newValue) {
-        console.log("new");
-        try {
-          await user.save();
-          const newUser = await User.findOne({ email: user.email }).select(
-            "about email img language personalData username workerData _id security.hasPassword"
-          );
-
-          let userToCreateToken = {
-            _id: newUser._id,
-            username: newUser.username,
-          };
-
-          let userRefresh = {
-            _id: newUser._id,
-          };
-
-          res.json({
-            access_token: accessTokenGen(userToCreateToken, true),
-            refresh_token: refreshTokenGen(userRefresh),
-            user: newUser,
-          });
-        } catch (error) {
-          if (error.code === 11000) {
-            // Manejar el error de documento duplicado
-            res.status(409).json({ error: "El usuario ya existe." });
-          } else {
-            // Manejar otros errores
-            next(error);
-          }
-        }
-      } else {
-        let newUser = await User.findByIdAndUpdate(user._id, user, {
-          new: true,
-        }).exec();
-        delete newUser.password;
-        // USER (TO CREATE TOKEN)
-        let userToCreateToken = {
-          _id: newUser._id,
-          username: newUser.username,
-        };
-        res.status(200).json({
-          msg: "login success",
-          access_token: accessTokenGen(userToCreateToken, true),
-          refresh_token: refreshTokenGen(userToCreateToken),
-          user: newUser,
-        });
-      }
-    });
+    let { email, name, image } = req.body;
+    console.log("IMAGE", image);
+    email = email.toLowerCase().trim();
+    var user = await User.findOne({ email }).exec();
+    User.findOne({ email }).exec();
+    let newValue = false;
+    if (!user) {
+      console.log("nuevo");
+      newValue = true;
+      user = new User();
+      user.email = email;
+      var partes = name.split(" ");
+      var names = [partes[0], partes.slice(1).join(" ")];
+      user.personalData.name.first = names[0];
+      user.personalData.name.last = names[1];
+      !user.type ? (user.type = "personal") : "";
+      user.username = user.email
+        .toLowerCase()
+        .trim()
+        .replace(/@/g, "_")
+        .replace(".", "_");
+    }
+    !user.img.imgUrl ? (user.img.imgUrl = image) : "";
+    user.lastLogin = Date.now();
+    user.lastLoginType = "google";
+    user.isActive = true;
+    user.isValidate = true;
+    if (newValue) {
+      console.log("new");
+      await user.save();
+      const newUser = await User.findOne({ email: user.email }).select(
+        "about email img language personalData username workerData _id security.hasPassword"
+      );
+      let userToCreateToken = {
+        _id: newUser._id,
+        username: newUser.username,
+      };
+      let userRefresh = {
+        _id: newUser._id,
+      };
+      res.json({
+        access_token: accessTokenGen(userToCreateToken, true),
+        refresh_token: refreshTokenGen(userRefresh),
+        user: newUser,
+      });
+    } else {
+      let newUser = await User.findByIdAndUpdate(user._id, user, {
+        new: true,
+      }).select(
+        "about email img language personalData username workerData _id security.hasPassword"
+      );
+      delete newUser.password;
+      // USER (TO CREATE TOKEN)
+      let userToCreateToken = {
+        _id: newUser._id,
+        username: newUser.username,
+      };
+      res.status(200).json({
+        msg: "login success",
+        access_token: accessTokenGen(userToCreateToken, true),
+        refresh_token: refreshTokenGen(userToCreateToken),
+        user: newUser,
+      });
+    }
   } catch (err) {
     next(err);
+    res.status(500).json({ message: "Internal server error." });
   }
 };
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
+  console.log("--- GET USER BY ID ---");
   try {
-    console.log("---GET USER BY ID---", req.params.id);
     const user = await User.findOne({ _id: req.params.id }).select(
       "about email img language personalData username workerData _id security.hasPassword"
     );
@@ -297,14 +285,14 @@ export const getById = async (req, res, next) => {
       res.send(user);
     }
   } catch (err) {
-    console.log(err);
+    next(err);
     res.status(500).json({ message: "Internal server error." });
   }
 };
 // función para crear contraseña para usuario que no tienen creada
 export const createPassword = async (req, res, next) => {
+  console.log("-- CREATE PASSWORD --");
   try {
-    console.log("createPassword");
     const id = req.params.id;
     const newPassword = req.body.password.trim();
     if (!newPassword) {
@@ -341,11 +329,33 @@ export const createPassword = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+//Función para encontrar usuario por email
+export const findByEmail = async (req, res, next) => {
+  console.log("--- FIND BY EMAIL ---");
+  try {
+    var text = decodeURIComponent(req.body.email);
+    const email = text.trim().toLowerCase();
+    const user = await User.findOne({
+      email: email,
+    }).select("isActive isValidate security email personalData _id");
+    if (!user) {
+      let err = createError(404, "email not found");
+      next(err);
+      return res.status(404).json(err);
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 // envia correo con codigo de validación por tiempo definido
 export const sendValidationCode = async (req, res, next) => {
+  console.log("--- SEND VALIDATION CODE ---");
   try {
     const { id, email } = req.query;
-    console.log("buena", id, email);
+    console.log(id, email);
     const user = await User.findById(id).exec();
     if (!user) {
       let err = createError(404, "User not found or invalid credentials");
@@ -387,8 +397,8 @@ export const sendValidationCode = async (req, res, next) => {
     await sendEmailTemplate(params);
     res.send({ msg: "code sent" });
   } catch (err) {
-    next(err);
     if (err instanceof Error && err.$metadata) {
+      next(err);
       res
         .status(err.$metadata.httpStatusCode)
         .json({ error: err.Error.message });
@@ -400,8 +410,9 @@ export const sendValidationCode = async (req, res, next) => {
 };
 //validar codigo para validar correo
 export const verifyValidationCode = async (req, res, next) => {
+  console.log("--- VERIFY VALIDATION CODE ---");
   try {
-    console.log("verify code", req.body.code);
+    console.log(req.body.code);
     const number = req.body.code;
     const id = req.params.id;
     const user = await User.findById(id).exec();
@@ -429,12 +440,12 @@ export const verifyValidationCode = async (req, res, next) => {
       // Realiza cualquier operación adicional aquí, como la conexión a SES AWS
       res.send(updatedUser);
     } else {
-      let error = createError(
+      let err = createError(
         400,
         "Authentication failed: Incorrect or expired code"
       );
       next(err);
-      return res.status(400).json(error);
+      return res.status(400).json(err);
     }
   } catch (err) {
     next(err);
@@ -442,49 +453,33 @@ export const verifyValidationCode = async (req, res, next) => {
   }
 };
 
-//Función para encontrar usuario por email
-export const findByEmail = async (req, res, next) => {
-  try {
-    console.log("findByEmail");
-    var text = decodeURIComponent(req.body.email);
-    const email = text.trim().toLowerCase();
-    let user = await User.findOne({
-      email: email,
-    }).select("isActive isValidate security email personalData _id");
-    if (!user) {
-      let err = createError(404, "email not found");
-      next(err);
-      return res.status(404).json(err);
-    } else {
-      res.send(user);
-    }
-  } catch (err) {
-    next(err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
-  console.log("---GET USERS---");
-  let body = {};
-  Object.assign(body, req.query);
-  console.log("query", body);
-  let options = {
-    // populate,
-    // select,
-    page: body.page || 1,
-    limit: body.limit || 10,
-    sort: { updatedAt: -1 },
-  };
-  let query = {};
-  body.type ? (query.type = body.type) : "";
-  body.isActive ? (query.isActive = body.isActive) : "";
+  console.log("--- GET USERS ---");
   try {
+    let body = {};
+    Object.assign(body, req.query);
+    console.log("query", body);
+    let options = {
+      // populate,
+      select: "personalData img _id username",
+      page: body.page || 1,
+      limit: body.limit || 10,
+      sort: { updatedAt: -1 },
+    };
+    let query = {
+      // Agregar una condición para excluir los documentos con type="personal"
+      type: { $ne: "personal" },
+    };
+    body.type ? (query.type = body.type) : "";
+    body.isActive ? (query.isActive = body.isActive) : "";
+
     User.paginate(query, options, (err, items) => {
       if (err) return next(err);
       res.send(items);
     });
   } catch (err) {
     next(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -154,8 +154,9 @@ export const getTemplate = async (name) => {
 };
 // Crear el comando para enviar el template
 export const sendEmailTemplate = async (params) => {
+  console.log("$$$ SEND EMAIL TEMPLATE $$$");
   try {
-    console.log("buena", params);
+    console.log(params);
     const sendCommand = new SendTemplatedEmailCommand(params);
     const response = await SES.send(sendCommand);
 
