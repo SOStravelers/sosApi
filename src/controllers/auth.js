@@ -3,6 +3,7 @@ import envar from "../config/envar.js";
 import { sendEmailTemplate } from "../services/aws_ses.js";
 import { createError } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
+import { procesarNombre } from "../utils/data.js";
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
@@ -137,7 +138,7 @@ export const registerEmail = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    next(err);
+    console.log(err);
     res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -186,7 +187,7 @@ export const loginEmail = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    next(err);
+    console.log(err);
     res.status(500).json({ message: "Internal server error." });
   }
 };
