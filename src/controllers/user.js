@@ -114,6 +114,27 @@ export const findbusinessbyname = async (req, res, next) => {
 };
 
 //Actualizar data de un usuario por ID
+export const setWorker = async (req, res, next) => {
+  try {
+    console.log("---Set Worker---");
+    let id = req.user._id.toString();
+    let newUser = await User.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      { type: "worker" },
+      {
+        new: true,
+      }
+    ).exec();
+    res.send(newUser);
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Actualizar data de un usuario por ID
 export const updateOne = async (req, res, next) => {
   try {
     console.log("---UPDATE USER---", req.body);

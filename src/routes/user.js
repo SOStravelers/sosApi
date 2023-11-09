@@ -32,6 +32,7 @@ import {
   findbusinessbyname,
   changePassword,
   hasPassword,
+  setWorker,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -48,6 +49,12 @@ router.get(
     "query"
   ),
   getUsers
+);
+//set worker
+router.get(
+  "/setworker",
+
+  setWorker
 );
 //get business accounts by service with paginate
 router.get(

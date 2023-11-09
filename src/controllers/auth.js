@@ -127,7 +127,7 @@ export const registerEmail = async (req, res, next) => {
     }
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
-      "about email img language personalData username workerData _id security.hasPassword"
+      "about email img language personalData type username workerData _id security.hasPassword"
     );
     console.log("el item", newUser);
     let userToCreateToken = {
@@ -177,7 +177,7 @@ export const loginEmail = async (req, res, next) => {
     user.lastLoginType = "email";
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
-      "about email img language personalData username workerData _id security.hasPassword"
+      "about email img type language personalData username workerData _id security.hasPassword"
     );
     delete newUser.password;
 
@@ -231,7 +231,7 @@ export const loginGoogle = async (req, res, next) => {
       console.log("new");
       await user.save();
       const newUser = await User.findOne({ email: user.email }).select(
-        "about email img language personalData username workerData _id security.hasPassword"
+        "about email img language personalData type username workerData _id security.hasPassword"
       );
       let userToCreateToken = {
         _id: newUser._id,
@@ -246,11 +246,13 @@ export const loginGoogle = async (req, res, next) => {
         user: newUser,
       });
     } else {
+      console.log("obteniendo");
       let newUser = await User.findByIdAndUpdate(user._id, user, {
         new: true,
       }).select(
-        "about email img language personalData username workerData _id security.hasPassword"
+        "about email img language personalData username type workerData _id security.hasPassword"
       );
+      console.log("caca", newUser.type);
       delete newUser.password;
       // USER (TO CREATE TOKEN)
       let userToCreateToken = {
