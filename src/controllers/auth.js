@@ -465,7 +465,8 @@ export const getUsers = async (req, res, next) => {
     console.log("query", body);
     let options = {
       // populate,
-      select: "personalData img _id username",
+      select:
+        "personalData img _id username businessData.name businessData.location",
       page: body.page || 1,
       limit: body.limit || 10,
       sort: { updatedAt: -1 },
