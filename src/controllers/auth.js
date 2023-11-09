@@ -275,9 +275,18 @@ export const loginGoogle = async (req, res, next) => {
 export const getById = async (req, res, next) => {
   console.log("--- GET USER BY ID ---");
   try {
-    const user = await User.findOne({ _id: req.params.id }).select(
-      "about email img language personalData username workerData _id security.hasPassword"
-    );
+    const user = await User.findOne({ _id: req.params.id })
+      .select(
+        "about email img language personalData username workerData _id security.hasPassword"
+      )
+      .populate({
+        path: "workerData.services.id",
+        select: "name _id",
+      })
+      .populate({
+        path: "workerData.services.subServices",
+        select: "name _id",
+      });
     console.log(user);
     if (!user) {
       let err = createError(404, "User not found");

@@ -97,7 +97,7 @@ const userSchema = new Schema(
           id: { type: String, ref: "Service" },
           subServices: Array({
             type: String,
-            ref: "SubServices",
+            ref: "Subservice",
           }),
           gallery: { type: Array },
         },

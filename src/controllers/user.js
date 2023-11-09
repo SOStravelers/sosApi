@@ -34,6 +34,35 @@ export const getUsers = async (req, res, next) => {
     next(err);
   }
 };
+//Obtener usuario por ID
+export const getById = async (req, res, next) => {
+  console.log("--- GET USER BY ID sss---");
+  try {
+    const user = await User.findOne({ _id: req.params.id })
+      .select(
+        "about email img language personalData username workerData _id security.hasPassword"
+      )
+      .populate({
+        path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
+        model: "Service", // Modelo de "Service"
+      })
+      .populate({
+        path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
+        model: "SubServices", // Modelo de "SubServices"
+      });
+    console.log(user);
+    if (!user) {
+      let err = createError(404, "User not found");
+      next(err);
+      return res.status(404).json(err);
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
 //Obtener usuarios business con paginate por servicios
 export const getBusinesByService = async (req, res, next) => {
   console.log("---GET BUSINESS BY SERVICE---", req.query);
