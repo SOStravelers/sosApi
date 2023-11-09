@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const scheduleSchema = new Schema(
   {
     user: { type: String, ref: "User" },
+    isActive: { type: Boolean, default: true },
     default: { type: String, default: false },
     service: { type: String, ref: "Service" },
     location: { type: String },
@@ -16,6 +17,7 @@ const scheduleSchema = new Schema(
           min: 0,
           max: 6,
         },
+        isActive: { type: Boolean, default: true },
         intervals: [
           {
             startTime: {
@@ -31,7 +33,7 @@ const scheduleSchema = new Schema(
       },
     ],
     creator: { type: String, ref: "User" },
-    isActive: { type: Boolean, default: true },
+
     details: { type: String },
   },
   { timestamps: true }

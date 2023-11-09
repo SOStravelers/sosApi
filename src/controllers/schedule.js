@@ -151,7 +151,11 @@ export const getByUser = async (req, res, next) => {
     const id = req.user._id.toString();
     const schedule = await Schedule.findOne({ user: id }).exec();
     console.log(schedule);
-    res.send(schedule);
+    if (schedule) {
+      res.send(schedule);
+    } else {
+      res.send({ schedules: [] });
+    }
   } catch (err) {
     next(err);
     res.status(500).json({ message: "Internal server error." });
