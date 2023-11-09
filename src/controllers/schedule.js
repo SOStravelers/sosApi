@@ -31,6 +31,34 @@ export const create = async (req, res, next) => {
     next(err);
   }
 };
+
+// Crear/Actualizar schedule worker
+export const addOrUpdate = async (req, res, next) => {
+  console.log("---ADD NEW SCHEDULE OR UPDATE---");
+  const user = req.user;
+  const id = user._id.toString();
+  const schedules = req.body.schedules;
+  try {
+    const schedule = await Schedule.findOne({ id: id, type: "worker" });
+    if (schedule) {
+      schedule.schedules = schedules;
+      let updatedSchedule = await Schedule.findOneAndUpdate(schedule, {
+        new: true,
+      }).exec();
+      res.json(updatedSchedule);
+    } else {
+      let newSchedule = new Schedule(myschedule);
+      newSchedule.user = id;
+      newSchedule.creator = id;
+      newSchedule.save();
+      res.json(newSchedule);
+    }
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 //Obtener horarios por hotel y si estan activos
 export const scheduleBusinessbyService = async (req, res, next) => {
   console.log("---GET SCHEDULES BUSINESS BY SERVICE---");

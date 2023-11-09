@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const scheduleSchema = new Schema(
   {
     user: { type: String, ref: "User" },
+    default: { type: String, default: false },
     service: { type: String, ref: "Service" },
     location: { type: String },
     timeZone: { type: String },

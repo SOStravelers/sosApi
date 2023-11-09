@@ -9,11 +9,9 @@ const subserviceSchema = new Schema(
     name: { type: String, unique: true },
     service: { type: String, ref: "Service" },
     isActive: { type: Boolean, default: true },
-    icon: { type: String },
     duration: { type: String },
     details: { type: String },
     imgUrl: { type: String },
-    coverImg: { type: String },
     creator: { type: String, ref: "User" },
     updated: {
       updatedAt: {
@@ -22,12 +20,12 @@ const subserviceSchema = new Schema(
       },
       updatedBy: { type: String, ref: "User" },
     },
-    price: {
-      value: { type: String, default: "$ 0" },
-      lastValue: { type: String, default: "$ 0" },
-      number: { type: Number, default: 0 },
-      lastNumber: { type: Number, default: 0 },
-    },
+    // price: {
+    //   value: { type: String, default: "$ 0" },
+    //   lastValue: { type: String, default: "$ 0" },
+    //   number: { type: Number, default: 0 },
+    //   lastNumber: { type: Number, default: 0 },
+    // },
   },
   { timestamps: true }
 );

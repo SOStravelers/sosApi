@@ -34,6 +34,7 @@ const userSchema = new Schema(
       },
     },
     username: { type: String, unique: true },
+    rating: { type: Number, default: 5 },
     email: { type: String, unique: true },
     isAdminUser: { type: Boolean },
     type: {
@@ -63,7 +64,7 @@ const userSchema = new Schema(
     language: {
       type: String,
       default: "EN",
-      enum: ["EN", "ES", "Fr", "Br"],
+      enum: ["EN", "ES", "FR", "BR"],
     },
     personalData: {
       name: {
@@ -87,7 +88,7 @@ const userSchema = new Schema(
         main: {
           type: String,
           default: "EN",
-          enum: ["EN", "ES", "Fr", "Br"],
+          enum: ["EN", "ES", "FR", "BR"],
         },
         secondary: { type: Array },
       },
@@ -104,6 +105,7 @@ const userSchema = new Schema(
     },
     businessData: {
       isActive: { type: Boolean, default: false },
+      category: { type: Number, enum: [1, 2, 3] },
       location: {
         country: { type: String },
         city: { type: String },

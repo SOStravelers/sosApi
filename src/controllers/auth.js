@@ -294,6 +294,7 @@ export const createPassword = async (req, res, next) => {
   console.log("-- CREATE PASSWORD --");
   try {
     const id = req.params.id;
+    console.log(id);
     const newPassword = req.body.password.trim();
     if (!newPassword) {
       let err = createError(400, "a field is missing");
@@ -310,7 +311,7 @@ export const createPassword = async (req, res, next) => {
         "security.updatedAt": new Date(),
       },
       { new: true } // Opcional: para obtener el documento actualizado como resultado
-    ).select("isActive isValidate security email personalData _id img");
+    ).select("isActive _id isValidate security email personalData _id img");
 
     let userToCreateToken = {
       _id: updatedUser._id,
