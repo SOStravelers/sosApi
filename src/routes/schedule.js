@@ -10,6 +10,7 @@ import {
   activateMany,
   scheduleBusinessbyService,
   addOrUpdate,
+  getByUser,
 } from "../controllers/schedule.js";
 
 router.post(
@@ -44,18 +45,20 @@ router.post(
 //add or update worker schedule
 router.post(
   "/add",
-  validateParams(
-    [
-      {
-        param_key: "schedules",
-        required: true,
-        type: "array",
-      },
-    ],
-    "body"
-  ),
+  // validateParams(
+  //   [
+  //     {
+  //       param_key: "schedules",
+  //       required: true,
+  //       type: "array",
+  //     },
+  //   ],
+  //   "body"
+  // ),
   addOrUpdate
 );
+//get By user
+router.get("/get", getByUser);
 
 router.get(
   "/businessbyservice",

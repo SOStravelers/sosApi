@@ -1,4 +1,5 @@
 import Schedule from "../models/schedule.js";
+import User from "../models/user.js";
 import Service from "../models/service.js";
 import Subservice from "../models/subservice.js";
 import mongoose from "mongoose";
@@ -37,17 +38,42 @@ export const addOrUpdate = async (req, res, next) => {
   console.log("---ADD NEW SCHEDULE OR UPDATE---");
   const user = req.user;
   const id = user._id.toString();
-  const schedules = req.body.schedules;
+  console.log(id);
+  const schedules = req.body;
+  console.log("schedulesss", schedules.schedules);
   try {
-    const schedule = await Schedule.findOne({ id: id, type: "worker" });
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      let err = createError(409, "User not exist");
+      next(err);
+      return res.status(409).json(err);
+    }
+    if (user && user.type != "worker") {
+      let err = createError(409, "you dont have the credentials");
+      next(err);
+      return res.status(409).json(err);
+    }
+    const schedule = await Schedule.findOne({ user: id });
     if (schedule) {
-      schedule.schedules = schedules;
-      let updatedSchedule = await Schedule.findOneAndUpdate(schedule, {
-        new: true,
-      }).exec();
+      console.log("entro", schedule);
+
+      // Supongamos que tienes un objeto `schedules` con los nuevos valores que deseas asignar.
+      // Debes crear un objeto de actualización con $set para actualizar el campo 'schedules'.
+      const update = {
+        $set: { schedules: schedules.schedules },
+      };
+
+      let updatedSchedule = await Schedule.findOneAndUpdate(
+        { user: id },
+        update,
+        {
+          new: true,
+        }
+      ).exec();
+      console.log("cambiando", updatedSchedule);
       res.json(updatedSchedule);
     } else {
-      let newSchedule = new Schedule(myschedule);
+      let newSchedule = new Schedule(schedules);
       newSchedule.user = id;
       newSchedule.creator = id;
       newSchedule.save();
@@ -118,6 +144,18 @@ export const scheduleBusinessbyService = async (req, res, next) => {
   }
 
   res.send({ horas });
+};
+export const getByUser = async (req, res, next) => {
+  try {
+    console.log("---GET SCHEDULE BY User id---");
+    const id = req.user._id.toString();
+    const schedule = await Schedule.findOne({ user: id }).exec();
+    console.log(schedule);
+    res.send(schedule);
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
