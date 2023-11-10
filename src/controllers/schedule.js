@@ -174,7 +174,6 @@ export const getByUser = async (req, res, next) => {
     console.log("---GET SCHEDULE BY USER ID---");
     const id = req.user._id.toString();
     const schedule = await Schedule.findOne({ user: id }).exec();
-    console.log(schedule);
     if (schedule) {
       res.send(schedule);
     } else {

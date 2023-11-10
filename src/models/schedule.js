@@ -14,12 +14,13 @@ const scheduleSchema = new Schema(
         day: {
           type: Number,
           required: true,
-          min: 0,
-          max: 6,
+          min: 1,
+          max: 7,
         },
         isActive: { type: Boolean, default: true },
         intervals: [
           {
+            _id: false,
             startTime: {
               type: String,
               required: true,

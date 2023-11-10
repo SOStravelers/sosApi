@@ -11,12 +11,14 @@ import favorite from "./favorite.js";
 import admin from "./admin.js";
 import notification from "./notification.js";
 import schedule from "./schedule.js";
+import holliday from "./holliday.js";
 import {
   isAuth,
   isAdmin,
   isAuthOptional,
   renewToken,
 } from "../middleware/auth.js";
+import Holliday from "../models/holliday.js";
 
 routes.get("/isAuth", isAuth, (req, res) => {
   res.statusMessage = "authenticated";
@@ -41,6 +43,8 @@ routes.use("/notification", notification);
 
 routes.use("/schedules", isAuth, schedule);
 routes.use("/schedules2", schedule);
+
+routes.use("/hollidays", isAuth, holliday);
 
 routes.use("/favorites", isAuth, favorite);
 
