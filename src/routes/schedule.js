@@ -11,6 +11,7 @@ import {
   scheduleBusinessbyService,
   addOrUpdate,
   getByUser,
+  addUpdateDefault,
 } from "../controllers/schedule.js";
 
 router.post(
@@ -58,6 +59,7 @@ router.post(
   addOrUpdate
 );
 //get By user
+router.get("/template", addUpdateDefault);
 router.get("/get", getByUser);
 
 router.get(

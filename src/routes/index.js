@@ -40,6 +40,7 @@ routes.use("/subservices", subservice);
 routes.use("/notification", notification);
 
 routes.use("/schedules", isAuth, schedule);
+routes.use("/schedules2", schedule);
 
 routes.use("/favorites", isAuth, favorite);
 

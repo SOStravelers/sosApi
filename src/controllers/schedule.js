@@ -4,6 +4,7 @@ import Service from "../models/service.js";
 import Subservice from "../models/subservice.js";
 import mongoose from "mongoose";
 import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
+import { template } from "../lib/schedule.js";
 import {
   notFoundError,
   createError,
@@ -32,6 +33,32 @@ export const create = async (req, res, next) => {
     next(err);
   }
 };
+export const addUpdateDefault = async (req, res, next) => {
+  console.log("---ADD UPDATE  SCHEDULE DEFAULT---");
+  try {
+    const templateSchedule = template;
+    const schedule = await Schedule.findOne({ default: true }).exec();
+    if (schedule) {
+      let updatedSchedule = await Schedule.findOneAndUpdate(
+        { user: id },
+        templateSchedule,
+        {
+          new: true,
+        }
+      ).exec();
+      res.json(updatedSchedule);
+    } else {
+      let schedule = new Schedule(template);
+      console.log("saving...", schedule);
+      const newSchedule = await schedule.save();
+      console.log("nuevo horario", newSchedule);
+      res.json(newSchedule);
+    }
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
 
 // Crear/Actualizar schedule worker
 export const addOrUpdate = async (req, res, next) => {
@@ -56,9 +83,6 @@ export const addOrUpdate = async (req, res, next) => {
     const schedule = await Schedule.findOne({ user: id });
     if (schedule) {
       console.log("entro", schedule);
-
-      // Supongamos que tienes un objeto `schedules` con los nuevos valores que deseas asignar.
-      // Debes crear un objeto de actualización con $set para actualizar el campo 'schedules'.
       const update = {
         $set: { schedules: schedules.schedules },
       };
@@ -147,14 +171,15 @@ export const scheduleBusinessbyService = async (req, res, next) => {
 };
 export const getByUser = async (req, res, next) => {
   try {
-    console.log("---GET SCHEDULE BY User id---");
+    console.log("---GET SCHEDULE BY USER ID---");
     const id = req.user._id.toString();
     const schedule = await Schedule.findOne({ user: id }).exec();
     console.log(schedule);
     if (schedule) {
       res.send(schedule);
     } else {
-      res.send({ schedules: [] });
+      const schedule = await Schedule.findOne({ default: true }).exec();
+      schedule.schedules ? res.send(schedule) : res.send({ schedules: [] });
     }
   } catch (err) {
     next(err);
