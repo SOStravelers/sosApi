@@ -345,7 +345,7 @@ export const hasPassword = async (req, res, next) => {
 // función para crear contraseña para usuario que no tienen creada
 export const changePassword = async (req, res, next) => {
   try {
-    console.log("changePassword");
+    console.log("changePassword", req.body);
     const newPassword = req.body.newPassword;
     const currentPassword = req.body.currentPassword;
     if (!newPassword) {
@@ -385,6 +385,25 @@ export const changePassword = async (req, res, next) => {
       refresh_token: refreshTokenGen(userRefresh),
       user: updatedUser,
     });
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const inactiveMode = async (req, res, next) => {
+  try {
+    console.log("inactiveMode", req.body);
+    const isActive = req.body.isActive;
+    const id = req.user._id.toString();
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: id },
+      {
+        isActive: isActive,
+      },
+      { new: true }
+    ).select("isActive isValidate security email personalData _id img");
+    res.json(updatedUser);
   } catch (err) {
     next(err);
     res.status(500).json({ error: "Internal Server Error" });

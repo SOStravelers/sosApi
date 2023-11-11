@@ -33,6 +33,7 @@ import {
   changePassword,
   hasPassword,
   setWorker,
+  inactiveMode,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -206,5 +207,20 @@ router.post(
   ),
   upload.single("file"),
   galleryPhoto
+);
+
+router.post(
+  "/inactivemode",
+  validateParams(
+    [
+      {
+        param_key: "isActive",
+        required: true,
+        type: "boolean",
+      },
+    ],
+    "body"
+  ),
+  inactiveMode
 );
 export default router;
