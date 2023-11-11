@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import Schedule from "../models/schedule.js";
 import envar from "../config/envar.js";
 import { sendEmailTemplate } from "../services/aws_ses.js";
 import { createError } from "../config/error.js";
@@ -300,6 +301,26 @@ export const getById = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+//Verificar si existe el email
+export const verifyEmail = async (req, res, next) => {
+  console.log("--- Find Email ---");
+  try {
+    const email = req.body.email;
+    let checkUser = await User.findOne({
+      email: email.toLowerCase().trim(),
+    }).exec();
+    if (checkUser) {
+      let err = createError(409, "The email is not available.");
+      next(err);
+      return res.status(409).json(err);
+    } else {
+      return res.status(200).json({ message: "The email is available" });
+    }
+  } catch (err) {
+    next(err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
 // función para crear contraseña para usuario que no tienen creada
 export const createPassword = async (req, res, next) => {
   console.log("-- CREATE PASSWORD --");
@@ -492,6 +513,58 @@ export const getUsers = async (req, res, next) => {
       res.send(items);
     });
   } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Entrega trabajadores segun hora solicitada y subservicio solicitado
+export const workerByTimeAndService = async (req, res, next) => {
+  try {
+    const { startTime, day, subservice, page, limit } = req.body;
+    const query = {
+      $and: [
+        { isActive: true },
+        { "workerData.isActive": true },
+        { "workerData.services.subServices": subservice },
+      ],
+    };
+    const options = {
+      populate: {
+        path: "workerData.services.id",
+        select: "name",
+      },
+      select: "personalData workerData img _id username",
+      page: page || 1,
+      limit: limit || 100,
+      sort: { updatedAt: -1 },
+    };
+
+    const response = await User.paginate(query, options);
+    var workersAvailable = [];
+    if (response && response.data.docs) {
+      for (let worker of response) {
+        const schedule = await Schedule.findOne({
+          user: worker._id,
+          isActive: true,
+          "schedules.isActive": true,
+          "schedules.day": day,
+          "schedules.intervals": {
+            $elemMatch: {
+              startTime: { $lte: startTime },
+              endTime: { $gte: startTime, $lte: endTime },
+            },
+          },
+        }).exec();
+        if (schedule) {
+          workersAvailable.push(worker);
+        }
+      }
+      res.send(workersAvailable);
+    } else {
+      res.send(response);
+    }
+  } catch (error) {
     next(err);
     res.status(500).json({ error: "Internal Server Error" });
   }

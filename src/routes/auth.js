@@ -13,6 +13,7 @@ import {
   sendValidationCode,
   verifyValidationCode,
   getUsers,
+  verifyEmail,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -84,6 +85,21 @@ router.post(
     "body"
   ),
   loginEmail
+);
+//login user by email
+router.post(
+  "/verifyEmail",
+  validateParams(
+    [
+      {
+        param_key: "email",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  verifyEmail
 );
 //login user by google
 router.post(
