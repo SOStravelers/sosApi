@@ -67,6 +67,7 @@ const userSchema = new Schema(
       enum: ["EN", "ES", "FR", "BR"],
     },
     personalData: {
+      isActive: { type: Boolean, default: true },
       name: {
         first: {
           type: String,
