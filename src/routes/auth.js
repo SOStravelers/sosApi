@@ -16,6 +16,8 @@ import {
   verifyEmail,
   workerByTimeAndService,
   businessByService,
+  getBussinesId,
+  getWorkerId,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -142,6 +144,36 @@ router.get(
     "params"
   ),
   getById
+);
+// //Obtener un usuario business por id
+router.get(
+  "/user/business/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getBussinesId
+);
+// //Obtener un usuario business por id
+router.get(
+  "/user/worker/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getWorkerId
 );
 //Envia codigo de validacion
 router.get(
