@@ -14,6 +14,8 @@ import {
   verifyValidationCode,
   getUsers,
   verifyEmail,
+  workerByTimeAndService,
+  businessByService,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -226,6 +228,42 @@ router.post(
   ),
   findByEmail
 );
+
+router.post(
+  "/workerByTimeAndService",
+  validateParams(
+    [
+      {
+        param_key: "startTime",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "day",
+        required: true,
+        type: "number",
+      },
+      {
+        param_key: "subservice",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "number",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "number",
+      },
+    ],
+    "body"
+  ),
+  workerByTimeAndService
+);
+
 //get users by type and isActive
 router.get(
   "/all",
@@ -240,5 +278,30 @@ router.get(
     "query"
   ),
   getUsers
+);
+//get business by service
+router.get(
+  "/business",
+  validateParams(
+    [
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  businessByService
 );
 export default router;

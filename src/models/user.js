@@ -96,6 +96,7 @@ const userSchema = new Schema(
       services: [
         {
           id: { type: String, ref: "Service" },
+          _id: false,
           subServices: Array({
             type: String,
             ref: "Subservice",
@@ -108,6 +109,7 @@ const userSchema = new Schema(
       isActive: { type: Boolean, default: false },
       category: { type: Number, enum: [1, 2, 3] },
       location: {
+        _id: false,
         country: { type: String },
         city: { type: String },
       },
@@ -128,6 +130,7 @@ const userSchema = new Schema(
       },
       services: [
         {
+          _id: false,
           service: { type: String, ref: "Service" },
           isActive: { type: Boolean, default: true },
           schedule: { type: String, ref: "Schedule" },

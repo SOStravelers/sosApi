@@ -8,7 +8,9 @@ export const template = {
       intervals: [
         {
           startTime: "09:00",
-          endTime: "16:00",
+          startTimeIso: "2023-11-11T09:00:00.000Z",
+          endTime: "17:00",
+          endTimeIso: "2023-11-11T17:00:00.000Z",
         },
       ],
     },
@@ -18,7 +20,9 @@ export const template = {
       intervals: [
         {
           startTime: "09:00",
-          endTime: "16:00",
+          startTimeIso: "2023-11-11T09:00:00.000Z",
+          endTime: "17:00",
+          endTimeIso: "2023-11-11T17:00:00.000Z",
         },
       ],
     },
@@ -28,7 +32,9 @@ export const template = {
       intervals: [
         {
           startTime: "09:00",
-          endTime: "16:00",
+          startTimeIso: "2023-11-11T09:00:00.000Z",
+          endTime: "17:00",
+          endTimeIso: "2023-11-11T17:00:00.000Z",
         },
       ],
     },

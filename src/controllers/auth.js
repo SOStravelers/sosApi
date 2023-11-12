@@ -542,21 +542,26 @@ export const workerByTimeAndService = async (req, res, next) => {
 
     const response = await User.paginate(query, options);
     var workersAvailable = [];
-    if (response && response.data.docs) {
-      for (let worker of response) {
+    if (response && response.docs) {
+      for (let worker of response.docs) {
+        console.log("startTime", startTime);
         const schedule = await Schedule.findOne({
-          user: worker._id,
-          isActive: true,
           "schedules.isActive": true,
+          user: worker._id.toString(),
           "schedules.day": day,
           "schedules.intervals": {
             $elemMatch: {
-              startTime: { $lte: startTime },
-              endTime: { $gte: startTime, $lte: endTime },
+              formatStartTime: {
+                $lte: startTime,
+              },
+              formatEndTime: {
+                $gte: startTime,
+              },
             },
           },
         }).exec();
         if (schedule) {
+          console.log(schedule);
           workersAvailable.push(worker);
         }
       }
@@ -564,7 +569,36 @@ export const workerByTimeAndService = async (req, res, next) => {
     } else {
       res.send(response);
     }
-  } catch (error) {
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Entrega trabajadores segun hora solicitada y subservicio solicitado
+export const businessByService = async (req, res, next) => {
+  console.log("--- GET BUSINESS BY SERVICE ---");
+  try {
+    const { service, page, limit } = req.query;
+    console.log(service, page, limit);
+    const query = {
+      $and: [
+        { isActive: true },
+        { type: "business" },
+        { "businessData.isActive": true },
+        { "businessData.services.service": service },
+      ],
+    };
+    const options = {
+      select: "businessData img _id username",
+      page: page || 1,
+      limit: limit || 100,
+      sort: { updatedAt: -1 },
+    };
+    console.log(query);
+    const response = await User.paginate(query, options);
+    res.send(response);
+  } catch (err) {
     next(err);
     res.status(500).json({ error: "Internal Server Error" });
   }

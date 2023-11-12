@@ -25,8 +25,16 @@ const scheduleSchema = new Schema(
               type: String,
               required: true,
             },
+            startTimeIso: {
+              type: Date,
+              required: true,
+            },
             endTime: {
               type: String,
+              required: true,
+            },
+            endTimeIso: {
+              type: Date,
               required: true,
             },
           },
