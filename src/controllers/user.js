@@ -266,8 +266,8 @@ export const galleryPhoto = async (req, res, next) => {
     console.log("---UPLOAD GALLERY FOTO---", req.params.number);
     console.log("gato", req.file);
     let paramsNumber = Number(req.params.number);
-    //VALIDACION PARA SOLO SUBIR UN MAXIMO DE 6 FOTOS
-    if (!paramsNumber || paramsNumber >= 7 || paramsNumber == NaN) {
+    // VALIDACION PARA SOLO SUBIR UN MAXIMO DE 6 FOTOS
+    if (isNaN(paramsNumber) || paramsNumber >= 10 || paramsNumber < 0) {
       paramsNumber = 1;
     }
     let file = req.file ? req.file : fakeReq.file;
@@ -282,6 +282,7 @@ export const galleryPhoto = async (req, res, next) => {
         let lastIndex = file.originalname.lastIndexOf(".");
         let name = file.originalname.slice(0, lastIndex);
         let ext = file.originalname.slice(lastIndex + 1);
+        console.log("el numero", paramsNumber);
         let resp = await AwsUploadFile({
           fileName: `users/${req.user._id}/gallery/photo${paramsNumber}.${ext}`,
           buffer: imagenReducida,
@@ -290,13 +291,20 @@ export const galleryPhoto = async (req, res, next) => {
           let user = await User.findOne({
             _id: req.user._id.toString(),
           }).select("img");
-          const gallery = user.img.gallery;
-          // if (paramsNumber <= gallery.length) {
-
-          // } else {
-          //   gallery.push(resp.url);
-          // }
-          gallery[paramsNumber - 1] = resp.url;
+          let gallery = user.img.gallery;
+          console.log("la url", resp.url);
+          console.log(paramsNumber);
+          gallery[paramsNumber] = resp.url;
+          if (gallery?.length > 0) {
+            const filledArray = Array.from(
+              { length: 10 },
+              (_, index) => user.img.gallery[index] || null
+            );
+            gallery = filledArray;
+          } else {
+            const emptyArray = Array.from({ length: 10 }, () => null);
+            gallery = emptyArray;
+          }
 
           let updateUser = await User.findByIdAndUpdate(
             req.user._id,
@@ -320,6 +328,28 @@ export const galleryPhoto = async (req, res, next) => {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
       });
+  } catch (err) {
+    next(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export const deleteFromGallery = async (req, res, next) => {
+  try {
+    console.log("---UPLOAD GALLERY FOTO---", req.params.number);
+    console.log("gato", req.file);
+
+    let updateUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        "img.gallery": gallery,
+      },
+      {
+        new: true,
+      }
+    )
+      .select("img")
+      .exec();
+    res.send(updateUser);
   } catch (err) {
     next(err);
     res.status(500).json({ error: "Internal Server Error" });
