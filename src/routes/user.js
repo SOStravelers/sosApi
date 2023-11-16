@@ -8,13 +8,7 @@ const limits = {
   fileSize: filesConfig.profile.maxsize,
 };
 const fileFilter = (req, file, cb) => {
-  let formats = [
-    "image/jpg",
-    "image/jpeg",
-    "image/png",
-    "image/svg",
-    "image/webp",
-  ];
+  let formats = ["image/jpg", "image/jpeg", "image/png", "image/svg"];
   if (!formats.includes(file.mimetype)) {
     cb(createError(400, "Illegal file format."), false);
   } else {
@@ -24,7 +18,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   limits: { fieldSize: 1000 * 1024 * 1024 },
-  //fileFilter,
+  fileFilter,
 });
 import {
   getUsers,
@@ -197,7 +191,33 @@ router.delete(
   deleteById
 );
 // SUBIR ARCHIVOS FOTO DE PERFIL
-router.post("/profile/photo", upload.single("file"), profilePhoto);
+router.post("/profile/photo", upload.single("file"), async (req, res, next) => {
+  try {
+    // Manejar el caso si el tamaño del archivo excede el límite
+    if (req.file.size > 1000 * 1024 * 1024) {
+      throw createError(413, "File size exceeds the limit.");
+    }
+
+    // Resto del código para procesar la imagen
+
+    // Utilizar la función profilePhoto para procesar la imagen
+    const result = await profilePhoto(req, res, next);
+
+    // Resto del código si es necesario
+  } catch (error) {
+    // Manejar el error de formato no válido
+    if (
+      error instanceof multer.MulterError &&
+      error.code === "LIMIT_FILE_SIZE"
+    ) {
+      // Multer genera un error si el tamaño del archivo excede el límite
+      next(createError(413, "File size exceeds the limit."));
+    } else {
+      // Si no es un error de tamaño de archivo, verificar el formato no válido
+      next(error);
+    }
+  }
+});
 // SUBIR ARCHIVOS FOTOS DE GALERIA
 router.post(
   "/profile/gallery/:number",

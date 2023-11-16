@@ -3,7 +3,7 @@ import path from "path";
 import staticDir from "../config/staticPath.js";
 
 export const n64tobuffer = async (data) => {
-  console.log("n64buffer", data);
+  console.log("n64buffer");
   // Supongamos que 'data' es la cadena base64 que recibes de la solicitud
   // Extraer el formato MIME de la cadena base64
   const matches = data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
