@@ -213,7 +213,7 @@ router.post(
     ],
     "params"
   ),
-  upload.single("file"),
+  // upload.single("file"),
   galleryPhoto
 );
 router.put(
