@@ -19,7 +19,7 @@ db.on("error", (err) => {
 const app = express();
 const router = Router();
 app.use(express.static(staticDir));
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "100mb" }));
 
 //Nos sirve para pintar las peticiones HTTP request que se solicitan a nuestro aplicación.
 app.use(morgan("tiny"));
