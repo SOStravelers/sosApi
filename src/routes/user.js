@@ -198,7 +198,7 @@ router.delete(
   deleteById
 );
 // SUBIR ARCHIVOS FOTO DE PERFIL
-router.post("/profile/photo", upload.single("file"), profilePhoto);
+router.post("/profile/photo", profilePhoto);
 // SUBIR ARCHIVOS FOTOS DE GALERIA
 router.post(
   "/profile/gallery/:number",
