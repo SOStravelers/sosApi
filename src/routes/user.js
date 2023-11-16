@@ -8,7 +8,7 @@ const limits = {
   fileSize: filesConfig.profile.maxsize,
 };
 const fileFilter = (req, file, cb) => {
-  console.log("filters");
+  console.log("filters", file.mimetype);
   let formats = ["image/jpg", "image/jpeg", "image/png", "image/svg"];
   if (!formats.includes(file.mimetype)) {
     cb(createError(400, "Illegal file format."), false);
@@ -196,6 +196,7 @@ router.post("/profile/photo", upload.single("file"), profilePhoto);
 // SUBIR ARCHIVOS FOTOS DE GALERIA
 router.post(
   "/profile/gallery/:number",
+
   validateParams(
     [
       {
@@ -208,21 +209,6 @@ router.post(
   ),
   upload.single("file"),
   galleryPhoto
-);
-
-router.post(
-  "/inactivemode",
-  validateParams(
-    [
-      {
-        param_key: "isActive",
-        required: true,
-        type: "boolean",
-      },
-    ],
-    "body"
-  ),
-  inactiveMode
 );
 router.put(
   "/profile/updategallery",
@@ -238,4 +224,19 @@ router.put(
   ),
   updateGallery
 );
+router.post(
+  "/inactivemode",
+  validateParams(
+    [
+      {
+        param_key: "isActive",
+        required: true,
+        type: "boolean",
+      },
+    ],
+    "body"
+  ),
+  inactiveMode
+);
+
 export default router;
