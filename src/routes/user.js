@@ -34,6 +34,7 @@ import {
   hasPassword,
   setWorker,
   inactiveMode,
+  updateGallery,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -222,5 +223,19 @@ router.post(
     "body"
   ),
   inactiveMode
+);
+router.put(
+  "/profile/updategallery",
+  validateParams(
+    [
+      {
+        param_key: "array",
+        required: true,
+        type: "array",
+      },
+    ],
+    "body"
+  ),
+  updateGallery
 );
 export default router;

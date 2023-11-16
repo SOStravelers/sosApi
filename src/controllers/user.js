@@ -333,15 +333,14 @@ export const galleryPhoto = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-export const deleteFromGallery = async (req, res, next) => {
+export const updateGallery = async (req, res, next) => {
   try {
-    console.log("---UPLOAD GALLERY FOTO---", req.params.number);
-    console.log("gato", req.file);
+    console.log("---UPDATE GALLERY ---", req.body);
 
     let updateUser = await User.findByIdAndUpdate(
       req.user._id,
       {
-        "img.gallery": gallery,
+        "img.gallery": req.body.array,
       },
       {
         new: true,
