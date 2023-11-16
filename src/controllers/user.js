@@ -214,16 +214,16 @@ export const profilePhoto = async (req, res, next) => {
     console.log("---UPLOAD PROFILE FOTO---");
     let file = req.file ? req.file : fakeReq.file;
     let elbuffer = await n64tobuffer(req.body.file);
-    console.log("elbuffer", elbuffer);
+    // console.log("elbuffer", elbuffer);
     // Jimp.read(file.buffer)
     Jimp.read(elbuffer)
       .then(async (image) => {
-        console.log("imafen", image);
+        // console.log("imafen", image);
         image
           .resize(320, Jimp.AUTO) // resize
           .quality(70); // set JPEG quality
         let imagenReducida = await image.getBufferAsync(Jimp.MIME_JPEG);
-        console.log("imagenReducida", imagenReducida);
+        // console.log("imagenReducida", imagenReducida);
         let lastIndex = file.originalname.lastIndexOf(".");
         let name = file.originalname.slice(0, lastIndex);
         let ext = file.originalname.slice(lastIndex + 1);
@@ -231,7 +231,7 @@ export const profilePhoto = async (req, res, next) => {
           fileName: `users/${req.user._id}/profile/${req.user._id}.${ext}`,
           buffer: imagenReducida,
         });
-        console.log("respuesta", resp);
+        // console.log("respuesta", resp);
         if (resp.results.$metadata.httpStatusCode == 200) {
           let user = await User.findByIdAndUpdate(
             req.user._id,

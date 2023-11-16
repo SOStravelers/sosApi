@@ -7,18 +7,9 @@ import { createError } from "../config/error.js";
 const limits = {
   fileSize: filesConfig.profile.maxsize,
 };
-const fileFilter = (req, file, cb) => {
-  let formats = ["image/jpg", "image/jpeg", "image/png", "image/svg"];
-  if (!formats.includes(file.mimetype)) {
-    cb(createError(400, "Illegal file format."), false);
-  } else {
-    cb(null, true);
-  }
-};
 
 const upload = multer({
-  limits: { fieldSize: 100 * 1024 * 1024 },
-  fileFilter,
+  limits: { fieldSize: 50 * 1024 * 1024 },
 });
 import {
   getUsers,
@@ -191,31 +182,44 @@ router.delete(
   deleteById
 );
 // SUBIR ARCHIVOS FOTO DE PERFIL
-router.post("/profile/photo", upload.single("file"), async (req, res, next) => {
-  try {
-    // Resto del código para procesar la imagen
-    const result = await profilePhoto(req, res, next);
+// router.post("/profile/photo", upload.single("file"), profilePhoto);
 
-    // Resto del código si es necesario
-  } catch (error) {
-    // Manejar el error
-    if (error instanceof multer.MulterError) {
-      // Si es un error de Multer, devolver el error correspondiente
-      if (error.code === "LIMIT_FILE_SIZE") {
-        return res.status(413).json({ error: "File size exceeds the limit." });
+router.post(
+  "/profile/photo",
+  upload.single("file"),
+  async function (req, res, next) {
+    try {
+      let formats = ["jpeg", "jpg", "png", "svg"];
+      const base64Data = req.body.file; // tu cadena base64 aquí
+
+      // Encuentra la parte de la cadena que contiene el tipo de imagen (jpeg, png, etc.)
+      const match = base64Data.match(/^data:image\/([a-zA-Z]+);base64,/);
+
+      // Verifica si hubo una coincidencia y extrae el tipo de imagen
+      const imageType = match ? match[1] : null;
+
+      if (!formats.includes(imageType)) {
+        let err = createError(400, "Format img not valid");
+        next(err);
       } else {
-        return res.status(400).json({ error: "Illegal file format." });
+        await profilePhoto(req, res, next);
       }
-    } else {
-      // Si no es un error de Multer, devolver el error original
-      next(error);
+    } catch (err) {
+      next(err);
     }
+  },
+  // Middleware de manejo de errores específicos de Multer
+  (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ message: "File max 50mb" });
+    }
+    next(err); // Pasar otros errores al siguiente middleware de manejo de errores
   }
-});
+);
+
 // SUBIR ARCHIVOS FOTOS DE GALERIA
 router.post(
   "/profile/gallery/:number",
-
   validateParams(
     [
       {
@@ -227,8 +231,36 @@ router.post(
     "params"
   ),
   upload.single("file"),
-  galleryPhoto
+  async function (req, res, next) {
+    try {
+      let formats = ["jpeg", "jpg", "png", "svg"];
+      const base64Data = req.body.file; // tu cadena base64 aquí
+
+      // Encuentra la parte de la cadena que contiene el tipo de imagen (jpeg, png, etc.)
+      const match = base64Data.match(/^data:image\/([a-zA-Z]+);base64,/);
+
+      // Verifica si hubo una coincidencia y extrae el tipo de imagen
+      const imageType = match ? match[1] : null;
+
+      if (!formats.includes(imageType)) {
+        let err = createError(400, "Format img not valid");
+        next(err);
+      } else {
+        await galleryPhoto(req, res, next);
+      }
+    } catch (err) {
+      next(err);
+    }
+  },
+  // Middleware de manejo de errores específicos de Multer
+  (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ message: "File max 50mb" });
+    }
+    next(err); // Pasar otros errores al siguiente middleware de manejo de errores
+  }
 );
+
 router.put(
   "/profile/updategallery",
   validateParams(
