@@ -3,7 +3,7 @@ const router = Router();
 import validateParams from "../middleware/validate.js";
 import filesConfig from "../config/files.js";
 import multer from "multer";
-
+import { createError } from "../config/error.js";
 const limits = {
   fileSize: filesConfig.profile.maxsize,
 };
@@ -17,7 +17,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  limits: { fieldSize: 1000 * 1024 * 1024 },
+  limits: { fieldSize: 100 * 1024 * 1024 },
   fileFilter,
 });
 import {
