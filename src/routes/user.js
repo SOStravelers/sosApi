@@ -193,27 +193,21 @@ router.delete(
 // SUBIR ARCHIVOS FOTO DE PERFIL
 router.post("/profile/photo", upload.single("file"), async (req, res, next) => {
   try {
-    // Manejar el caso si el tamaño del archivo excede el límite
-    if (req.file.size > 1000 * 1024 * 1024) {
-      throw createError(413, "File size exceeds the limit.");
-    }
-
     // Resto del código para procesar la imagen
-
-    // Utilizar la función profilePhoto para procesar la imagen
     const result = await profilePhoto(req, res, next);
 
     // Resto del código si es necesario
   } catch (error) {
-    // Manejar el error de formato no válido
-    if (
-      error instanceof multer.MulterError &&
-      error.code === "LIMIT_FILE_SIZE"
-    ) {
-      // Multer genera un error si el tamaño del archivo excede el límite
-      next(createError(413, "File size exceeds the limit."));
+    // Manejar el error
+    if (error instanceof multer.MulterError) {
+      // Si es un error de Multer, devolver el error correspondiente
+      if (error.code === "LIMIT_FILE_SIZE") {
+        return res.status(413).json({ error: "File size exceeds the limit." });
+      } else {
+        return res.status(400).json({ error: "Illegal file format." });
+      }
     } else {
-      // Si no es un error de tamaño de archivo, verificar el formato no válido
+      // Si no es un error de Multer, devolver el error original
       next(error);
     }
   }
