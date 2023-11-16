@@ -8,7 +8,6 @@ const limits = {
   fileSize: filesConfig.profile.maxsize,
 };
 const fileFilter = (req, file, cb) => {
-  console.log("filters", file.mimetype);
   let formats = [
     "image/jpg",
     "image/jpeg",
@@ -25,7 +24,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   // limits,
-  fileFilter,
+  //fileFilter,
 });
 import {
   getUsers,
@@ -198,7 +197,7 @@ router.delete(
   deleteById
 );
 // SUBIR ARCHIVOS FOTO DE PERFIL
-router.post("/profile/photo", profilePhoto);
+router.post("/profile/photo", upload.single("file"), profilePhoto);
 // SUBIR ARCHIVOS FOTOS DE GALERIA
 router.post(
   "/profile/gallery/:number",
@@ -213,7 +212,7 @@ router.post(
     ],
     "params"
   ),
-  // upload.single("file"),
+  upload.single("file"),
   galleryPhoto
 );
 router.put(
