@@ -9,7 +9,13 @@ const limits = {
 };
 const fileFilter = (req, file, cb) => {
   console.log("filters", file.mimetype);
-  let formats = ["image/jpg", "image/jpeg", "image/png", "image/svg"];
+  let formats = [
+    "image/jpg",
+    "image/jpeg",
+    "image/png",
+    "image/svg",
+    "image/webp",
+  ];
   if (!formats.includes(file.mimetype)) {
     cb(createError(400, "Illegal file format."), false);
   } else {
@@ -18,7 +24,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  limits,
+  // limits,
   fileFilter,
 });
 import {
