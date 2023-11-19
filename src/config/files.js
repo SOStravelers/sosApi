@@ -4,7 +4,7 @@ export default {
     gallery: 100 * 1024 * 1024,
   },
   profile: {
-    maxsize: 1000 * 1024 * 1024,
+    maxsize: 100 * 1024 * 1024,
     formats: ["image/jpg", "image/jpeg", "image/png", "image/svg"],
   },
   gallery: {
