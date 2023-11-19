@@ -7,7 +7,7 @@
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>SOS Travelers - Confirm Email</title>
+    <title>Unabase - Confirmación de Correo</title>
     <style>
       body {
         font-family: "Nunito", sans-serif;
@@ -21,7 +21,7 @@
         padding: 20px;
         background-color: #fff;
         border-radius: 10px;
-        box-shadow: 0px 0px 10px #001c25;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
       }
 
       .header {
@@ -29,11 +29,13 @@
         align-items: center;
         margin-bottom: 30px;
         padding: 10px;
-        border-bottom: 4px solid;
+        border-bottom: 4px solid #00a0d5;
       }
 
       .header-logo {
         margin-right: 10px;
+        display: flex;
+        align-items: center;
       }
 
       .header-title {
@@ -59,6 +61,8 @@
 
       .icons-social {
         display: flex;
+        flex-direction: column;
+        align-items: center;
         margin-left: 320px;
         margin-right: 320px;
       }
@@ -89,7 +93,7 @@
         text-align: center;
         font-size: 0.8em;
         padding: 10px;
-        border-bottom: 4px solid #001c25;
+        border-bottom: 4px solid #00a0d5;
         color: black;
       }
 
@@ -102,27 +106,13 @@
         font-size: 14px;
         color: #98a2b3;
       }
-      .header p {
-        font-weight: bold; /* Hace que el texto sea más grueso */
-        font-size: 24px; /* Ajusta el tamaño de fuente según tus preferencias */
-        margin-bottom: -5px; /* Ajusta la separación vertical entre los párrafos */
-      }
-      .header {
-        display: flex;
-        align-items: center; /* Centra verticalmente los elementos del encabezado */
-        height: 45px; /* Establece la altura deseada (igual a la altura del logo) */
-      }
-      .header-text {
-        margin-right: 10px; /* Ajusta la separación entre el logo y el texto */
-      }
 
-      .header-text p {
-        font-weight: bold;
-        font-size: 24px;
-        margin: 0; /* Elimina el margen predeterminado de los párrafos */
+      .img-main {
+        max-width: 300px;
       }
     </style>
   </head>
+
   <body>
     <div class="container">
       <div class="header">
@@ -131,15 +121,14 @@
             src="https://sosappfiles.s3.amazonaws.com/icons/email/sosWhite.png"
             alt=""
           />
-        </div>
-        <div class="header-text">
-          <p>SOS</p>
-          <p>Travelers</p>
+          <div style="font-size: 24px; font-weight: bold; margin-left: 5px">
+            Sos Travelers
+          </div>
         </div>
         <div class="header-title">The best travel app</div>
       </div>
 
-      <div class="content">
+      <div class="content" style="margin-top: -20px">
         <img
           src="https://sosappfiles.s3.amazonaws.com/icons/email/nin%CC%83a.png"
           class="img-main"
@@ -148,10 +137,18 @@
         <h2>You are almost there!! Confirm your email address</h2>
 
         <div class="code-inputs">
-          <div class="code-input"><span>{{number1}}</span></div>
-          <div class="code-input"><span>{{number2}}</span></div>
-          <div class="code-input"><span>{{number3}}</span></div>
-          <div class="code-input"><span>{{number4}}</span></div>
+          <div class="code-input" style="justify-content: center">
+            <span>{{number1}}</span>
+          </div>
+          <div class="code-input" style="justify-content: center">
+            <span>{{number2}}</span>
+          </div>
+          <div class="code-input" style="justify-content: center">
+            <span>{{number3}}</span>
+          </div>
+          <div class="code-input" style="justify-content: center">
+            <span>{{number4}}</span>
+          </div>
         </div>
 
         <p class="parrafo1">
@@ -164,38 +161,18 @@
         </p>
       </div>
 
-      <div
-        class="content"
-        style="margin-top: -30px; display: flex; justify-content: center"
-      >
-        <p style="margin: 0px 20px; display: flex; align-items: center">
-          Follow us in Instagram:
-        </p>
-        <a
-          style="display: flex; align-items: center"
-          href="https://www.instagram.com/sos.travelers"
-          target="_blank"
-        >
+      <div class="icons-social">
+        <a href="https://www.instagram.com/sos.travelers/">
           <img
-            style="margin-top: 20px"
             src="https://sosappfiles.s3.amazonaws.com/icons/email/instaBlue.png"
             alt=""
           />
         </a>
-        <a
-          href="https://www.instagram.com/sos.travelers"
-          target="_blank"
-          style="
-            display: flex;
-            align-items: center;
-            text-decoration: none; /* Elimina el subrayado */
-            color: #000;
-          "
-          >@sos.travelers</a
-        >
+        <div style="flex: auto; text-align: center">@sosTravelers</div>
       </div>
-
       <div class="footer">Copyright 2023 SOS Travelers</div>
     </div>
   </body>
+
+  <script src="src/test.js"></script>
 </html>

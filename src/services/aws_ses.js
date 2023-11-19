@@ -179,7 +179,7 @@ export const updateTemplate = async (file) => {
       Template: {
         TemplateName: "validationCode", // Nombre del template a crear
         SubjectPart: "Confirm your email address", // Asunto del correo con una variable {{name}}
-        HtmlPart: templateHtml(TemplateName),
+        HtmlPart: templateHtml("validationCode"),
       },
     };
     // Crear el comando para borrar el template
