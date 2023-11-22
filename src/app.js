@@ -1,6 +1,8 @@
-import server from './server.js';
+import server from "./server.js";
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 9000;
 server.listen(port, function () {
-  console.log('SOS API TRAVELERS is listening on port '+ port + ' AGUANTE LA U !!');
+  console.log(
+    "SOS API TRAVELERS is listening on port " + port + " AGUANTE LA U !!"
+  );
 });

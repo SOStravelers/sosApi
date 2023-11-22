@@ -19,12 +19,44 @@ export const getUsers = async (req, res, next) => {
     // populate,
     // select,
     page: body.page || 1,
-    limit: body.limit || 10,
+    limit: body.limit || 20,
     sort: { updatedAt: -1 },
   };
   let query = {};
   body.type ? (query.type = body.type) : "";
   body.isActive ? (query.isActive = body.isActive) : "";
+  try {
+    User.paginate(query, options, (err, items) => {
+      if (err) return next(err);
+      res.send(items);
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Obtener usuarios con paginate por tipos y activados
+export const contacts = async (req, res, next) => {
+  console.log("---GET MY CONTACTS test---");
+  let body = {};
+  Object.assign(body, req.query);
+  console.log("query", body);
+  let options = {
+    // populate,
+    // select,
+    page: body.page || 1,
+    limit: body.limit || 20,
+    sort: { updatedAt: -1 },
+  };
+  let query = {
+    $and: [
+      // Utilizamos $and para agregar múltiples condiciones
+      body.type ? { type: body.type } : {}, // Condición para type
+      body.isActive ? { isActive: body.isActive } : {}, // Condición para isActive
+      { _id: { $ne: req.user._id } }, // Excluir documentos con _id igual a req.user._id
+      { type: { $ne: "business" } }, // Excluir documentos con _id igual a req.user._id
+    ],
+  };
   try {
     User.paginate(query, options, (err, items) => {
       if (err) return next(err);

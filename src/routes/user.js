@@ -25,6 +25,7 @@ import {
   setWorker,
   inactiveMode,
   updateGallery,
+  contacts,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -34,7 +35,7 @@ router.get(
     [
       {
         param_key: "type",
-        required: true,
+        required: false,
         type: "string",
       },
     ],
@@ -42,6 +43,8 @@ router.get(
   ),
   getUsers
 );
+//get users by type and isActive
+router.get("/contacts", contacts);
 //set worker
 router.get(
   "/setworker",

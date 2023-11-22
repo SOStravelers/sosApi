@@ -29,6 +29,7 @@ routes.post("/renew", renewToken);
 routes.use("/auth", auth);
 
 routes.use("/users", isAuth, user);
+routes.use("/usersfree", user);
 routes.use("/admin", isAuth, isAdmin, admin);
 
 routes.use("/bookings", booking);
