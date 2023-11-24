@@ -1,40 +1,23 @@
 import Schedule from "../models/schedule.js";
 import User from "../models/user.js";
-import Service from "../models/service.js";
 import Subservice from "../models/subservice.js";
-import mongoose from "mongoose";
 import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
 import { template } from "../lib/schedule.js";
-import {
-  notFoundError,
-  createError,
-  missingData,
-  duplicateData,
-} from "../config/error.js";
-import {
-  time30Min,
-  time45Min,
-  time1Hour,
-  time1Hour30,
-  time2Hour,
-} from "../lib/time.js";
+import { createError } from "../config/error.js";
 
 //Crear horario
 export const create = async (req, res, next) => {
-  console.log("---CREATE NEW SCHEDULE---");
-  let schedule = new Schedule(req.body);
+  global.logger.info("---CREATE NEW SCHEDULE---");
   try {
-    console.log("saving...", schedule);
+    let schedule = new Schedule(req.body);
     const newSchedule = await schedule.save();
-    console.log("nuevo horario", newSchedule);
-    res.json(newSchedule);
+    res.status(201).json(newSchedule);
   } catch (err) {
-    //console.log("El error: ",err.errors.hotel.properties.message)
     next(err);
   }
 };
 export const addUpdateDefault = async (req, res, next) => {
-  console.log("---ADD UPDATE  SCHEDULE DEFAULT---");
+  global.logger.info("---ADD UPDATE  SCHEDULE DEFAULT---");
   try {
     const templateSchedule = template;
     const schedule = await Schedule.findOne({ default: true }).exec();
@@ -46,43 +29,31 @@ export const addUpdateDefault = async (req, res, next) => {
           new: true,
         }
       ).exec();
-      res.json(updatedSchedule);
+      res.status(200).json(updatedSchedule);
     } else {
       let schedule = new Schedule(template);
-      console.log("saving...", schedule);
       const newSchedule = await schedule.save();
-      console.log("nuevo horario", newSchedule);
-      res.json(newSchedule);
+      res.status(201).json(newSchedule);
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
-
 // Crear/Actualizar schedule worker
 export const addOrUpdate = async (req, res, next) => {
-  console.log("---ADD NEW SCHEDULE OR UPDATE---");
-  const user = req.user;
-  const id = user._id.toString();
-  console.log(id);
-  const schedules = req.body;
-  console.log("schedulesss", schedules.schedules);
+  global.logger.info("---ADD NEW SCHEDULE OR UPDATE---");
   try {
+    const id = req.user._id.toString();
+    const schedules = req.body;
     const user = await User.findOne({ _id: id });
     if (!user) {
-      let err = createError(409, "User not exist");
-      next(err);
-      return res.status(409).json(err);
+      throw createError(409, "User not exist");
     }
     if (user && user.type != "worker") {
-      let err = createError(409, "you dont have the credentials");
-      next(err);
-      return res.status(409).json(err);
+      throw createError(409, "you dont have the credentials");
     }
     const schedule = await Schedule.findOne({ user: id });
     if (schedule) {
-      console.log("entro", schedule);
       const update = {
         $set: { schedules: schedules.schedules },
       };
@@ -94,27 +65,92 @@ export const addOrUpdate = async (req, res, next) => {
           new: true,
         }
       ).exec();
-      console.log("cambiando", updatedSchedule);
-      res.json(updatedSchedule);
+      res.status(200).json(updatedSchedule);
     } else {
       let newSchedule = new Schedule(schedules);
       newSchedule.user = id;
       newSchedule.creator = id;
       newSchedule.save();
-      res.json(newSchedule);
+      res.status(200).json(newSchedule);
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error." });
+  }
+};
+//Obtener horarios por usuario y si estan activos
+export const getByUser = async (req, res, next) => {
+  global.logger.info("---GET SCHEDULE BY USER ID---");
+  try {
+    const id = req.user._id.toString();
+    const schedule = await Schedule.findOne({ user: id }).exec();
+    if (schedule) {
+      res.send(schedule);
+    } else {
+      const schedule = await Schedule.findOne({ default: true }).exec();
+      schedule.schedules ? res.send(schedule) : res.send({ schedules: [] });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+//Obtener schedule por ID
+export const getById = async (req, res, next) => {
+  global.logger.info("---GET SCHEDULE BY ID---");
+  try {
+    const schedule = await Schedule.findOne({ _id: req.params.id })
+      .populate([
+        {
+          path: "hotel",
+          //   select: "isActive name  email phone creator user imgUrl emails type",
+        },
+      ])
+      .exec();
+    if (!schedule) throw createError(404, "Schedule not found");
+    res.status(200).json(schedule);
+  } catch (err) {
+    next(err);
+  }
+};
+//Actualizar data de un schedule
+export const updateOne = async (req, res, next) => {
+  global.logger.info("---UPDATE SCHEDULE---");
+  try {
+    let data = req.body;
+    const schedule = await Schedule.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      data,
+      {
+        new: true,
+      }
+    ).exec();
+    res.status(200).json(schedule);
+  } catch (err) {
+    next(err);
+  }
+};
+//Activar o desactivar multiples schedules
+export const activateMany = async (req, res, next) => {
+  global.logger.info("---ACTIVATE MANY SCHEDULE---");
+  try {
+    const schedules = await Schedule.updateMany(
+      { _id: { $in: req.body.schedules } },
+      { isActive: req.body.isActive ? req.body.isActive : true }
+    ).exec();
+    res.status(200).json(schedules);
+  } catch (err) {
+    next(err);
   }
 };
 
+//Por revisar:
+
 //Obtener horarios por hotel y si estan activos
 export const scheduleBusinessbyService = async (req, res, next) => {
-  console.log("---GET SCHEDULES BUSINESS BY SERVICE---");
+  global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE---");
   let body = {};
   Object.assign(body, req.query);
-  console.log("query", body);
   let horario = await Schedule.findOne({
     creator: body.id,
     service: body.service,
@@ -168,69 +204,4 @@ export const scheduleBusinessbyService = async (req, res, next) => {
   }
 
   res.send({ horas });
-};
-export const getByUser = async (req, res, next) => {
-  try {
-    console.log("---GET SCHEDULE BY USER ID---");
-    const id = req.user._id.toString();
-    const schedule = await Schedule.findOne({ user: id }).exec();
-    if (schedule) {
-      res.send(schedule);
-    } else {
-      const schedule = await Schedule.findOne({ default: true }).exec();
-      schedule.schedules ? res.send(schedule) : res.send({ schedules: [] });
-    }
-  } catch (err) {
-    next(err);
-    res.status(500).json({ message: "Internal server error." });
-  }
-};
-//Obtener usuario por ID
-export const getById = async (req, res, next) => {
-  console.log("---GET SCHEDULE BY ID---");
-  Schedule.findOne({ _id: req.params.id }).exec((err, schedule) => {
-    if (err) next(err);
-    schedule.populate([
-      {
-        path: "hotel",
-        //   select: "isActive name  email phone creator user imgUrl emails type",
-      },
-    ]);
-    if (err) return next(err);
-    if (schedule) {
-      res.send(schedule);
-    } else {
-      return next(createError(404, req.lg.user.notFound));
-    }
-  });
-};
-//Actualizar data de un usuario
-export const updateOne = (req, res, next) => {
-  console.log("---UPDATE SCHEDULE---");
-  let data = req.body;
-  Schedule.findOneAndUpdate(
-    {
-      _id: req.params.id,
-    },
-    data,
-    {
-      new: true,
-    }
-  ).exec((err, schedule) => {
-    if (err) return next(err);
-    res.send(schedule);
-  });
-};
-//Activar o desactivar multiples usuarios
-export const activateMany = (req, res, next) => {
-  console.log("---ACTIVATE MANY SCHEDULE---");
-  console.log(req.body);
-  Schedule.updateMany(
-    { _id: { $in: req.body.schedules } },
-    { isActive: req.body.isActive ? req.body.isActive : true }
-  ).exec((err, data) => {
-    if (err) next(err);
-    res.send(data);
-  });
-  // res.send("buena")
 };

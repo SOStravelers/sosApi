@@ -9,7 +9,7 @@ import {
   sendEmailPaymentConfirmation,
 } from "../services/aws_ses.js";
 
-export const sendEmailConfirmation = async (req, res, _) => {
+export const sendEmailConfirmation = async (req, res, next) => {
   const data = req.body;
   sendEmailPaymentConfirmation(data);
   const response = {

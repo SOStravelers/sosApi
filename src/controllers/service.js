@@ -1,37 +1,25 @@
 import Service from "../models/service.js";
 import Subservice from "../models/subservice.js";
-import mongoose from "mongoose";
 import { AwsUploadFile } from "../services/aws_s3.js";
 import Jimp from "jimp";
-import {
-  notFoundError,
-  createError,
-  missingData,
-  duplicateData,
-} from "../config/error.js";
+import { createError } from "../config/error.js";
 
 //Crear Servicio
 export const create = async (req, res, next) => {
-  console.log("--- CREATE NEW SERVICE ---");
+  global.logger.info("--- CREATE NEW SERVICE ---");
   try {
     let service = new Service(req.body);
     service.name = req.body.name.toLowerCase();
     service.creator = req.body.user;
     const newService = await service.save();
-    console.log("nuevo servicio", newService);
-    res.json(newService);
+    res.status(201).json(newService);
   } catch (err) {
     next(err);
-    return res.status(400).send({
-      status: 400,
-      err: err,
-      result: `Duplicate data ${req.body.name.toLowerCase()}`,
-    });
   }
 };
 //Obtener servicios con paginate por tipos y activados
 export const getServices = async (req, res, next) => {
-  console.log("--- GET SERVICES ---");
+  global.logger.info("--- GET SERVICES ---");
   try {
     let body = {};
     Object.assign(body, req.query);
@@ -44,33 +32,29 @@ export const getServices = async (req, res, next) => {
     };
     let query = {};
     body.isActive ? (query.isActive = body.isActive) : "";
-    Service.paginate(query, options, (err, items) => {
-      res.send(items);
-    });
+    const services = await Service.paginate(query, options);
+    res.status(200).json(services);
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
-  console.log("---GET SERVICE BY ID---");
-  Service.findOne({ _id: req.params.id }).exec((err, user) => {
-    if (err) return next(err);
-    if (user) {
-      res.send(user);
-    } else {
-      return next(createError(404, req.lg.user.notFound));
-    }
-  });
+  global.logger.info("---GET SERVICE BY ID---");
+  try {
+    const service = await Service.findOne({ _id: req.params.id }).exec();
+    if (!service) throw createError(404, "Service not found");
+    res.status(200).json(service);
+  } catch (err) {
+    next(err);
+  }
 };
 //Actualizar data de un usuario
-export const updateOne = (req, res, next) => {
+export const updateOne = async (req, res, next) => {
+  global.logger.info("---UPDATE SERVICE---");
   try {
-    console.log("---UPDATE SERVICE---");
-
     let data = req.body;
-    Service.findOneAndUpdate(
+    const service = await Service.findOneAndUpdate(
       {
         _id: req.params.id,
       },
@@ -78,29 +62,25 @@ export const updateOne = (req, res, next) => {
       {
         new: true,
       }
-    ).exec((err, service) => {
-      if (err) return next(err);
-      res.send(service);
-    });
+    ).exec();
+    res.status(200).json(service);
   } catch (err) {
     next(err);
-    next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 //Activar o desactivar multiples usuarios
-export const activateMany = (req, res, next) => {
-  console.log(req.body);
-  Service.updateMany(
-    { _id: { $in: req.body.services } },
-    { isActive: req.body.isActive ? req.body.isActive : true }
-  ).exec((err, data) => {
-    if (err) next(err);
-    res.send(data);
-  });
-  // res.send("buena")
+export const activateMany = async (req, res, next) => {
+  global.logger.info("---ACTIVATE/DESACTIVATE MANY SERVICES---");
+  try {
+    const services = await Service.updateMany(
+      { _id: { $in: req.body.services } },
+      { isActive: req.body.isActive ? req.body.isActive : true }
+    ).exec();
+    res.status(200).json(services);
+  } catch (err) {
+    next(err);
+  }
 };
-
 export const uploadIconService = async (req, res, next) => {
   console.log("--- UPLOAD ICON SERVICE/SUBSERVICE ---", req.query);
   try {
@@ -174,8 +154,9 @@ export const uploadIconService = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+//obtener los subservicios por servicio
 export const serviceAndSubservice = async (req, res, next) => {
-  console.log("--- GET ALL SERVICES WITH SUBSERVICE ---", req.query);
+  global.logger.info("--- GET ALL SERVICES WITH SUBSERVICE ---");
   try {
     let services = await Service.find({}).select("_id name");
     if (services.length > 0) {
@@ -192,10 +173,9 @@ export const serviceAndSubservice = async (req, res, next) => {
         };
         result.push(serviceWithSubservices);
       }
-      res.send(result);
+      res.status(200).json(result);
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(err);
   }
 };

@@ -1,140 +1,113 @@
-//import { sendMailTest } from "../lib/mailer.js";
-import { notFoundError, createError, missingData } from "../config/error.js";
+import { createError } from "../config/error.js";
 import Booking from "../models/booking.js";
 import { sendEmailPaymentConfirmation } from "../services/aws_ses.js";
 
 //Crear booking
 export const create = async (req, res, next) => {
-  console.log("---CREATE NEW BOOKING---");
-
-  const emailData = req.body.emailData;
-
-  const bookingData = req.body;
-  bookingData.emailData = null;
-
-  let booking = new Booking(bookingData);
-  console.log("booking", booking);
-  let query = {
-    $and: [
-      {
-        location: booking.location,
-      },
-      {
-        subService: booking.subService,
-      },
-      {
-        date: booking.date,
-      },
-      {
-        startTime: booking.startTime,
-      },
-    ],
-  };
-  console.log("la query", query);
-  let exists = await Booking.findOne(query, {}).exec();
-  console.log("exists", exists);
-  if (exists) {
-    console.log("ya existe");
-    res.send({ booking: exists, msg: "document already exists" });
-  } else {
-    console.log("no existe");
-    try {
+  global.logger.info("---CREATE NEW BOOKING---");
+  try {
+    const emailData = req.body.emailData;
+    const bookingData = req.body;
+    bookingData.emailData = null;
+    let booking = new Booking(bookingData);
+    let query = {
+      $and: [
+        {
+          location: booking.location,
+        },
+        {
+          subService: booking.subService,
+        },
+        {
+          date: booking.date,
+        },
+        {
+          startTime: booking.startTime,
+        },
+      ],
+    };
+    let exists = await Booking.findOne(query, {}).exec();
+    if (exists) {
+      throw createError(409, "document already exists");
+    } else {
       const newBooking = await booking.save();
-
       if (emailData) sendEmailPaymentConfirmation(emailData);
-
-      console.log("nueva reserva", newBooking);
-      res.send({ booking: newBooking, msg: "new Document" });
-    } catch (err) {
-      next(err);
+      res.status(201).json({ booking: newBooking, msg: "new Document" });
     }
+  } catch (err) {
+    next(err);
   }
 };
 //Obtener reserva por ID
 export const getById = async (req, res, next) => {
-  console.log("---GET BOOKING BY ID---");
-  Booking.findOne({ _id: req.params.id }).exec((err, booking) => {
-    if (err) next(err);
-    if (booking) {
-      booking.populate([
-        {
-          path: "hotel",
-          //   select: "isActive name  email phone creator user imgUrl emails type",
-        },
-        {
-          path: "service",
-          //   select: "isActive name  email phone creator user imgUrl emails type",
-        },
-        {
-          path: "client",
-          //   select: "isActive name  email phone creator user imgUrl emails type",
-        },
-      ]);
-      res.send(booking);
-    } else {
-      console.log("se viene error");
-      return next(err);
-    }
-  });
+  global.logger.info("---GET BOOKING BY ID---");
+  try {
+    const booking = await Booking.findOne({ _id: req.params.id }).exec();
+    if (!booking) throw createError(404, "Booking not found");
+    res.send(booking);
+  } catch (err) {
+    next(err);
+  }
 };
 //Obtener bookings con paginate por cliente, hotel, Worker,
 export const getBookings = async (req, res, next) => {
-  console.log("---GET bookings---");
-  let body = {};
-  Object.assign(body, req.query);
-  console.log("query", body);
-
-  const populate = [
-    {
-      path: "hotel",
-      //   select: "isActive name  email phone creator user imgUrl emails type",
-    },
-    {
-      path: "worker",
-    },
-    {
-      path: "client",
-    },
-    {
-      path: "creator",
-    },
-  ];
-  let options = {
-    // populate,
-    // select,
-    page: body.page || 1,
-    limit: body.limit || 50,
-    sort: { updatedAt: -1 },
-  };
-  let query = {};
-  body.isActive ? (query.isActive = body.isActive) : "";
-  body.client ? (query.client = body.client) : "";
-  body.hotel ? (query.hotel = body.hotel) : "";
-  body.worker ? (query.worker = body.worker) : "";
-  body.creator ? (query.creator = body.creator) : "";
+  global.logger.info("---GET BOOKINGS---");
   try {
-    Booking.paginate(query, options, (err, items) => {
-      if (err) return next(err);
-      res.send(items);
-    });
+    let body = {};
+    Object.assign(body, req.query);
+    const populate = [
+      {
+        path: "hotel",
+        //   select: "isActive name  email phone creator user imgUrl emails type",
+      },
+      {
+        path: "worker",
+      },
+      {
+        path: "client",
+      },
+      {
+        path: "creator",
+      },
+    ];
+    let options = {
+      // populate,
+      // select,
+      page: body.page || 1,
+      limit: body.limit || 50,
+      sort: { updatedAt: -1 },
+    };
+    let query = {};
+    body.isActive ? (query.isActive = body.isActive) : "";
+    body.client ? (query.client = body.client) : "";
+    body.hotel ? (query.hotel = body.hotel) : "";
+    body.worker ? (query.worker = body.worker) : "";
+    body.creator ? (query.creator = body.creator) : "";
+
+    const bookings = await Booking.paginate(query, options);
+    res.status(200).json(bookings);
   } catch (err) {
     next(err);
   }
 };
 //Actualizar data de un booking
-export const updateOne = (req, res, next) => {
-  console.log("---UPDATE Booking---");
-  let data = req.body;
-  Booking.findOneAndUpdate(
-    {
-      _id: req.params.id,
-    },
-    data,
-    {
-      new: true,
-    }
-  ).exec((err, service) => {
-    if (err) return next(err);
-    res.send(service);
-  });
+export const updateOne = async (req, res, next) => {
+  global.logger.info("---UPDATE BOOKING---");
+  try {
+    let data = req.body;
+
+    const booking = await Booking.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      data,
+      {
+        new: true,
+      }
+    ).exec();
+    if (!booking) throw createError(404, "Booking not found");
+    res.status(200).json(booking);
+  } catch (err) {
+    next(err);
+  }
 };

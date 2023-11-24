@@ -4,7 +4,7 @@ import { createError } from "../config/error.js";
 
 //Añadir usuario a favorito
 export const addFavorite = async (req, res, next) => {
-  console.log("--- ADD FAVORITE ---");
+  global.logger.info("--- ADD FAVORITE ---");
   try {
     let receptor = await User.findById(req.params.id);
     let favorite = await Favorite.findOne({
@@ -12,29 +12,24 @@ export const addFavorite = async (req, res, next) => {
       receptor: req.params.id,
     });
     if (!receptor) {
-      let err = createError(404, "User not found or invalid credentials");
-      next(err);
-      res.status(404).json(err);
+      throw createError(404, "User not found or invalid credentials");
     } else if (favorite) {
-      let err = createError(409, "Already exists");
-      next(err);
-      res.status(404).json(err);
+      throw createError(409, "Already exists");
     } else {
       let newFavorite = new Favorite({
         emisor: req.user._id.toString(),
         receptor: req.params.id,
       });
       await newFavorite.save();
-      res.send(newFavorite);
+      res.status(201).json(newFavorite);
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 //Eliminar usuario a favorito
 export const deleteFavorite = async (req, res, next) => {
-  console.log("--- DELETE FAVORITE ---");
+  global.logger.info("--- DELETE FAVORITE ---");
   try {
     let receptor = await User.findById(req.params.id);
     let favorite = await Favorite.findOne({
@@ -42,28 +37,23 @@ export const deleteFavorite = async (req, res, next) => {
       receptor: req.params.id,
     });
     if (!receptor) {
-      let err = createError(404, "User not found or invalid credentials");
-      next(err);
-      res.status(404).json(err);
+      throw createError(404, "User not found or invalid credentials");
     } else if (!favorite) {
-      let err = createError(404, "relation doesnt exist");
-      next(err);
-      res.status(404).json(err);
+      throw createError(404, "relation doesnt exist");
     } else {
       await Favorite.findOneAndDelete({
         emisor: req.user._id.toString(),
         receptor: req.params.id,
       });
-      res.send({ message: "deleted success" });
+      res.status(200).json({ message: "deleted success" });
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 //Obtener todos los favoritos de un usuario
 export const getFavorites = async (req, res, next) => {
-  console.log("--- GET ALL FAVORITES ---");
+  global.logger.info("--- GET FAVORITE ---");
   try {
     let favorites = await Favorite.find({
       emisor: req.user._id.toString(),
@@ -71,9 +61,8 @@ export const getFavorites = async (req, res, next) => {
       path: "receptor",
       select: "_id img personalData workerData email", // Lista de campos que deseas seleccionar
     });
-    res.send(favorites);
+    res.status(200).json(favorites);
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error" });
   }
 };

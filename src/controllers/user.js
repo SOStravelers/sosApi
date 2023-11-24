@@ -11,21 +11,20 @@ import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
-  console.log("---GET USERS---");
-  let body = {};
-  Object.assign(body, req.query);
-  console.log("query", body);
-  let options = {
-    // populate,
-    // select,
-    page: body.page || 1,
-    limit: body.limit || 20,
-    sort: { updatedAt: -1 },
-  };
-  let query = {};
-  body.type ? (query.type = body.type) : "";
-  body.isActive ? (query.isActive = body.isActive) : "";
+  global.logger.info("---GET USERS---");
   try {
+    let body = {};
+    Object.assign(body, req.query);
+    let options = {
+      // populate,
+      // select,
+      page: body.page || 1,
+      limit: body.limit || 20,
+      sort: { updatedAt: -1 },
+    };
+    let query = {};
+    body.type ? (query.type = body.type) : "";
+    body.isActive ? (query.isActive = body.isActive) : "";
     User.paginate(query, options, (err, items) => {
       if (err) return next(err);
       res.send(items);
@@ -34,41 +33,38 @@ export const getUsers = async (req, res, next) => {
     next(err);
   }
 };
-
 //Obtener usuarios con paginate por tipos y activados
 export const contacts = async (req, res, next) => {
-  console.log("---GET MY CONTACTS test---");
-  let body = {};
-  Object.assign(body, req.query);
-  console.log("query", body);
-  let options = {
-    // populate,
-    // select,
-    page: body.page || 1,
-    limit: body.limit || 20,
-    sort: { updatedAt: -1 },
-  };
-  let query = {
-    $and: [
-      // Utilizamos $and para agregar múltiples condiciones
-      body.type ? { type: body.type } : {}, // Condición para type
-      body.isActive ? { isActive: body.isActive } : {}, // Condición para isActive
-      { _id: { $ne: req.user._id } }, // Excluir documentos con _id igual a req.user._id
-      { type: { $ne: "business" } }, // Excluir documentos con _id igual a req.user._id
-    ],
-  };
+  global.logger.info("---GET CONTACTS---");
   try {
-    User.paginate(query, options, (err, items) => {
-      if (err) return next(err);
-      res.send(items);
-    });
+    let body = {};
+    Object.assign(body, req.query);
+    console.log("query", body);
+    let options = {
+      // populate,
+      // select,
+      page: body.page || 1,
+      limit: body.limit || 20,
+      sort: { updatedAt: -1 },
+    };
+    let query = {
+      $and: [
+        // Utilizamos $and para agregar múltiples condiciones
+        body.type ? { type: body.type } : {}, // Condición para type
+        body.isActive ? { isActive: body.isActive } : {}, // Condición para isActive
+        { _id: { $ne: req.user._id } }, // Excluir documentos con _id igual a req.user._id
+        { type: { $ne: "business" } }, // Excluir documentos con _id igual a req.user._id
+      ],
+    };
+    const users = await User.paginate(query, options);
+    res.send(users);
   } catch (err) {
     next(err);
   }
 };
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
-  console.log("--- GET USER BY ID sss---");
+  global.logger.info("---GET USER BY ID---");
   try {
     const user = await User.findOne({ _id: req.params.id })
       .select(
@@ -82,25 +78,21 @@ export const getById = async (req, res, next) => {
         path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
         model: "SubServices", // Modelo de "SubServices"
       });
-    console.log(user);
     if (!user) {
-      let err = createError(404, "User not found");
-      next(err);
-      return res.status(404).json(err);
+      throw createError(404, "User not found");
     } else {
       res.send(user);
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 //Obtener usuarios business con paginate por servicios
 export const getBusinesByService = async (req, res, next) => {
-  console.log("---GET BUSINESS BY SERVICE---", req.query);
-  let body = {};
-  Object.assign(body, req.query);
+  global.logger.info("---GET BUSINESS BY SERVICE---");
   try {
+    let body = {};
+    Object.assign(body, req.query);
     const options = {
       page: body.page || 1,
       limit: body.limit || 10,
@@ -112,63 +104,53 @@ export const getBusinesByService = async (req, res, next) => {
       isActive: true, // Condición isActive=true
       type: "business", // Condición type="business"
     };
-    console.log("query", query);
     const result = await User.paginate(query, options);
     res.send(result);
   } catch (error) {
-    console.error("Error al buscar usuarios:", error);
     next(error);
   }
 };
 //Obtener usuarios business con paginate por nombre
 export const findbusinessbyname = async (req, res, next) => {
-  console.log("---FIND BUSINESS BY NAME---");
-  let body = {};
-  Object.assign(body, req.query);
-  body.name = decodeURIComponent(body.name);
-  console.log("query", body);
-  const options = {
-    page: body.page || 1,
-    limit: body.limit || 10,
-  };
-  let query = {
-    $and: [
-      {
-        $or: [
-          {
-            "businessData.name": {
-              $regex: body.name,
-              $options: "i",
-            },
-          },
-        ],
-      },
-      {
-        type: "business",
-      },
-      {
-        isActive: "true",
-      },
-      {
-        "businessData.services.isActive": true,
-      },
-      {
-        "businessData.services.id": body.service,
-      },
-    ],
-  };
-  console.log(query["$and"][0]["$or"][0]);
+  global.logger.info("---FIND BUSINESS BY NAME---");
   try {
-    User.paginate(query, options, (err, users) => {
-      console.log(users);
-      if (err) {
-        let error = createError(400, "not users found");
-        console.log(error);
-        return res.status(400).json(error);
-      } else {
-        res.status(200).send(users);
-      }
-    });
+    let body = {};
+    Object.assign(body, req.query);
+    body.name = decodeURIComponent(body.name);
+    console.log("query", body);
+    const options = {
+      page: body.page || 1,
+      limit: body.limit || 10,
+    };
+    let query = {
+      $and: [
+        {
+          $or: [
+            {
+              "businessData.name": {
+                $regex: body.name,
+                $options: "i",
+              },
+            },
+          ],
+        },
+        {
+          type: "business",
+        },
+        {
+          isActive: "true",
+        },
+        {
+          "businessData.services.isActive": true,
+        },
+        {
+          "businessData.services.id": body.service,
+        },
+      ],
+    };
+
+    const users = await User.paginate(query, options);
+    res.send(users);
   } catch (err) {
     next(err);
   }
@@ -176,8 +158,8 @@ export const findbusinessbyname = async (req, res, next) => {
 
 //Actualizar data de un usuario por ID
 export const setWorker = async (req, res, next) => {
+  global.logger.info("---SET WORKER---");
   try {
-    console.log("---Set Worker---");
     let id = req.user._id.toString();
     let newUser = await User.findOneAndUpdate(
       {
@@ -191,14 +173,13 @@ export const setWorker = async (req, res, next) => {
     res.send(newUser);
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 //Actualizar data de un usuario por ID
 export const updateOne = async (req, res, next) => {
+  global.logger.info("---UPDATE USER---");
   try {
-    console.log("---UPDATE USER---", req.body);
     let { user } = req.body;
     let newUser = await User.findOneAndUpdate(
       {
@@ -212,33 +193,32 @@ export const updateOne = async (req, res, next) => {
     res.send(newUser);
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 //Eliminar usuario por ID
 export const deleteById = async (req, res, next) => {
+  global.logger.info("---DELETE USER---");
   try {
-    console.log("---DELETE USER---");
     let removeUser = await User.findOneAndRemove({
       _id: req.params.id,
     }).exec();
     res.send({ removeUser, message: "user deleted" });
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 //Activar o desactivar multiples usuarios
-export const activateMany = (req, res, next) => {
-  console.log(req.body);
-  User.updateMany(
-    { _id: { $in: req.body.users } },
-    { isActive: req.body.isActive ? req.body.isActive : false }
-  ).exec((err, data) => {
-    if (err) next(err);
-    res.send(data);
-  });
-  // res.send("buena")
+export const activateMany = async (req, res, next) => {
+  global.logger.info("---ACTIVATE/DESACTIVATE MANY USERS---");
+  try {
+    const users = await User.updateMany(
+      { _id: { $in: req.body.users } },
+      { isActive: req.body.isActive ? req.body.isActive : true }
+    ).exec();
+    res.status(200).json(users);
+  } catch (err) {
+    next(err);
+  }
 };
 //crear o cambiar foto de perfil worker
 export const profilePhoto = async (req, res, next) => {
@@ -294,8 +274,8 @@ export const profilePhoto = async (req, res, next) => {
 };
 //crear o cambiar fotos de galeria worker
 export const galleryPhoto = async (req, res, next) => {
+  global.logger.info("---UPLOAD GALLERY FOTO---");
   try {
-    console.log("---UPLOAD GALLERY FOTO---", req.params.number);
     console.log("gato", req.file);
     let paramsNumber = Number(req.params.number);
     // VALIDACION PARA SOLO SUBIR UN MAXIMO DE 6 FOTOS
@@ -366,9 +346,8 @@ export const galleryPhoto = async (req, res, next) => {
   }
 };
 export const updateGallery = async (req, res, next) => {
+  global.logger.info("---UPDATE GALLERY---");
   try {
-    console.log("---UPDATE GALLERY ---", req.body);
-
     let updateUser = await User.findByIdAndUpdate(
       req.user._id,
       {
@@ -380,48 +359,42 @@ export const updateGallery = async (req, res, next) => {
     )
       .select("img")
       .exec();
-    res.send(updateUser);
+    res.status(200).send(updateUser);
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 // función para crear contraseña para usuario que no tienen creada
 export const hasPassword = async (req, res, next) => {
+  global.logger.info("---HAS PASSWORD---");
   try {
-    console.log("hasPass");
     let user = await User.findOne({
       _id: req.user._id.toString(),
     }).select("security");
     if (user.security && user.security.hasPassword) {
-      res.send({ hasPassword: true });
+      res.status(200).send({ hasPassword: true });
     } else {
-      res.send({ hasPassword: false });
+      res.status(200).send({ hasPassword: false });
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 // función para crear contraseña para usuario que no tienen creada
 export const changePassword = async (req, res, next) => {
+  global.logger.info("---CHANGE PASSWORD---");
   try {
-    console.log("changePassword", req.body);
     const newPassword = req.body.newPassword;
     const currentPassword = req.body.currentPassword;
     if (!newPassword) {
-      let err = createError(400, "a field is missing");
-      next(err);
-      return res.status(404).json(err);
+      throw createError(400, "a field is missing");
     }
     const validPass = await User.validPassword(
       req.user._id.toString(),
       currentPassword
     );
     if (!validPass) {
-      let err = createError(400, "current password wrong");
-      next(err);
-      return res.status(400).json(err);
+      throw createError(400, "current password wrong");
     }
     const encryptPassword = await User.hash(newPassword);
     const updatedUser = await User.findOneAndUpdate(
@@ -448,13 +421,12 @@ export const changePassword = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 export const inactiveMode = async (req, res, next) => {
+  global.logger.info("---INACTIVE MODE---");
   try {
-    console.log("inactiveMode", req.body);
     const isActive = req.body.isActive;
     const id = req.user._id.toString();
     const updatedUser = await User.findOneAndUpdate(
@@ -464,9 +436,8 @@ export const inactiveMode = async (req, res, next) => {
       },
       { new: true }
     ).select("isActive isValidate security email personalData _id img");
-    res.json(updatedUser);
+    res.status(200).json(updatedUser);
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
