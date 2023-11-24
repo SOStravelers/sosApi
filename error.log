@@ -200,3 +200,25 @@ Error: User not found or invalid credentials
     at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
     at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:174:13)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T20:35:18.183Z [31merror[39m: [31mMissing Parameter password - Status: 400[39m
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:32:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T20:35:28.256Z [31merror[39m: [31mThis email is already in use - Status: 409[39m
+Error: This email is already in use
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at registerEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:90:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T20:35:36.564Z [31merror[39m: [31mThis email is already in use - Status: 409[39m
+Error: This email is already in use
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at registerEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:90:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)

@@ -358,3 +358,54 @@ Error: User not found or invalid credentials
     at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:174:13)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
 2023-11-24T20:34:08.987Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T20:35:18.183Z [31merror[39m: [31mMissing Parameter password - Status: 400[39m
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:32:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T20:35:23.644Z [36minfo[39m: [36m--- REGISTER NEW USER AND CREATE TOKEN ---[39m
+2023-11-24T20:35:28.131Z [36minfo[39m: [36m--- REGISTER NEW USER AND CREATE TOKEN ---[39m
+2023-11-24T20:35:28.256Z [31merror[39m: [31mThis email is already in use - Status: 409[39m
+Error: This email is already in use
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at registerEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:90:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T20:35:36.435Z [36minfo[39m: [36m--- REGISTER NEW USER AND CREATE TOKEN ---[39m
+2023-11-24T20:35:36.564Z [31merror[39m: [31mThis email is already in use - Status: 409[39m
+Error: This email is already in use
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at registerEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:90:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T20:37:17.813Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:37:19.154Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:38:08.350Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:38:09.634Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:41:15.423Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:41:16.793Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:42:23.623Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:42:24.917Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:44:17.437Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:44:18.744Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:44:47.447Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:44:48.719Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:47:08.646Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:47:10.178Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:49:32.373Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:49:33.749Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:50:05.883Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:50:07.215Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:51:04.372Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:51:05.752Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:53:17.155Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:53:18.655Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:53:56.493Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:53:57.757Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:54:09.937Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:54:11.232Z [33mhttp[39m: [33mConnnected to mongodb[39m
