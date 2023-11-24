@@ -128,4 +128,3 @@ app.use(history());
 //app.use(express.static(path.join(__dirname, 'public')));
 
 export default app;
-1;
