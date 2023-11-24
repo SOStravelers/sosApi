@@ -36,7 +36,8 @@
     "path": "^0.12.7",
     "sharp": "^0.32.6",
     "stripe": "^13.6.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",

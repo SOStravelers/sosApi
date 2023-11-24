@@ -123,6 +123,11 @@ app.get("/", (req, res) => {
   `;
   res.send(htmlResponse);
 });
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
+    error: err.message || "Internal Server Error.",
+  });
+});
 // Middleware para Vue.js router modo history
 app.use(history());
 //app.use(express.static(path.join(__dirname, 'public')));

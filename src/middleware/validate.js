@@ -1,44 +1,55 @@
 // import { convertToObject } from "typescript";
 import checkObjectId from "../lib/db/checkObjectId.js";
+import { createError } from "../config/error.js";
+import logger from "../config/logger.js";
 
 const validateParams = function (requestParams, toValidate) {
   return function (req, res, next) {
-    for (let param of requestParams) {
-      console.log(param);
-      if (checkParamPresent(Object.keys(req[toValidate]), param)) {
-        let reqParam = req[toValidate][param.param_key];
-        if (!checkParamType(reqParam, param)) {
-          console.log("caso1");
-          return res.send(400, {
-            statusCode: 400,
-            message:
+    try {
+      for (let param of requestParams) {
+        if (checkParamPresent(Object.keys(req[toValidate]), param)) {
+          let reqParam = req[toValidate][param.param_key];
+          if (!checkParamType(reqParam, param)) {
+            console.log("caso1");
+
+            throw createError(
+              400,
               `${param.param_key} is of type ` +
-              `${typeof reqParam} but should be ${param.type}`,
-          });
-        } else {
-          if (!runValidators(reqParam, param.validator_functions)) {
-            console.log("caso2");
-            return res.send(400, {
-              statusCode: 400,
-              message: `Validation failed for ${param.param_key}`,
-            });
+                `${typeof reqParam} but should be ${param.type}`
+            );
+          } else {
+            if (!runValidators(reqParam, param.validator_functions)) {
+              throw createError(
+                400,
+                `Validation failed for ${param.param_key}`
+              );
+            }
+            if (param.enum && !checkEnums(reqParam, param)) {
+              throw createError(
+                400,
+                `Validation failed for ${param.param_key}`
+              );
+            }
           }
-          if (param.enum && !checkEnums(reqParam, param)) {
-            console.log("caso3");
-            return res.status(400).send({
-              message: `Validation failed for ${param.param_key} it is not a value allowed`,
-            });
-          }
+        } else if (param.required) {
+          throw createError(400, `Missing Parameter ${param.param_key}`);
         }
-      } else if (param.required) {
-        console.log("caso4");
-        return res.status(400).send({
-          statusCode: 400,
-          message: `Missing Parameter ${param.param_key}`,
-        });
       }
+      next();
+    } catch (err) {
+      logger.error({
+        message: `${err.message} - Status: ${err.statusCode || 500}`,
+        path: req.path,
+        method: req.method,
+        body: req.body,
+        stack: err.stack,
+      });
+      // console.log(err);
+      if (!(err instanceof Error) || !err.statusCode) {
+        err = createError();
+      }
+      next(err);
     }
-    next();
   };
 };
 

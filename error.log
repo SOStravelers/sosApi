@@ -1,0 +1,80 @@
+{"level":"error","message":"server error.","service":"user-service","statusCode":500}
+2023-11-24T17:24:19.460Z [user-service] [31merror[39m: server error.
+2023-11-24T17:25:16.218Z [user-service] [31merror[39m: server error.
+2023-11-24T17:28:09.137Z [user-service] [31merror[39m: server error.
+2023-11-24T17:32:06.702Z [user-service] [31merror[39m: server error.
+2023-11-24T17:33:17.721Z [user-service] [31merror[39m: server error.
+2023-11-24T17:42:46.771Z [default] [31merror[39m: server error. - Status: 500
+2023-11-24T17:44:19.158Z [default] [31merror[39m: server error. - Status: 500
+2023-11-24T17:47:41.998Z [default] [31merror[39m: server error. - Status: 500
+2023-11-24T17:51:27.544Z [default] [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:51:59.190Z [default] [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:52:17.133Z [default] [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:53:01.044Z [default] [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:53:27.318Z [default] [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:55:38.962Z [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:58:13.291Z [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:58:52.644Z [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T17:59:34.712Z [31merror[39m: User not found or invalid credentialsss - Status: 401
+2023-11-24T18:01:00.772Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:03:09.166Z [31merror[39m: server error. - Status: 500
+2023-11-24T18:04:12.398Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T18:05:58.959Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T18:06:08.836Z [31merror[39m: [31mserver error. - Status: 500[39m
+2023-11-24T18:07:50.510Z [31merror[39m: [31ma is not defined - Status: 500[39m
+2023-11-24T18:09:41.910Z [31merror[39m: [31ma is not defined - Status: 500[39m
+2023-11-24T18:10:44.076Z [31merror[39m: [31ma is not defined - Status: 500[39m
+2023-11-24T18:14:11.810Z [31merror[39m: a is not defined - Status: 500
+2023-11-24T18:14:53.735Z [31merror[39m: a is not defined - Status: 500
+2023-11-24T18:15:08.864Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:16:17.522Z [31merror[39m: a is not defined - Status: 500
+2023-11-24T18:16:34.484Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:17:11.627Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:17:26.977Z [31merror[39m: a is not defined - Status: 500
+2023-11-24T18:18:01.977Z [31merror[39m: a is not defined - Status: 500
+2023-11-24T18:18:19.662Z [31merror[39m: a is not defined - Status: 500
+2023-11-24T18:18:48.788Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:20:37.820Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:29:31.178Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:32:17.159Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:33:05.277Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T18:34:01.973Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:36:30.245Z [31merror[39m: Your message
+2023-11-24T18:39:17.099Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:41:03.580Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:50:17.021Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T18:58:58.212Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T19:01:41.425Z [31merror[39m: Missing Parameter password - Status: 400
+2023-11-24T19:02:20.024Z [31merror[39m: Missing Parameter password - Status: 400
+2023-11-24T19:04:05.890Z [31merror[39m: Missing Parameter password - Status: 400
+2023-11-24T19:04:19.637Z [31merror[39m: Missing Parameter password - Status: 400
+2023-11-24T19:05:19.450Z [31merror[39m: Missing Parameter password - Status: 400
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:35:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T19:05:52.678Z [31merror[39m: User not found or invalid credentials - Status: 401
+2023-11-24T19:06:21.054Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:06:54.000Z [31merror[39m: Missing Parameter password - Status: 400
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:35:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)

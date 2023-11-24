@@ -1,5 +1,4 @@
-const create = (statusCode = 500, message = "server error.") => {
-  console.log("creating error..");
+const create = (statusCode = 500, message = "Internal server error.") => {
   let err = new Error();
   err.message = message;
   err.statusCode = statusCode;

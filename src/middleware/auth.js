@@ -17,7 +17,6 @@ const encodeFunc = (toSing, expiresIn) => {
   return jwt.sign(toSing, envar().SECRET, { expiresIn });
 };
 const accessToken = (user, tokenFresh = false, time) => {
-  console.log("llego aqui");
   let tiempo = time ? time : "3d";
   return encodeFunc({ ...user, tokenFresh }, tiempo);
 };

@@ -3,7 +3,7 @@ const router = Router();
 import validateParams from "../middleware/validate.js";
 
 import {
-  create,
+  createUser,
   getById,
   registerEmail,
   loginEmail,
@@ -43,7 +43,7 @@ router.post(
     ],
     "body"
   ),
-  create
+  createUser
 );
 //register user
 router.post(

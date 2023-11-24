@@ -5,13 +5,15 @@ import { sendEmailTemplate } from "../services/aws_ses.js";
 import { createError } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 import { procesarNombre } from "../utils/data.js";
+import logger from "../config/logger.js";
+
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
 } from "../utils/code.js";
 
 //Create user personal/workers/business
-export const create = async (req, res, next) => {
+export const createUser = async (req, res, next) => {
   console.log("--- CREATE NEW USER-WORKER-BUSINESS ---");
   try {
     let user = new User(req.body);
@@ -65,6 +67,9 @@ export const create = async (req, res, next) => {
     const newUser = await user.save();
     res.json(newUser);
   } catch (err) {
+    if (!err.statusCode) {
+      err = create();
+    }
     next(err);
     res.status(500).json({ message: "Internal server error." });
   }
@@ -82,9 +87,7 @@ export const registerEmail = async (req, res, next) => {
     let theEmail = req.body.email.toLowerCase().trim();
     let theUser = await User.findOne({ email: theEmail }).exec();
     if (theUser) {
-      let err = createError(409, "This email is already in use");
-      next(err);
-      return res.status(409).json(err);
+      throw createError(409, "This email is already in use");
     }
     let user = new User(req.body);
     if (req.body.password) {
@@ -144,57 +147,73 @@ export const registerEmail = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
+    logger.error({
+      message: `${err.message} - Status: ${err.statusCode || 500}`,
+      path: req.path,
+      method: req.method,
+      body: req.body,
+    });
+    if (!(err instanceof Error) || !err.statusCode) {
+      err = createError();
+    }
     next(err);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 //Login user by email
 export const loginEmail = async (req, res, next) => {
-  console.log("--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---");
+  logger.info({
+    message: "--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---",
+  });
   try {
     let { email, password } = req.body;
     email = email.toLowerCase().trim();
-    let user = await User.findOne({ email }).exec();
+    const user = await User.findOne({ email }).exec();
+    const msg401 = "User not found or invalid credentials";
     if (!user) {
-      let err = createError(401, "User not found or invalid credentials");
-      next(err);
-      return res.status(401).json(err);
+      throw createError(401, msg401);
     }
     if (!user.security.hasPassword) {
-      let err = createError(400, "has Not password");
-      next(err);
-      return res.status(400).json(err);
+      throw createError(400, "has Not password");
     }
     const isValid =
       typeof password !== "undefined"
         ? await User.validPassword(user._id.toString(), password)
         : false;
     if (!isValid) {
-      let err = createError(401, "User not found or invalid credentialsss");
-      next(err);
-      return res.status(401).json(err);
+      throw createError(401, msg401);
     }
     user.lastLogin = Date.now();
     user.lastLoginType = "email";
-    await user.save();
-    const newUser = await User.findOne({ email: user.email }).select(
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { lastLogin: Date.now(), lastLoginType: "email" },
+      { new: true }
+    ).select(
       "about email img type language personalData username workerData _id security.hasPassword"
     );
-    delete newUser.password;
-
+    delete updatedUser.password;
     let userToCreateToken = {
-      _id: newUser._id,
-      username: newUser.username,
+      _id: updatedUser._id,
+      username: updatedUser.username,
     };
     res.send({
       msg: "login success",
       access_token: accessTokenGen(userToCreateToken, true),
       refresh_token: refreshTokenGen(userToCreateToken),
-      user: newUser,
+      user: updatedUser,
     });
   } catch (err) {
+    logger.error({
+      message: `${err.message} - Status: ${err.statusCode || 500}`,
+      path: req.path,
+      method: req.method,
+      body: req.body,
+      stack: err.stack,
+    });
+    if (!(err instanceof Error) || !err.statusCode) {
+      err = createError();
+    }
     next(err);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 //login y registro por google
