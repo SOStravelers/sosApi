@@ -584,6 +584,7 @@ export const getUsers = async (req, res, next) => {
     body.isActive ? (query.isActive = body.isActive) : "";
 
     const response = await User.paginate(query, options);
+    console.log(response);
     res.status(200).json(response);
   } catch (err) {
     next(err);

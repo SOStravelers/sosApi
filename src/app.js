@@ -3,7 +3,7 @@ global.logger = logger;
 
 import server from "./server.js";
 
-const port = process.env.PORT || 9000;
+const port = process.env.PORT || 4000;
 server.listen(port, function () {
   logger.http(
     "SOS API TRAVELERS is listening on port " + port + " AGUANTE LA U !"

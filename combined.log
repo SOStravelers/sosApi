@@ -565,3 +565,16 @@ Error: This email is already in use
 2023-11-24T21:59:45.715Z [33mhttp[39m: [33mConnnected to mongodb[39m
 2023-11-24T21:59:55.566Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
 2023-11-24T21:59:57.329Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T22:02:42.597Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 4000 AGUANTE LA U ![39m
+2023-11-24T22:02:44.357Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T22:02:46.891Z [36minfo[39m: [36m--- GET SERVICES ---[39m
+2023-11-24T22:02:55.717Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T22:03:04.546Z [36minfo[39m: [36m---GET SUBSERVICES BY SERVICE---[39m
+2023-11-24T22:03:06.363Z [36minfo[39m: [36m--- GET USERS ---[39m
+2023-11-24T22:03:10.487Z [36minfo[39m: [36m---GET SUBSERVICES BY SERVICE---[39m
+2023-11-24T22:03:11.496Z [36minfo[39m: [36m--- GET USERS ---[39m
+2023-11-24T22:03:46.046Z [36minfo[39m: [36m---GET SUBSERVICES BY SERVICE---[39m
+2023-11-24T22:05:12.746Z [36minfo[39m: [36m--- GET USERS ---[39m
+2023-11-24T22:05:30.856Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 4000 AGUANTE LA U ![39m
+2023-11-24T22:05:32.825Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T22:05:35.270Z [36minfo[39m: [36m--- GET USERS ---[39m
