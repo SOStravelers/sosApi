@@ -1,5 +1,6 @@
-import express, { Router } from "express";
+import express from "express";
 import morgan from "morgan";
+import errorHandling from "./middleware/errorHandling.js";
 import cors from "cors";
 import history from "connect-history-api-fallback";
 import staticDir from "./config/staticPath.js";
@@ -7,18 +8,16 @@ import bodyParser from "body-parser";
 import localeMiddleware from "express-locale";
 import db from "./db.js";
 import routes from "./routes/index.js";
-import errorHandling from "./middleware/errorHandling.js";
 
 // check connection
 db.once("open", () => {
-  console.log(`Connnected to mongodb`);
+  logger.http(`Connnected to mongodb`);
 });
 db.on("error", (err) => {
-  console.log(err);
+  logger.success(err);
 });
 
 const app = express();
-const router = Router();
 app.use(express.static(staticDir));
 app.use(express.json({ limit: "500mb" }));
 
@@ -131,7 +130,6 @@ app.get("/", (req, res) => {
 // });
 
 app.use(errorHandling);
-// Middleware para Vue.js router modo history
 app.use(history());
 //app.use(express.static(path.join(__dirname, 'public')));
 

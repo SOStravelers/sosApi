@@ -271,7 +271,45 @@ export const loginGoogle = async (req, res, next) => {
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error." });
+  }
+};
+// función para crear contraseña para usuario que no tienen creada
+export const createPassword = async (req, res, next) => {
+  global.logger.info({
+    message: "--- CREATE PASSWORD ---",
+  });
+  try {
+    const id = req.params.id;
+    const newPassword = req.body.password.trim();
+    if (!newPassword) {
+      throw createError(400, "a field is missing");
+    }
+    const encryptPassword = await User.hash(newPassword);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: id },
+      {
+        password: encryptPassword,
+        isActive: true,
+        "security.hasPassword": true,
+        "security.updatedAt": new Date(),
+      },
+      { new: true }
+    ).select("isActive _id isValidate security email personalData _id img");
+
+    let userToCreateToken = {
+      _id: updatedUser._id,
+      username: updatedUser.username,
+    };
+    let userRefresh = {
+      _id: updatedUser._id,
+    };
+    res.json({
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userRefresh),
+      user: updatedUser,
+    });
+  } catch (err) {
+    next(err);
   }
 };
 //Obtener usuario por ID
@@ -377,47 +415,7 @@ export const verifyEmail = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
-// función para crear contraseña para usuario que no tienen creada
-export const createPassword = async (req, res, next) => {
-  console.log("-- CREATE PASSWORD --");
-  try {
-    const id = req.params.id;
-    console.log(id);
-    const newPassword = req.body.password.trim();
-    if (!newPassword) {
-      let err = createError(400, "a field is missing");
-      next(err);
-      return res.status(404).json(err);
-    }
-    const encryptPassword = await User.hash(newPassword);
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: id }, // Filtro para encontrar el usuario por su ID
-      {
-        password: encryptPassword,
-        isActive: true,
-        "security.hasPassword": true,
-        "security.updatedAt": new Date(),
-      },
-      { new: true } // Opcional: para obtener el documento actualizado como resultado
-    ).select("isActive _id isValidate security email personalData _id img");
 
-    let userToCreateToken = {
-      _id: updatedUser._id,
-      username: updatedUser.username,
-    };
-    let userRefresh = {
-      _id: updatedUser._id,
-    };
-    res.json({
-      access_token: accessTokenGen(userToCreateToken, true),
-      refresh_token: refreshTokenGen(userRefresh),
-      user: updatedUser,
-    });
-  } catch (err) {
-    next(err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
 //Función para encontrar usuario por email
 export const findByEmail = async (req, res, next) => {
   console.log("--- FIND BY EMAIL ---");

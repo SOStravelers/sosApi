@@ -1,7 +1,8 @@
 import { createError } from "../config/error.js";
+import logger from "../config/logger.js";
 
 export default function errorHandlingMiddleware(err, req, res, next) {
-  global.logger.error({
+  logger.error({
     message: `${err.message} - Status: ${err.statusCode || 500}`,
     path: req.path,
     method: req.method,

@@ -263,3 +263,98 @@ Error: Missing Parameter password
     at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
     at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
     at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T19:49:35.020Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T19:53:27.041Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T19:54:20.596Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T19:54:34.874Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T19:58:36.344Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T19:59:41.699Z [31merror[39m: Missing Parameter password - Status: 400
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:32:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at param (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:365:14)
+    at param (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:376:14)
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:421:3)
+2023-11-24T20:01:46.487Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T20:01:46.932Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T20:01:57.077Z [34minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T20:02:07.542Z [31merror[39m: Missing Parameter password - Status: 400
+2023-11-24T20:02:22.076Z [32minfo[39m: SOS API TRAVELERS is listening on port 9000 AGUANTE LA U !
+2023-11-24T20:03:37.802Z [32minfo[39m: [32mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:04:01.163Z [34minfo[39m: [34mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:07:40.297Z [34minfo[39m: [34mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:08:04.099Z [33mwarn[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:09:45.562Z [32mdebug[39m: [32mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:09:50.618Z [35msilly[39m: [35mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:09:54.392Z [34minfo[39m: [34mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:11:34.863Z [34minfo[39m: [34mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:12:02.578Z [35mhttp[39m: [35mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:12:23.598Z [35mhttp[39m: [35mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:12:29.712Z [34mhttp[39m: [34mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:13:00.020Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:13:09.734Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:13:13.595Z [31merror[39m: [31mMissing Parameter password - Status: 400[39m
+2023-11-24T20:13:32.683Z [96minfo[39m: [96m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T20:13:33.070Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T20:13:48.858Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:14:11.957Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:14:15.708Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T20:14:16.094Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T20:14:56.848Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:16:30.372Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:16:31.654Z [33mwarn[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:16:39.129Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:16:40.405Z [33mwarn[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:16:59.305Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:17:00.583Z [33mwarn[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:17:35.366Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:17:52.607Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:17:53.869Z [94mhttp[39m: [94mConnnected to mongodb[39m
+2023-11-24T20:24:11.930Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:24:13.322Z [94mhttp[39m: [94mConnnected to mongodb[39m
+2023-11-24T20:25:41.849Z [94mhttp[39m: [94mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:25:45.545Z [94mhttp[39m: [94mConnnected to mongodb[39m
+2023-11-24T20:25:57.989Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T20:25:58.364Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T20:26:36.631Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:26:37.926Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:26:45.317Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T20:26:45.740Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T20:29:17.183Z [36minfo[39m: [36m--- CREATE PASSWORD ---[39m
+2023-11-24T20:29:54.728Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T20:29:55.119Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+2023-11-24T20:30:05.515Z [31merror[39m: [31mExpected double-quoted property name in JSON at position 36 (line 3 column 1) - Status: 400[39m
+2023-11-24T20:30:19.493Z [31merror[39m: [31mMissing Parameter password - Status: 400[39m
+2023-11-24T20:30:58.315Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:30:59.748Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:31:33.693Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:31:34.970Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:31:40.949Z [31merror[39m: [31mMissing Parameter password - Status: 400[39m
+2023-11-24T20:33:39.635Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:33:40.985Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:33:46.297Z [33mhttp[39m: [33mSOS API TRAVELERS is listening on port 9000 AGUANTE LA U ![39m
+2023-11-24T20:33:47.590Z [33mhttp[39m: [33mConnnected to mongodb[39m
+2023-11-24T20:33:48.695Z [31merror[39m: [31mMissing Parameter password - Status: 400[39m
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:32:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T20:33:58.033Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
+2023-11-24T20:33:58.432Z [31merror[39m: [31mUser not found or invalid credentials - Status: 401[39m
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:174:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T20:34:08.987Z [36minfo[39m: [36m--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---[39m
