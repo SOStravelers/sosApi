@@ -259,14 +259,11 @@ export const profilePhoto = async (req, res, next) => {
           console.log("respuesta", user);
           res.send(user);
         } else {
-          let error = createError(400, "Create error");
-          return res.status(400).json(error);
+          throw createError(400, "Create error");
         }
       })
       .catch((err) => {
         next(err);
-        console.log(err);
-        res.status(500).json({ error: "Internal Server Error" });
       });
   } catch (err) {
     next(err);
@@ -317,7 +314,6 @@ export const galleryPhoto = async (req, res, next) => {
             const emptyArray = Array.from({ length: 10 }, () => null);
             gallery = emptyArray;
           }
-
           let updateUser = await User.findByIdAndUpdate(
             req.user._id,
             {
@@ -331,18 +327,14 @@ export const galleryPhoto = async (req, res, next) => {
             .exec();
           res.send(updateUser);
         } else {
-          let error = createError(500, "Error while saving data");
-          return res.status(500).json(error);
+          throw createError(500, "Error while saving data");
         }
       })
       .catch((err) => {
         next(err);
-        console.log(err);
-        res.status(500).json({ error: "Internal Server Error" });
       });
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 export const updateGallery = async (req, res, next) => {
