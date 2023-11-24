@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import localeMiddleware from "express-locale";
 import db from "./db.js";
 import routes from "./routes/index.js";
+import errorHandling from "./middleware/errorHandling.js";
 
 // check connection
 db.once("open", () => {
@@ -123,11 +124,13 @@ app.get("/", (req, res) => {
   `;
   res.send(htmlResponse);
 });
-app.use((err, req, res, next) => {
-  res.status(err.statusCode || 500).json({
-    error: err.message || "Internal Server Error.",
-  });
-});
+// app.use((err, req, res, next) => {
+//   res.status(err.statusCode || 500).json({
+//     error: err.message || "Internal Server Error.",
+//   });
+// });
+
+app.use(errorHandling);
 // Middleware para Vue.js router modo history
 app.use(history());
 //app.use(express.static(path.join(__dirname, 'public')));

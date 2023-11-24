@@ -1,7 +1,6 @@
 // import { convertToObject } from "typescript";
 import checkObjectId from "../lib/db/checkObjectId.js";
 import { createError } from "../config/error.js";
-import logger from "../config/logger.js";
 
 const validateParams = function (requestParams, toValidate) {
   return function (req, res, next) {
@@ -10,8 +9,6 @@ const validateParams = function (requestParams, toValidate) {
         if (checkParamPresent(Object.keys(req[toValidate]), param)) {
           let reqParam = req[toValidate][param.param_key];
           if (!checkParamType(reqParam, param)) {
-            console.log("caso1");
-
             throw createError(
               400,
               `${param.param_key} is of type ` +
@@ -37,14 +34,6 @@ const validateParams = function (requestParams, toValidate) {
       }
       next();
     } catch (err) {
-      logger.error({
-        message: `${err.message} - Status: ${err.statusCode || 500}`,
-        path: req.path,
-        method: req.method,
-        body: req.body,
-        stack: err.stack,
-      });
-      // console.log(err);
       if (!(err instanceof Error) || !err.statusCode) {
         err = createError();
       }

@@ -5,7 +5,7 @@ import { sendEmailTemplate } from "../services/aws_ses.js";
 import { createError } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 import { procesarNombre } from "../utils/data.js";
-import logger from "../config/logger.js";
+// import logger from "../config/logger.js";
 
 import {
   generarNumero4Digitos,
@@ -76,10 +76,10 @@ export const createUser = async (req, res, next) => {
 };
 //Register user
 export const registerEmail = async (req, res, next) => {
-  console.log("--- REGISTER NEW USER AND CREATE TOKEN ---");
+  global.logger.info({
+    message: "--- REGISTER NEW USER AND CREATE TOKEN ---",
+  });
   try {
-    console.log("==== REGISTER NEW USER AND CREATE TOKEN   ========");
-    console.log(req.body);
     const accessTime = req.body.accessTime ? req.body.accessTime : "1d";
     const refreshTime = req.body.refreshTime ? req.body.refreshTime : "30d";
     req.body.accessTime ? delete req.body.accessTime : "";
@@ -147,21 +147,12 @@ export const registerEmail = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    logger.error({
-      message: `${err.message} - Status: ${err.statusCode || 500}`,
-      path: req.path,
-      method: req.method,
-      body: req.body,
-    });
-    if (!(err instanceof Error) || !err.statusCode) {
-      err = createError();
-    }
     next(err);
   }
 };
 //Login user by email
 export const loginEmail = async (req, res, next) => {
-  logger.info({
+  global.logger.info({
     message: "--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---",
   });
   try {
@@ -203,22 +194,14 @@ export const loginEmail = async (req, res, next) => {
       user: updatedUser,
     });
   } catch (err) {
-    logger.error({
-      message: `${err.message} - Status: ${err.statusCode || 500}`,
-      path: req.path,
-      method: req.method,
-      body: req.body,
-      stack: err.stack,
-    });
-    if (!(err instanceof Error) || !err.statusCode) {
-      err = createError();
-    }
     next(err);
   }
 };
 //login y registro por google
 export const loginGoogle = async (req, res, next) => {
-  console.log("--- LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN ---");
+  global.logger.info({
+    message: "--- LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN ---",
+  });
   try {
     let { email, name, image } = req.body;
     console.log("IMAGE", image);

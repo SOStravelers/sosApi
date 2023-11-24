@@ -78,3 +78,86 @@ Error: Missing Parameter password
     at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
     at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
     at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T19:28:55.865Z [31merror[39m: Missing Parameter password - Status: 400
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:35:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T19:31:45.456Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:35:49.098Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:36:12.222Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:38:23.512Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:39:04.674Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:39:23.609Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:39:38.039Z [31merror[39m: User not found or invalid credentials - Status: 401
+Error: User not found or invalid credentials
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at loginEmail (file:///Users/unabase/Desktop/SOS/sosApi/src/controllers/auth.js:183:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2023-11-24T19:47:16.192Z [31merror[39m: Missing Parameter password - Status: 400
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:35:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T19:47:16.194Z [31merror[39m: Missing Parameter password - Status: 400
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:35:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
+2023-11-24T19:48:29.958Z [31merror[39m: Missing Parameter password - Status: 400
+Error: Missing Parameter password
+    at create (file:///Users/unabase/Desktop/SOS/sosApi/src/config/error.js:2:13)
+    at file:///Users/unabase/Desktop/SOS/sosApi/src/middleware/validate.js:32:17
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/Users/unabase/Desktop/SOS/sosApi/node_modules/express/lib/middleware/init.js:40:5)
