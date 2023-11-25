@@ -1,10 +1,13 @@
-import Stripe from "stripe";
-import envar from "../config/envar.js";
-const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 import { captureOrder, createOrderPaypal } from "../services/paypal.js";
-import { capturePaymentIntent } from "../services/stripe.js";
+import {
+  cancelPaymentIntent,
+  capturePaymentIntent,
+  createPaymentIntent,
+  refund,
+  updatedPaymentIntent,
+} from "../services/stripe.js";
 
-//PAYPAL
+//------PAYPAL------
 export const createOrder = async (req, res, next) => {
   global.logger.info("---CREATE ORDER---");
   console.log(req.body);
@@ -27,31 +30,55 @@ export const aprovedOrder = async (req, res, next) => {
     next(err);
   }
 };
+//-----------------
 
-//STRIPE
+//------STRIPE------
 
-export const createPaymentIntent = async (req, res) => {
-  const { amount } = req.body;
-
+export const paymentIntentStripe = async (req, res) => {
+  const data = req.body;
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 15,
-      currency: "usd",
-      capture_method: "manual",
-    });
-    console.log(paymentIntent);
+    const paymentIntent = await createPaymentIntent(data);
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-export const capturePayment = async (req, res, next) => {
-  const id = req.params.id;
+//Capture payment intent change to charge
+export const capturePaymentStripe = async (req, res, next) => {
   try {
+    const id = req.params.id; // Hay que buscarla por la id del booking y ahi la id del payment intent
     const paymentIntent = await capturePaymentIntent(id);
     res.status(200).json(paymentIntent);
   } catch (err) {
     next(err);
   }
 };
+export const updatedPaymentIntentStripe = async (req, res, next) => {
+  try {
+    const metadata = req.body;
+    const paymentIntent = await updatedPaymentIntent(metadata);
+    res.status(200).json(paymentIntent);
+  } catch (err) {
+    next(err);
+  }
+};
+export const cancelPaymentIntentStripe = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const paymentIntent = await cancelPaymentIntent(id);
+    res.status(200).json(paymentIntent);
+  } catch (err) {
+    next(err);
+  }
+};
+export const refundStripe = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const result = await refund(data);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+//-----------------
