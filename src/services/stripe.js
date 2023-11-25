@@ -63,16 +63,16 @@ export const capturePaymentIntent = async (id) => {
   }
 };
 //UPDATE PAYMENT INTENT WITH METADATA
-export const updatedPaymentIntent = async (metadata) => {
+export const updatedPaymentIntent = async (data) => {
   logger.info("---UPDATE PAYMENT INTENT STRIPE ---");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
     const paymentIntent = await stripe.paymentIntents.update(
-      "pi_1J2QIK2eZvKYlo2CZtE9nqeu", // ID del PaymentIntent que quieres actualizar
+      data.id, // ID del PaymentIntent que quieres actualizar
       {
-        metadata: metadata,
+        metadata: data.metadata,
         // metadata: {
         //   order_id: '123',
         //   user_id: '456'

@@ -35,8 +35,8 @@ export const aprovedOrder = async (req, res, next) => {
 //------STRIPE------
 
 export const paymentIntentStripe = async (req, res) => {
-  const data = req.body;
   try {
+    const data = req.body;
     const paymentIntent = await createPaymentIntent(data);
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
@@ -56,8 +56,8 @@ export const capturePaymentStripe = async (req, res, next) => {
 };
 export const updatedPaymentIntentStripe = async (req, res, next) => {
   try {
-    const metadata = req.body;
-    const paymentIntent = await updatedPaymentIntent(metadata);
+    const data = req.body;
+    const paymentIntent = await updatedPaymentIntent(data);
     res.status(200).json(paymentIntent);
   } catch (err) {
     next(err);
