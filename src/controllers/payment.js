@@ -35,7 +35,7 @@ export const createPaymentIntent = async (req, res) => {
 
   try {
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 2,
+      amount: amount * 15,
       currency: "usd",
       capture_method: "manual",
     });
