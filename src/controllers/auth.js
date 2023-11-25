@@ -5,10 +5,12 @@ import { sendEmailTemplate } from "../services/aws_ses.js";
 import { createError } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 import { procesarNombre } from "../utils/data.js";
+import { createCustomerId } from "../services/stripe.js";
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
 } from "../utils/code.js";
+import { create } from "./booking.js";
 
 //Create user personal/workers/business
 export const createUser = async (req, res, next) => {
@@ -280,6 +282,7 @@ export const loginGoogle = async (req, res, next) => {
       let userRefresh = {
         _id: newUser._id,
       };
+      await createCustomerId(newUser._id);
       res.status(200).json({
         msg: "login success",
         access_token: accessTokenGen(userToCreateToken, true),
@@ -298,6 +301,7 @@ export const loginGoogle = async (req, res, next) => {
         _id: newUser._id,
         username: newUser.username,
       };
+      await createCustomerId(newUser._id);
       res.status(200).json({
         msg: "login success",
         access_token: accessTokenGen(userToCreateToken, true),

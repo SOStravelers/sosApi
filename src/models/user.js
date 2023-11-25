@@ -137,7 +137,17 @@ const userSchema = new Schema(
         },
       ],
     },
-    paymentData: {},
+    paymentData: {
+      isActive: { type: Boolean, default: false },
+      stripeCustomerId: { type: String },
+      stripeAccountId: { type: String },
+      paypalAccountId: { type: String },
+      paypalClientId: { type: String },
+      paypalClientSecret: { type: String },
+      paypalRefreshToken: { type: String },
+      paypalAccessToken: { type: String },
+      paypalExpiresIn: { type: Number },
+    },
     currency: { type: String, ref: "Currency" },
   },
   { timestamps: true }

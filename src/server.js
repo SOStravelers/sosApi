@@ -11,7 +11,7 @@ import routes from "./routes/index.js";
 
 // check connection
 db.once("open", () => {
-  logger.http(`Connnected to mongodb`);
+  logger.info(`Connnected to mongodb`);
 });
 db.on("error", (err) => {
   logger.success(err);
