@@ -3,79 +3,120 @@ import envar from "../config/envar.js";
 import Stripe from "stripe";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 
-// export const createPaymentIntent = async (data) => {
-//   try {
-//     if (!envar().STRIPE_SECRET_KEY) {
-//       throw new Error("MISSING_API_CREDENTIALS");
-//     }
-//     const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount: data.amount * 100,
-//       currency: "usd",
-//       automatic_payment_methods: { enabled: true },
-//     });
-//     return paymentIntent;
-//   } catch (error) {
-//     throw err;
-//   }
-// };
-
-export const createPaymentIntent = async (req, res) => {
-  const { amount } = req.body;
-  const user = req.user;
-
+//CREATE CUSTOMER ID
+export const createCustomerId = async (id) => {
+  logger.info("---CREATE CUSTOMER ID STRIPE ---");
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      customer: user.paymentData.stripeCustomerId,
-      currency: "usd",
-      setup_future_usage: "off_session",
-    });
-    console.log(paymentIntent);
-    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+    const user = await User.findById(id);
+    if (user) {
+      if (
+        user.paymentData &&
+        (!user.paymentData.stripeCustomerId ||
+          user.paymentData.stripeCustomerId == "")
+      ) {
+        if (!envar().STRIPE_SECRET_KEY) {
+          throw new Error("MISSING_API_CREDENTIALS");
+        }
+        const customer = await stripe.customers.create();
+        user.paymentData.stripeCustomerId = customer.id;
+        user.save();
+        return customer.id;
+      }
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw error;
   }
 };
-
-export const chargeCustomer = async (customerId, amount) => {
+//CREATE PAYMENT INTENT
+export const createPaymentIntent = async (data) => {
+  logger.info("---CREATE PAYMENT INTENT STRIPE ---");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
-    const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100,
-      currency: "usd",
-      customer: customerId,
+      amount: data.amount,
+      currency: data.currency,
+      // currency: "usd",
+      capture_method: "manual",
+      // automatic_payment_methods: { enabled: true },
+      // setup_future_usage: "off_session",
+      // customer: user.paymentData.stripeCustomerId,
     });
+    console.log(paymentIntent);
     return paymentIntent;
   } catch (error) {
     throw error;
   }
 };
-
-export const createCustomerId = async (id) => {
-  const user = await User.findById(id);
-  if (user) {
-    if (
-      user.paymentData &&
-      (!user.paymentData.stripeCustomerId ||
-        user.paymentData.stripeCustomerId == "")
-    ) {
-      const customer = await stripe.customers.create();
-      user.paymentData.stripeCustomerId = customer.id;
-      user.save();
-      return customer.id;
-    }
-  }
-};
-
+//CAPTURE PAYMENT INTENT
 export const capturePaymentIntent = async (id) => {
+  logger.info("---CAPTURE PAYMENT INTENT STRIPE ---");
   try {
+    if (!envar().STRIPE_SECRET_KEY) {
+      throw new Error("MISSING_API_CREDENTIALS");
+    }
     const paymentIntent = await stripe.paymentIntents.capture(id);
     return paymentIntent;
   } catch (error) {
     throw error;
+  }
+};
+//UPDATE PAYMENT INTENT WITH METADATA
+export const updatedPaymentIntent = async (metadata) => {
+  logger.info("---UPDATE PAYMENT INTENT STRIPE ---");
+  try {
+    if (!envar().STRIPE_SECRET_KEY) {
+      throw new Error("MISSING_API_CREDENTIALS");
+    }
+    const paymentIntent = await stripe.paymentIntents.update(
+      "pi_1J2QIK2eZvKYlo2CZtE9nqeu", // ID del PaymentIntent que quieres actualizar
+      {
+        metadata: metadata,
+        // metadata: {
+        //   order_id: '123',
+        //   user_id: '456'
+        // }
+      }
+    );
+    return paymentIntent;
+  } catch (err) {
+    throw err;
+  }
+};
+//CANCEL PAYMENT INTENT
+export const cancelPaymentIntent = async (id) => {
+  logger.info("---CANCEL PAYMENT INTENT STRIPE---");
+  try {
+    if (!envar().STRIPE_SECRET_KEY) {
+      throw new Error("MISSING_API_CREDENTIALS");
+    }
+    const canceledPaymentIntent = await stripe.paymentIntents.cancel(id);
+    return canceledPaymentIntent;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//REFUND PAYMENT INTENT
+export const refund = async (data) => {
+  logger.info("---REFUND CHARGE STRIPE---");
+  try {
+    if (!envar().STRIPE_SECRET_KEY) {
+      throw new Error("MISSING_API_CREDENTIALS");
+    }
+    const paymentIntent = await stripe.paymentIntents.retrieve(data.id);
+    const chargeId = paymentIntent.charges.data[0].id;
+    if (chargeId) {
+      const refund = await stripe.refunds.create({
+        charge: chargeId,
+        amount: data.amount, // cantidad en la moneda más pequeña (centavos para USD)
+        //charge: "ch_1J2QIK2eZvKYlo2CZtE9nqeu",
+        //amount: 500,
+      });
+      return refund;
+    }
+  } catch (err) {
+    throw err;
   }
 };
