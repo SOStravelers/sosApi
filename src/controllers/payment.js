@@ -2,9 +2,9 @@ import { captureOrder, createOrderPaypal } from "../services/paypal.js";
 import {
   cancelPaymentIntent,
   capturePaymentIntent,
+  updatedPaymentIntent,
   createPaymentIntent,
   refund,
-  updatedPaymentIntent,
 } from "../services/stripe.js";
 
 //------PAYPAL------
@@ -73,6 +73,7 @@ export const cancelPaymentIntentStripe = async (req, res, next) => {
   }
 };
 export const refundStripe = async (req, res, next) => {
+  console.log("refund", req.body);
   try {
     const data = req.body;
     const result = await refund(data);

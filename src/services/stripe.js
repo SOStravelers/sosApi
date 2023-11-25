@@ -100,14 +100,18 @@ export const cancelPaymentIntent = async (id) => {
 
 //REFUND PAYMENT INTENT
 export const refund = async (data) => {
-  logger.info("---REFUND CHARGE STRIPE---");
+  console.log("refund", data);
+  logger.info("---REFUND CHARGE STRIPE---", data);
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
+    console.log("id", data.id);
     const paymentIntent = await stripe.paymentIntents.retrieve(data.id);
-    const chargeId = paymentIntent.charges.data[0].id;
+    console.log(paymentIntent);
+    const chargeId = paymentIntent.latest_charge;
     if (chargeId) {
+      console.log("encontro charge");
       const refund = await stripe.refunds.create({
         charge: chargeId,
         amount: data.amount, // cantidad en la moneda más pequeña (centavos para USD)

@@ -60,7 +60,7 @@ router.put(
         type: "string",
       },
       {
-        param_key: "metadat",
+        param_key: "metadata",
         required: true,
         type: "object",
       },
@@ -83,7 +83,7 @@ router.get(
   ),
   cancelPaymentIntentStripe
 );
-router.post(
+router.put(
   "/stripe/refund",
   validateParams(
     [
