@@ -1,6 +1,6 @@
 /node_modules
 /.env
-/combiner.log
-/error.log
+/.combiner.log
+/.error.log
 
 /* lib/casa.jpg */
