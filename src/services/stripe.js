@@ -97,7 +97,6 @@ export const cancelPaymentIntent = async (id) => {
     throw error;
   }
 };
-
 //REFUND PAYMENT INTENT
 export const refund = async (data) => {
   console.log("refund", data);
