@@ -51,6 +51,6 @@ routes.use("/favorites", isAuth, favorite);
 
 routes.use("/tests", test);
 
-routes.use("/payments", payment);
+routes.use("/payments", isAuth, payment);
 
 export default routes;

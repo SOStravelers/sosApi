@@ -22,8 +22,10 @@ export const createCustomerId = async (id) => {
         user.email ? (objeto.email = user.email) : "";
         user.personalData
           ? (objeto.name =
-              user.personalData.name[0] + " " + user.personalData.lastName[1])
+              user.personalData.name.first + " " + user.personalData.name.last)
           : "";
+        console.log("casa");
+        console.log("el objetossss", objeto);
         const customer = await stripe.customers.create(objeto);
         user.paymentData.stripeCustomerId = customer.id;
         user.save();
@@ -35,13 +37,16 @@ export const createCustomerId = async (id) => {
   }
 };
 //CREATE PAYMENT INTENT
-export const createPaymentIntent = async (data) => {
+export const createPaymentIntent = async (data, user) => {
   logger.info("---CREATE PAYMENT INTENT STRIPE ---");
+  console.log("data", data);
+  console.log("user", user);
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
-    const paymentIntent = await stripe.paymentIntents.create({
+    const userDB = await User.findById(user._id.toString());
+    const objeto = {
       amount: data.amount,
       currency: data.currency ? data.currency : "usd",
       // currency: "usd",
@@ -50,7 +55,11 @@ export const createPaymentIntent = async (data) => {
       // automatic_payment_methods: { enabled: true },
       // setup_future_usage: "off_session",
       // customer: user.paymentData.stripeCustomerId,
-    });
+    };
+    userDB && userDB.paymentData && userDB.paymentData.stripeCustomerId
+      ? (objeto.customer = userDB.paymentData.stripeCustomerId)
+      : "";
+    const paymentIntent = await stripe.paymentIntents.create(objeto);
     console.log(paymentIntent);
     return paymentIntent;
   } catch (error) {

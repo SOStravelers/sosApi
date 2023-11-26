@@ -34,10 +34,11 @@ export const aprovedOrder = async (req, res, next) => {
 
 //------STRIPE------
 
-export const paymentIntentStripe = async (req, res) => {
+export const paymentIntentStripe = async (req, res, next) => {
   try {
     const data = req.body;
-    const paymentIntent = await createPaymentIntent(data);
+    const user = req.user;
+    const paymentIntent = await createPaymentIntent(data, user);
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
     next(error);
