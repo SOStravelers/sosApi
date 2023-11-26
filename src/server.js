@@ -14,7 +14,7 @@ db.once("open", () => {
   logger.info(`Connnected to mongodb`);
 });
 db.on("error", (err) => {
-  logger.success(err);
+  logger.err(err);
 });
 
 const app = express();
