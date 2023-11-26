@@ -36,9 +36,10 @@ export const createPaymentIntent = async (data) => {
     }
     const paymentIntent = await stripe.paymentIntents.create({
       amount: data.amount,
-      currency: data.currency,
+      currency: data.currency ? data.currency : "usd",
       // currency: "usd",
       capture_method: "manual",
+      description: "Service booking SOS app",
       // automatic_payment_methods: { enabled: true },
       // setup_future_usage: "off_session",
       // customer: user.paymentData.stripeCustomerId,

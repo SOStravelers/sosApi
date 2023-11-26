@@ -18,17 +18,17 @@ router.post("/approvedOrder", aprovedOrder);
 
 //------STRIPE------
 router.post(
-  "/stripe/create",
+  "/stripe/payment-intents",
   validateParams(
     [
       {
         param_key: "amount",
-        required: true,
+        required: false,
         type: "number",
       },
       {
         param_key: "currency",
-        required: true,
+        required: false,
         type: "string",
       },
     ],
