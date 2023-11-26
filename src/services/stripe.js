@@ -17,7 +17,14 @@ export const createCustomerId = async (id) => {
         if (!envar().STRIPE_SECRET_KEY) {
           throw new Error("MISSING_API_CREDENTIALS");
         }
-        const customer = await stripe.customers.create();
+        const objeto = {};
+        user.phone ? (objeto.phone = user.phone) : "";
+        user.email ? (objeto.email = user.email) : "";
+        user.personalData
+          ? (objeto.name =
+              user.personalData.name[0] + " " + user.personalData.lastName[1])
+          : "";
+        const customer = await stripe.customers.create(objeto);
         user.paymentData.stripeCustomerId = customer.id;
         user.save();
         return customer.id;
