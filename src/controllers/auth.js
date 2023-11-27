@@ -357,6 +357,7 @@ export const getById = async (req, res, next) => {
   global.logger.info({
     message: "--- GET USER BY ID ---",
   });
+  console.log(req.params.id);
   try {
     const user = await User.findOne({ _id: req.params.id })
       .select(
@@ -393,15 +394,12 @@ export const getBussinesId = async (req, res, next) => {
       });
     console.log("el user", user ? user.businessData : null);
     if (!user) {
-      let err = createError(404, "User not found");
-      next(err);
-      return res.status(404).json(err);
+      throw createError(404, "User not found");
     } else {
       res.send(user);
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 export const getWorkerId = async (req, res, next) => {
@@ -421,15 +419,12 @@ export const getWorkerId = async (req, res, next) => {
       });
     console.log(user);
     if (!user) {
-      let err = createError(404, "User not found");
-      next(err);
-      return res.status(404).json(err);
+      throw createError(404, "User not found");
     } else {
       res.send(user);
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 //Verificar si existe el email
@@ -441,15 +436,12 @@ export const verifyEmail = async (req, res, next) => {
       email: email.toLowerCase().trim(),
     }).exec();
     if (checkUser) {
-      let err = createError(409, "The email is not available.");
-      next(err);
-      return res.status(409).json(err);
+      throw createError(409, "The email is not available.");
     } else {
       return res.status(200).json({ message: "The email is available" });
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 //Función para encontrar usuario por email
@@ -650,7 +642,6 @@ export const workerByTimeAndService = async (req, res, next) => {
     }
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 //Entrega trabajadores segun hora solicitada y subservicio solicitado
@@ -678,6 +669,5 @@ export const businessByService = async (req, res, next) => {
     res.send(response);
   } catch (err) {
     next(err);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 };
