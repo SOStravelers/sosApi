@@ -6,6 +6,8 @@ import { createError } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 import { procesarNombre } from "../utils/data.js";
 import { createCustomerId } from "../services/stripe.js";
+import { resendEmail } from "../services/resend.js";
+
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
@@ -181,6 +183,7 @@ export const loginEmail = async (req, res, next) => {
       _id: updatedUser._id,
       username: updatedUser.username,
     };
+    await resendEmail();
     res.send({
       msg: "login success",
       access_token: accessTokenGen(userToCreateToken, true),
@@ -506,7 +509,13 @@ export const sendValidationCode = async (req, res, next) => {
         number4: digitosArray[3],
       }),
     };
-    await sendEmailTemplate(params);
+    // await sendEmailTemplate(params);
+    await resendEmail(updatedUser.email, {
+      number1: digitosArray[0],
+      number2: digitosArray[1],
+      number3: digitosArray[2],
+      number4: digitosArray[3],
+    });
     res.status(200).json({ msg: "code sent" });
   } catch (err) {
     if (err instanceof Error && err.$metadata) {
