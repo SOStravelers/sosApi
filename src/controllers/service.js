@@ -179,3 +179,13 @@ export const serviceAndSubservice = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getByUserId = async (req, res, next) => {
+  global.logger.info("--- GET SERVICE BY USER ID ---");
+  try {
+    let services = await Service.find({ creator: req.params.id }).exec();
+    res.status(200).json(services);
+  } catch (err) {
+    next(err);
+  }
+};
