@@ -133,5 +133,19 @@ router.post(
   upload.single("file"),
   uploadIconService
 );
+router.get(
+  "byuser/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getById
+);
 
 export default router;

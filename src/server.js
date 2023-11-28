@@ -11,10 +11,10 @@ import routes from "./routes/index.js";
 
 // check connection
 db.once("open", () => {
-  logger.info(`Connnected to mongodb`);
+  global.logger.info(`Connnected to mongodb`);
 });
 db.on("error", (err) => {
-  logger.err(err);
+  global.logger.error(err);
 });
 
 const app = express();

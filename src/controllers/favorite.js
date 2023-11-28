@@ -57,10 +57,36 @@ export const getFavorites = async (req, res, next) => {
   try {
     let favorites = await Favorite.find({
       emisor: req.user._id.toString(),
-    }).populate({
-      path: "receptor",
-      select: "_id img personalData workerData email", // Lista de campos que deseas seleccionar
-    });
+    })
+      // .populate({
+      //   path: "receptor",
+      //   select: "_id img personalData workerData email",
+
+      // })
+      .populate({
+        path: "receptor",
+        select:
+          "img.imgUrl type workerData.services businessData.name businessData.isActive businessData.services businessData.type personalData.name personalData.isActive",
+        populate: [
+          {
+            path: "workerData.services.subServices",
+            model: "Subservice",
+            // Puedes agregar opciones adicionales para el populate de subServicios si es necesario
+          },
+          {
+            path: "workerData.services.id",
+            select: "name isActive imgUrl",
+            model: "Service",
+            // Puedes agregar opciones adicionales para el populate de servicios si es necesario
+          },
+          {
+            path: "businessData.services.service",
+            select: "name isActive imgUrl",
+            model: "Service",
+            // Puedes agregar opciones adicionales para el populate de servicios en businessData si es necesario
+          },
+        ],
+      });
     res.status(200).json(favorites);
   } catch (err) {
     next(err);

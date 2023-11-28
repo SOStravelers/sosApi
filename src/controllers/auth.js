@@ -501,7 +501,6 @@ export const sendValidationCode = async (req, res, next) => {
         CcAddresses: [envar().SES_EMAIL_AUTH], // Lista de copias
       },
       Template: "validationCode", // Nombre del template a usar
-      SubjectPart: "wena",
       TemplateData: JSON.stringify({
         number1: digitosArray[0],
         number2: digitosArray[1],
@@ -509,7 +508,10 @@ export const sendValidationCode = async (req, res, next) => {
         number4: digitosArray[3],
       }),
     };
-    // await sendEmailTemplate(params);
+
+    //Funcion de amazon
+    //await sendEmailTemplate(params);
+    //Funcion de resend
     await resendEmail(updatedUser.email, {
       number1: digitosArray[0],
       number2: digitosArray[1],
