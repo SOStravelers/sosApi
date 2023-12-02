@@ -156,7 +156,10 @@ export const loginEmail = async (req, res, next) => {
     email = email.toLowerCase().trim();
     const user = await User.findOne({ email }).exec();
     const msg401 = "User not found or invalid credentials";
-    if (!user || !user.type == "business") {
+    console.log(user.type);
+    console.log(!user);
+    console.log(!user.type == "business");
+    if (!user || user.type == "business") {
       throw createError(401, msg401);
     }
     if (!user.security.hasPassword) {
@@ -166,6 +169,7 @@ export const loginEmail = async (req, res, next) => {
       typeof password !== "undefined"
         ? await User.validPassword(user._id.toString(), password)
         : false;
+    console.log(isValid);
     if (!isValid) {
       throw createError(401, msg401);
     }
