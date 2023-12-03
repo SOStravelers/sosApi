@@ -18,6 +18,8 @@ import {
   businessByService,
   getBussinesId,
   getWorkerId,
+  loginEmailBusinnes,
+  loginEmailBusiness,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -89,6 +91,25 @@ router.post(
     "body"
   ),
   loginEmail
+);
+router.post(
+  "/loginEmailBusiness",
+  validateParams(
+    [
+      {
+        param_key: "email",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "password",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  loginEmailBusiness
 );
 //login user by email
 router.post(

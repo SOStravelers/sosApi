@@ -199,7 +199,7 @@ export const loginEmail = async (req, res, next) => {
   }
 };
 //Login user by email only businness
-export const loginEmailBusinnes = async (req, res, next) => {
+export const loginEmailBusiness = async (req, res, next) => {
   global.logger.info({
     message: "--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---",
   });
