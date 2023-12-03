@@ -445,3 +445,36 @@ export const inactiveMode = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getServices = async (req, res, next) => {
+  global.logger.info("---GET SERVICES BY WORKER---");
+  try {
+    const id = req.user._id.toString();
+    console.log(id);
+    const user = await User.findOne({ _id: id })
+      .select("workerData.services type")
+      .populate({
+        path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      })
+      .populate({
+        path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
+        select: "name imgUrl duration price ",
+        model: "Subservice", // Modelo de "SubServices"
+        match: { isActive: true }, // Solo selecciona los subservicios activos
+      })
+      .exec();
+    if (!user) {
+      throw createError(404, "User not found");
+    }
+    if (user && user.type != "worker") {
+      throw createError(409, "you dont have the credentials");
+    }
+
+    res.status(200).json(user?.workerData?.services || []);
+  } catch (err) {
+    next(err);
+  }
+};

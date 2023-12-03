@@ -26,6 +26,7 @@ import {
   inactiveMode,
   updateGallery,
   contacts,
+  getServices,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -292,5 +293,6 @@ router.post(
   ),
   inactiveMode
 );
+router.get("/getServices", getServices);
 
 export default router;
