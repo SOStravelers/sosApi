@@ -12,6 +12,7 @@ import {
   addOrUpdate,
   getByUser,
   addUpdateDefault,
+  addOrUpdateBusiness,
 } from "../controllers/schedule.js";
 
 router.post(
@@ -44,19 +45,21 @@ router.post(
   create
 );
 //add or update worker schedule
+router.post("/addbusiness", addOrUpdate);
+//add or update business schedule
 router.post(
-  "/add",
-  // validateParams(
-  //   [
-  //     {
-  //       param_key: "schedules",
-  //       required: true,
-  //       type: "array",
-  //     },
-  //   ],
-  //   "body"
-  // ),
-  addOrUpdate
+  "/addBusiness",
+  validateParams(
+    [
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  addOrUpdateBusiness
 );
 //get By user
 router.get("/template", addUpdateDefault);

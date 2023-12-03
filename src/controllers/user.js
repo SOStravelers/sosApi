@@ -190,17 +190,18 @@ export const updateOne = async (req, res, next) => {
         new: true,
       }
     )
-      // .populate(
-      //   {
-      //     path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
-      //     model: "Service", // Modelo de "Service"
-      //     select: "name",
-      //   }
-      //   // {
-      //   //   path: "businessData.services.schedule", // Poblar "subServices" dentro de "services"
-      //   //   model: "Schedule", // Modelo de "SubServices"
-      //   // }
-      // )
+      .populate({
+        path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      })
+      .populate({
+        path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
+        select: "name imgUrl duration price ",
+        model: "Subservice", // Modelo de "SubServices"
+        match: { isActive: true }, // Solo selecciona los subservicios activos
+      })
       .exec();
     res.send(newUser);
   } catch (err) {

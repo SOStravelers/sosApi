@@ -77,6 +77,43 @@ export const addOrUpdate = async (req, res, next) => {
     next(err);
   }
 };
+//Para crear horarios de servicio en negocios
+export const addOrUpdateBusiness = async (req, res, next) => {
+  global.logger.info("---ADD NEW SCHEDULE OR UPDATE BUSINESS---");
+  try {
+    const id = req.user._id.toString();
+    const service = req.body.service;
+    const schedules = req.body.schedules;
+    const user = await User.findOne({ _id: id });
+    if (!user || user.type != "business") {
+      throw createError(409, "you dont have the credentials");
+    }
+    const schedule = await Schedule.findOne({ user: id, service: service });
+    if (schedule) {
+      const update = {
+        $set: { schedules: schedules.schedules },
+      };
+
+      let updatedSchedule = await Schedule.findOneAndUpdate(
+        { user: id },
+        update,
+        {
+          new: true,
+        }
+      ).exec();
+      res.status(200).json(updatedSchedule);
+    } else {
+      let newSchedule = new Schedule(schedules);
+      newSchedule.user = id;
+      newSchedule.creator = id;
+      newSchedule.service = service;
+      newSchedule.save();
+      res.status(200).json(newSchedule);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 //Obtener horarios por usuario y si estan activos
 export const getByUser = async (req, res, next) => {
   global.logger.info("---GET SCHEDULE BY USER ID---");
