@@ -27,6 +27,7 @@ import {
   updateGallery,
   contacts,
   getServices,
+  updateOneBusiness,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -154,6 +155,32 @@ router.put(
     "body"
   ),
   updateOne
+);
+
+//Actualizar un usuario por id Business
+router.put(
+  "business/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "name",
+        required: false,
+        type: "object",
+      },
+    ],
+    "body"
+  ),
+  updateOneBusiness
 );
 //Activar varios usuarios
 router.put(

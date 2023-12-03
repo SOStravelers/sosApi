@@ -479,3 +479,30 @@ export const getServices = async (req, res, next) => {
     next(err);
   }
 };
+
+//Actualizar data de un usuario por ID
+export const updateOneBusiness = async (req, res, next) => {
+  global.logger.info("---UPDATE USER Business---");
+  try {
+    let { user } = req.body;
+    let newUser = await User.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      user,
+      {
+        new: true,
+      }
+    )
+      .populate({
+        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      })
+      .exec();
+    res.send(newUser);
+  } catch (err) {
+    next(err);
+  }
+};
