@@ -194,11 +194,12 @@ export const updateOne = async (req, res, next) => {
         {
           path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
           model: "Service", // Modelo de "Service"
-        },
-        {
-          path: "businessData.services.schedule", // Poblar "subServices" dentro de "services"
-          model: "Schedule", // Modelo de "SubServices"
+          select: "name",
         }
+        // {
+        //   path: "businessData.services.schedule", // Poblar "subServices" dentro de "services"
+        //   model: "Schedule", // Modelo de "SubServices"
+        // }
       )
       .exec();
     res.send(newUser);
