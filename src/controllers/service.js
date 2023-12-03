@@ -38,7 +38,7 @@ export const getServices = async (req, res, next) => {
     next(err);
   }
 };
-//Obtener usuario por ID
+//Obtener servicio por ID
 export const getById = async (req, res, next) => {
   global.logger.info("---GET SERVICE BY ID---");
   try {
@@ -49,7 +49,7 @@ export const getById = async (req, res, next) => {
     next(err);
   }
 };
-//Actualizar data de un usuario
+//Actualizar data de un servicio
 export const updateOne = async (req, res, next) => {
   global.logger.info("---UPDATE SERVICE---");
   try {
