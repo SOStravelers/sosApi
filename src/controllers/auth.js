@@ -208,7 +208,7 @@ export const loginEmailBusinnes = async (req, res, next) => {
     email = email.toLowerCase().trim();
     const user = await User.findOne({ email }).exec();
     const msg401 = "User not found or invalid credentials";
-    if (!user || !user.type != "business") {
+    if (!user || user.type != "business") {
       throw createError(401, msg401);
     }
     if (!user.security.hasPassword) {
