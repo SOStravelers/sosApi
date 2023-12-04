@@ -159,7 +159,7 @@ router.put(
 
 //Actualizar un usuario por id Business
 router.put(
-  "business/:id",
+  "/business/:id",
   validateParams(
     [
       {
