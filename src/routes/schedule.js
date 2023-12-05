@@ -13,7 +13,23 @@ import {
   getByUser,
   addUpdateDefault,
   addOrUpdateBusiness,
+  getScheduleByBusiness,
 } from "../controllers/schedule.js";
+
+router.get(
+  "/business/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string"
+      }
+    ],
+    "params"
+  ),
+  getScheduleByBusiness
+);
 
 router.post(
   "/",

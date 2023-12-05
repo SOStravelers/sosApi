@@ -181,6 +181,21 @@ export const activateMany = async (req, res, next) => {
   }
 };
 
+//refactoring of scheduleBusinessbyService
+export const getScheduleByBusiness = async (req, res, next) => {
+  const { id: businessId } = req.params;
+
+  try {
+    
+    const schedule = await Schedule.findOne({
+      isActive: true,
+      creator: businessId,
+    });
+
+    res.status(200).json(schedule);
+  } catch (err) { next(err); }
+};
+
 //Por revisar:
 
 //Obtener horarios por hotel y si estan activos

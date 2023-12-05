@@ -576,6 +576,10 @@ export const getUsers = async (req, res, next) => {
   global.logger.info({
     message: "--- GET USERS ---",
   });
+
+  //pasar el service id en la query
+  const service_id = "64f5d3e97e27ca17eb1e47ec"; //delete this, test
+
   try {
     let body = {};
     Object.assign(body, req.query);
@@ -590,10 +594,15 @@ export const getUsers = async (req, res, next) => {
     let query = {
       // Agregar una condición para excluir los documentos con type="personal"
       type: { $ne: "personal" },
+      /*isActive: true, //si type es de tipo business continuar con el query, pero pierde el sentido rest api
+      "businessData.services": {
+        $elemMatch: { service: service_id, isActive: true },
+      },*/
     };
     body.type ? (query.type = body.type) : "";
     body.isActive ? (query.isActive = body.isActive) : "";
 
+    console.log(body, query, options);
     const response = await User.paginate(query, options);
     console.log(response);
     res.status(200).json(response);

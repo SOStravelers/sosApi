@@ -28,6 +28,7 @@ import {
   contacts,
   getServices,
   updateOneBusiness,
+  getWokersByBusiness,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -47,6 +48,39 @@ router.get(
 );
 //get users by type and isActive
 router.get("/contacts", contacts);
+
+//get business by service id
+router.get(
+  "/service/:id/business",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getBusinesByService
+);
+
+//get wokers by business id
+router.get(
+  "/business/:id/workers",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getWokersByBusiness
+);
+
 //set worker
 router.get(
   "/setworker",

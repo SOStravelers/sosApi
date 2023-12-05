@@ -9,6 +9,29 @@ import { fakeReq } from "../utils/externalFiles.js";
 import { notFoundError, createError, missingData } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 
+export const getWokersByBusiness = async (req, res, next) => {
+
+  const query = {
+    type: "worker",
+    //set the businnes id
+    "businessData.services.0": { $exists: true },
+  };
+
+  const options = {
+    sort: { updatedAt: -1 },
+    page: req.query.page || 1,
+    limit: req.query.limit || 20,
+    select: "img.imgUrl type workerData.services businessData.name businessData.isActive businessData.services businessData.type personalData.name personalData.isActive",
+  };
+
+  // No hay en la db alguna forma de filtrar en cuales/cual hostales trabaja
+
+  User.paginate(query, options, (err, workers) => {
+    if(err) return next(err);
+    res.send(workers);
+  });
+};
+
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
   global.logger.info("---GET USERS---");
