@@ -119,7 +119,14 @@ export const getByUser = async (req, res, next) => {
   global.logger.info("---GET SCHEDULE BY USER ID---");
   try {
     const id = req.user._id.toString();
-    const schedule = await Schedule.findOne({ user: id }).exec();
+    let query = { user: id };
+
+    // Si req.params.idService está presente, añadirlo a la consulta
+    if (req.params.idService) {
+      query.service = req.params.idService;
+    }
+
+    const schedule = await Schedule.findOne(query).exec();
     if (schedule) {
       res.send(schedule);
     } else {
@@ -186,14 +193,15 @@ export const getScheduleByBusiness = async (req, res, next) => {
   const { id: businessId } = req.params;
 
   try {
-    
     const schedule = await Schedule.findOne({
       isActive: true,
       creator: businessId,
     });
 
     res.status(200).json(schedule);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 //Por revisar:
