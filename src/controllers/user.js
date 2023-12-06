@@ -10,7 +10,6 @@ import { notFoundError, createError, missingData } from "../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 
 export const getWokersByBusiness = async (req, res, next) => {
-
   const query = {
     type: "worker",
     //set the businnes id
@@ -21,13 +20,14 @@ export const getWokersByBusiness = async (req, res, next) => {
     sort: { updatedAt: -1 },
     page: req.query.page || 1,
     limit: req.query.limit || 20,
-    select: "img.imgUrl type workerData.services businessData.name businessData.isActive businessData.services businessData.type personalData.name personalData.isActive",
+    select:
+      "img.imgUrl type workerData.services businessData.name businessData.isActive businessData.services businessData.type personalData.name personalData.isActive",
   };
 
   // No hay en la db alguna forma de filtrar en cuales/cual hostales trabaja
 
   User.paginate(query, options, (err, workers) => {
-    if(err) return next(err);
+    if (err) return next(err);
     res.send(workers);
   });
 };
@@ -505,9 +505,10 @@ export const getServices = async (req, res, next) => {
 
 //Actualizar data de un usuario por ID
 export const updateOneBusiness = async (req, res, next) => {
-  global.logger.info("---UPDATE USER Business---");
+  global.logger.info("---UPDATE USER BUSINESS---");
   try {
-    let { user } = req.body;
+    let user = req.body;
+    console.log("user", user.personalData.name);
     let newUser = await User.findOneAndUpdate(
       {
         _id: req.params.id,
@@ -524,6 +525,7 @@ export const updateOneBusiness = async (req, res, next) => {
         match: { isActive: true }, // Solo selecciona los servicios activos
       })
       .exec();
+    console.log("newuser", newUser.personalData.name);
     res.send(newUser);
   } catch (err) {
     next(err);
