@@ -124,6 +124,7 @@ export const renewToken = async (req, res, next) => {
   }
 };
 export const isAuth = async (req, res, next) => {
+  console.log("validate auth");
   req.access_token = req.headers.authorization;
   if (typeof req.access_token !== "undefined" && req.access_token !== "") {
     let decoded = decodeFunc(req.access_token);
