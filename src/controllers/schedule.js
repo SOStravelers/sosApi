@@ -121,9 +121,9 @@ export const getByUser = async (req, res, next) => {
     const id = req.user._id.toString();
     let query = { user: id };
 
-    // Si req.params.idService está presente, añadirlo a la consulta
-    if (req.params.idService) {
-      query.service = req.params.idService;
+    // Si req.query.idService está presente, añadirlo a la consulta
+    if (req.query.service) {
+      query.service = req.query.service;
     }
 
     const schedule = await Schedule.findOne(query).exec();
