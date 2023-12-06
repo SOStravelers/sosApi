@@ -49,7 +49,7 @@ export const addOrUpdate = async (req, res, next) => {
     if (!user) {
       throw createError(409, "User not exist");
     }
-    if (user && user.type != "worker") {
+    if (user && user.type == "persola") {
       throw createError(409, "you dont have the credentials");
     }
     const schedule = await Schedule.findOne({ user: id });
