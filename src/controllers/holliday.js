@@ -23,7 +23,7 @@ export const addOrUpdate = async (req, res, next) => {
     if (!user) {
       throw createError(409, "User not exist");
     }
-    if (user && user.type != "worker") {
+    if (user && user.type != "personal") {
       throw createError(409, "you dont have the credentials");
     }
     const holliday = await Holliday.findOne({ user: id });
