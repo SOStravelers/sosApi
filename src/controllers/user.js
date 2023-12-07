@@ -110,29 +110,27 @@ export const getById = async (req, res, next) => {
     next(err);
   }
 };
+
 //Obtener usuarios business con paginate por servicios
 export const getBusinesByService = async (req, res, next) => {
-  global.logger.info("---GET BUSINESS BY SERVICE---");
-  try {
-    let body = {};
-    Object.assign(body, req.query);
-    const options = {
-      page: body.page || 1,
-      limit: body.limit || 10,
-    };
+  const query = {
+    isActive: true,
+    type: "business",
+    "businessData.services.isActive": true,
+    "businessData.services.service": req.params.id,
+  };
 
-    const query = {
-      "businessData.services.service": body.id, // Filtra por la ID del servicio en el array
-      "businessData.services.isActive": true, // Filtra por la ID del servicio en el array
-      isActive: true, // Condición isActive=true
-      type: "business", // Condición type="business"
-    };
-    const result = await User.paginate(query, options);
-    res.send(result);
-  } catch (error) {
-    next(error);
-  }
+  const options = {
+    page: req.query.page || 1,
+    limit: req.query.limit || 20,
+  };
+
+  User.paginate(query, options, (err, workers) => {
+    if (err) return next(err);
+    res.send(workers);
+  });
 };
+
 //Obtener usuarios business con paginate por nombre
 export const findbusinessbyname = async (req, res, next) => {
   global.logger.info("---FIND BUSINESS BY NAME---");
