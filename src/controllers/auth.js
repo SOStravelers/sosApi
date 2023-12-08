@@ -228,7 +228,7 @@ export const loginEmailBusiness = async (req, res, next) => {
       { lastLogin: Date.now(), lastLoginType: "email" },
       { new: true }
     ).select(
-      "about email img type language personalData username workerData _id security.hasPassword"
+      "about email img type language personalData businessData username workerData _id security.hasPassword"
     );
     delete updatedUser.password;
     let userToCreateToken = {
