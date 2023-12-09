@@ -29,6 +29,7 @@ import {
   getServices,
   updateOneBusiness,
   getWokersByBusiness,
+  findUserToken,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -80,6 +81,9 @@ router.get(
   ),
   getWokersByBusiness
 );
+
+//get user con token
+router.get("/findUserToken", findUserToken);
 
 //set worker
 router.get(
