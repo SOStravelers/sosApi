@@ -282,6 +282,29 @@ router.post(
 );
 
 router.post(
+  "/workers/service/:serviceId/subservice/:subserviceId",
+  validateParams([
+    {
+      param_key: "serviceId",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "subserviceId",
+      required: true,
+      type: "string",
+    }
+  ], "params"),
+  validateParams([
+    {
+      param_key: "serviceId",
+      required: true,
+      type: "string",
+    }
+  ])
+)
+
+router.post(
   "/workerByTimeAndService",
   validateParams(
     [

@@ -611,6 +611,34 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
+export const getWorkerByBook = async (req, res, next) => {
+  const { startTime, day, page, limit } = req.body;
+
+  const query = {
+    type: "worker",
+    isActive: true,
+    "workerData.services.subServices": subservice,
+  };
+
+  const options = {
+    populate: {
+      path: "workerData.services.id",
+      select: "name",
+    },
+    select: "personalData workerData img _id username",
+    page: page || 1,
+    limit: limit || 100,
+    sort: { updatedAt: -1 },
+  };
+
+  User.paginate(query, options)
+  .then(users => {
+    if(!users) return res.status(404).json(users);
+
+    
+  })
+  .catch(err => next(err));
+};
 //Por trabajar
 
 //Entrega trabajadores segun hora solicitada y subservicio solicitado

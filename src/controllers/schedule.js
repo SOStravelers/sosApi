@@ -190,8 +190,11 @@ export const activateMany = async (req, res, next) => {
 };
 
 //refactoring of scheduleBusinessbyService
+//falta por agregar el 2 horas despues del horario
 export const getScheduleByBusiness = async (req, res, next) => {
-  const nextDays = 16; //until now + 15 days after
+  let nextDay = 0;
+  let dayContinue = 0;
+  const untilDays = 15;
   const { businessId, serviceId, subserviceId } = req.params;
 
   Schedule.findOne({
@@ -200,26 +203,32 @@ export const getScheduleByBusiness = async (req, res, next) => {
     service: serviceId,
   })
     .then((schedule) => {
+      if(!schedule) return res.json(404).json({ message: "Schedule not found" });
       Subservice.findOne({
         _id: subserviceId,
       })
         .then((subservice) => {
+          if(!subservice) return res.json(404).json({ message: "Subservice not found" });
           const allTimes = [];
 
           Holiday.findOne({
             user: businessId,
           })
             .then((holidays) => {
-              for (const i in Array(nextDays).fill()) {
+              while (dayContinue < untilDays) {
+                
                 const dateDay = new Date();
-                dateDay.setDate(dateDay.getDate() + Number(i));
+                dateDay.setDate(dateDay.getDate() + Number(nextDay));
                 const formatedDay =
                   dateDay.getDay() === 0 ? 7 : dateDay.getDay();
 
                 const scheduleIndex = schedule.schedules.findIndex(
                   (time) => time.day === formatedDay && time.isActive
                 );
-                if (scheduleIndex < 0) continue;
+                if (scheduleIndex < 0) {
+                  ++nextDay;
+                  continue;
+                };
 
                 const time = schedule.schedules[scheduleIndex];
 
@@ -235,7 +244,10 @@ export const getScheduleByBusiness = async (req, res, next) => {
                   }
                 }
 
-                if(skipLoop) continue;
+                if(skipLoop) {
+                  ++nextDay;
+                  continue;
+                };;
 
                 for (const inverval of time.intervals) {
                   const endHourDate = new Date(inverval.endTimeIso);
@@ -244,7 +256,7 @@ export const getScheduleByBusiness = async (req, res, next) => {
                   for (
                     let hour = startHourDate;
                     hour <= endHourDate;
-                    hour.setHours(hour.getHours() + 1)
+                    hour.setMinutes(hour.getMinutes() + subservice.duration)
                   ) {
                     //check if that hours isn't booked
                     const endHour = new Date(hour);
@@ -265,6 +277,9 @@ export const getScheduleByBusiness = async (req, res, next) => {
                   day: dateDay,
                   intervals: allIntervals,
                 });
+
+                ++nextDay;
+                ++dayContinue;
               }
               res.status(200).json(allTimes);
             })
