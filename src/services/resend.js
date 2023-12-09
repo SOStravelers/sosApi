@@ -22,3 +22,29 @@ export const resendEmail = async (email, numbers) => {
     console.error(error);
   }
 };
+
+export const resendSupport = async (message, subject, email, name, user) => {
+  const sName = name ? name : user.personalData.name.first;
+  const sEmail = email ? email : user.email;
+  const htmlString = templateHtml("supportEmail");
+  const template = Handlebars.compile(htmlString);
+  const htmlToSend = template({
+    message: message,
+    sName: sName,
+    userType: user.type,
+  });
+
+  console.log("resendSupport");
+  try {
+    const mailData = await resend.emails.send({
+      from: "Support prueba SOS <support.prueba@sostvl.com>",
+      to: "sostravelbr@gmail.com",
+      subject: subject + sEmail,
+      html: htmlToSend,
+    });
+
+    console.log(mailData);
+  } catch (error) {
+    console.error(error);
+  }
+};

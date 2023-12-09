@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Unabase - Confirmación de Correo</title>
+    <style>
+      body {
+        font-family: "Nunito", sans-serif;
+        background-color: #f6f6f6;
+      }
+
+      .container {
+        width: 80%;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        padding: 10px;
+        border-bottom: 4px solid #00a0d5;
+      }
+
+      .header-logo {
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      .header-title {
+        color: black;
+        margin-left: auto;
+      }
+
+      .content {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .content img {
+        width: 60%;
+        margin-bottom: 20px;
+      }
+
+      .code-inputs {
+        display: flex;
+        justify-content: center;
+      }
+
+      .icons-social {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .icons-social a {
+        margin: 5px auto;
+      }
+      .icons-social img {
+        display: block;
+        margin: 0 auto; /* Centra la imagen horizontalmente */
+      }
+
+      .code-input {
+        width: 40px;
+        height: 40px;
+        padding: 5px;
+        margin: 5px;
+        display: flex;
+        justify-content: center; /* Alineación horizontal al centro */
+        align-items: center; /* Alineación vertical al centro */
+        font-size: 18px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .code-input span {
+        font-weight: bold;
+      }
+
+      .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 0.8em;
+        padding: 10px;
+        border-bottom: 4px solid #00a0d5;
+        color: black;
+      }
+
+      .parrafo1 {
+        font-size: 22px;
+        color: #98a2b3;
+      }
+
+      .parrafo2 {
+        font-size: 14px;
+        color: #98a2b3;
+      }
+
+      .img-main {
+        max-width: 300px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header-logo">
+          <img
+            src="https://sosappfiles.s3.amazonaws.com/icons/email/sosWhite.png"
+            alt=""
+          />
+          <div style="font-size: 24px; font-weight: bold; margin-left: 5px">
+            Sos Travelers
+          </div>
+        </div>
+        <div class="header-title">The best travel app</div>
+      </div>
+
+      <div class="content" style="margin-top: -20px">
+        <img
+          src="https://sosappfiles.s3.amazonaws.com/icons/email/nin%CC%83a.png"
+          class="img-main"
+        />
+
+        <p class="parrafo1">
+          {{message}} - {{sName}} - {{userType}}
+        </p>
+
+        <p class="parrafo2">
+          If you give up using this email, ignore this message.
+        </p>
+      </div>
+
+      <div class="icons-social">
+        <a href="https://www.instagram.com/sos.travelers/">
+          <img
+            src="https://sosappfiles.s3.amazonaws.com/icons/email/instaBlue.png"
+            alt=""
+          />
+        </a>
+        <div style="flex: auto; text-align: center">@sosTravelers</div>
+      </div>
+      <div class="footer">Copyright 2023 SOS Travelers</div>
+    </div>
+  </body>
+
+  <script src="src/test.js"></script>
+</html>

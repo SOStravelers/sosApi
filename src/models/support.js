@@ -7,7 +7,7 @@ import paginateConfig from "../config/paginate.js";
 const supportSchema = new Schema(
   {
     subject: { type: String },
-    body: { type: String },
+    message: { type: String },
     name: { type: String },
     email: {
         type: String,

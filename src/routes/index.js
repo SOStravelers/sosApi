@@ -12,6 +12,7 @@ import admin from "./admin.js";
 import notification from "./notification.js";
 import schedule from "./schedule.js";
 import holliday from "./holliday.js";
+import support from "./support.js"
 import {
   isAuth,
   isAdmin,
@@ -52,5 +53,8 @@ routes.use("/favorites", isAuth, favorite);
 routes.use("/tests", test);
 
 routes.use("/payments", isAuth, payment);
+
+//rutas metal
+routes.use("/support", support);
 
 export default routes;
