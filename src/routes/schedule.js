@@ -17,14 +17,24 @@ import {
 } from "../controllers/schedule.js";
 
 router.get(
-  "/business/:id",
+  "/business/:businessId/service/:serviceId/subservice/:subserviceId",
   validateParams(
     [
       {
-        param_key: "id",
+        param_key: "businessId",
         required: true,
         type: "string"
-      }
+      },
+      {
+        param_key: "serviceId",
+        required: true,
+        type: "string"
+      },
+      {
+        param_key: "subserviceId",
+        required: true,
+        type: "string"
+      },
     ],
     "params"
   ),

@@ -113,11 +113,13 @@ export const getById = async (req, res, next) => {
 
 //Obtener usuarios business con paginate por servicios
 export const getBusinesByService = async (req, res, next) => {
+  const { id: serviceId } = req.params;
+
   const query = {
     isActive: true,
     type: "business",
     "businessData.services.isActive": true,
-    "businessData.services.service": req.params.id,
+    "businessData.services.service": serviceId,
   };
 
   const options = {
@@ -127,7 +129,7 @@ export const getBusinesByService = async (req, res, next) => {
 
   User.paginate(query, options, (err, workers) => {
     if (err) return next(err);
-    res.send(workers);
+    res.status(200).json(workers);
   });
 };
 

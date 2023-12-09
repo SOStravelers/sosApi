@@ -1,9 +1,10 @@
-import Schedule from "../models/schedule.js";
 import User from "../models/user.js";
-import Subservice from "../models/subservice.js";
-import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
+import Holiday from "../models/holliday.js";
+import Schedule from "../models/schedule.js";
 import { template } from "../lib/schedule.js";
 import { createError } from "../config/error.js";
+import Subservice from "../models/subservice.js";
+import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
 
 //Crear horario
 export const create = async (req, res, next) => {
@@ -190,18 +191,88 @@ export const activateMany = async (req, res, next) => {
 
 //refactoring of scheduleBusinessbyService
 export const getScheduleByBusiness = async (req, res, next) => {
-  const { id: businessId } = req.params;
+  const nextDays = 16; //until now + 15 days after
+  const { businessId, serviceId, subserviceId } = req.params;
 
-  try {
-    const schedule = await Schedule.findOne({
-      isActive: true,
-      creator: businessId,
-    });
+  Schedule.findOne({
+    isActive: true,
+    user: businessId,
+    service: serviceId,
+  })
+    .then((schedule) => {
+      Subservice.findOne({
+        _id: subserviceId,
+      })
+        .then((subservice) => {
+          const allTimes = [];
 
-    res.status(200).json(schedule);
-  } catch (err) {
-    next(err);
-  }
+          Holiday.findOne({
+            user: businessId,
+          })
+            .then((holidays) => {
+              for (const i in Array(nextDays).fill()) {
+                const dateDay = new Date();
+                dateDay.setDate(dateDay.getDate() + Number(i));
+                const formatedDay =
+                  dateDay.getDay() === 0 ? 7 : dateDay.getDay();
+
+                const scheduleIndex = schedule.schedules.findIndex(
+                  (time) => time.day === formatedDay && time.isActive
+                );
+                if (scheduleIndex < 0) continue;
+
+                const time = schedule.schedules[scheduleIndex];
+
+                let skipLoop = false;
+                const allIntervals = [];
+
+                if (holidays && holidays.range) {
+                  for(const holiday of holidays.range) {
+                    if(dateDay >= holiday.from && dateDay <= holiday.to) {
+                      skipLoop = true;
+                      break;
+                    };
+                  }
+                }
+
+                if(skipLoop) continue;
+
+                for (const inverval of time.intervals) {
+                  const endHourDate = new Date(inverval.endTimeIso);
+                  const startHourDate = new Date(inverval.startTimeIso);
+
+                  for (
+                    let hour = startHourDate;
+                    hour <= endHourDate;
+                    hour.setHours(hour.getHours() + 1)
+                  ) {
+                    //check if that hours isn't booked
+                    const endHour = new Date(hour);
+                    endHour.setMinutes(
+                      endHour.getMinutes() + subservice.duration
+                    );
+
+                    allIntervals.push({
+                      startTimeIso: hour.toISOString(),
+                      startTime: hour.toISOString().slice(11, 16),
+                      endtime: endHour.toISOString().slice(11, 16),
+                      endTimeIso: endHour.toISOString(),
+                    });
+                  }
+                }
+
+                allTimes.push({
+                  day: dateDay,
+                  intervals: allIntervals,
+                });
+              }
+              res.status(200).json(allTimes);
+            })
+            .catch((err) => next(err));
+        })
+        .catch((err) => next(err));
+    })
+    .catch((err) => next(err));
 };
 
 //Por revisar:
