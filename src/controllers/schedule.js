@@ -247,11 +247,11 @@ export const getScheduleByBusiness = async (req, res, next) => {
                 if(skipLoop) {
                   ++nextDay;
                   continue;
-                };;
+                };
 
-                for (const inverval of time.intervals) {
-                  const endHourDate = new Date(inverval.endTimeIso);
-                  const startHourDate = new Date(inverval.startTimeIso);
+                for (const interval of time.intervals) {
+                  const endHourDate = new Date(interval.endTimeIso);
+                  const startHourDate = new Date(interval.startTimeIso);
 
                   for (
                     let hour = startHourDate;

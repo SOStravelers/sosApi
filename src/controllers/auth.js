@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import Schedule from "../models/schedule.js";
+import Holiday from "../models/holliday.js";
 import envar from "../config/envar.js";
 import { sendEmailTemplate } from "../services/aws_ses.js";
 import { createError } from "../config/error.js";
@@ -611,13 +612,15 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
-export const getWorkerByBook = async (req, res, next) => {
-  const { startTime, day, page, limit } = req.body;
+export const getWorkerForBook = async (req, res, next) => {
+  const { serviceId, subserviceId } = req.params; //filtrar si ese worker trabaja en ese hostel (johan me dijo que por ahora todos trabajan en todos)
+  const { day, page, limit } = req.body;
 
   const query = {
     type: "worker",
     isActive: true,
-    "workerData.services.subServices": subservice,
+    "workerData.services.id": serviceId,
+    "workerData.services.subServices": subserviceId,
   };
 
   const options = {
@@ -632,12 +635,43 @@ export const getWorkerByBook = async (req, res, next) => {
   };
 
   User.paginate(query, options)
-  .then(users => {
-    if(!users) return res.status(404).json(users);
+    .then(({ docs: workers }) => {
+      if (!workers) return res.status(404).json({ message: "Users not found" });
 
-    
-  })
-  .catch(err => next(err));
+      console.log(workers)
+      Holiday.find({
+        user: { $in: workers.map((worker) => worker._id) },
+        isActive: true,
+      })
+        .then((holidays) => {
+
+          let availableWorkers = [];
+          for(const worker of workers) {
+
+            let skipLoop = false;
+            if(holidays) {
+              const holidayIndex = holidays.findIndex(holy => holy.user === worker._id);
+              if (holidayIndex >= 0) {
+                for(const holy of holidays[holidayIndex].range) {
+                  if(day >= holy.from && day <= holy.to) {
+                    skipLoop = true;
+                    break;
+                  };
+                }
+              }
+            }
+
+            //check if booked (test first)
+
+            if(skipLoop) continue;
+            availableWorkers.push(worker)
+          }
+
+          res.status(200).json(availableWorkers)
+        })
+        .catch((err) => next(err));
+    })
+    .catch((err) => next(err));
 };
 //Por trabajar
 

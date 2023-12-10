@@ -19,6 +19,7 @@ import {
   getBussinesId,
   getWorkerId,
   loginEmailBusiness,
+  getWorkerForBook,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -297,12 +298,23 @@ router.post(
   ], "params"),
   validateParams([
     {
-      param_key: "serviceId",
+      param_key: "day",
       required: true,
       type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
     }
-  ])
-)
+  ], "body"),
+  getWorkerForBook
+);
 
 router.post(
   "/workerByTimeAndService",
