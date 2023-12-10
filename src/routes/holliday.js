@@ -5,16 +5,16 @@ import { addOrUpdate, getByUser } from "../controllers/holliday.js";
 
 router.post(
   "/add",
-  // validateParams(
-  //   [
-  //     {
-  //       param_key: "schedules",
-  //       required: true,
-  //       type: "array",
-  //     },
-  //   ],
-  //   "body"
-  // ),
+  validateParams(
+    [
+      {
+        param_key: "range",
+        required: true,
+        type: "array",
+      },
+    ],
+    "body"
+  ),
   addOrUpdate
 );
 //get By user

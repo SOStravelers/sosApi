@@ -15,7 +15,8 @@ export const getByUser = async (req, res, next) => {
 };
 // Crear/Actualizar schedule worker
 export const addOrUpdate = async (req, res, next) => {
-  global.logger.info("---ADD NEW Hollyday OR UPDATE---");
+  global.logger.info("---ADD UPDATE HOLLIDAYS---");
+  console.log(req.body);
   try {
     const id = req.user._id.toString();
     const data = req.body;
@@ -23,11 +24,12 @@ export const addOrUpdate = async (req, res, next) => {
     if (!user) {
       throw createError(409, "User not exist");
     }
-    if (user && user.type != "personal") {
+    if (user && user.type == "personal") {
       throw createError(409, "you dont have the credentials");
     }
-    const holliday = await Holliday.findOne({ user: id });
-    if (holliday) {
+    const hollidayExist = await Holliday.findOne({ user: id });
+    if (hollidayExist) {
+      console.log("update");
       const update = {
         $set: { range: data.range },
       };
@@ -40,6 +42,7 @@ export const addOrUpdate = async (req, res, next) => {
       ).exec();
       res.status(200).json(updatedHolliday);
     } else {
+      console.log("create");
       let newHolliday = new Holliday(data);
       newHolliday.user = id;
       newHolliday.creator = id;
