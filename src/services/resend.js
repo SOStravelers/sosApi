@@ -16,25 +16,26 @@ export const resendEmail = async (email, numbers) => {
       subject: "SOS Travelers - Validate your email address",
       html: htmlToSend,
     });
-
-    console.log(data);
   } catch (error) {
     console.error(error);
   }
 };
 
-export const resendSupport = async (message, subject, email, name, user) => {
-  const sName = name ? name : user.personalData.name.first;
-  const sEmail = email ? email : user.email;
+export const resendSupport = async (data) => {
+  const { subject, message, name, email, user } = data;
+  const sName =
+    name ?? user.personalData.name.first + " " + user.personalData.name.last;
+  const sEmail = email ?? data.user.email;
+  const sType = user ? user.type : "not registered";
+
   const htmlString = templateHtml("supportEmail");
   const template = Handlebars.compile(htmlString);
   const htmlToSend = template({
     message: message,
     sName: sName,
-    userType: user.type,
+    userType: sType,
   });
 
-  console.log("resendSupport");
   try {
     const mailData = await resend.emails.send({
       from: "Support prueba SOS <support.prueba@sostvl.com>",
@@ -43,7 +44,7 @@ export const resendSupport = async (message, subject, email, name, user) => {
       html: htmlToSend,
     });
 
-    console.log(mailData);
+    console.log("resendSupport data: ", mailData);
   } catch (error) {
     console.error(error);
   }

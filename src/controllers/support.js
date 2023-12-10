@@ -7,19 +7,23 @@ export const supportEmail = async (req, res, next) => {
     global.logger.info("---SEND EMAIL---");
 
     const data = req.body;
-    // const support = new Support(data);
 
-    // const respuesta = await support.save();
-    // res.send(respuesta);
+    const support = new Support(data);
+    const respuesta = await support.save();
+    const user = await Support.findById(support._id.toString()).populate({
+      path: "user",
+      select: "personalData email type",
+    });
+    const aux = {
+      subject: data.subject,
+      message: data.message,
+      name: data.name,
+      email: data.email,
+      user: user.user,
+    };
+    await resendSupport(aux);
 
-    await resendSupport(
-      data.message,
-      data.subject,
-      data.email,
-      data.name,
-      data.user
-    );
-    res.status(200).json({ msg: "email sent" });
+    res.status(200).json({ msg: "email sent", respuesta: respuesta });
   } catch (err) {
     next(err);
   }
