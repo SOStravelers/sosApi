@@ -12,8 +12,9 @@ import {
   getByUser,
   addUpdateDefault,
   addOrUpdateBusiness,
-  getScheduleByBusiness,
+  scheduleByBusiness,
   addOrUpdateWorker,
+  workerScheduleForBook,
 } from "../controllers/schedule.js";
 
 //Obtener calendario flujo principal
@@ -39,7 +40,32 @@ router.get(
     ],
     "params"
   ),
-  getScheduleByBusiness
+  scheduleByBusiness
+);
+
+router.get(
+  "/worker/:workerId/service/:serviceId/subservice/:subserviceId",
+  validateParams(
+    [
+      {
+        param_key: "workerId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "serviceId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "subserviceId",
+        required: true,
+        type: "string",
+      }
+    ],
+    "params"
+  ),
+  workerScheduleForBook
 );
 
 //Crear Calendario
