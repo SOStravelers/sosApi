@@ -636,38 +636,83 @@ export const getWorkerForBook = async (req, res, next) => {
 
   User.paginate(query, options)
     .then(({ docs: workers }) => {
-      if (!workers) return res.status(404).json({ message: "Users not found" });
+      if (!workers) return res.status(404).json({ message: "No workers were found" });
 
-      console.log(workers)
-      Holiday.find({
-        user: { $in: workers.map((worker) => worker._id) },
+      const query = {
         isActive: true,
-      })
-        .then((holidays) => {
+        user: { $in: workers.map((worker) => worker._id.toString()) },
+      };
 
-          let availableWorkers = [];
-          for(const worker of workers) {
+      Schedule.find(query)
+        .then((schedule) => {
+          if (!schedule.length)
+            return res
+              .status(404)
+              .json({ message: "No workers were found for this service" });
+          Holiday.find(query)
+            .then((holidays) => {
+              const dateDay = new Date(day);
+              let availableWorkers = [];
+              for (const worker of workers) {
+                let skipLoop = false;
 
-            let skipLoop = false;
-            if(holidays) {
-              const holidayIndex = holidays.findIndex(holy => holy.user === worker._id);
-              if (holidayIndex >= 0) {
-                for(const holy of holidays[holidayIndex].range) {
-                  if(day >= holy.from && day <= holy.to) {
-                    skipLoop = true;
+                const workerSchedule = schedule.findIndex(time => time.user === worker._id.toString());
+                if (workerSchedule < 0) continue;
+
+                const scheduleIndex = schedule[workerSchedule].schedules.findIndex(
+                  (time) =>
+                    time.isActive &&
+                    time.day === (dateDay.getDay() === 0 ? 7 : dateDay.getDay())
+                );
+
+                if (scheduleIndex < 0) continue;
+
+                console.log("preparado para saltar, veamos si anda de vacaiones...")
+                skipLoop = true;
+                for (const hours of schedule[workerSchedule].schedules[scheduleIndex].intervals) {
+                  const startDate = new Date(hours.startTimeIso);
+                  const endDate = new Date(hours.endTimeIso)
+
+                  //agregar esto en una función aparte para reutilizar
+                  startDate.setFullYear( dateDay.getFullYear() );
+                  startDate.setMonth( dateDay.getMonth() );
+                  startDate.setDate( dateDay.getDate() );
+
+                  endDate.setFullYear( dateDay.getFullYear() );
+                  endDate.setMonth( dateDay.getMonth() );
+                  endDate.setDate( dateDay.getDate() );
+
+                  if (dateDay >= startDate && dateDay <= endDate) {
+                    skipLoop = false;
                     break;
-                  };
+                  }
                 }
+
+                if (skipLoop) continue;
+
+                if (holidays) {
+                  const holidayIndex = holidays.findIndex(
+                    (holy) => holy.user === worker._id
+                  );
+                  if (holidayIndex >= 0) {
+                    for (const holy of holidays[holidayIndex].range) {
+                      if (day >= holy.from && day <= holy.to) {
+                        skipLoop = true;
+                        break;
+                      }
+                    }
+                  }
+                }
+
+                //check if booked (test first)
+
+                if (skipLoop) continue;
+                availableWorkers.push(worker);
               }
-            }
 
-            //check if booked (test first)
-
-            if(skipLoop) continue;
-            availableWorkers.push(worker)
-          }
-
-          res.status(200).json(availableWorkers)
+              res.status(200).json(availableWorkers);
+            })
+            .catch((err) => next(err));
         })
         .catch((err) => next(err));
     })
