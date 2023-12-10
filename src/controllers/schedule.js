@@ -299,7 +299,7 @@ export const scheduleByBusiness = async (req, res, next) => {
 };
 
 export const workerScheduleForBook = async (req, res, next) => {
-  const { workerId, serviceId, subserviceId } = req.params;
+  const { workerId, subserviceId } = req.params;
 
   let nextDay = 0;
   let dayContinue = 0;
@@ -309,11 +309,9 @@ export const workerScheduleForBook = async (req, res, next) => {
     .then((worker) => {
       if (!worker)
         return res.status(404).json({ message: "No worker was found" });
-
       Schedule.findOne({
         isActive: true,
         user: workerId,
-        //service: serviceId,
       })
         .then((schedule) => {
           if (!schedule)
@@ -396,10 +394,10 @@ export const workerScheduleForBook = async (req, res, next) => {
                       continue;
                     }
 
-                    if(!allIntervals.length) {
-                      ++nextDay;
-                      continue;
-                    }
+                    // if(!allIntervals.length) {
+                    //   ++nextDay;
+                    //   continue;
+                    // }
 
                     allTimes.push({
                       day: dateDay,

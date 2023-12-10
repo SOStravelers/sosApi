@@ -44,16 +44,11 @@ router.get(
 );
 
 router.get(
-  "/worker/:workerId/service/:serviceId/subservice/:subserviceId",
+  "/worker/:workerId/subservice/:subserviceId",
   validateParams(
     [
       {
         param_key: "workerId",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "serviceId",
         required: true,
         type: "string",
       },
