@@ -355,7 +355,6 @@ export const workerScheduleForBook = async (req, res, next) => {
                       for (const holi of holiday.range) {
                         if (dateDay >= holi.from && dateDay <= holi.to) {
                           skipLoop = true;
-                          console.log(dateDay);
                           break;
                         }
                       }
