@@ -13,6 +13,7 @@ import {
   uploadIconService,
   serviceAndSubservice,
 } from "../controllers/service.js";
+import { getServicesBusiness } from "../controllers/user.js";
 
 const limits = {
   fileSize: filesConfig.profile.maxsize,
@@ -68,6 +69,30 @@ router.get(
     "query"
   ),
   getServices
+);
+router.get(
+  "/get/all/business",
+  validateParams(
+    [
+      {
+        param_key: "isActive",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string", // Dependiendo de si limit es un número o no
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string", // Dependiendo de si page es un número o no
+      },
+    ],
+    "query"
+  ),
+  getServicesBusiness
 );
 router.get(
   "/:id",

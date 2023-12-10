@@ -519,6 +519,33 @@ export const getServices = async (req, res, next) => {
   }
 };
 
+export const getServicesBusiness = async (req, res, next) => {
+  global.logger.info("---GET SERVICES BY Business---");
+  try {
+    const id = req.user._id.toString();
+    console.log(id);
+    const user = await User.findOne({ _id: id })
+      .select("businessData type")
+      .populate({
+        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      })
+      .exec();
+    if (!user) {
+      throw createError(404, "User not found");
+    }
+    if (user && user.type != "business") {
+      throw createError(409, "you dont have the credentials");
+    }
+
+    res.status(200).json(user?.business?.services || []);
+  } catch (err) {
+    next(err);
+  }
+};
+
 //Actualizar data de un usuario por ID
 export const updateOneBusiness = async (req, res, next) => {
   global.logger.info("---UPDATE USER BUSINESS---");
