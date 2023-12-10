@@ -524,7 +524,7 @@ export const getServicesBusiness = async (req, res, next) => {
   try {
     const id = req.user._id.toString();
     console.log(id);
-    const user = await User.findOne({ _id: id })
+    const user = await User.findById(id)
       .select("businessData type")
       .populate({
         path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
@@ -540,7 +540,7 @@ export const getServicesBusiness = async (req, res, next) => {
       throw createError(409, "you dont have the credentials");
     }
 
-    res.status(200).json(user?.business?.services || []);
+    res.status(200).json(user);
   } catch (err) {
     next(err);
   }

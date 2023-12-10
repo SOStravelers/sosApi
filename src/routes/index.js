@@ -12,7 +12,7 @@ import admin from "./admin.js";
 import notification from "./notification.js";
 import schedule from "./schedule.js";
 import holliday from "./holliday.js";
-import support from "./support.js"
+import support from "./support.js";
 import {
   isAuth,
   isAdmin,
@@ -38,6 +38,7 @@ routes.use("/bookingAuth", isAuth, booking);
 routes.use("/boookingAdmin", isAuth, isAdmin, booking);
 
 routes.use("/services", service);
+routes.use("/services2", isAuth, service);
 routes.use("/serviceAdmin", isAuth, isAdmin, service);
 routes.use("/subservices", subservice);
 
