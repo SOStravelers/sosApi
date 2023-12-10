@@ -241,6 +241,12 @@ export const updateOne = async (req, res, next) => {
         model: "Subservice", // Modelo de "SubServices"
         match: { isActive: true }, // Solo selecciona los subservicios activos
       })
+      .populate({
+        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      })
       .exec();
     res.send(newUser);
   } catch (err) {
