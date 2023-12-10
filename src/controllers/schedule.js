@@ -41,8 +41,8 @@ export const addUpdateDefault = async (req, res, next) => {
   }
 };
 // Crear/Actualizar schedule worker
-export const addOrUpdate = async (req, res, next) => {
-  global.logger.info("---ADD NEW SCHEDULE OR UPDATE---");
+export const addOrUpdateWorker = async (req, res, next) => {
+  global.logger.info("---ADD NEW SCHEDULE OR UPDATE WORKER---");
   try {
     const id = req.user._id.toString();
     const schedules = req.body;
@@ -50,7 +50,7 @@ export const addOrUpdate = async (req, res, next) => {
     if (!user) {
       throw createError(409, "User not exist");
     }
-    if (user && user.type == "personal") {
+    if (!user || user.type != "worker") {
       throw createError(409, "you dont have the credentials");
     }
     const schedule = await Schedule.findOne({ user: id });
@@ -82,21 +82,26 @@ export const addOrUpdate = async (req, res, next) => {
 export const addOrUpdateBusiness = async (req, res, next) => {
   global.logger.info("---ADD NEW SCHEDULE OR UPDATE BUSINESS---");
   try {
+    console.log("body", req.body);
     const id = req.user._id.toString();
     const service = req.body.service;
     const schedules = req.body.schedules;
-    const user = await User.findOne({ _id: id });
+    const user = await User.findById(id);
     if (!user || user.type != "business") {
       throw createError(409, "you dont have the credentials");
     }
-    const schedule = await Schedule.findOne({ user: id, service: service });
-    if (schedule) {
+    const existSchedule = await Schedule.findOne({
+      user: id,
+      service: service,
+    });
+    if (existSchedule) {
+      console.log("update", schedules);
       const update = {
-        $set: { schedules: schedules.schedules },
+        $set: { schedules: schedules },
       };
 
       let updatedSchedule = await Schedule.findOneAndUpdate(
-        { user: id },
+        { user: id, service: service },
         update,
         {
           new: true,
@@ -104,8 +109,10 @@ export const addOrUpdateBusiness = async (req, res, next) => {
       ).exec();
       res.status(200).json(updatedSchedule);
     } else {
+      console.log("create");
       let newSchedule = new Schedule(schedules);
       newSchedule.user = id;
+      newSchedule.schedules = schedules;
       newSchedule.creator = id;
       newSchedule.service = service;
       newSchedule.save();
@@ -203,12 +210,14 @@ export const getScheduleByBusiness = async (req, res, next) => {
     service: serviceId,
   })
     .then((schedule) => {
-      if(!schedule) return res.json(404).json({ message: "Schedule not found" });
+      if (!schedule)
+        return res.json(404).json({ message: "Schedule not found" });
       Subservice.findOne({
         _id: subserviceId,
       })
         .then((subservice) => {
-          if(!subservice) return res.json(404).json({ message: "Subservice not found" });
+          if (!subservice)
+            return res.json(404).json({ message: "Subservice not found" });
           const allTimes = [];
 
           Holiday.findOne({
@@ -216,7 +225,6 @@ export const getScheduleByBusiness = async (req, res, next) => {
           })
             .then((holidays) => {
               while (dayContinue < untilDays) {
-                
                 const dateDay = new Date();
                 dateDay.setDate(dateDay.getDate() + Number(nextDay));
                 const formatedDay =
@@ -228,7 +236,7 @@ export const getScheduleByBusiness = async (req, res, next) => {
                 if (scheduleIndex < 0) {
                   ++nextDay;
                   continue;
-                };
+                }
 
                 const time = schedule.schedules[scheduleIndex];
 
@@ -236,18 +244,18 @@ export const getScheduleByBusiness = async (req, res, next) => {
                 const allIntervals = [];
 
                 if (holidays && holidays.range) {
-                  for(const holiday of holidays.range) {
-                    if(dateDay >= holiday.from && dateDay <= holiday.to) {
+                  for (const holiday of holidays.range) {
+                    if (dateDay >= holiday.from && dateDay <= holiday.to) {
                       skipLoop = true;
                       break;
-                    };
+                    }
                   }
                 }
 
-                if(skipLoop) {
+                if (skipLoop) {
                   ++nextDay;
                   continue;
-                };
+                }
 
                 for (const interval of time.intervals) {
                   const endHourDate = new Date(interval.endTimeIso);

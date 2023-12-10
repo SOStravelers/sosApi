@@ -9,13 +9,14 @@ import {
   updateOne,
   activateMany,
   scheduleBusinessbyService,
-  addOrUpdate,
   getByUser,
   addUpdateDefault,
   addOrUpdateBusiness,
   getScheduleByBusiness,
+  addOrUpdateWorker,
 } from "../controllers/schedule.js";
 
+//Obtener calendario flujo principal
 router.get(
   "/business/:businessId/service/:serviceId/subservice/:subserviceId",
   validateParams(
@@ -23,17 +24,17 @@ router.get(
       {
         param_key: "businessId",
         required: true,
-        type: "string"
+        type: "string",
       },
       {
         param_key: "serviceId",
         required: true,
-        type: "string"
+        type: "string",
       },
       {
         param_key: "subserviceId",
         required: true,
-        type: "string"
+        type: "string",
       },
     ],
     "params"
@@ -41,6 +42,7 @@ router.get(
   getScheduleByBusiness
 );
 
+//Crear Calendario
 router.post(
   "/",
   validateParams(
@@ -70,8 +72,8 @@ router.post(
   ),
   create
 );
-//add or update worker schedule
-router.post("/addbusiness", addOrUpdate);
+// //add or update worker schedule
+router.post("/addWorker", addOrUpdateWorker);
 //add or update business schedule
 router.post(
   "/addBusiness",
