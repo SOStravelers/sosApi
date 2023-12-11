@@ -9,6 +9,7 @@ import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
 //Crear horario
 export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW SCHEDULE---");
+  console.log("estoy en create");
   try {
     let schedule = new Schedule(req.body);
     const newSchedule = await schedule.save();
@@ -22,6 +23,7 @@ export const addUpdateDefault = async (req, res, next) => {
   try {
     const templateSchedule = template;
     const schedule = await Schedule.findOne({ default: true }).exec();
+    console.log("estoy en add update");
     if (schedule) {
       let updatedSchedule = await Schedule.findOneAndUpdate(
         { user: id },
@@ -109,7 +111,6 @@ export const addOrUpdateBusiness = async (req, res, next) => {
       ).exec();
       res.status(200).json(updatedSchedule);
     } else {
-      console.log("create");
       let newSchedule = new Schedule(schedules);
       newSchedule.user = id;
       newSchedule.schedules = schedules;
@@ -137,9 +138,16 @@ export const getByUser = async (req, res, next) => {
     const schedule = await Schedule.findOne(query).exec();
     if (schedule) {
       res.send(schedule);
+      console.log("estoy arribita");
     } else {
+      global.logger.info("---NEW DEFAULT SCHEDULE BY USER ID---");
       const schedule = await Schedule.findOne({ default: true }).exec();
       schedule.schedules ? res.send(schedule) : res.send({ schedules: [] });
+
+      let newSchedule = new Schedule(template);
+      newSchedule.user = id;
+      newSchedule.creator = "default";
+      newSchedule.save();
     }
   } catch (err) {
     next(err);
