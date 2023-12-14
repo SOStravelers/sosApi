@@ -84,6 +84,7 @@ const userSchema = new Schema(
       idNumber: { type: String },
     },
     workerData: {
+      isCheck: { type: Boolean, default: false },
       isActive: { type: Boolean, default: false },
       languages: {
         main: {

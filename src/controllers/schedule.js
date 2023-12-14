@@ -23,7 +23,6 @@ export const addUpdateDefault = async (req, res, next) => {
   try {
     const templateSchedule = template;
     const schedule = await Schedule.findOne({ default: true }).exec();
-    console.log("estoy en add update");
     if (schedule) {
       let updatedSchedule = await Schedule.findOneAndUpdate(
         { user: id },
@@ -138,7 +137,6 @@ export const getByUser = async (req, res, next) => {
     const schedule = await Schedule.findOne(query).exec();
     if (schedule) {
       res.send(schedule);
-      console.log("estoy arribita");
     } else {
       global.logger.info("---NEW DEFAULT SCHEDULE BY USER ID---");
       const schedule = await Schedule.findOne({ default: true }).exec();

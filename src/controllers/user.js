@@ -36,7 +36,9 @@ export const findUserToken = async (req, res, next) => {
   global.logger.info("---FIND USER TOKEN---");
   const userId = req.user._id.toString();
   const user = await User.findOne({ _id: userId })
-    .select("type isActive username email rating img personalData security")
+    .select(
+      "type isActive username email rating img personalData security workerData.isCheck"
+    )
     .populate({
       path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
       model: "Service", // Modelo de "Service"
@@ -248,6 +250,7 @@ export const updateOne = async (req, res, next) => {
         match: { isActive: true }, // Solo selecciona los servicios activos
       })
       .exec();
+
     res.send(newUser);
   } catch (err) {
     next(err);
