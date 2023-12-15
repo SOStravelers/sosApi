@@ -19,14 +19,21 @@ const bookingSchema = new Schema(
     },
     title: { type: String, default: "new Event" },
     details: { type: String },
-    paymentMethod: {
-      type: String,
-      default: "stripe",
-      enum: ["cash", "paypal", "stripe"],
+    payment: {
+      method: {
+        type: String,
+        default: "stripe",
+        enum: ["cash", "paypal", "stripe"],
+      },
+      status: {
+        type: String,
+        default: "pending",
+        enum: ["pending", "paid", "failed", "canceled", "refunded"],
+      },
+      paymentId: { type: String, ref: "Payment" },
+      price: { type: Number },
     },
-    paymentId: { type: String, ref: "Payment" },
     duration: { type: Number },
-    suggestedDuration: { type: Number },
     coverImg: { type: String, default: "" },
     status: {
       type: String,
