@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import Holiday from "../models/holliday.js";
+import Booking from "../models/booking.js";
 import Schedule from "../models/schedule.js";
 import { template } from "../lib/schedule.js";
 import { createError } from "../config/error.js";
@@ -199,103 +200,150 @@ export const activateMany = async (req, res, next) => {
 //refactoring of scheduleBusinessbyService
 //falta por agregar el 2 horas despues del horario
 export const scheduleByBusiness = async (req, res, next) => {
+  global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE MAIN FLOW---");
   let nextDay = 0;
   let dayContinue = 0;
+  const today = new Date();
   const untilDays = 15;
+  const limitDate = new Date(today);
+  limitDate.setDate(today.getDate() + untilDays);
   const { businessId, serviceId, subserviceId } = req.params;
+  try {
+    const user = await User.findById(businessId);
+    if (user?.type != "business" || !user?.businessData?.isActive) {
+      throw createError(404, "User is not active");
+    }
+    const schedule = await Schedule.findOne({
+      isActive: true,
+      user: businessId,
+      service: serviceId,
+    });
+    if (!schedule) {
+      throw createError(404, "Schedule not found");
+    }
+    const subservice = await Subservice.findOne({
+      _id: subserviceId,
+    });
+    if (!subservice) {
+      throw createError(404, "Subservice not found");
+    }
+    const allTimes = [];
+    const holidays = await Holiday.findOne({
+      user: businessId,
+    });
+    const startDate = new Date();
+    startDate.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00.000
 
-  Schedule.findOne({
-    isActive: true,
-    user: businessId,
-    service: serviceId,
-  })
-    .then((schedule) => {
-      if (!schedule)
-        return res.json(404).json({ message: "Schedule not found" });
-      Subservice.findOne({
-        _id: subserviceId,
-      })
-        .then((subservice) => {
-          if (!subservice)
-            return res.json(404).json({ message: "Subservice not found" });
-          const allTimes = [];
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 15); // Add 15 days
+    endDate.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00.000
+    const bookings = await Booking.find({
+      service: serviceId,
+      location: businessId,
+      subservice: subserviceId,
+      "date.isoDate": { $gte: startDate, $lt: endDate },
+    });
+    console.log(bookings.length);
+    while (dayContinue < untilDays) {
+      const dateDay = new Date();
+      dateDay.setDate(dateDay.getDate() + Number(nextDay));
+      dateDay.setUTCHours(0, 0, 0, 0);
 
-          Holiday.findOne({
-            user: businessId,
-          })
-            .then((holidays) => {
-              while (dayContinue < untilDays) {
-                const dateDay = new Date();
-                dateDay.setDate(dateDay.getDate() + Number(nextDay));
-                const formatedDay =
-                  dateDay.getDay() === 0 ? 7 : dateDay.getDay();
+      if (dateDay > limitDate) {
+        break;
+      }
 
-                const scheduleIndex = schedule.schedules.findIndex(
-                  (time) => time.day === formatedDay && time.isActive
-                );
-                if (scheduleIndex < 0) {
-                  ++nextDay;
-                  continue;
-                }
+      const formatedDay = dateDay.getDay() === 0 ? 7 : dateDay.getDay();
+      const scheduleIndex = schedule.schedules.findIndex(
+        (time) => time.day === formatedDay && time.isActive
+      );
+      if (scheduleIndex < 0) {
+        ++nextDay;
+        continue;
+      }
+      const time = schedule.schedules[scheduleIndex];
+      let skipLoop = false;
+      const allIntervals = [];
+      if (holidays && holidays.range) {
+        for (const holiday of holidays.range) {
+          if (dateDay >= holiday.from && dateDay <= holiday.to) {
+            skipLoop = true;
+            break;
+          }
+        }
+      }
+      if (skipLoop) {
+        ++nextDay;
+        continue;
+      }
+      for (const interval of time.intervals) {
+        const endHourDate = new Date(interval.endTimeIso);
+        const startHourDate = new Date(interval.startTimeIso);
+        for (
+          let hour = startHourDate;
+          hour <= endHourDate;
+          hour.setMinutes(hour.getMinutes() + subservice.duration)
+        ) {
+          const endHour = new Date(hour);
+          endHour.setMinutes(endHour.getMinutes() + subservice.duration);
+          endHour.setMilliseconds(0);
+          if (dayContinue === 0) {
+            hour.setMinutes(hour.getMinutes() + 120);
+            endHour.setMinutes(endHour.getMinutes() + 120);
+          }
+          console.log(dayContinue);
 
-                const time = schedule.schedules[scheduleIndex];
+          hour.setMilliseconds(0);
+          console.log(hour);
+          console.log(endHour);
+          const bookingExists = bookings.some((booking) => {
+            const bookingStartHour = booking.startTime.stringTime;
+            const bookingEndHour = booking.endTime.stringTime;
 
-                let skipLoop = false;
-                const allIntervals = [];
+            const currentHour = hour.toISOString().slice(11, 16);
+            const currentEndHour = endHour.toISOString().slice(11, 16);
 
-                if (holidays && holidays.range) {
-                  for (const holiday of holidays.range) {
-                    if (dateDay >= holiday.from && dateDay <= holiday.to) {
-                      skipLoop = true;
-                      break;
-                    }
-                  }
-                }
+            return (
+              ((bookingStartHour >= currentHour &&
+                bookingStartHour < currentEndHour) ||
+                (bookingEndHour > currentHour &&
+                  bookingEndHour <= currentEndHour) ||
+                (bookingStartHour <= currentHour &&
+                  bookingEndHour >= currentEndHour) ||
+                (bookingStartHour >= currentHour &&
+                  bookingEndHour <= currentEndHour)) &&
+              dateDay.toISOString() ==
+                (booking.date.isoDate instanceof Date
+                  ? booking.date.isoDate.toISOString()
+                  : booking.date.isoDate)
+            );
+          });
+          console.log("casa", endHour.toISOString());
+          const date = new Date(endHour);
+          const onlyHour = date.getUTCHours();
+          console.log(onlyHour);
+          if (!bookingExists && onlyHour >= 8 && onlyHour < 16) {
+            allIntervals.push({
+              startTimeIso: hour.toISOString(),
+              startTime: hour.toISOString().slice(11, 16),
+              endtime: endHour.toISOString().slice(11, 16),
+              endTimeIso: endHour.toISOString(),
+            });
+          }
+        }
+      }
 
-                if (skipLoop) {
-                  ++nextDay;
-                  continue;
-                }
-
-                for (const interval of time.intervals) {
-                  const endHourDate = new Date(interval.endTimeIso);
-                  const startHourDate = new Date(interval.startTimeIso);
-
-                  for (
-                    let hour = startHourDate;
-                    hour <= endHourDate;
-                    hour.setMinutes(hour.getMinutes() + subservice.duration)
-                  ) {
-                    //check if that hours isn't booked
-                    const endHour = new Date(hour);
-                    endHour.setMinutes(
-                      endHour.getMinutes() + subservice.duration
-                    );
-
-                    allIntervals.push({
-                      startTimeIso: hour.toISOString(),
-                      startTime: hour.toISOString().slice(11, 16),
-                      endtime: endHour.toISOString().slice(11, 16),
-                      endTimeIso: endHour.toISOString(),
-                    });
-                  }
-                }
-
-                allTimes.push({
-                  day: dateDay,
-                  intervals: allIntervals,
-                });
-
-                ++nextDay;
-                ++dayContinue;
-              }
-              res.status(200).json(allTimes);
-            })
-            .catch((err) => next(err));
-        })
-        .catch((err) => next(err));
-    })
-    .catch((err) => next(err));
+      allTimes.push({
+        day: dateDay,
+        intervals: allIntervals,
+      });
+      ++nextDay;
+      ++dayContinue;
+    }
+    res.status(200).json(allTimes);
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const workerScheduleForBook = async (req, res, next) => {
@@ -377,13 +425,47 @@ export const workerScheduleForBook = async (req, res, next) => {
                         endHour.setMinutes(
                           endHour.getMinutes() + subservice.duration
                         );
+                        endHour.setMilliseconds(0);
 
-                        allIntervals.push({
-                          startTimeIso: hour.toISOString(),
-                          startTime: hour.toISOString().slice(11, 16),
-                          endtime: endHour.toISOString().slice(11, 16),
-                          endTimeIso: endHour.toISOString(),
+                        hour.setMilliseconds(0);
+
+                        const bookingExists = bookings.some((booking) => {
+                          const bookingStartHour = new Date(
+                            booking.startTime.isoTime
+                          ).getUTCHours();
+                          const bookingEndHour = new Date(
+                            booking.endTime.isoTime
+                          ).getUTCHours();
+                          const currentHour = hour.getUTCHours();
+                          const currentEndHour = endHour.getUTCHours();
+
+                          return (
+                            (bookingStartHour > currentHour &&
+                              bookingStartHour < currentEndHour &&
+                              bookingEndHour > currentHour &&
+                              bookingEndHour < currentEndHour) ||
+                            (bookingStartHour < currentHour &&
+                              bookingStartHour < currentEndHour &&
+                              bookingEndHour > currentHour &&
+                              bookingEndHour < currentEndHour) ||
+                            (bookingStartHour > currentHour &&
+                              bookingStartHour < currentEndHour &&
+                              bookingEndHour > currentHour &&
+                              bookingEndHour < currentEndHour) ||
+                            (bookingStartHour < currentHour &&
+                              bookingStartHour < currentEndHour &&
+                              bookingEndHour < currentHour &&
+                              bookingEndHour > currentEndHour)
+                          );
                         });
+                        if (!bookingExists) {
+                          allIntervals.push({
+                            startTimeIso: hour.toISOString(),
+                            startTime: hour.toISOString().slice(11, 16),
+                            endtime: endHour.toISOString().slice(11, 16),
+                            endTimeIso: endHour.toISOString(),
+                          });
+                        }
                       }
                     }
 
@@ -418,8 +500,6 @@ export const workerScheduleForBook = async (req, res, next) => {
     })
     .catch((err) => next(err));
 };
-
-//Por revisar:
 
 //Obtener horarios por hotel y si estan activos
 export const scheduleBusinessbyService = async (req, res, next) => {

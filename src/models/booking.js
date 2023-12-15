@@ -6,7 +6,7 @@ import paginateConfig from "../config/paginate.js";
 const bookingSchema = new Schema(
   {
     location: { type: String, ref: "User" },
-    servicio: { type: String, ref: "Service" },
+    service: { type: String, ref: "Service" },
     subservice: { type: String, ref: "Subservice" },
     worker: { type: String, ref: "User" },
     client: { type: String, ref: "User" },
