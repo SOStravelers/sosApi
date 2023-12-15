@@ -297,8 +297,8 @@ export const scheduleByBusiness = async (req, res, next) => {
           console.log(hour);
           console.log(endHour);
           const bookingExists = bookings.some((booking) => {
-            const bookingStartHour = booking.startTime.stringTime;
-            const bookingEndHour = booking.endTime.stringTime;
+            const bookingStartHour = booking.startTime;
+            const bookingEndHour = booking.endTime;
 
             const currentHour = hour.toISOString().slice(11, 16);
             const currentEndHour = endHour.toISOString().slice(11, 16);
@@ -318,10 +318,8 @@ export const scheduleByBusiness = async (req, res, next) => {
                   : booking.date.isoDate)
             );
           });
-          console.log("casa", endHour.toISOString());
           const date = new Date(endHour);
           const onlyHour = date.getUTCHours();
-          console.log(onlyHour);
           if (!bookingExists && onlyHour >= 8 && onlyHour < 16) {
             allIntervals.push({
               startTimeIso: hour.toISOString(),
@@ -428,44 +426,12 @@ export const workerScheduleForBook = async (req, res, next) => {
                         endHour.setMilliseconds(0);
 
                         hour.setMilliseconds(0);
-
-                        const bookingExists = bookings.some((booking) => {
-                          const bookingStartHour = new Date(
-                            booking.startTime.isoTime
-                          ).getUTCHours();
-                          const bookingEndHour = new Date(
-                            booking.endTime.isoTime
-                          ).getUTCHours();
-                          const currentHour = hour.getUTCHours();
-                          const currentEndHour = endHour.getUTCHours();
-
-                          return (
-                            (bookingStartHour > currentHour &&
-                              bookingStartHour < currentEndHour &&
-                              bookingEndHour > currentHour &&
-                              bookingEndHour < currentEndHour) ||
-                            (bookingStartHour < currentHour &&
-                              bookingStartHour < currentEndHour &&
-                              bookingEndHour > currentHour &&
-                              bookingEndHour < currentEndHour) ||
-                            (bookingStartHour > currentHour &&
-                              bookingStartHour < currentEndHour &&
-                              bookingEndHour > currentHour &&
-                              bookingEndHour < currentEndHour) ||
-                            (bookingStartHour < currentHour &&
-                              bookingStartHour < currentEndHour &&
-                              bookingEndHour < currentHour &&
-                              bookingEndHour > currentEndHour)
-                          );
+                        allIntervals.push({
+                          startTimeIso: hour.toISOString(),
+                          startTime: hour.toISOString().slice(11, 16),
+                          endtime: endHour.toISOString().slice(11, 16),
+                          endTimeIso: endHour.toISOString(),
                         });
-                        if (!bookingExists) {
-                          allIntervals.push({
-                            startTimeIso: hour.toISOString(),
-                            startTime: hour.toISOString().slice(11, 16),
-                            endtime: endHour.toISOString().slice(11, 16),
-                            endTimeIso: endHour.toISOString(),
-                          });
-                        }
                       }
                     }
 

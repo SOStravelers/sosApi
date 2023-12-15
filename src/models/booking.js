@@ -5,20 +5,14 @@ import paginateConfig from "../config/paginate.js";
 
 const bookingSchema = new Schema(
   {
-    location: { type: String, ref: "User" },
+    businessUser: { type: String, ref: "User" },
+    workerUser: { type: String, ref: "User" },
+    clientUser: { type: String, ref: "User" },
+    creatorUser: { type: String, ref: "User" },
     service: { type: String, ref: "Service" },
     subservice: { type: String, ref: "Subservice" },
-    worker: { type: String, ref: "User" },
-    client: { type: String, ref: "User" },
-    creator: { type: String, ref: "User" },
-    startTime: {
-      stringTime: { type: String },
-      isoTime: { type: Date },
-    },
-    endTime: {
-      stringTime: { type: String },
-      isoTime: { type: Date },
-    },
+    startTime: { type: String },
+    endTime: { type: String },
     date: {
       stringData: { type: String },
       isoDate: { type: Date },
