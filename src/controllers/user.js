@@ -492,7 +492,7 @@ export const inactiveMode = async (req, res, next) => {
   }
 };
 
-export const getServices = async (req, res, next) => {
+export const getServicesWorker = async (req, res, next) => {
   global.logger.info("---GET SERVICES BY WORKER---");
   try {
     const id = req.user._id.toString();

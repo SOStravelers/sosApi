@@ -6,18 +6,27 @@ import paginateConfig from "../config/paginate.js";
 const bookingSchema = new Schema(
   {
     location: { type: String, ref: "User" },
-    subService: { type: String, ref: "Service" },
+    servicio: { type: String, ref: "Service" },
+    subservice: { type: String, ref: "Subservice" },
     worker: { type: String, ref: "User" },
     client: { type: String, ref: "User" },
     creator: { type: String, ref: "User" },
-    startTime: { type: String },
-    endTime: { type: String },
-    date: { type: String },
-
+    startTime: {
+      stringTime: { type: String },
+      isoTime: { type: Date },
+    },
+    endTime: {
+      stringTime: { type: String },
+      isoTime: { type: Date },
+    },
+    date: {
+      stringData: { type: String },
+      isoDate: { type: Date },
+    },
     title: { type: String, default: "new Event" },
     details: { type: String },
-    payment: { type: String, default: "cash", enum: ["cash", "card"] },
-
+    paymentMethod: { type: String, default: "cash", enum: ["cash", "card"] },
+    paymentId: { type: String, ref: "Payment" },
     duration: { type: Number },
     suggestedDuration: { type: Number },
     coverImg: { type: String, default: "" },
