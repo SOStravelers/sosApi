@@ -19,13 +19,13 @@ export const create = async (req, res, next) => {
   }
 };
 export const addUpdateDefault = async (req, res, next) => {
-  global.logger.info("---ADD UPDATE  SCHEDULE DEFAULT---");
+  global.logger.info("---ADD UPDATE SCHEDULE DEFAULT---");
   try {
     const templateSchedule = template;
     const schedule = await Schedule.findOne({ default: true }).exec();
     if (schedule) {
       let updatedSchedule = await Schedule.findOneAndUpdate(
-        { user: id },
+        { _id: schedule._id },
         templateSchedule,
         {
           new: true,
@@ -41,7 +41,7 @@ export const addUpdateDefault = async (req, res, next) => {
     next(err);
   }
 };
-// Crear/Actualizar schedule worker
+// Crear /Actualizar schedule worker
 export const addOrUpdateWorker = async (req, res, next) => {
   global.logger.info("---ADD NEW SCHEDULE OR UPDATE WORKER---");
   try {
@@ -196,10 +196,8 @@ export const activateMany = async (req, res, next) => {
     next(err);
   }
 };
-
-//refactoring of scheduleBusinessbyService
-//falta por agregar el 2 horas despues del horario
-export const scheduleByBusiness = async (req, res, next) => {
+// Horario de negocio por servicio
+export const businessSchedule = async (req, res, next) => {
   global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE MAIN FLOW---");
   let nextDay = 0;
   let dayContinue = 0;
@@ -342,129 +340,6 @@ export const scheduleByBusiness = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-export const workerScheduleForBook = async (req, res, next) => {
-  const { workerId, subserviceId } = req.params;
-
-  let nextDay = 0;
-  let dayContinue = 0;
-  const untilDays = 15;
-
-  User.findOne({ type: "worker", isActive: true, _id: workerId })
-    .then((worker) => {
-      if (!worker)
-        return res.status(404).json({ message: "No worker was found" });
-      Schedule.findOne({
-        isActive: true,
-        user: workerId,
-      })
-        .then((schedule) => {
-          if (!schedule)
-            return res
-              .status(404)
-              .json({ message: "No schedule for this worker was found" });
-          Subservice.findOne({
-            _id: subserviceId,
-          })
-            .then((subservice) => {
-              if (!subservice)
-                return res
-                  .status(404)
-                  .json({ message: "No subservice for this worker was found" });
-              Holiday.findOne({ user: worker._id.toString() })
-                .then((holiday) => {
-                  const allTimes = [];
-
-                  while (dayContinue < untilDays) {
-                    let skipLoop = false;
-
-                    const dateDay = new Date();
-                    dateDay.setDate(dateDay.getDate() + Number(nextDay));
-                    const formatedDay =
-                      dateDay.getDay() === 0 ? 7 : dateDay.getDay();
-
-                    const scheduleIndex = schedule.schedules.findIndex(
-                      (time) => time.day === formatedDay && time.isActive
-                    );
-                    if (scheduleIndex < 0) {
-                      ++nextDay;
-                      continue;
-                    }
-
-                    const allIntervals = [];
-                    const time = schedule.schedules[scheduleIndex];
-
-                    if (holiday && holiday.range) {
-                      for (const holi of holiday.range) {
-                        if (dateDay >= holi.from && dateDay <= holi.to) {
-                          skipLoop = true;
-                          break;
-                        }
-                      }
-                    }
-
-                    if (skipLoop) {
-                      ++nextDay;
-                      continue;
-                    }
-
-                    for (const interval of time.intervals) {
-                      const endHourDate = new Date(interval.endTimeIso);
-                      const startHourDate = new Date(interval.startTimeIso);
-
-                      for (
-                        let hour = startHourDate;
-                        hour <= endHourDate;
-                        hour.setMinutes(hour.getMinutes() + subservice.duration)
-                      ) {
-                        //check if that hours isn't booked
-                        const endHour = new Date(hour);
-                        endHour.setMinutes(
-                          endHour.getMinutes() + subservice.duration
-                        );
-                        endHour.setMilliseconds(0);
-
-                        hour.setMilliseconds(0);
-                        allIntervals.push({
-                          startTimeIso: hour.toISOString(),
-                          startTime: hour.toISOString().slice(11, 16),
-                          endtime: endHour.toISOString().slice(11, 16),
-                          endTimeIso: endHour.toISOString(),
-                        });
-                      }
-                    }
-
-                    //check if isn't booked
-
-                    if (skipLoop) {
-                      ++nextDay;
-                      continue;
-                    }
-
-                    // if(!allIntervals.length) {
-                    //   ++nextDay;
-                    //   continue;
-                    // }
-
-                    allTimes.push({
-                      day: dateDay,
-                      intervals: allIntervals,
-                    });
-
-                    ++nextDay;
-                    ++dayContinue;
-                  }
-
-                  res.status(200).json(allTimes);
-                })
-                .catch((err) => next(err));
-            })
-            .catch((err) => next(err));
-        })
-        .catch((err) => next(err));
-    })
-    .catch((err) => next(err));
 };
 
 //Obtener horarios por hotel y si estan activos
