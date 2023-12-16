@@ -46,6 +46,10 @@ export const findUserToken = async (req, res, next) => {
     .populate({
       path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
       model: "Service", // Modelo de "Service"
+    })
+    .populate({
+      path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
+      model: "Service", // Modelo de "Service"
     });
 
   if (!user) {
