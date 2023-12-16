@@ -29,6 +29,7 @@ import {
   updateOneBusiness,
   getWokersByBusiness,
   findUserToken,
+  findWorkerMainFlow,
   getServicesBusiness,
   getServicesWorker,
 } from "../controllers/user.js";
@@ -363,4 +364,7 @@ router.post(
 router.get("/worker/services", getServicesWorker);
 //Para obtener todos los servicios del business
 router.get("/business/services", getServicesBusiness);
+
+//Para obtener todos los workers
+router.get("/allworkers", findWorkerMainFlow);
 export default router;

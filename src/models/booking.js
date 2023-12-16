@@ -11,8 +11,14 @@ const bookingSchema = new Schema(
     creatorUser: { type: String, ref: "User" },
     service: { type: String, ref: "Service" },
     subservice: { type: String, ref: "Subservice" },
-    startTime: { type: String },
-    endTime: { type: String },
+    startTime: {
+      stringData: { type: String },
+      isoTime: { type: Date },
+    },
+    endTime: {
+      stringData: { type: String },
+      isoTime: { type: Date },
+    },
     date: {
       stringData: { type: String },
       isoDate: { type: Date },
