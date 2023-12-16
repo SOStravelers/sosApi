@@ -3,6 +3,7 @@ const router = Router();
 import validateParams from "../middleware/validate.js";
 import { addOrUpdate, getByUser } from "../controllers/holliday.js";
 
+//Crear/Actualizar schedule worker/business
 router.post(
   "/add",
   validateParams(
@@ -17,7 +18,7 @@ router.post(
   ),
   addOrUpdate
 );
-//get By user
+//get by user
 router.get("/get", getByUser);
 
 export default router;

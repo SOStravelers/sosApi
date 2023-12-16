@@ -12,56 +12,9 @@ import {
   getByUser,
   addUpdateDefault,
   addOrUpdateBusiness,
-  scheduleByBusiness,
   addOrUpdateWorker,
-  workerScheduleForBook,
+  businessSchedule,
 } from "../controllers/schedule.js";
-
-//Obtener calendario flujo principal
-router.get(
-  "/business/:businessId/service/:serviceId/subservice/:subserviceId",
-  validateParams(
-    [
-      {
-        param_key: "businessId",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "serviceId",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "subserviceId",
-        required: true,
-        type: "string",
-      },
-    ],
-    "params"
-  ),
-  scheduleByBusiness
-);
-
-router.get(
-  "/worker/:workerId/subservice/:subserviceId",
-  validateParams(
-    [
-      {
-        param_key: "workerId",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "subserviceId",
-        required: true,
-        type: "string",
-      }
-    ],
-    "params"
-  ),
-  workerScheduleForBook
-);
 
 //Crear Calendario
 router.post(
@@ -93,9 +46,22 @@ router.post(
   ),
   create
 );
-// //add or update worker schedule
-router.post("/addWorker", addOrUpdateWorker);
-//add or update business schedule
+// Add or update worker schedule
+router.post(
+  "/addWorker",
+  validateParams(
+    [
+      {
+        param_key: "schedules",
+        required: true,
+        type: "array",
+      },
+    ],
+    "body"
+  ),
+  addOrUpdateWorker
+);
+// Add or update business schedule
 router.post(
   "/addBusiness",
   validateParams(
@@ -105,13 +71,44 @@ router.post(
         required: true,
         type: "string",
       },
+      {
+        param_key: "schedules",
+        required: true,
+        type: "array",
+      },
     ],
     "body"
   ),
   addOrUpdateBusiness
 );
-//get By user
+//Obtener calendario flujo principal
+router.get(
+  "/business/:businessId/service/:serviceId/subservice/:subserviceId",
+  validateParams(
+    [
+      {
+        param_key: "businessId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "serviceId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "subserviceId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  businessSchedule
+);
+//Actualizar schedule default
 router.get("/template", addUpdateDefault);
+
 router.get("/get", getByUser);
 
 router.get(

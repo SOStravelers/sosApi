@@ -26,10 +26,12 @@ import {
   inactiveMode,
   updateGallery,
   contacts,
-  getServices,
   updateOneBusiness,
   getWokersByBusiness,
   findUserToken,
+  findWorkerMainFlow,
+  getServicesBusiness,
+  getServicesWorker,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -358,6 +360,11 @@ router.post(
   ),
   inactiveMode
 );
-router.get("/getServices", getServices);
+//Para obtener todos los servicios del worker
+router.get("/worker/services", getServicesWorker);
+//Para obtener todos los servicios del business
+router.get("/business/services", getServicesBusiness);
 
+//Para obtener todos los workers
+router.get("/allworkers", findWorkerMainFlow);
 export default router;

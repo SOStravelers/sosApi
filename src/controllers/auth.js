@@ -636,7 +636,8 @@ export const getWorkerForBook = async (req, res, next) => {
 
   User.paginate(query, options)
     .then(({ docs: workers }) => {
-      if (!workers) return res.status(404).json({ message: "No workers were found" });
+      if (!workers)
+        return res.status(404).json({ message: "No workers were found" });
 
       const query = {
         isActive: true,
@@ -656,10 +657,14 @@ export const getWorkerForBook = async (req, res, next) => {
               for (const worker of workers) {
                 let skipLoop = false;
 
-                const workerSchedule = schedule.findIndex(time => time.user === worker._id.toString());
+                const workerSchedule = schedule.findIndex(
+                  (time) => time.user === worker._id.toString()
+                );
                 if (workerSchedule < 0) continue;
 
-                const scheduleIndex = schedule[workerSchedule].schedules.findIndex(
+                const scheduleIndex = schedule[
+                  workerSchedule
+                ].schedules.findIndex(
                   (time) =>
                     time.isActive &&
                     time.day === (dateDay.getDay() === 0 ? 7 : dateDay.getDay())
@@ -667,20 +672,24 @@ export const getWorkerForBook = async (req, res, next) => {
 
                 if (scheduleIndex < 0) continue;
 
-                console.log("preparado para saltar, veamos si anda de vacaiones...")
+                console.log(
+                  "preparado para saltar, veamos si anda de vacaiones..."
+                );
                 skipLoop = true;
-                for (const hours of schedule[workerSchedule].schedules[scheduleIndex].intervals) {
+                for (const hours of schedule[workerSchedule].schedules[
+                  scheduleIndex
+                ].intervals) {
                   const startDate = new Date(hours.startTimeIso);
-                  const endDate = new Date(hours.endTimeIso)
+                  const endDate = new Date(hours.endTimeIso);
 
                   //agregar esto en una función aparte para reutilizar
-                  startDate.setFullYear( dateDay.getFullYear() );
-                  startDate.setMonth( dateDay.getMonth() );
-                  startDate.setDate( dateDay.getDate() );
+                  startDate.setFullYear(dateDay.getFullYear());
+                  startDate.setMonth(dateDay.getMonth());
+                  startDate.setDate(dateDay.getDate());
 
-                  endDate.setFullYear( dateDay.getFullYear() );
-                  endDate.setMonth( dateDay.getMonth() );
-                  endDate.setDate( dateDay.getDate() );
+                  endDate.setFullYear(dateDay.getFullYear());
+                  endDate.setMonth(dateDay.getMonth());
+                  endDate.setDate(dateDay.getDate());
 
                   if (dateDay >= startDate && dateDay <= endDate) {
                     skipLoop = false;
