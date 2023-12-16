@@ -13,10 +13,9 @@ export const getByUser = async (req, res, next) => {
     next(err);
   }
 };
-// Crear/Actualizar schedule worker
+// Crear/Actualizar schedule worker/business
 export const addOrUpdate = async (req, res, next) => {
-  global.logger.info("---ADD UPDATE HOLLIDAYS---");
-  console.log(req.body);
+  global.logger.info("---ADD UPDATE HOLLIDAYS BUSINESS/WORKER ---");
   try {
     const id = req.user._id.toString();
     const data = req.body;

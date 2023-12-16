@@ -157,9 +157,7 @@ export const loginEmail = async (req, res, next) => {
     email = email.toLowerCase().trim();
     const user = await User.findOne({ email }).exec();
     const msg401 = "User not found or invalid credentials";
-    console.log(user.type);
     console.log(!user);
-    console.log(!user.type == "business");
     if (!user || user.type == "business") {
       throw createError(401, msg401);
     }
@@ -613,7 +611,7 @@ export const getUsers = async (req, res, next) => {
 };
 
 export const getWorkerForBook = async (req, res, next) => {
-  const { serviceId, subserviceId } = req.params; //filtrar si ese worker trabaja en ese hostel (johan me dijo que por ahora todos trabajan en todos)
+  const { serviceId, subserviceId } = req.params;
   const { day, page, limit } = req.body;
 
   const query = {
@@ -634,98 +632,95 @@ export const getWorkerForBook = async (req, res, next) => {
     sort: { updatedAt: -1 },
   };
 
-  User.paginate(query, options)
-    .then(({ docs: workers }) => {
-      if (!workers)
-        return res.status(404).json({ message: "No workers were found" });
+  try {
+    const { docs: workers } = await User.paginate(query, options);
 
-      const query = {
-        isActive: true,
-        user: { $in: workers.map((worker) => worker._id.toString()) },
-      };
+    if (!workers) {
+      return res.status(404).json({ message: "No workers were found" });
+    }
 
-      Schedule.find(query)
-        .then((schedule) => {
-          if (!schedule.length)
-            return res
-              .status(404)
-              .json({ message: "No workers were found for this service" });
-          Holiday.find(query)
-            .then((holidays) => {
-              const dateDay = new Date(day);
-              let availableWorkers = [];
-              for (const worker of workers) {
-                let skipLoop = false;
+    const scheduleQuery = {
+      isActive: true,
+      user: { $in: workers.map((worker) => worker._id.toString()) },
+    };
 
-                const workerSchedule = schedule.findIndex(
-                  (time) => time.user === worker._id.toString()
-                );
-                if (workerSchedule < 0) continue;
+    const schedule = await Schedule.find(scheduleQuery);
 
-                const scheduleIndex = schedule[
-                  workerSchedule
-                ].schedules.findIndex(
-                  (time) =>
-                    time.isActive &&
-                    time.day === (dateDay.getDay() === 0 ? 7 : dateDay.getDay())
-                );
+    if (!schedule.length) {
+      return res
+        .status(404)
+        .json({ message: "No workers were found for this service" });
+    }
 
-                if (scheduleIndex < 0) continue;
+    const holidays = await Holiday.find(scheduleQuery);
 
-                console.log(
-                  "preparado para saltar, veamos si anda de vacaiones..."
-                );
-                skipLoop = true;
-                for (const hours of schedule[workerSchedule].schedules[
-                  scheduleIndex
-                ].intervals) {
-                  const startDate = new Date(hours.startTimeIso);
-                  const endDate = new Date(hours.endTimeIso);
+    const dateDay = new Date(day);
+    let availableWorkers = [];
 
-                  //agregar esto en una función aparte para reutilizar
-                  startDate.setFullYear(dateDay.getFullYear());
-                  startDate.setMonth(dateDay.getMonth());
-                  startDate.setDate(dateDay.getDate());
+    for (const worker of workers) {
+      let skipLoop = false;
 
-                  endDate.setFullYear(dateDay.getFullYear());
-                  endDate.setMonth(dateDay.getMonth());
-                  endDate.setDate(dateDay.getDate());
+      const workerSchedule = schedule.findIndex(
+        (time) => time.user === worker._id.toString()
+      );
 
-                  if (dateDay >= startDate && dateDay <= endDate) {
-                    skipLoop = false;
-                    break;
-                  }
-                }
+      if (workerSchedule < 0) continue;
 
-                if (skipLoop) continue;
+      const scheduleIndex = schedule[workerSchedule].schedules.findIndex(
+        (time) =>
+          time.isActive &&
+          time.day === (dateDay.getDay() === 0 ? 7 : dateDay.getDay())
+      );
 
-                if (holidays) {
-                  const holidayIndex = holidays.findIndex(
-                    (holy) => holy.user === worker._id
-                  );
-                  if (holidayIndex >= 0) {
-                    for (const holy of holidays[holidayIndex].range) {
-                      if (day >= holy.from && day <= holy.to) {
-                        skipLoop = true;
-                        break;
-                      }
-                    }
-                  }
-                }
+      if (scheduleIndex < 0) continue;
 
-                //check if booked (test first)
+      console.log("preparado para saltar, veamos si anda de vacaiones...");
+      skipLoop = true;
 
-                if (skipLoop) continue;
-                availableWorkers.push(worker);
-              }
+      for (const hours of schedule[workerSchedule].schedules[scheduleIndex]
+        .intervals) {
+        const startDate = new Date(hours.startTimeIso);
+        const endDate = new Date(hours.endTimeIso);
 
-              res.status(200).json(availableWorkers);
-            })
-            .catch((err) => next(err));
-        })
-        .catch((err) => next(err));
-    })
-    .catch((err) => next(err));
+        startDate.setFullYear(dateDay.getFullYear());
+        startDate.setMonth(dateDay.getMonth());
+        startDate.setDate(dateDay.getDate());
+
+        endDate.setFullYear(dateDay.getFullYear());
+        endDate.setMonth(dateDay.getMonth());
+        endDate.setDate(dateDay.getDate());
+
+        if (dateDay >= startDate && dateDay <= endDate) {
+          skipLoop = false;
+          break;
+        }
+      }
+
+      if (skipLoop) continue;
+
+      if (holidays) {
+        const holidayIndex = holidays.findIndex(
+          (holy) => holy.user === worker._id
+        );
+
+        if (holidayIndex >= 0) {
+          for (const holy of holidays[holidayIndex].range) {
+            if (day >= holy.from && day <= holy.to) {
+              skipLoop = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (skipLoop) continue;
+      availableWorkers.push(worker);
+    }
+
+    res.status(200).json(availableWorkers);
+  } catch (err) {
+    next(err);
+  }
 };
 //Por trabajar
 
