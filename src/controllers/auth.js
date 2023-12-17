@@ -590,12 +590,20 @@ export const getUsers = async (req, res, next) => {
     let options = {
       select:
         "personalData img _id username businessData.name businessData.location workerData",
-      populate: {
-        path: "workerData.services.id",
-        select: "name imgUrl ",
-        model: "Service",
-        match: { isActive: true },
-      },
+      populate: [
+        {
+          path: "workerData.services.id",
+          select: "name imgUrl ",
+          model: "Service",
+          match: { isActive: true },
+        },
+        {
+          path: "workerData.services.subServices",
+          select: "name imgUrl duration price ",
+          model: "Subservice",
+          match: { isActive: true },
+        },
+      ],
 
       page: body.page || 1,
       limit: body.limit || 10,
