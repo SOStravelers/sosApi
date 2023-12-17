@@ -342,7 +342,7 @@ export const createPassword = async (req, res, next) => {
       },
       { new: true }
     ).select("isActive _id isValidate security email personalData _id img");
-
+    console.log("el user", updatedUser);
     let userToCreateToken = {
       _id: updatedUser._id,
       username: updatedUser.username,
