@@ -84,6 +84,10 @@ const userSchema = new Schema(
       idNumber: { type: String },
     },
     workerData: {
+      isMyServicesOk: { type: Boolean, default: false },
+      isAboutmeOk: { type: Boolean, default: false },
+      isMySchedulesOk: { type: Boolean, default: false },
+      isMyWorkplacesOk: { type: Boolean, default: true },
       isActive: { type: Boolean, default: false },
       languages: {
         main: {
