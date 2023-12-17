@@ -95,6 +95,7 @@ export const registerEmail = async (req, res, next) => {
     }
     user.type = req.body.type || "personal";
     let name = procesarNombre(req.body.name);
+    console.log("el name", name);
     if (name.length > 1) {
       user.personalData.name.first =
         name[0].charAt(0).toUpperCase() + name[0].slice(1).toLowerCase().trim();
@@ -370,12 +371,16 @@ export const getById = async (req, res, next) => {
         "about email img language personalData username workerData _id security.hasPassword"
       )
       .populate({
-        path: "workerData.services.id",
-        select: "name _id",
+        path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
       })
       .populate({
-        path: "workerData.services.subServices",
-        select: "name _id",
+        path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
+        select: "name imgUrl duration price ",
+        model: "Subservice", // Modelo de "SubServices"
+        match: { isActive: true }, // Solo selecciona los subservicios activos
       });
     if (!user) {
       throw createError(404, "User not found");
@@ -583,9 +588,15 @@ export const getUsers = async (req, res, next) => {
     let body = {};
     Object.assign(body, req.query);
     let options = {
-      // populate,
       select:
-        "personalData img _id username businessData.name businessData.location",
+        "personalData img _id username businessData.name businessData.location workerData",
+      populate: {
+        path: "workerData.services.id",
+        select: "name imgUrl ",
+        model: "Service",
+        match: { isActive: true },
+      },
+
       page: body.page || 1,
       limit: body.limit || 10,
       sort: { updatedAt: -1 },

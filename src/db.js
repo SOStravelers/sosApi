@@ -11,11 +11,13 @@ const dbConfig = {
   }`,
 };
 
-const url = "mongodb://localhost:27017/dev";
+const url = "mongodb://localhost:27017/sosLocal";
 const env = process.env.NODE_ENV || "";
-console.log(`Conectando... ${dbConfig[env]}`);
+// console.log(`Conectando... ${dbConfig[env]}`);
+console.log(`Conectando... ${url}`);
 mongoose.set("strictQuery", false);
-mongoose.connect(dbConfig[env], {
+// mongoose.connect(dbConfig[env], {
+mongoose.connect(url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   // useFindAndModify: false,
