@@ -814,28 +814,38 @@ export const workerByTimeAndService = async (req, res, next) => {
         if (schedule) {
           console.log("hay calendario");
           const scheduleIndex = schedule.schedules.findIndex(
-            (time) =>
-              time.isActive &&
-              time.day ===
-                (bookingStartTime.getDay() === 0
-                  ? 7
-                  : bookingStartTime.getDay())
+            (time) => time.isActive && time.day === bookingStartTime.getUTCDay()
           );
           if (scheduleIndex >= 0) {
             console.log("dia calendario activado");
             const intervals = schedule.schedules[scheduleIndex].intervals;
             console.log("analizando intervalos");
-            console.log(intervals[0]);
+            console.log(intervals[0], bookingStartTime, bookingEndTime);
+
+            const intervalStartTime = stripDate(intervals[0].startTimeIso);
+            const intervalEndTime = stripDate(intervals[0].endTimeIso);
+            const strippedBookingStartTime = stripDate(bookingStartTime);
+            const strippedBookingEndTime = stripDate(bookingEndTime);
+
             console.log(
-              intervals[0].startTimeIso.getTime() <= bookingStartTime.getTime()
+              intervalStartTime.getTime(),
+              intervalEndTime.getTime(),
+              strippedBookingStartTime.getTime(),
+              strippedBookingEndTime.getTime()
             );
             console.log(
-              intervals[0].endTimeIso.getTime() >= bookingEndTime.getTime()
+              intervalStartTime.getTime() <= strippedBookingStartTime.getTime()
             );
+            console.log(
+              intervalEndTime.getTime() >= strippedBookingEndTime.getTime()
+            );
+
             const intervalIndex = intervals.findIndex(
               (time) =>
-                time.startTimeIso.getTime() <= bookingStartTime.getTime() &&
-                time.endTimeIso.getTime() >= bookingEndTime.getTime()
+                stripDate(time.startTimeIso).getTime() <=
+                  strippedBookingStartTime.getTime() &&
+                stripDate(time.endTimeIso).getTime() >=
+                  strippedBookingEndTime.getTime()
             );
             if (
               intervalIndex >= 0 &&
@@ -902,3 +912,14 @@ export const businessByService = async (req, res, next) => {
     next(err);
   }
 };
+
+function stripDate(date) {
+  return new Date(
+    1970,
+    0,
+    1,
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds()
+  );
+}
