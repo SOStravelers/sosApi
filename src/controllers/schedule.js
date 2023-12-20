@@ -365,7 +365,7 @@ export const businessSchedule = async (req, res, next) => {
             allIntervals.push({
               startTimeIso: hour.toISOString(),
               startTime: hour.toISOString().slice(11, 16),
-              endtime: endHour.toISOString().slice(11, 16),
+              endTime: endHour.toISOString().slice(11, 16),
               endTimeIso: endHour.toISOString(),
             });
           }
@@ -457,11 +457,3 @@ const cambioHora = (hour, dateDay) => {
   let newHourString = yearMonthDayPart + "T" + hourPart + ".000Z";
   return new Date(newHourString);
 };
-
-function convertToCustomDayFormat(day) {
-  // Ajustar el valor del día según tu formato personalizado
-  const customFormat = ((day + 6) % 7) + 1;
-
-  // Puedes devolver el resultado o ajustar según tus necesidades
-  return customFormat === 7 ? 1 : customFormat;
-}
