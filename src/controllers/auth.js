@@ -8,12 +8,12 @@ import { refreshTokenGen, accessTokenGen } from "../middleware/auth.js";
 import { procesarNombre } from "../utils/data.js";
 import { createCustomerId } from "../services/stripe.js";
 import { resendEmail } from "../services/resend.js";
+import Booking from "../models/booking.js";
 
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
 } from "../utils/code.js";
-import { create } from "./booking.js";
 
 //Create user personal/workers/business
 export const createUser = async (req, res, next) => {
@@ -745,8 +745,11 @@ export const getWorkerForBook = async (req, res, next) => {
 
 //Entrega trabajadores segun hora solicitada y subservicio solicitado
 export const workerByTimeAndService = async (req, res, next) => {
+  global.logger.info({
+    message: "--- GET WORKERS BY TIME AND SERVICE ---",
+  });
   try {
-    const { startTime, day, subservice, page, limit } = req.body;
+    const { startTime, endTime, subservice, page, limit } = req.body;
     const query = {
       $and: [
         { isActive: true },
@@ -759,45 +762,112 @@ export const workerByTimeAndService = async (req, res, next) => {
         path: "workerData.services.id",
         select: "name",
       },
-      select: "personalData workerData img _id username",
+      select: "personalData.name workerData.services img.imgUrl _id ",
       page: page || 1,
       limit: limit || 100,
       sort: { updatedAt: -1 },
     };
 
-    const response = await User.paginate(query, options);
-    var workersAvailable = [];
-    if (response && response.docs) {
-      for (let worker of response.docs) {
-        console.log("startTime", startTime);
-        const schedule = await Schedule.findOne({
-          "schedules.isActive": true,
-          user: worker._id.toString(),
-          "schedules.day": day,
-          "schedules.intervals": {
-            $elemMatch: {
-              formatStartTime: {
-                $lte: startTime,
-              },
-              formatEndTime: {
-                $gte: startTime,
-              },
-            },
+    const users = await User.paginate(query, options);
+    console.log("usuarios encontrados", users.docs.length);
+    const bookingStartTime = new Date(startTime.isoTime);
+    const bookingEndTime = new Date(endTime.isoTime);
+
+    let allUsers = users.docs;
+    let bookings = [];
+    for (let user of users.docs) {
+      console.log("buscando bookings", user._id.toString(), subservice);
+      console.log();
+      bookings = await Booking.find({
+        workerUser: user._id.toString(),
+        subservice: subservice,
+        $or: [
+          {
+            "startTime.isoTime": { $gte: bookingStartTime },
+            "endTime.isoTime": { $lte: bookingEndTime },
           },
-        }).exec();
+          {
+            "startTime.isoTime": { $lt: bookingStartTime },
+            "endTime.isoTime": { $gt: bookingStartTime, $lte: bookingEndTime },
+          },
+          {
+            "startTime.isoTime": {
+              $gte: bookingStartTime,
+              $lt: bookingEndTime,
+            },
+            "endTime.isoTime": { $gt: bookingEndTime },
+          },
+          {
+            "startTime.isoTime": { $lt: bookingStartTime },
+            "endTime.isoTime": { $gt: bookingEndTime },
+          },
+        ],
+      });
+      if (bookings.length > 0) {
+        console.log("hay bookings");
+        allUsers = allUsers.filter(
+          (item) => item._id.toString() != user._id.toString()
+        );
+      } else {
+        console.log("no hay booking, buscando calendario");
+        const schedule = await Schedule.findOne({ user: user._id.toString() });
         if (schedule) {
-          console.log(schedule);
-          workersAvailable.push(worker);
+          console.log("hay calendario");
+          const scheduleIndex = schedule.schedules.findIndex(
+            (time) =>
+              time.isActive &&
+              time.day ===
+                (bookingStartTime.getDay() === 0
+                  ? 7
+                  : bookingStartTime.getDay())
+          );
+          if (scheduleIndex >= 0) {
+            console.log("dia calendario activado");
+            const intervals = schedule.schedules[scheduleIndex].intervals;
+            console.log("analizando intervalos");
+            console.log(intervals[0]);
+            console.log(
+              intervals[0].startTimeIso.getTime() <= bookingStartTime.getTime()
+            );
+            console.log(
+              intervals[0].endTimeIso.getTime() >= bookingEndTime.getTime()
+            );
+            const intervalIndex = intervals.findIndex(
+              (time) =>
+                time.startTimeIso.getTime() <= bookingStartTime.getTime() &&
+                time.endTimeIso.getTime() >= bookingEndTime.getTime()
+            );
+            if (
+              intervalIndex >= 0 &&
+              schedule.schedules[scheduleIndex].isActive
+            ) {
+              console.log("intervalo disponible");
+            } else {
+              console.log("intervalo no disponible");
+              allUsers = allUsers.filter(
+                (item) => item._id.toString() != user._id.toString()
+              );
+            }
+          } else {
+            console.log("dia esta apagado");
+            allUsers = allUsers.filter(
+              (item) => item._id.toString() != user._id.toString()
+            );
+          }
+        } else {
+          console.log("no tiene schedule");
+          allUsers = allUsers.filter(
+            (item) => item._id.toString() != user._id.toString()
+          );
         }
       }
-      res.send(workersAvailable);
-    } else {
-      res.send(response);
     }
+    return res.send({ allUsers, users, bookings });
   } catch (err) {
     next(err);
   }
 };
+
 //Entrega trabajadores segun hora solicitada y subservicio solicitado
 export const businessByService = async (req, res, next) => {
   console.log("--- GET BUSINESS BY SERVICE ---");

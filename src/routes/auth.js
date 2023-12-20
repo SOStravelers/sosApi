@@ -329,12 +329,12 @@ router.post(
       {
         param_key: "startTime",
         required: true,
-        type: "string",
+        type: "object",
       },
       {
-        param_key: "day",
+        param_key: "startTime",
         required: true,
-        type: "number",
+        type: "object",
       },
       {
         param_key: "subservice",
