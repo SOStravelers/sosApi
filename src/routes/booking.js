@@ -24,34 +24,30 @@ router.post(
       //   type: "string",
       // },
       {
-        param_key: "worker",
+        param_key: "workerUser",
         required: true,
         type: "string",
       },
       {
-        param_key: "client",
+        param_key: "clientUser",
         required: true,
         type: "string",
       },
-      {
-        param_key: "creator",
-        required: true,
-        type: "string",
-      },
+
       {
         param_key: "startTime",
         required: true,
-        type: "string",
+        type: "object",
       },
       {
         param_key: "endTime",
         required: true,
-        type: "string",
+        type: "object",
       },
       {
         param_key: "date",
         required: true,
-        type: "string",
+        type: "object",
       },
     ],
     "body"

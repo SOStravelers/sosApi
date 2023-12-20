@@ -6,10 +6,10 @@ import { sendEmailPaymentConfirmation } from "../services/aws_ses.js";
 export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW BOOKING---");
   try {
-    const emailData = req.body.emailData;
     const bookingData = req.body;
-    bookingData.emailData = null;
     let booking = new Booking(bookingData);
+    const newBooking = await booking.save();
+    return res.status(201).json({ booking: newBooking, msg: "new Document" });
     let query = {
       $and: [
         {

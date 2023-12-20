@@ -251,7 +251,7 @@ export const businessSchedule = async (req, res, next) => {
     endDate.setDate(endDate.getDate() + 15); // Add 15 days
     endDate.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00.000
     const bookings = await Booking.find({
-      service: serviceId,
+      // service: serviceId,
       businessUser: businessId,
       subservice: subserviceId,
       "date.isoDate": { $gte: startDate, $lt: endDate },
@@ -330,26 +330,36 @@ export const businessSchedule = async (req, res, next) => {
           const maxHour = new Date(
             endHourDate.getTime() - subservice.duration * 60000 // Resta la duración en milisegundos
           );
-
-          const bookingExists = bookings.some((booking) => {
-            console.log(booking);
+          let bookingExists = false;
+          console.log("bookin¿ds lenght", bookings.length);
+          for (let i = 0; i < bookings.length; i++) {
+            const booking = bookings[i];
             const bookingStartHour = booking.startTime.isoTime;
             const bookingEndHour = booking.endTime.isoTime;
+
             console.log(
-              "booking",
-              bookingStartHour,
-              bookingEndHour,
-              hour,
-              endHour
+              "bookingsss",
+              stripDate(bookingStartHour),
+              stripDate(bookingEndHour),
+              stripDate(hour),
+              stripDate(endHour)
             );
-            return (
-              (bookingStartHour >= hour && bookingStartHour < endHour) ||
-              (bookingEndHour > hour && bookingEndHour <= endHour) ||
-              (bookingStartHour <= hour && bookingEndHour >= endHour) ||
-              (bookingStartHour >= hour && bookingEndHour <= endHour)
-            );
-          });
-          console.log("booking", bookingExists);
+
+            if (
+              (stripDate(bookingStartHour) >= stripDate(hour) &&
+                stripDate(bookingStartHour) < stripDate(endHour)) ||
+              (stripDate(bookingEndHour) > stripDate(hour) &&
+                stripDate(bookingEndHour) <= stripDate(endHour)) ||
+              (stripDate(bookingStartHour) <= stripDate(hour) &&
+                stripDate(bookingEndHour) >= stripDate(endHour)) ||
+              (stripDate(bookingStartHour) >= stripDate(hour) &&
+                stripDate(bookingEndHour) <= stripDate(endHour))
+            ) {
+              bookingExists = true;
+              break;
+            }
+          }
+          // console.log("booking", bookingExists);
           const date = new Date(hour);
           const onlyHour = date.getUTCHours();
 
@@ -457,3 +467,14 @@ const cambioHora = (hour, dateDay) => {
   let newHourString = yearMonthDayPart + "T" + hourPart + ".000Z";
   return new Date(newHourString);
 };
+
+function stripDate(date) {
+  return new Date(
+    1970,
+    0,
+    1,
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds()
+  );
+}
