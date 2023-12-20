@@ -762,7 +762,7 @@ export const workerByTimeAndService = async (req, res, next) => {
         path: "workerData.services.id",
         select: "name",
       },
-      select: "personalData.name workerData.services img.imgUrl _id ",
+      select: "personalData.name email  workerData.services img.imgUrl _id ",
       page: page || 1,
       limit: limit || 100,
       sort: { updatedAt: -1 },
@@ -776,8 +776,8 @@ export const workerByTimeAndService = async (req, res, next) => {
     let allUsers = users.docs;
     let bookings = [];
     for (let user of users.docs) {
+      console.log("user", user.email);
       console.log("buscando bookings", user._id.toString(), subservice);
-      console.log();
       bookings = await Booking.find({
         workerUser: user._id.toString(),
         subservice: subservice,
@@ -804,7 +804,7 @@ export const workerByTimeAndService = async (req, res, next) => {
         ],
       });
       if (bookings.length > 0) {
-        console.log("hay bookings");
+        console.log("hay bookings", bookings.length);
         allUsers = allUsers.filter(
           (item) => item._id.toString() != user._id.toString()
         );
@@ -820,40 +820,46 @@ export const workerByTimeAndService = async (req, res, next) => {
             console.log("dia calendario activado");
             const intervals = schedule.schedules[scheduleIndex].intervals;
             console.log("analizando intervalos");
-            console.log(intervals[0], bookingStartTime, bookingEndTime);
 
-            const intervalStartTime = stripDate(intervals[0].startTimeIso);
-            const intervalEndTime = stripDate(intervals[0].endTimeIso);
-            const strippedBookingStartTime = stripDate(bookingStartTime);
-            const strippedBookingEndTime = stripDate(bookingEndTime);
-
-            console.log(
-              intervalStartTime.getTime(),
-              intervalEndTime.getTime(),
-              strippedBookingStartTime.getTime(),
-              strippedBookingEndTime.getTime()
-            );
-            console.log(
-              intervalStartTime.getTime() <= strippedBookingStartTime.getTime()
-            );
-            console.log(
-              intervalEndTime.getTime() >= strippedBookingEndTime.getTime()
-            );
-
-            const intervalIndex = intervals.findIndex(
-              (time) =>
-                stripDate(time.startTimeIso).getTime() <=
-                  strippedBookingStartTime.getTime() &&
-                stripDate(time.endTimeIso).getTime() >=
-                  strippedBookingEndTime.getTime()
-            );
-            if (
-              intervalIndex >= 0 &&
-              schedule.schedules[scheduleIndex].isActive
-            ) {
-              console.log("intervalo disponible");
-            } else {
-              console.log("intervalo no disponible");
+            let contador = 0;
+            for (let interval of intervals) {
+              console.log(intervals, bookingStartTime, bookingEndTime);
+              const intervalStartTime = stripDate(interval.startTimeIso);
+              const intervalEndTime = stripDate(interval.endTimeIso);
+              const strippedBookingStartTime = stripDate(bookingStartTime);
+              const strippedBookingEndTime = stripDate(bookingEndTime);
+              console.log(
+                intervalStartTime.getTime(),
+                intervalEndTime.getTime(),
+                strippedBookingStartTime.getTime(),
+                strippedBookingEndTime.getTime()
+              );
+              console.log(
+                intervalStartTime.getTime() <=
+                  strippedBookingStartTime.getTime()
+              );
+              console.log(
+                intervalEndTime.getTime() >= strippedBookingEndTime.getTime()
+              );
+              const intervalIndex = intervals.findIndex(
+                (time) =>
+                  stripDate(time.startTimeIso).getTime() <=
+                    strippedBookingStartTime.getTime() &&
+                  stripDate(time.endTimeIso).getTime() >=
+                    strippedBookingEndTime.getTime()
+              );
+              if (
+                intervalIndex >= 0 &&
+                schedule.schedules[scheduleIndex].isActive
+              ) {
+                console.log("intervalo disponible");
+                continue;
+              } else {
+                console.log("intervalo no disponible");
+                contador++;
+              }
+            }
+            if (contador == intervals.length) {
               allUsers = allUsers.filter(
                 (item) => item._id.toString() != user._id.toString()
               );

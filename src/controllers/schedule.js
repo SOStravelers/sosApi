@@ -250,12 +250,14 @@ export const businessSchedule = async (req, res, next) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 15); // Add 15 days
     endDate.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00.000
+    console.log("wena", startDate, endDate, subserviceId, businessId);
     const bookings = await Booking.find({
-      // service: serviceId,
+      service: serviceId,
       businessUser: businessId,
-      subservice: subserviceId,
+      //subservice: subserviceId,
       "date.isoDate": { $gte: startDate, $lt: endDate },
     });
+    console.log("bookings", bookings.length);
 
     while (dayContinue < untilDays) {
       const dateDay = new Date();
@@ -331,31 +333,27 @@ export const businessSchedule = async (req, res, next) => {
             endHourDate.getTime() - subservice.duration * 60000 // Resta la duración en milisegundos
           );
           let bookingExists = false;
-          console.log("bookin¿ds lenght", bookings.length);
           for (let i = 0; i < bookings.length; i++) {
             const booking = bookings[i];
             const bookingStartHour = booking.startTime.isoTime;
             const bookingEndHour = booking.endTime.isoTime;
 
-            console.log(
-              "bookingsss",
-              stripDate(bookingStartHour),
-              stripDate(bookingEndHour),
-              stripDate(hour),
-              stripDate(endHour)
-            );
+            const strippedDate1 = stripTime(bookingStartHour);
+            const strippedDate2 = stripTime(hour);
 
             if (
-              (stripDate(bookingStartHour) >= stripDate(hour) &&
+              ((stripDate(bookingStartHour) >= stripDate(hour) &&
                 stripDate(bookingStartHour) < stripDate(endHour)) ||
-              (stripDate(bookingEndHour) > stripDate(hour) &&
-                stripDate(bookingEndHour) <= stripDate(endHour)) ||
-              (stripDate(bookingStartHour) <= stripDate(hour) &&
-                stripDate(bookingEndHour) >= stripDate(endHour)) ||
-              (stripDate(bookingStartHour) >= stripDate(hour) &&
-                stripDate(bookingEndHour) <= stripDate(endHour))
+                (stripDate(bookingEndHour) > stripDate(hour) &&
+                  stripDate(bookingEndHour) <= stripDate(endHour)) ||
+                (stripDate(bookingStartHour) <= stripDate(hour) &&
+                  stripDate(bookingEndHour) >= stripDate(endHour)) ||
+                (stripDate(bookingStartHour) >= stripDate(hour) &&
+                  stripDate(bookingEndHour) <= stripDate(endHour))) &&
+              strippedDate1.getTime() === strippedDate2.getTime()
             ) {
               bookingExists = true;
+              console.log("verdadero");
               break;
             }
           }
@@ -477,4 +475,10 @@ function stripDate(date) {
     date.getMinutes(),
     date.getSeconds()
   );
+}
+
+function stripTime(date) {
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate;
 }
