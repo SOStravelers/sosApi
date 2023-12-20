@@ -885,6 +885,12 @@ export const businessByService = async (req, res, next) => {
     };
     const options = {
       select: "businessData img _id username",
+      populate: {
+        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      },
       page: page || 1,
       limit: limit || 100,
       sort: { updatedAt: -1 },
