@@ -6,6 +6,7 @@ import { template } from "../lib/schedule.js";
 import { createError } from "../config/error.js";
 import Subservice from "../models/subservice.js";
 import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
+import moment from "moment-timezone";
 
 //Crear horario
 export const create = async (req, res, next) => {
@@ -205,13 +206,22 @@ export const activateMany = async (req, res, next) => {
 // Horario de negocio por servicio
 export const businessSchedule = async (req, res, next) => {
   global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE MAIN FLOW---");
-  let nextDay = 0;
-  let dayContinue = 0;
-  const today = new Date();
-  const untilDays = 15;
-  const limitDate = new Date(today);
-  limitDate.setDate(today.getDate() + untilDays);
   const { businessId, serviceId, subserviceId } = req.params;
+
+  //----variables para bucles de dias-----
+  const today = new Date(); // dia de hoy
+  let dayContinue = 0; // variable para saber si saltar dias
+  let nextDay = 0; // variable auxiliar para el bucle de dias
+  const untilDays = 15; // dias maximos para ralizar el bucle de dias
+  const allTimes = []; // array para guardar los dias y sus horarios
+  const limitDate = today.setDate(today.getDate() + untilDays); // dias maximos a mostrar en el calendario
+  // Variables para desfasar primera hora de booking posible. Es decir si tomo ahora, significa que puedo tomar desde dentro de 30 minutos
+  let bookingPosible = true; //para activar o no ese desfase
+  let minDesfase = 30; //minutos
+  //-------------
+  //Variable que permite la hora minima posible para agendar (independiente de las horas del calendario
+  let horaMinDia = 9; //Variable que permite la hora minima posible para agendar (independiente)
+
   try {
     const user = await User.findById(businessId);
     if (user?.type != "business" || !user?.businessData?.isActive) {
@@ -223,15 +233,14 @@ export const businessSchedule = async (req, res, next) => {
       service: serviceId,
     });
     if (!schedule) {
-      throw createError(404, "Schedule not found");
+      return res.status(200).json([]);
     }
     const subservice = await Subservice.findOne({
       _id: subserviceId,
     });
     if (!subservice) {
-      throw createError(404, "Subservice not found");
+      return res.status(200).json([]);
     }
-    const allTimes = [];
     const holidays = await Holiday.findOne({
       user: businessId,
     });
@@ -243,21 +252,19 @@ export const businessSchedule = async (req, res, next) => {
     endDate.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00.000
     const bookings = await Booking.find({
       service: serviceId,
-      location: businessId,
+      businessUser: businessId,
       subservice: subserviceId,
       "date.isoDate": { $gte: startDate, $lt: endDate },
     });
-    console.log(bookings.length);
+
     while (dayContinue < untilDays) {
       const dateDay = new Date();
       dateDay.setDate(dateDay.getDate() + Number(nextDay));
       dateDay.setUTCHours(0, 0, 0, 0);
-
       if (dateDay > limitDate) {
         break;
       }
-
-      const formatedDay = dateDay.getDay() === 0 ? 7 : dateDay.getDay();
+      const formatedDay = dateDay.getUTCDay();
       const scheduleIndex = schedule.schedules.findIndex(
         (time) => time.day === formatedDay && time.isActive
       );
@@ -281,50 +288,80 @@ export const businessSchedule = async (req, res, next) => {
         continue;
       }
       for (const interval of time.intervals) {
-        const endHourDate = new Date(interval.endTimeIso);
-        const startHourDate = new Date(interval.startTimeIso);
+        const startHourDate = cambioHora(
+          new Date(interval.startTimeIso),
+          dateDay
+        );
+        startHourDate.setMilliseconds(0);
+        const endHourDate = cambioHora(new Date(interval.endTimeIso), dateDay);
+        endHourDate.setMilliseconds(0);
         for (
           let hour = startHourDate;
           hour <= endHourDate;
           hour.setMinutes(hour.getMinutes() + subservice.duration)
         ) {
+          // Obtener la hora local actual en Brasil
+          const horaLocalBrasil = moment()
+            .tz("America/Sao_Paulo")
+            .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+
+          // Convertir la hora local de Brasil a objeto Date
+          const fechaHoraLocalBrasil = new Date(horaLocalBrasil);
+          // console.log("horas", hour, horaLocalBrasil);
+
+          if (hour < fechaHoraLocalBrasil) {
+            console.log("salto");
+            continue;
+          }
+
           const endHour = new Date(hour);
           endHour.setMinutes(endHour.getMinutes() + subservice.duration);
-          endHour.setMilliseconds(0);
-          if (dayContinue === 0) {
-            hour.setMinutes(hour.getMinutes() + 120);
-            endHour.setMinutes(endHour.getMinutes() + 120);
+          //Si la hora actual es menor a la hora local de Brasil, se desfasa la hora para que lleguen workers
+          if (
+            bookingPosible &&
+            hour - fechaHoraLocalBrasil < minDesfase * 60 * 1000
+          ) {
+            console.log("desfase");
+            bookingPosible = false;
+            hour.setMinutes(hour.getMinutes() + minDesfase);
+            endHour.setMinutes(endHour.getMinutes() + minDesfase);
           }
-          console.log(dayContinue);
+          //Sirve para que una persona no pueda agendar el ultimo servicio del dia en menos tiempo que la duracion del servicio
+          const maxHour = new Date(
+            endHourDate.getTime() - subservice.duration * 60000 // Resta la duración en milisegundos
+          );
 
-          hour.setMilliseconds(0);
-          console.log(hour);
-          console.log(endHour);
           const bookingExists = bookings.some((booking) => {
-            const bookingStartHour = booking.startTime;
-            const bookingEndHour = booking.endTime;
-
-            const currentHour = hour.toISOString().slice(11, 16);
-            const currentEndHour = endHour.toISOString().slice(11, 16);
-
+            console.log(booking);
+            const bookingStartHour = booking.startTime.isoTime;
+            const bookingEndHour = booking.endTime.isoTime;
+            console.log(
+              "booking",
+              bookingStartHour,
+              bookingEndHour,
+              hour,
+              endHour
+            );
             return (
-              ((bookingStartHour >= currentHour &&
-                bookingStartHour < currentEndHour) ||
-                (bookingEndHour > currentHour &&
-                  bookingEndHour <= currentEndHour) ||
-                (bookingStartHour <= currentHour &&
-                  bookingEndHour >= currentEndHour) ||
-                (bookingStartHour >= currentHour &&
-                  bookingEndHour <= currentEndHour)) &&
-              dateDay.toISOString() ==
-                (booking.date.isoDate instanceof Date
-                  ? booking.date.isoDate.toISOString()
-                  : booking.date.isoDate)
+              (bookingStartHour >= hour && bookingStartHour < endHour) ||
+              (bookingEndHour > hour && bookingEndHour <= endHour) ||
+              (bookingStartHour <= hour && bookingEndHour >= endHour) ||
+              (bookingStartHour >= hour && bookingEndHour <= endHour)
             );
           });
-          const date = new Date(endHour);
+          console.log("booking", bookingExists);
+          const date = new Date(hour);
           const onlyHour = date.getUTCHours();
-          if (!bookingExists && onlyHour >= 8 && onlyHour < 16) {
+
+          //condicion final: solo se agregan si:
+          //1. no existe un booking en ese horario
+          //2. la hora final es menor o igual a la hora maxima
+          //3. la hora inicial es mayor o igual a las 9am
+          if (
+            !bookingExists &&
+            onlyHour >= horaMinDia &&
+            startHourDate <= maxHour
+          ) {
             allIntervals.push({
               startTimeIso: hour.toISOString(),
               startTime: hour.toISOString().slice(11, 16),
@@ -353,8 +390,9 @@ export const scheduleBusinessbyService = async (req, res, next) => {
   global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE---");
   let body = {};
   Object.assign(body, req.query);
+  console.log(body);
   let horario = await Schedule.findOne({
-    creator: body.id,
+    owner: body.id,
     service: body.service,
     isActive: true,
   });
@@ -407,3 +445,23 @@ export const scheduleBusinessbyService = async (req, res, next) => {
 
   res.send({ horas });
 };
+
+const cambioHora = (hour, dateDay) => {
+  // Obtener partes de año, mes y día de 'dateDay'
+  let yearMonthDayPart = dateDay.toISOString().slice(0, 10);
+
+  // Obtener la parte de la hora de 'hour'
+  let hourPart = hour.toISOString().slice(11, 19);
+
+  // Crear la nueva variable 'hour' concatenando las partes
+  let newHourString = yearMonthDayPart + "T" + hourPart + ".000Z";
+  return new Date(newHourString);
+};
+
+function convertToCustomDayFormat(day) {
+  // Ajustar el valor del día según tu formato personalizado
+  const customFormat = ((day + 6) % 7) + 1;
+
+  // Puedes devolver el resultado o ajustar según tus necesidades
+  return customFormat === 7 ? 1 : customFormat;
+}

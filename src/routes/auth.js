@@ -284,35 +284,41 @@ router.post(
 
 router.post(
   "/workers/service/:serviceId/subservice/:subserviceId",
-  validateParams([
-    {
-      param_key: "serviceId",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "subserviceId",
-      required: true,
-      type: "string",
-    }
-  ], "params"),
-  validateParams([
-    {
-      param_key: "day",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    }
-  ], "body"),
+  validateParams(
+    [
+      {
+        param_key: "serviceId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "subserviceId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "day",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
   getWorkerForBook
 );
 
@@ -378,12 +384,12 @@ router.get(
       },
       {
         param_key: "page",
-        required: true,
+        required: false,
         type: "string",
       },
       {
         param_key: "limit",
-        required: true,
+        required: false,
         type: "string",
       },
     ],

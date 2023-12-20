@@ -810,6 +810,7 @@ export const businessByService = async (req, res, next) => {
         { type: "business" },
         { "businessData.isActive": true },
         { "businessData.services.service": service },
+        { "businessData.services.isActive": true },
       ],
     };
     const options = {

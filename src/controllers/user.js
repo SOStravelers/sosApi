@@ -41,7 +41,7 @@ export const findUserToken = async (req, res, next) => {
   const userId = req.user._id.toString();
   const user = await User.findOne({ _id: userId })
     .select(
-      "type isActive username email rating img personalData security workerData.isMyServicesOk workerData.isAboutmeOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk wokerData.isActive"
+      "type isActive username businessData email rating img personalData security workerData.isMyServicesOk workerData.isAboutmeOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk wokerData.isActive"
     )
     .populate({
       path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
