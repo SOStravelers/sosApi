@@ -332,7 +332,7 @@ router.post(
         type: "object",
       },
       {
-        param_key: "startTime",
+        param_key: "endTime",
         required: true,
         type: "object",
       },
