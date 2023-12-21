@@ -32,6 +32,7 @@ import {
   findWorkerMainFlow,
   getServicesBusiness,
   getServicesWorker,
+  getById,
 } from "../controllers/user.js";
 
 //get users by type and isActive
@@ -367,4 +368,20 @@ router.get("/business/services", getServicesBusiness);
 
 //Para obtener todos los workers
 router.get("/allworkers", findWorkerMainFlow);
+
+router.get(
+  "/user/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getById
+);
+
 export default router;

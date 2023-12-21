@@ -116,16 +116,18 @@ export const getById = async (req, res, next) => {
   global.logger.info("---GET USER BY ID---");
   try {
     const user = await User.findOne({ _id: req.params.id })
-      .select(
-        "about email img language personalData username workerData _id security.hasPassword"
-      )
+      .select("  img  personalData  workerData.services _id ")
       .populate({
         path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
         model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
       })
       .populate({
         path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
-        model: "SubServices", // Modelo de "SubServices"
+        select: "name imgUrl duration price ",
+        model: "Subservice", // Modelo de "SubServices"
+        match: { isActive: true }, // Solo selecciona los subservicios activos
       });
     if (!user) {
       throw createError(404, "User not found");
