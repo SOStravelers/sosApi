@@ -4,6 +4,16 @@ import {
   getById,
   getBookings,
   updateOne,
+  getDayClientId,
+  getMonthClientId,
+  getAllClientsId,
+  getAllworkersId,
+  getDayWorkers,
+  getDayBusiness,
+  getAllBusiness,
+  getYearBusiness,
+  getMonthBusiness
+
 } from "../controllers/booking.js";
 import validateParams from "../middleware/validate.js";
 
@@ -24,6 +34,11 @@ router.post(
       //   type: "string",
       // },
       {
+        param_key: "businessUser",
+        required: true,
+        type: "string",
+      },
+      {
         param_key: "workerUser",
         required: true,
         type: "string",
@@ -33,7 +48,11 @@ router.post(
         required: true,
         type: "string",
       },
-
+      {
+        param_key: "creatorUser",
+        required: true,
+        type: "string",
+      },
       {
         param_key: "startTime",
         required: true,
@@ -99,5 +118,232 @@ router.put(
   ),
   updateOne
 );
+
+// get day
+router.get("/client/day",
+
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getDayClientId
+)
+
+/* get month */
+router.get("/client/month",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+  getMonthClientId
+)
+
+/* get all clients */
+router.get("/clients/allclients",
+  validateParams(
+    [
+
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "params"
+
+  ),
+  getAllClientsId
+)
+
+/* get workers */
+router.get("/worker/day",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+
+    ],
+    "query"
+  ),
+  getDayWorkers
+)
+
+/* get allworkers  */
+router.get("/worker/allworkers",
+  validateParams(
+    [
+
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "params"
+
+  ),
+  getAllworkersId)
+
+/* get specific place */
+router.get("/business/day",
+
+  validateParams(
+    [
+      {
+        param_key: "date_start",
+        required: true,
+        type: "string",
+      },
+
+      {
+        param_key: "date_end",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+
+  getDayBusiness
+
+)
+
+/* get all business */
+router.get("/business/allbusiness",
+  validateParams(
+    [
+
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getAllBusiness
+)
+
+/* get year business */
+router.get("/business/year",
+
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getYearBusiness
+)
+
+/* get month business */
+router.get("/business/month",
+
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getMonthBusiness
+)
 
 export default router;
