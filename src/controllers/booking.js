@@ -7,13 +7,12 @@ export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW BOOKING---");
   try {
     const bookingData = req.body;
+    const email = req.body.email;
     let booking = new Booking(bookingData);
-    const newBooking = await booking.save();
-    return res.status(201).json({ booking: newBooking, msg: "new Document" });
     let query = {
       $and: [
         {
-          location: booking.location,
+          businessUser: booking.location,
         },
         {
           subService: booking.subService,
@@ -24,6 +23,9 @@ export const create = async (req, res, next) => {
         {
           startTime: booking.startTime,
         },
+        {
+          endTime: booking.startTime,
+        },
       ],
     };
     let exists = await Booking.findOne(query, {}).exec();
@@ -31,8 +33,8 @@ export const create = async (req, res, next) => {
       throw createError(409, "document already exists");
     } else {
       const newBooking = await booking.save();
-      if (emailData) sendEmailPaymentConfirmation(emailData);
-      res.status(201).json({ booking: newBooking, msg: "new Document" });
+      if (email) sendEmailPaymentConfirmation(email);
+      return res.status(201).json({ booking: newBooking, msg: "new Document" });
     }
   } catch (err) {
     next(err);
