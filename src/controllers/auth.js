@@ -919,6 +919,45 @@ export const businessByService = async (req, res, next) => {
   }
 };
 
+export const getRandomUsers = async (req, res, next) => {
+  try {
+    // Obtén todos los IDs de usuario
+    const userIds = await User.find({
+      type: "worker",
+      isActive: true,
+      "workerData.isActive": true,
+    }).select("_id");
+
+    // Selecciona aleatoriamente dos IDs
+    const randomIds = [];
+    for (let i = 0; i < 2; i++) {
+      const randomIndex = Math.floor(Math.random() * userIds.length);
+      randomIds.push(userIds[randomIndex]);
+      userIds.splice(randomIndex, 1); // Elimina el ID seleccionado para evitar duplicados
+    }
+
+    // Busca los usuarios con los IDs seleccionados y pobla los campos necesarios
+    const randomUsers = await User.find({ _id: { $in: randomIds } })
+      .select("_id personalData workerData.services img.imgUrl")
+      .populate([
+        {
+          path: "workerData.services.id",
+          select: "name",
+        },
+        {
+          path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
+          select: "name imgUrl duration price ",
+          model: "Subservice", // Modelo de "SubServices"
+          match: { isActive: true }, // Solo selecciona los subservicios activos
+        },
+      ]);
+
+    res.send(randomUsers);
+  } catch (err) {
+    next(err);
+  }
+};
+
 function stripDate(date) {
   return new Date(
     1970,

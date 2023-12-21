@@ -20,6 +20,7 @@ import {
   getWorkerId,
   loginEmailBusiness,
   getWorkerForBook,
+  getRandomUsers,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -397,4 +398,6 @@ router.get(
   ),
   businessByService
 );
+//get business by service
+router.get("/random/users", getRandomUsers);
 export default router;
