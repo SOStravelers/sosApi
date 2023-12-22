@@ -750,6 +750,7 @@ export const workerByTimeAndService = async (req, res, next) => {
   });
   try {
     const { startTime, endTime, subservice, page, limit } = req.body;
+    //User
     const query = {
       $and: [
         { isActive: true },
@@ -767,118 +768,161 @@ export const workerByTimeAndService = async (req, res, next) => {
       limit: limit || 100,
       sort: { updatedAt: -1 },
     };
-
-    const users = await User.paginate(query, options);
+    let users = await User.paginate(query, options);
     console.log("usuarios encontrados", users.docs.length);
+    let workers = users.docs;
+    const scheduleQuery = {
+      isActive: true,
+      user: { $in: workers.map((worker) => worker._id.toString()) },
+    };
+    //schedule
+    const schedules = await Schedule.find(scheduleQuery);
+    if (!schedules) {
+      console.log("no hay calendarios");
+      workers = [];
+      return res.send({ workers });
+    }
     const bookingStartTime = new Date(startTime.isoTime);
     const bookingEndTime = new Date(endTime.isoTime);
-
-    let allUsers = users.docs;
+    //Hollidays
+    const holidays = await Holiday.find(scheduleQuery);
+    //booking
+    const bookingQuery = {
+      workerUser: { $in: workers.map((worker) => worker._id.toString()) },
+      subservice: subservice,
+      $or: [
+        {
+          "startTime.isoTime": { $gte: bookingStartTime },
+          "endTime.isoTime": { $lte: bookingEndTime },
+        },
+        {
+          "startTime.isoTime": { $lt: bookingStartTime },
+          "endTime.isoTime": { $gt: bookingStartTime, $lte: bookingEndTime },
+        },
+        {
+          "startTime.isoTime": {
+            $gte: bookingStartTime,
+            $lt: bookingEndTime,
+          },
+          "endTime.isoTime": { $gt: bookingEndTime },
+        },
+        {
+          "startTime.isoTime": { $lt: bookingStartTime },
+          "endTime.isoTime": { $gt: bookingEndTime },
+        },
+      ],
+    };
     let bookings = [];
-    for (let user of users.docs) {
-      console.log("user", user.email);
-      console.log("buscando bookings", user._id.toString(), subservice);
-      bookings = await Booking.find({
-        workerUser: user._id.toString(),
-        subservice: subservice,
-        $or: [
-          {
-            "startTime.isoTime": { $gte: bookingStartTime },
-            "endTime.isoTime": { $lte: bookingEndTime },
-          },
-          {
-            "startTime.isoTime": { $lt: bookingStartTime },
-            "endTime.isoTime": { $gt: bookingStartTime, $lte: bookingEndTime },
-          },
-          {
-            "startTime.isoTime": {
-              $gte: bookingStartTime,
-              $lt: bookingEndTime,
-            },
-            "endTime.isoTime": { $gt: bookingEndTime },
-          },
-          {
-            "startTime.isoTime": { $lt: bookingStartTime },
-            "endTime.isoTime": { $gt: bookingEndTime },
-          },
-        ],
-      });
-      if (bookings.length > 0) {
-        console.log("hay bookings", bookings.length);
-        allUsers = allUsers.filter(
-          (item) => item._id.toString() != user._id.toString()
+    bookings = await Booking.find(bookingQuery);
+    console.log("bookings encontrados", bookings.length);
+    for (let worker of workers) {
+      console.log("---worker--------------", worker.email);
+      //aqui va la validacion de hollidays
+      const indexHolliday = holidays.findIndex(
+        (holliday) => holliday.user === worker._id.toString()
+      );
+      if (indexHolliday >= 0) {
+        console.log("hay vacaciones");
+        const holliday = holidays[indexHolliday];
+        console.log(holliday);
+        const hollidayIndex = holliday.range.findIndex(
+          (time) =>
+            new Date(time.from).getTime() <= bookingStartTime.getTime() &&
+            new Date(time.to).getTime() >= bookingEndTime.getTime()
         );
-      } else {
-        console.log("no hay booking, buscando calendario");
-        const schedule = await Schedule.findOne({ user: user._id.toString() });
-        if (schedule) {
-          console.log("hay calendario");
-          const scheduleIndex = schedule.schedules.findIndex(
-            (time) => time.isActive && time.day === bookingStartTime.getUTCDay()
+        if (hollidayIndex >= 0) {
+          console.log("hay vacaciones en el rango");
+          workers = workers.filter(
+            (item) => item._id.toString() != worker._id.toString()
           );
-          if (scheduleIndex >= 0) {
-            console.log("dia calendario activado");
-            const intervals = schedule.schedules[scheduleIndex].intervals;
-            console.log("analizando intervalos");
-
-            let contador = 0;
-            for (let interval of intervals) {
-              console.log(intervals, bookingStartTime, bookingEndTime);
-              const intervalStartTime = stripDate(interval.startTimeIso);
-              const intervalEndTime = stripDate(interval.endTimeIso);
-              const strippedBookingStartTime = stripDate(bookingStartTime);
-              const strippedBookingEndTime = stripDate(bookingEndTime);
-              console.log(
-                intervalStartTime.getTime(),
-                intervalEndTime.getTime(),
-                strippedBookingStartTime.getTime(),
-                strippedBookingEndTime.getTime()
-              );
-              console.log(
-                intervalStartTime.getTime() <=
-                  strippedBookingStartTime.getTime()
-              );
-              console.log(
-                intervalEndTime.getTime() >= strippedBookingEndTime.getTime()
-              );
-              const intervalIndex = intervals.findIndex(
-                (time) =>
-                  stripDate(time.startTimeIso).getTime() <=
-                    strippedBookingStartTime.getTime() &&
-                  stripDate(time.endTimeIso).getTime() >=
-                    strippedBookingEndTime.getTime()
-              );
-              if (
-                intervalIndex >= 0 &&
-                schedule.schedules[scheduleIndex].isActive
-              ) {
-                console.log("intervalo disponible");
-                continue;
-              } else {
-                console.log("intervalo no disponible");
-                contador++;
-              }
+          continue;
+        }
+      }
+      console.log("no hay problemas de vacaciones, vamos a ver si hay booking");
+      const indexBooking = bookings.findIndex(
+        (booking) => booking.workerUser === worker._id.toString()
+      );
+      if (indexBooking >= 0) {
+        console.log("hay booking");
+        workers = workers.filter(
+          (item) => item._id.toString() != worker._id.toString()
+        );
+        continue;
+      }
+      console.log("no hay problema de booking, analizando calendario");
+      const indexSchedule = schedules.findIndex(
+        (schedule) => schedule.user === worker._id.toString()
+      );
+      if (indexSchedule >= 0) {
+        console.log("hay calendario");
+        const schedule = schedules[indexSchedule];
+        console.log("hay calendario");
+        const scheduleIndex = schedule.schedules.findIndex(
+          (time) => time.isActive && time.day === bookingStartTime.getUTCDay()
+        );
+        if (scheduleIndex >= 0) {
+          console.log("dia calendario activado");
+          const intervals = schedule.schedules[scheduleIndex].intervals;
+          console.log("analizando intervalos");
+          let contador = 0;
+          for (let interval of intervals) {
+            console.log(intervals, bookingStartTime, bookingEndTime);
+            const intervalStartTime = stripDate(interval.startTimeIso);
+            const intervalEndTime = stripDate(interval.endTimeIso);
+            const strippedBookingStartTime = stripDate(bookingStartTime);
+            const strippedBookingEndTime = stripDate(bookingEndTime);
+            console.log(
+              intervalStartTime.getTime(),
+              intervalEndTime.getTime(),
+              strippedBookingStartTime.getTime(),
+              strippedBookingEndTime.getTime()
+            );
+            console.log(
+              intervalStartTime.getTime() <= strippedBookingStartTime.getTime()
+            );
+            console.log(
+              intervalEndTime.getTime() >= strippedBookingEndTime.getTime()
+            );
+            const intervalIndex = intervals.findIndex(
+              (time) =>
+                stripDate(time.startTimeIso).getTime() <=
+                  strippedBookingStartTime.getTime() &&
+                stripDate(time.endTimeIso).getTime() >=
+                  strippedBookingEndTime.getTime()
+            );
+            if (
+              intervalIndex >= 0 &&
+              schedule.schedules[scheduleIndex].isActive
+            ) {
+              console.log("intervalo disponible");
+              continue;
+            } else {
+              console.log("intervalo no disponible");
+              contador++;
             }
-            if (contador == intervals.length) {
-              allUsers = allUsers.filter(
-                (item) => item._id.toString() != user._id.toString()
-              );
-            }
-          } else {
-            console.log("dia esta apagado");
-            allUsers = allUsers.filter(
-              (item) => item._id.toString() != user._id.toString()
+          }
+          if (contador == intervals.length) {
+            workers = workers.filter(
+              (item) => item._id.toString() != worker._id.toString()
             );
           }
         } else {
-          console.log("no tiene schedule");
-          allUsers = allUsers.filter(
-            (item) => item._id.toString() != user._id.toString()
+          console.log("dia esta apagado");
+          workers = workers.filter(
+            (item) => item._id.toString() != worker._id.toString()
           );
         }
+      } else {
+        console.log("no tiene schedule");
+        workers = workers.filter(
+          (item) => item._id.toString() != worker._id.toString()
+        );
       }
+
+      console.log("----------------------");
     }
-    return res.send({ allUsers, users, bookings });
+
+    return res.send({ workers });
   } catch (err) {
     next(err);
   }
@@ -921,12 +965,16 @@ export const businessByService = async (req, res, next) => {
 
 export const getRandomUsers = async (req, res, next) => {
   try {
+    global.logger.info({
+      message: "--- GET RANDOM USERS ---",
+    });
     // Obtén todos los IDs de usuario
     const userIds = await User.find({
       type: "worker",
       isActive: true,
       "workerData.isActive": true,
     }).select("_id");
+    console.log(userIds.length);
 
     // Selecciona aleatoriamente dos IDs
     const randomIds = [];

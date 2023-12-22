@@ -12,7 +12,7 @@ const dbConfig = {
   }`,
 };
 
-const env = process.env.NODE_ENV || "";
+const env = process.env.NODE_ENV || "dev";
 console.log(`Conectando... DB:${process.env.NODE_ENV}`);
 mongoose.set("strictQuery", false);
 mongoose.connect(dbConfig[env], {
