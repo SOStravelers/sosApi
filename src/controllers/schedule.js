@@ -396,7 +396,7 @@ export const businessSchedule = async (req, res, next) => {
             ) {
               bookingExists = true;
               console.log("hay booking de worker");
-              break;
+              continue;
             }
           }
 
