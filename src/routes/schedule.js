@@ -82,7 +82,7 @@ router.post(
 );
 //Obtener calendario flujo principal
 router.get(
-  "/business/:businessId/service/:serviceId/subservice/:subserviceId/worker/:workerId",
+  "/schedule/business",
   validateParams(
     [
       {
@@ -100,8 +100,13 @@ router.get(
         required: true,
         type: "string",
       },
+      {
+        param_key: "workerId",
+        required: false,
+        type: "string",
+      },
     ],
-    "params"
+    "query"
   ),
   businessSchedule
 );

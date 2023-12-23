@@ -206,7 +206,7 @@ export const activateMany = async (req, res, next) => {
 // Horario de negocio por servicio
 export const businessSchedule = async (req, res, next) => {
   global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE MAIN FLOW---");
-  const { businessId, serviceId, subserviceId, workerId } = req.params;
+  const { businessId, serviceId, subserviceId, workerId } = req.query;
   //----variables para bucles de dias-----
   const today = new Date(); // dia de hoy
   let dayContinue = 0; // variable para saber si saltar dias
