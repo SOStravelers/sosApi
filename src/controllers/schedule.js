@@ -262,11 +262,11 @@ export const businessSchedule = async (req, res, next) => {
     var bookingWorker = [];
     if (workerId) {
       bookingWorker = await Booking.find({
-        service: serviceId,
         workerUser: workerId,
         "date.isoDate": { $gte: startDate, $lt: endDate },
       });
     }
+    console.log("todos los booking worker", bookingWorker.length);
 
     while (dayContinue < untilDays) {
       const dateDay = new Date();
@@ -375,9 +375,10 @@ export const businessSchedule = async (req, res, next) => {
           const bookingWorkerDay = bookingWorker.filter(
             (booking) => booking.date.stringData === dayString
           );
-          console.log("bookings worker", bookingWorkerDay.length);
+          console.log("bookings workerSSS", bookingWorkerDay.length);
           console.log(hour, endHour);
           if (bookingWorkerDay.length > 0) {
+            console.log("ENTRANDOOOOO");
             const bookingWorkerStartHour =
               bookingWorkerDay[0].startTime.isoTime;
             const bookingWorkerEndHour = bookingWorkerDay[0].endTime.isoTime;
