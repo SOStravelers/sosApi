@@ -206,8 +206,7 @@ export const activateMany = async (req, res, next) => {
 // Horario de negocio por servicio
 export const businessSchedule = async (req, res, next) => {
   global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE MAIN FLOW---");
-  const { businessId, serviceId, subserviceId } = req.params;
-
+  const { businessId, serviceId, subserviceId, workerId } = req.params;
   //----variables para bucles de dias-----
   const today = new Date(); // dia de hoy
   let dayContinue = 0; // variable para saber si saltar dias
@@ -250,7 +249,7 @@ export const businessSchedule = async (req, res, next) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 15); // Add 15 days
     endDate.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00.000
-    console.log("wena", startDate, endDate, subserviceId, businessId);
+    console.log("wena", startDate, endDate, subserviceId, businessId, workerId);
     const bookings = await Booking.find({
       service: serviceId,
       businessUser: businessId,
@@ -258,6 +257,16 @@ export const businessSchedule = async (req, res, next) => {
       "date.isoDate": { $gte: startDate, $lt: endDate },
     });
     console.log("bookings", bookings.length);
+
+    //Busca bookings de un worker en especifico solo si viene la id
+    var bookingWorker = [];
+    if (workerId) {
+      bookingWorker = await Booking.find({
+        service: serviceId,
+        workerUser: workerId,
+        "date.isoDate": { $gte: startDate, $lt: endDate },
+      });
+    }
 
     while (dayContinue < untilDays) {
       const dateDay = new Date();
@@ -289,6 +298,7 @@ export const businessSchedule = async (req, res, next) => {
         ++nextDay;
         continue;
       }
+      console.log("buena", dateDay, time.intervals.length);
       for (const interval of time.intervals) {
         const startHourDate = cambioHora(
           new Date(interval.startTimeIso),
@@ -361,6 +371,35 @@ export const businessSchedule = async (req, res, next) => {
           const date = new Date(hour);
           const onlyHour = date.getUTCHours();
 
+          const dayString = dateDay.toISOString().slice(0, 10);
+          const bookingWorkerDay = bookingWorker.filter(
+            (booking) => booking.date.stringData === dayString
+          );
+          console.log("bookings worker", bookingWorkerDay.length);
+          console.log(hour, endHour);
+          if (bookingWorkerDay.length > 0) {
+            const bookingWorkerStartHour =
+              bookingWorkerDay[0].startTime.isoTime;
+            const bookingWorkerEndHour = bookingWorkerDay[0].endTime.isoTime;
+            const strippedDate1 = stripTime(bookingWorkerStartHour);
+            const strippedDate2 = stripTime(hour);
+            if (
+              ((stripDate(bookingWorkerStartHour) >= stripDate(hour) &&
+                stripDate(bookingWorkerStartHour) < stripDate(endHour)) ||
+                (stripDate(bookingWorkerEndHour) > stripDate(hour) &&
+                  stripDate(bookingWorkerEndHour) <= stripDate(endHour)) ||
+                (stripDate(bookingWorkerStartHour) <= stripDate(hour) &&
+                  stripDate(bookingWorkerEndHour) >= stripDate(endHour)) ||
+                (stripDate(bookingWorkerStartHour) >= stripDate(hour) &&
+                  stripDate(bookingWorkerEndHour) <= stripDate(endHour))) &&
+              strippedDate1.getTime() === strippedDate2.getTime()
+            ) {
+              bookingExists = true;
+              console.log("hay booking de worker");
+              break;
+            }
+          }
+
           //condicion final: solo se agregan si:
           //1. no existe un booking en ese horario
           //2. la hora final es menor o igual a la hora maxima
@@ -391,67 +430,6 @@ export const businessSchedule = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-//Obtener horarios por hotel y si estan activos
-export const scheduleBusinessbyService = async (req, res, next) => {
-  global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE---");
-  let body = {};
-  Object.assign(body, req.query);
-  console.log(body);
-  let horario = await Schedule.findOne({
-    owner: body.id,
-    service: body.service,
-    isActive: true,
-  });
-  let subService = await Subservice.findOne({
-    _id: body.subService,
-    isActive: true,
-  });
-  console.log("duracion servicio", subService.duration);
-  // Obtén la fecha y hora actual en GMT-3 (hora de Brasilia, Brasil)
-  var fechaActualBrasil = new Date().toLocaleString("en-US", {
-    timeZone: "America/Sao_Paulo",
-  });
-  // Convierte la fecha y hora actual en una fecha de JavaScript
-  var fechaHoraBrasil = new Date(fechaActualBrasil);
-  console.log("BRASIL", fechaHoraBrasil);
-  let fechaActual = fechaHoraBrasil;
-  let horas = [];
-  for (var i = 1; i <= 14; i++) {
-    let date = fechaActual;
-    let day = fechaActual.getDay();
-    //console.log("EL DIA", day, date);
-    var scheduleNew = [];
-    for (let intervalo of horario.schedules[day].intervals) {
-      // console.log("inicio", intervalo.startTime, intervalo.endTime);
-      const startTimeMinutes = convertirHoraAMinutos(intervalo.startTime);
-      const endTimeMinutes = convertirHoraAMinutos(intervalo.endTime);
-      // console.log("min", startTimeMinutes, endTimeMinutes);
-      let currentTimeMinutes = startTimeMinutes;
-      const incrementoMinutos = 60; // Cambia esto para definir el incremento deseado
-
-      while (currentTimeMinutes < endTimeMinutes) {
-        const currentTime = convertirMinutosAHora(currentTimeMinutes);
-
-        //-----Aqui vendria parte de ver si existen bookings en ese horario
-        //console.log(currentTime);
-        scheduleNew.push(currentTime);
-
-        currentTimeMinutes += incrementoMinutos;
-      }
-    }
-    let fecha = date.toISOString().split("T")[0];
-    let enviar = {
-      day: day,
-      horas: fecha,
-      intervals: scheduleNew,
-    };
-    horas.push(enviar);
-    fechaActual.setDate(fechaActual.getDate() + 1);
-  }
-
-  res.send({ horas });
 };
 
 const cambioHora = (hour, dateDay) => {

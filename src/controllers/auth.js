@@ -743,14 +743,16 @@ export const getWorkerForBook = async (req, res, next) => {
 };
 //Por trabajar
 
-//Entrega trabajadores segun hora solicitada y subservicio solicitado
+//Entrega trabajadores segun hora solicitada y subservicio solicitado, vacaciones, calendario, booking
 export const workerByTimeAndService = async (req, res, next) => {
   global.logger.info({
     message: "--- GET WORKERS BY TIME AND SERVICE ---",
   });
   try {
     const { startTime, endTime, subservice, page, limit } = req.body;
-    //User
+    const bookingStartTime = new Date(startTime.isoTime);
+    const bookingEndTime = new Date(endTime.isoTime);
+    //Users
     const query = {
       $and: [
         { isActive: true },
@@ -771,19 +773,17 @@ export const workerByTimeAndService = async (req, res, next) => {
     let users = await User.paginate(query, options);
     console.log("usuarios encontrados", users.docs.length);
     let workers = users.docs;
+    //schedules
     const scheduleQuery = {
       isActive: true,
       user: { $in: workers.map((worker) => worker._id.toString()) },
     };
-    //schedule
     const schedules = await Schedule.find(scheduleQuery);
     if (!schedules) {
       console.log("no hay calendarios");
       workers = [];
       return res.send({ workers });
     }
-    const bookingStartTime = new Date(startTime.isoTime);
-    const bookingEndTime = new Date(endTime.isoTime);
     //Hollidays
     const holidays = await Holiday.find(scheduleQuery);
     //booking
@@ -905,30 +905,31 @@ export const workerByTimeAndService = async (req, res, next) => {
             workers = workers.filter(
               (item) => item._id.toString() != worker._id.toString()
             );
+            continue;
           }
         } else {
           console.log("dia esta apagado");
           workers = workers.filter(
             (item) => item._id.toString() != worker._id.toString()
           );
+          continue;
         }
       } else {
         console.log("no tiene schedule");
         workers = workers.filter(
           (item) => item._id.toString() != worker._id.toString()
         );
+        continue;
       }
-
       console.log("----------------------");
     }
-
-    return res.send({ workers });
+    return res.status(200).json({ workers });
   } catch (err) {
     next(err);
   }
 };
 
-//Entrega trabajadores segun hora solicitada y subservicio solicitado
+//Entrega hostels segun servicio solicitado y subservicio solicitado
 export const businessByService = async (req, res, next) => {
   console.log("--- GET BUSINESS BY SERVICE ---");
   try {

@@ -8,7 +8,6 @@ import {
   getById,
   updateOne,
   activateMany,
-  scheduleBusinessbyService,
   getByUser,
   addUpdateDefault,
   addOrUpdateBusiness,
@@ -83,7 +82,7 @@ router.post(
 );
 //Obtener calendario flujo principal
 router.get(
-  "/business/:businessId/service/:serviceId/subservice/:subserviceId",
+  "/business/:businessId/service/:serviceId/subservice/:subserviceId/worker/:workerId",
   validateParams(
     [
       {
@@ -111,25 +110,6 @@ router.get("/template", addUpdateDefault);
 
 router.get("/get", getByUser);
 
-router.get(
-  "/businessbyservice",
-  validateParams(
-    [
-      {
-        param_key: "service",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "id",
-        required: true,
-        type: "string",
-      },
-    ],
-    "query"
-  ),
-  scheduleBusinessbyService
-);
 router.get(
   "/:id",
   validateParams(
