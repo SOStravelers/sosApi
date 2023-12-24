@@ -33,7 +33,6 @@ function optionsBooking(page, limit) {
     sort: { updatedAt: -1 },
   };
 }
-
 //Crear booking
 export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW BOOKING---");

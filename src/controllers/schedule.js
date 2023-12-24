@@ -300,6 +300,7 @@ export const businessSchedule = async (req, res, next) => {
       }
       console.log("buena", dateDay, time.intervals.length);
       for (const interval of time.intervals) {
+        console.log(interval);
         const startHourDate = cambioHora(
           new Date(interval.startTimeIso),
           dateDay
