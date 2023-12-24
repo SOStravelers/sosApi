@@ -38,6 +38,7 @@ const bookingSchema = new Schema(
       },
       paymentId: { type: String, ref: "Payment" },
       price: { type: Number },
+      currency: { type: String, default: "BRL" },
     },
     duration: { type: Number },
     coverImg: { type: String, default: "" },
