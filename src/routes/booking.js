@@ -12,8 +12,7 @@ import {
   getDayBusiness,
   getAllBusiness,
   getYearBusiness,
-  getMonthBusiness
-
+  getMonthBusiness,
 } from "../controllers/booking.js";
 import validateParams from "../middleware/validate.js";
 
@@ -120,8 +119,8 @@ router.put(
 );
 
 // get day
-router.get("/client/day",
-
+router.get(
+  "/client/day",
   validateParams(
     [
       {
@@ -143,57 +142,11 @@ router.get("/client/day",
     "query"
   ),
   getDayClientId
-)
+);
 
 /* get month */
-router.get("/client/month",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-  getMonthClientId
-)
-
-/* get all clients */
-router.get("/clients/allclients",
-  validateParams(
-    [
-
-      {
-        param_key: "page",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
-        type: "string",
-      },
-    ],
-    "params"
-
-  ),
-  getAllClientsId
-)
-
-/* get workers */
-router.get("/worker/day",
+router.get(
+  "/client/month",
   validateParams(
     [
       {
@@ -211,18 +164,17 @@ router.get("/worker/day",
         required: false,
         type: "string",
       },
-
     ],
     "query"
   ),
-  getDayWorkers
-)
+  getMonthClientId
+);
 
-/* get allworkers  */
-router.get("/worker/allworkers",
+/* get all clients */
+router.get(
+  "/clients/allclients",
   validateParams(
     [
-
       {
         param_key: "page",
         required: false,
@@ -235,12 +187,60 @@ router.get("/worker/allworkers",
       },
     ],
     "params"
-
   ),
-  getAllworkersId)
+  getAllClientsId
+);
+
+/* get workers */
+router.get(
+  "/worker/day",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getDayWorkers
+);
+
+/* get allworkers  */
+router.get(
+  "/worker/allworkers",
+  validateParams(
+    [
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getAllworkersId
+);
 
 /* get specific place */
-router.get("/business/day",
+router.get(
+  "/business/day",
 
   validateParams(
     [
@@ -270,14 +270,13 @@ router.get("/business/day",
   ),
 
   getDayBusiness
-
-)
+);
 
 /* get all business */
-router.get("/business/allbusiness",
+router.get(
+  "/business/allbusiness",
   validateParams(
     [
-
       {
         param_key: "page",
         required: false,
@@ -292,10 +291,11 @@ router.get("/business/allbusiness",
     "query"
   ),
   getAllBusiness
-)
+);
 
 /* get year business */
-router.get("/business/year",
+router.get(
+  "/business/year",
 
   validateParams(
     [
@@ -318,10 +318,11 @@ router.get("/business/year",
     "query"
   ),
   getYearBusiness
-)
+);
 
 /* get month business */
-router.get("/business/month",
+router.get(
+  "/business/month",
 
   validateParams(
     [
@@ -344,6 +345,6 @@ router.get("/business/month",
     "query"
   ),
   getMonthBusiness
-)
+);
 
 export default router;

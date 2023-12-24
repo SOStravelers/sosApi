@@ -129,12 +129,13 @@ export const registerEmail = async (req, res, next) => {
     }
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
-      "about email img language personalData type username workerData _id security.hasPassword"
+      "about email type img language personalData type username workerData _id security.hasPassword"
     );
     console.log("el item", newUser);
     let userToCreateToken = {
       _id: newUser._id,
       username: newUser.username,
+      type: newUser.type,
     };
     let userRefresh = {
       _id: newUser._id,
@@ -186,6 +187,7 @@ export const loginEmail = async (req, res, next) => {
     let userToCreateToken = {
       _id: updatedUser._id,
       username: updatedUser.username,
+      type: updatedUser.type,
     };
     await resendEmail();
     res.send({
@@ -234,6 +236,7 @@ export const loginEmailBusiness = async (req, res, next) => {
     let userToCreateToken = {
       _id: updatedUser._id,
       username: updatedUser.username,
+      type: updatedUser.type,
     };
 
     res.send({
@@ -280,7 +283,7 @@ export const loginGoogle = async (req, res, next) => {
     if (newValue) {
       await user.save();
       const newUser = await User.findOne({ email: user.email }).select(
-        "about email img language personalData type username workerData _id security.hasPassword"
+        "about email type img language personalData type username workerData _id security.hasPassword"
       );
       let userToCreateToken = {
         _id: newUser._id,
@@ -307,6 +310,7 @@ export const loginGoogle = async (req, res, next) => {
       let userToCreateToken = {
         _id: newUser._id,
         username: newUser.username,
+        type: newUser.type,
       };
       await createCustomerId(newUser._id);
       res.status(200).json({
@@ -346,6 +350,7 @@ export const createPassword = async (req, res, next) => {
     let userToCreateToken = {
       _id: updatedUser._id,
       username: updatedUser.username,
+      type: updatedUser.type,
     };
     let userRefresh = {
       _id: updatedUser._id,

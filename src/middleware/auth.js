@@ -130,7 +130,7 @@ export const isAuth = async (req, res, next) => {
     let authUser;
     try {
       authUser = await User.findOne({ _id: decoded._id })
-        .select("isActive security isValidate name username email imgUrl")
+        .select("isActive type security isValidate name username email imgUrl")
         .exec();
       authUser.id = authUser._id.toString();
       req.user = authUser;
