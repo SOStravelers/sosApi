@@ -111,7 +111,7 @@ const userSchema = new Schema(
     },
     businessData: {
       isActive: { type: Boolean, default: false },
-      category: { type: Number, enum: [1, 2, 3] },
+      category: { type: String, enum: ["category1", "category2", "category3"] },
       location: {
         _id: false,
         country: { type: String },

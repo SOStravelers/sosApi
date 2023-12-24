@@ -2,7 +2,15 @@ import Router from "express";
 const router = Router();
 import validateParams from "../middleware/validate.js";
 
-import { create, getById, updateOne, activateMany,getByService, getAll} from "../controllers/subservice.js";
+import {
+  create,
+  getById,
+  updateOne,
+  activateMany,
+  getByService,
+  getAll,
+  getPrice,
+} from "../controllers/subservice.js";
 
 //Create subService
 router.post(
@@ -64,7 +72,7 @@ router.get(
   ),
   getById
 );
-//Get all services 
+//Get all services
 router.get(
   "/get/all",
   validateParams(
@@ -91,32 +99,52 @@ router.get(
 );
 //update subservice
 router.put(
-    "/:id",
-    validateParams(
-      [
-        {
-          param_key: "id",
-          required: true,
-          type: "string",
-        },
-      ],
-      "params"
-    ),
-    updateOne
+  "/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  updateOne
 );
 router.put(
-    "/active/many",
-    validateParams(
-      [
-        {
-          param_key: "services",
-          required: true,
-          type: "array",
-        },
-      ],
-      "body"
-    ),
-    activateMany
+  "/active/many",
+  validateParams(
+    [
+      {
+        param_key: "services",
+        required: true,
+        type: "array",
+      },
+    ],
+    "body"
+  ),
+  activateMany
+);
+//Obtener los precios actuaales
+router.get(
+  "/prices/business",
+  validateParams(
+    [
+      {
+        param_key: "subservice",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "businessUser",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getPrice
 );
 
 export default router;

@@ -20,6 +20,12 @@ const subserviceSchema = new Schema(
       },
       updatedBy: { type: String, ref: "User" },
     },
+    price: {
+      _id: false,
+      category1: { type: Number },
+      category2: { type: Number },
+      category3: { type: Number },
+    },
     // price: {
     //   value: { type: String, default: "$ 0" },
     //   lastValue: { type: String, default: "$ 0" },

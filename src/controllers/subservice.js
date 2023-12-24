@@ -1,5 +1,7 @@
 import Subservice from "../models/subservice.js";
+import User from "../models/user.js";
 import { createError } from "../config/error.js";
+import { botcurrency } from "../services/botcurrency.js";
 
 //Crear subServicio
 export const create = async (req, res, next) => {
@@ -94,6 +96,26 @@ export const activateMany = async (req, res, next) => {
       { isActive: req.body.isActive ? req.body.isActive : true }
     ).exec();
     res.status(200).json(subServices);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getPrice = async (req, res, next) => {
+  global.logger.info("---GET PRICE SUBSERVICE---");
+  console.log("query", req.query);
+  try {
+    const subservice = await Subservice.findById(req.query.subservice)
+      .select("price")
+      .exec();
+    const businessUser = await User.findById(req.query.businessUser)
+      .select("businessData")
+      .exec();
+    const price = subservice.price[businessUser.businessData.category] || 0;
+    const currencyBase = "BRL";
+    const othersCurrency = await botcurrency(price, currencyBase);
+    console.log(othersCurrency);
+    res.status(200).json(othersCurrency);
   } catch (err) {
     next(err);
   }
