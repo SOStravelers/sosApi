@@ -111,6 +111,7 @@ export const getPrice = async (req, res, next) => {
     const businessUser = await User.findById(req.query.businessUser)
       .select("businessData")
       .exec();
+    console.log("perro", businessUser.businessData.category);
     const price = subservice.price[businessUser.businessData.category] || 0;
     const currencyBase = "BRL";
     const othersCurrency = await botcurrency(price, currencyBase);
