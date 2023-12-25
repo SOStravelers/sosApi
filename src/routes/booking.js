@@ -7,12 +7,13 @@ import {
   getDayClientId,
   getMonthClientId,
   getAllClientsId,
-  getAllworkersId,
+  getAllworkers,
   getDayWorkers,
-  getDayBusiness,
+  getTimeBusiness,
   getAllBusiness,
   getYearBusiness,
-  getMonthBusiness,
+  getMonthBusiness
+
 } from "../controllers/booking.js";
 import validateParams from "../middleware/validate.js";
 
@@ -119,8 +120,7 @@ router.put(
 );
 
 // get day
-router.get(
-  "/client/day",
+router.get("/client/day",
   validateParams(
     [
       {
@@ -142,37 +142,35 @@ router.get(
     "query"
   ),
   getDayClientId
-);
+)
 
 /* get month */
-router.get(
-  "/client/month",
-  validateParams(
-    [
-      {
-        param_key: "date",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "page",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
-        type: "string",
-      },
-    ],
-    "query"
-  ),
+router.get("/client/month",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
   getMonthClientId
-);
+)
 
 /* get all clients */
-router.get(
-  "/clients/allclients",
+router.get("/clients/allclients",
   validateParams(
     [
       {
@@ -189,11 +187,10 @@ router.get(
     "params"
   ),
   getAllClientsId
-);
+)
 
 /* get workers */
-router.get(
-  "/worker/day",
+router.get("/worker/day",
   validateParams(
     [
       {
@@ -211,15 +208,15 @@ router.get(
         required: false,
         type: "string",
       },
+
     ],
     "query"
   ),
   getDayWorkers
-);
+)
 
 /* get allworkers  */
-router.get(
-  "/worker/allworkers",
+router.get("/worker/allworkers",
   validateParams(
     [
       {
@@ -235,13 +232,11 @@ router.get(
     ],
     "params"
   ),
-  getAllworkersId
-);
+  getAllworkers
+)
 
 /* get specific place */
-router.get(
-  "/business/day",
-
+router.get("/business/time",
   validateParams(
     [
       {
@@ -268,13 +263,11 @@ router.get(
     ],
     "query"
   ),
-
-  getDayBusiness
-);
+  getTimeBusiness
+)
 
 /* get all business */
-router.get(
-  "/business/allbusiness",
+router.get("/business/allbusiness",
   validateParams(
     [
       {
@@ -291,12 +284,10 @@ router.get(
     "query"
   ),
   getAllBusiness
-);
+)
 
 /* get year business */
-router.get(
-  "/business/year",
-
+router.get("/business/year",
   validateParams(
     [
       {
@@ -318,12 +309,10 @@ router.get(
     "query"
   ),
   getYearBusiness
-);
+)
 
 /* get month business */
-router.get(
-  "/business/month",
-
+router.get("/business/month",
   validateParams(
     [
       {
@@ -345,6 +334,6 @@ router.get(
     "query"
   ),
   getMonthBusiness
-);
+)
 
 export default router;
