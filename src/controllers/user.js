@@ -41,7 +41,7 @@ export const findUserToken = async (req, res, next) => {
   const userId = req.user._id.toString();
   const user = await User.findOne({ _id: userId })
     .select(
-      "type isActive username businessData email rating img personalData security workerData.isMyServicesOk workerData.isAboutmeOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk workerData.isActive"
+      "type isActive username businessData email rating img personalData security workerData.isActive workerData.isMyServicesOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk workerData.isAboutmeOk"
     )
     .populate({
       path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
@@ -487,18 +487,38 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
-export const inactiveMode = async (req, res, next) => {
-  global.logger.info("---INACTIVE MODE---");
+export const readyToWork = async (req, res, next) => {
+  global.logger.info("---READY TO WORK---");
   try {
-    const isActive = req.body.isActive;
+    const {
+      isActive,
+      isAboutmeOk,
+      isMyServicesOk,
+      isMySchedulesOk,
+      isMyWorkplacesOk,
+    } = req.body;
     const id = req.user._id.toString();
+
+    const updateFields = {
+      "workerData.isActive": isActive,
+      "workerData.isAboutmeOk": isAboutmeOk,
+      "workerData.isMyServicesOk": isMyServicesOk,
+      "workerData.isMySchedulesOk": isMySchedulesOk,
+      "workerData.isMyWorkplacesOk": isMyWorkplacesOk,
+    };
+
+    // Filtra solo los campos que tienen un valor definido (no son undefined)
+    const filteredUpdateFields = Object.fromEntries(
+      Object.entries(updateFields).filter(([key, value]) => value !== undefined)
+    );
     const updatedUser = await User.findOneAndUpdate(
       { _id: id },
-      {
-        isActive: isActive,
-      },
+      filteredUpdateFields,
       { new: true }
-    ).select("isActive isValidate security email personalData _id img");
+    ).select(
+      "workerData.isActive workerData.isAboutmeOk workerData.isMyServicesOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk"
+    );
+
     res.status(200).json(updatedUser);
   } catch (err) {
     next(err);

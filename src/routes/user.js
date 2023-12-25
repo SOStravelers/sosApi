@@ -23,7 +23,7 @@ import {
   changePassword,
   hasPassword,
   setWorker,
-  inactiveMode,
+  readyToWork,
   updateGallery,
   contacts,
   updateOneBusiness,
@@ -348,18 +348,38 @@ router.put(
   updateGallery
 );
 router.post(
-  "/inactivemode",
+  "/readyToWork",
   validateParams(
     [
       {
         param_key: "isActive",
-        required: true,
+        required: false,
+        type: "boolean",
+      },
+      {
+        param_key: "isAboutmeOk",
+        required: false,
+        type: "boolean",
+      },
+      {
+        param_key: "isMyServicesOk",
+        required: false,
+        type: "boolean",
+      },
+      {
+        param_key: "isMySchedulesOk",
+        required: false,
+        type: "boolean",
+      },
+      {
+        param_key: "isMyWorkplacesOk",
+        required: false,
         type: "boolean",
       },
     ],
     "body"
   ),
-  inactiveMode
+  readyToWork
 );
 //Para obtener todos los servicios del worker
 router.get("/worker/services", getServicesWorker);
