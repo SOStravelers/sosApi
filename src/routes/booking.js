@@ -7,12 +7,16 @@ import {
   getDayClientId,
   getMonthClientId,
   getAllClientsId,
+  getLastDayClientId,
   getAllworkers,
   getDayWorkers,
+  getListDayWorkers,
   getTimeBusiness,
   getAllBusiness,
   getYearBusiness,
-  getMonthBusiness
+  getMonthBusiness,
+  getNextDaysBusiness,
+  getNextMonthBusiness
 
 } from "../controllers/booking.js";
 import validateParams from "../middleware/validate.js";
@@ -144,6 +148,30 @@ router.get("/client/day",
   getDayClientId
 )
 
+router.get("/client/lastdays",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+getLastDayClientId
+)
+
 /* get month */
 router.get("/client/month",
 validateParams(
@@ -213,6 +241,31 @@ router.get("/worker/day",
     "query"
   ),
   getDayWorkers
+)
+
+router.get("/worker/listdays", 
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+
+  ],
+  "query"
+),
+getListDayWorkers
 )
 
 /* get allworkers  */
@@ -334,6 +387,56 @@ router.get("/business/month",
     "query"
   ),
   getMonthBusiness
+)
+
+/* get any date business */
+router.get("/business/anydate",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+getNextDaysBusiness
+)
+
+/* get any month business */
+router.get("/business/anymonth",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+getNextMonthBusiness
 )
 
 export default router;
