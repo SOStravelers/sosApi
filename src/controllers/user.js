@@ -299,7 +299,6 @@ export const updateDataUser = async (req, res, next) => {
     next(err);
   }
 };
-
 //Eliminar usuario por ID
 export const deleteById = async (req, res, next) => {
   global.logger.info("---DELETE USER---");
