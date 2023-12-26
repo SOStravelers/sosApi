@@ -266,6 +266,40 @@ export const updateOne = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateDataUser = async (req, res, next) => {
+  global.logger.info("---UPDATE USER---");
+  const user = req.user;
+  try {
+    let body = req.body;
+    let newUser = await User.findByIdAndUpdate(user._id.toString(), body, {
+      new: true,
+    })
+      .populate({
+        path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      })
+      .populate({
+        path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
+        select: "name imgUrl duration price ",
+        model: "Subservice", // Modelo de "SubServices"
+        match: { isActive: true }, // Solo selecciona los subservicios activos
+      })
+      .populate({
+        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
+        select: "name imgUrl ",
+        model: "Service", // Modelo de "Service"
+        match: { isActive: true }, // Solo selecciona los servicios activos
+      })
+      .exec();
+    res.send(newUser);
+  } catch (err) {
+    next(err);
+  }
+};
+
 //Eliminar usuario por ID
 export const deleteById = async (req, res, next) => {
   global.logger.info("---DELETE USER---");

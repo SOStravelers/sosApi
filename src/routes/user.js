@@ -14,6 +14,7 @@ const upload = multer({
 import {
   getUsers,
   updateOne,
+  updateDataUser,
   activateMany,
   deleteById,
   profilePhoto,
@@ -196,6 +197,13 @@ router.put(
     "body"
   ),
   updateOne
+);
+
+//Actualizar un usuario por id
+router.put(
+  "/data/user",
+
+  updateDataUser
 );
 
 //Actualizar un usuario por id Business
