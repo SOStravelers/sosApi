@@ -984,8 +984,8 @@ export const getRandomUsers = async (req, res, next) => {
 
     // Selecciona aleatoriamente dos IDs
     const randomIds = [];
-    for (let i = 0; i < 2; i++) {
-      const randomIndex = Math.floor(Math.random() * userIds.length + 1);
+    for (let i = 0; i < 6; i++) {
+      const randomIndex = Math.floor(Math.random() * userIds.length);
       randomIds.push(userIds[randomIndex]);
       userIds.splice(randomIndex, 1); // Elimina el ID seleccionado para evitar duplicados
     }
