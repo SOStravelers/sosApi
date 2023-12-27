@@ -27,7 +27,7 @@ function optionsBooking(page, limit) {
   ];
   return {
     populate: populate,
-    select: "startTime endTime date duration",
+    select: "startTime endTime date duration payment",
     page: page || 1,
     limit: limit || 5,
     sort: { updatedAt: -1 },
