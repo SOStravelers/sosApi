@@ -6,6 +6,7 @@ import {
   createPaymentIntent,
   refund,
 } from "../services/stripe.js";
+import Booking from "../models/booking.js";
 
 //------PAYPAL------
 export const createOrder = async (req, res, next) => {
@@ -37,6 +38,7 @@ export const aprovedOrder = async (req, res, next) => {
 export const paymentIntentStripe = async (req, res, next) => {
   try {
     const data = req.body;
+    console.log("");
     const user = req.user;
     const paymentIntent = await createPaymentIntent(data, user);
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
@@ -49,7 +51,9 @@ export const paymentIntentStripe = async (req, res, next) => {
 export const capturePaymentStripe = async (req, res, next) => {
   try {
     const id = req.params.id; // Hay que buscarla por la id del booking y ahi la id del payment intent
-    const paymentIntent = await capturePaymentIntent(id);
+    const booking = await Booking.findById(id);
+    console.log(booking.payment);
+    const paymentIntent = await capturePaymentIntent(booking);
     res.status(200).json(paymentIntent);
   } catch (err) {
     next(err);

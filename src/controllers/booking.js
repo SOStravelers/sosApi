@@ -27,7 +27,7 @@ function optionsBooking(page, limit) {
   ];
   return {
     populate: populate,
-    select: "startTime endTime date duration",
+    select: "payment idKey startTime currency status endTime date duration",
     page: page || 1,
     limit: limit || 5,
     sort: { updatedAt: -1 },
@@ -37,9 +37,13 @@ function optionsBooking(page, limit) {
 const validateFormatDate = (dateString, dateEndString) => {
   const formatDateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (dateEndString) {
-    if (!formatDateRegex.test(dateString) || !formatDateRegex.test(dateEndString)) throw createError(400, "invalid date format");
-  }
-  else if (!formatDateRegex.test(dateString)) throw createError(404, "invalid date format");
+    if (
+      !formatDateRegex.test(dateString) ||
+      !formatDateRegex.test(dateEndString)
+    )
+      throw createError(400, "invalid date format");
+  } else if (!formatDateRegex.test(dateString))
+    throw createError(404, "invalid date format");
 };
 
 //Crear booking
@@ -70,6 +74,21 @@ export const create = async (req, res, next) => {
     if (exists) {
       throw createError(409, "document already exists");
     } else {
+      // Buscar el último booking ordenado por idKey en orden descendente
+      let lastBooking = await Booking.findOne().sort({ idKey: -1 });
+
+      let newIdKey;
+      if (!lastBooking || !lastBooking.idKey) {
+        // Si no hay bookings, o si el último booking no tiene un idKey, usar "B-1000" como el primer idKey
+        newIdKey = "B-1000";
+      } else {
+        // Si hay bookings, incrementar el número en el último idKey en 1
+        let lastIdNumber = Number(lastBooking.idKey.split("-")[1]);
+        newIdKey = "B-" + (lastIdNumber + 1);
+      }
+
+      // Asignar el nuevo idKey al booking
+      booking.idKey = newIdKey;
       const newBooking = await booking.save();
       if (emailData) sendEmailPaymentConfirmation(emailData);
       res.status(201).json({ booking: newBooking, msg: "new Document" });
@@ -131,11 +150,9 @@ export const getBookings = async (req, res, next) => {
 };
 //Actualizar data de un booking
 export const updateOne = async (req, res, next) => {
-
   global.logger.info("---UPDATE BOOKING---");
 
   try {
-
     let data = req.body;
 
     const booking = await Booking.findOneAndUpdate(
@@ -149,9 +166,7 @@ export const updateOne = async (req, res, next) => {
     ).exec();
     if (!booking) throw createError(404, "Booking not found");
     res.status(200).json(booking);
-
   } catch (err) {
-
     next(err);
   }
 };
@@ -164,9 +179,9 @@ export const getDayClientId = async (req, res, next) => {
     /*   if (user.type != "personal") throw createError(401, "Unauthorized"); */
     const { date, page, limit } = req.query;
     validateFormatDate(date);
-    let options = optionsBooking(page, limit)
+    let options = optionsBooking(page, limit);
     let query = {
-      "clientUser": user._id.toString(),
+      clientUser: user._id.toString(),
       "date.stringData": date,
     };
     const booking = await Booking.paginate(query, options);
@@ -175,28 +190,28 @@ export const getDayClientId = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get last days client */
 export const getLastDayClientId = async (req, res, next) => {
-  global.logger.info("---GET LAST DAY CLIENT---")
+  global.logger.info("---GET LAST DAY CLIENT---");
   try {
     const user = req.user;
     /*   if (user.type != "personal") throw createError(401, "Unauthorized"); */
     const { date, page, limit } = req.query;
     validateFormatDate(date);
-    let options = optionsBooking(page, limit)
+    let options = optionsBooking(page, limit);
     let query = {
-      "clientUser": user._id.toString(),
+      clientUser: user._id.toString(),
       "date.stringData": { $lt: date },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client booking not found ");
     res.status(200).json(booking);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* get month by client  */
 export const getMonthClientId = async (req, res, next) => {
@@ -211,11 +226,11 @@ export const getMonthClientId = async (req, res, next) => {
     const startDate = new Date(Date.UTC(year, month - 1, 1));
     const endDate = new Date(Date.UTC(year, month, 0));
     const query = {
-      "clientUser": user._id.toString(),
+      clientUser: user._id.toString(),
       "date.isoDate": {
         $gte: startDate,
-        $lte: endDate
-      }
+        $lte: endDate,
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client booking not found");
@@ -223,7 +238,7 @@ export const getMonthClientId = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /*  get all bookings for client  */
 export const getAllClientsId = async (req, res, next) => {
@@ -234,15 +249,15 @@ export const getAllClientsId = async (req, res, next) => {
     const { page, limit } = req.query;
     let options = optionsBooking(page, limit);
     let query = {
-      "clientUser": user._id.toString()
-    }
+      clientUser: user._id.toString(),
+    };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client booking not found");
     res.status(200).json(booking);
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get all workers */
 export const getAllworkers = async (req, res, next) => {
@@ -253,7 +268,7 @@ export const getAllworkers = async (req, res, next) => {
     const { page, limit } = req.query;
     let options = optionsBooking(page, limit);
     let query = {
-      "workerUser": user._id.toString(),
+      workerUser: user._id.toString(),
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found");
@@ -261,19 +276,19 @@ export const getAllworkers = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get day by worker  */
 export const getDayWorkers = async (req, res, next) => {
-  global.logger.info("---GET DAY TO WORKER BOOKING---")
+  global.logger.info("---GET DAY TO WORKER BOOKING---");
   try {
     const user = req.user;
     /*   if (user.type != "personal") throw createError(401, "Unauthorized"); */
     const { date, page, limit } = req.query;
     validateFormatDate(date);
-    let options = optionsBooking(page, limit)
+    let options = optionsBooking(page, limit);
     let query = {
-      "workerUser": user._id.toString(),
+      workerUser: user._id.toString(),
       "date.stringData": date,
     };
     const booking = await Booking.paginate(query, options);
@@ -282,11 +297,11 @@ export const getDayWorkers = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get list day by worker */
 export const getListDayWorkers = async (req, res, next) => {
-  global.logger.info("---GET LIST DAYS TO WORKER BOOKING---")
+  global.logger.info("---GET LIST DAYS TO WORKER BOOKING---");
   try {
     const user = req.user;
     /* if (user.type != "worker") throw createError(401, "Unauthorized"); */
@@ -295,14 +310,15 @@ export const getListDayWorkers = async (req, res, next) => {
     const [year, month, day] = date.split("-");
     const startDate = new Date(Date.UTC(year, month - 1, parseInt(day)));
     let endDate = new Date(Date.UTC(year, month - 1, parseInt(day) + 3));
-    if (endDate.getMonth() !== (month - 1)) endDate = new Date(Date.UTC(year, month, 3));
+    if (endDate.getMonth() !== month - 1)
+      endDate = new Date(Date.UTC(year, month, 3));
     let options = optionsBooking(page, limit);
     let query = {
-      "workerUser": user._id.toString(),
+      workerUser: user._id.toString(),
       "date.isoDate": {
         $gte: startDate,
-        $lte: endDate
-      }
+        $lte: endDate,
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found");
@@ -310,7 +326,7 @@ export const getListDayWorkers = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get the business day for a specific place. */
 export const getTimeBusiness = async (req, res, next) => {
@@ -322,24 +338,29 @@ export const getTimeBusiness = async (req, res, next) => {
     validateFormatDate(date_start, date_end);
     const [year_start, month_start, day_start] = date_start.split("-");
     const [year_end, month_end, day_end] = date_end.split("-");
-    const startDate = new Date(Date.UTC(year_start, month_start - 1, parseInt(day_start)));
-    const endDate = new Date(Date.UTC(year_end, month_end - 1, parseInt(day_end)));
+    const startDate = new Date(
+      Date.UTC(year_start, month_start - 1, parseInt(day_start))
+    );
+    const endDate = new Date(
+      Date.UTC(year_end, month_end - 1, parseInt(day_end))
+    );
     let options = optionsBooking(page, limit);
     let query = {
-      "businessUser": user._id.toString(),
+      businessUser: user._id.toString(),
       "date.isoDate": {
         $gte: startDate,
-        $lte: endDate
+        $lte: endDate,
       },
       /* "status": { $in: ['canceled', 'completed', 'failed'] }  */
     };
     const booking = await Booking.paginate(query, options);
-    if (!booking) throw createError(404, "Booking specific date to business not found");
+    if (!booking)
+      throw createError(404, "Booking specific date to business not found");
     res.status(200).json(booking);
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get all business */
 export const getAllBusiness = async (req, res, next) => {
@@ -350,7 +371,7 @@ export const getAllBusiness = async (req, res, next) => {
     const { page, limit } = req.query;
     let options = optionsBooking(page, limit);
     let query = {
-      "businessUser": user._id.toString(),
+      businessUser: user._id.toString(),
       /*   "status": { $in: ['canceled', 'completed', 'failed'] } */
     };
     const booking = await Booking.paginate(query, options);
@@ -359,7 +380,7 @@ export const getAllBusiness = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get year business */
 export const getYearBusiness = async (req, res, next) => {
@@ -374,20 +395,20 @@ export const getYearBusiness = async (req, res, next) => {
     const endDate = new Date(Date.UTC(year, 11, 31));
     let options = optionsBooking(page, limit);
     let query = {
-      "businessUser": user._id.toString(),
+      businessUser: user._id.toString(),
       "date.isoDate": {
         $gte: startDate,
-        $lte: endDate
+        $lte: endDate,
       },
       /*   "status": { $in: ['canceled', 'completed', 'failed'] } */
-    }
+    };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
     res.status(200).json(booking);
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get month business */
 export const getMonthBusiness = async (req, res, next) => {
@@ -402,13 +423,12 @@ export const getMonthBusiness = async (req, res, next) => {
     const endDate = new Date(Date.UTC(year, month, 0));
     let options = optionsBooking(page, limit);
     const query = {
-      "businessUser": user._id.toString(),
+      businessUser: user._id.toString(),
       "date.isoDate": {
         $gte: startDate,
-        $lte: endDate
+        $lte: endDate,
       },
       /*   "status": { $in: ['canceled', 'completed', 'failed'] } */
-
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Month business booking not found");
@@ -416,19 +436,19 @@ export const getMonthBusiness = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get next date booking business*/
 export const getNextDaysBusiness = async (req, res, next) => {
-  global.logger.info("---GET DAY BUSINESS BOOKING---")
+  global.logger.info("---GET DAY BUSINESS BOOKING---");
   try {
     const user = req.user;
     /*   if (user.type != "personal") throw createError(401, "Unauthorized"); */
     const { date, page, limit } = req.query;
     validateFormatDate(date);
-    let options = optionsBooking(page, limit)
+    let options = optionsBooking(page, limit);
     let query = {
-      "businessUser": user._id.toString(),
+      businessUser: user._id.toString(),
       "date.stringData": date,
     };
     const booking = await Booking.paginate(query, options);
@@ -437,7 +457,7 @@ export const getNextDaysBusiness = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* get next date month booking business */
 export const getNextMonthBusiness = async (req, res, next) => {
@@ -452,10 +472,10 @@ export const getNextMonthBusiness = async (req, res, next) => {
     const endDate = new Date(Date.UTC(year, month, 0));
     let options = optionsBooking(page, limit);
     const query = {
-      "businessUser": user._id.toString(),
+      businessUser: user._id.toString(),
       "date.isoDate": {
         $gte: startDate,
-        $lte: endDate
+        $lte: endDate,
       },
     };
     const booking = await Booking.paginate(query, options);
@@ -464,4 +484,4 @@ export const getNextMonthBusiness = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};

@@ -1,6 +1,7 @@
 import User from "../models/user.js";
 import envar from "../config/envar.js";
 import Stripe from "stripe";
+import Booking from "../models/booking.js";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 
 //CREATE CUSTOMER ID
@@ -50,15 +51,15 @@ export const createPaymentIntent = async (data, user) => {
       amount: data.amount,
       currency: data.currency ? data.currency : "usd",
       // currency: "usd",
-      // capture_method: "manual",
+      capture_method: "manual", // esto es para que no se capture automaticamente. se hace con el capturePaymentIntent hasta 7 dias despues
       description: "Service booking SOS app",
       automatic_payment_methods: { enabled: true },
       // setup_future_usage: "off_session",
-      // customer: user.paymentData.stripeCustomerId,
+      //customer: user.paymentData.stripeCustomerId,
     };
-    userDB && userDB.paymentData && userDB.paymentData.stripeCustomerId
-      ? (objeto.customer = userDB.paymentData.stripeCustomerId)
-      : "";
+    if (userDB.paymentData && userDB.paymentData.stripeCustomerId) {
+      data.customer = userDB.paymentData.stripeCustomerId;
+    }
     const paymentIntent = await stripe.paymentIntents.create(objeto);
     console.log(paymentIntent);
     return paymentIntent;
@@ -67,33 +68,54 @@ export const createPaymentIntent = async (data, user) => {
   }
 };
 //CAPTURE PAYMENT INTENT
-export const capturePaymentIntent = async (id) => {
+export const capturePaymentIntent = async (booking) => {
   logger.info("---CAPTURE PAYMENT INTENT STRIPE ---");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
-    const paymentIntent = await stripe.paymentIntents.capture(id);
-    // Crea un InvoiceItem para el PaymentIntent
-    const invoiceItem = await stripe.invoiceItems.create({
-      customer: paymentIntent.customer,
-      amount: paymentIntent.amount,
-      currency: paymentIntent.currency,
-      description: paymentIntent.description,
-    });
-    // Crea una factura para el InvoiceItem
-    const invoice = await stripe.invoices.create({
-      customer: paymentIntent.customer,
-      auto_advance: true, // Auto-finalize this draft after ~1 hour
-      items: [{ invoiceitem: invoiceItem.id }], // Asociar el InvoiceItem con la factura
-    });
 
-    // Finaliza la factura y envíala por correo electrónico
-    await stripe.invoices.finalizeInvoice(invoice.id);
+    // Captura el pago
+    const paymentIntent = await stripe.paymentIntents.capture(
+      booking.payment.paymentId
+    );
+    // Obtiene el cargo y balanceTransaction
+    const chargeId = paymentIntent.latest_charge;
+    const charge = await stripe.charges.retrieve(chargeId);
+    const balanceTransaction = await stripe.balanceTransactions.retrieve(
+      charge.balance_transaction
+    );
+    console.log(balanceTransaction.net / 100);
+    console.log(balanceTransaction.currency);
 
-    console.log("invoice", invoice);
+    //Update booking
+    booking.payment.status = "paid";
+    booking.status = "confirmed";
+    booking.payment.priceBRL = balanceTransaction.net / 100;
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      booking._id,
+      booking,
+      { new: true }
+    );
+    return updatedBooking;
 
-    return paymentIntent;
+    // const invoiceItem = await stripe.invoiceItems.create({
+    //   customer: paymentIntent.customer,
+    //   amount: paymentIntent.amount,
+    //   currency: paymentIntent.currency,
+    //   description: paymentIntent.description,
+    // });
+    // // Crea una factura para el InvoiceItem
+    // const invoice = await stripe.invoices.create({
+    //   customer: paymentIntent.customer,
+    //   auto_advance: true, // Auto-finalize this draft after ~1 hour
+    //   items: [{ invoiceitem: invoiceItem.id }], // Asociar el InvoiceItem con la factura
+    // });
+
+    // // Finaliza la factura y envíala por correo electrónico
+    // await stripe.invoices.finalizeInvoice(invoice.id);
+
+    // console.log("invoice", invoice);
   } catch (error) {
     throw error;
   }

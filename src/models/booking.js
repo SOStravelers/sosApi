@@ -11,6 +11,7 @@ const bookingSchema = new Schema(
     creatorUser: { type: String, ref: "User" },
     service: { type: String, ref: "Service" },
     subservice: { type: String, ref: "Subservice" },
+    idKey: { type: String },
     startTime: {
       stringData: { type: String },
       isoTime: { type: Date },
@@ -38,6 +39,7 @@ const bookingSchema = new Schema(
       },
       paymentId: { type: String, ref: "Payment" },
       price: { type: Number },
+      priceBRL: { type: Number },
       currency: { type: String, default: "BRL" },
     },
     duration: { type: Number },
@@ -45,7 +47,7 @@ const bookingSchema = new Schema(
     status: {
       type: String,
       default: "requested",
-      enum: ["requested", "matched", "canceled", "completed", "failed"],
+      enum: ["requested", "confirmed", "canceled", "completed", "failed"],
     },
     observations: Array({
       creator: { type: String, ref: "User" },
