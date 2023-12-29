@@ -27,7 +27,11 @@ function optionsBooking(page, limit) {
   ];
   return {
     populate: populate,
+<<<<<<< HEAD
     select: "payment idKey startTime currency status endTime date duration",
+=======
+    select: "startTime endTime date duration payment",
+>>>>>>> 2f87a71fec21481396f8fc467202a78742fce9b2
     page: page || 1,
     limit: limit || 5,
     sort: { updatedAt: -1 },
