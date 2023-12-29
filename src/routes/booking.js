@@ -16,8 +16,8 @@ import {
   getYearBusiness,
   getMonthBusiness,
   getNextDaysBusiness,
-  getNextMonthBusiness
-
+  getNextMonthBusiness,
+  cancelBooking,
 } from "../controllers/booking.js";
 import validateParams from "../middleware/validate.js";
 
@@ -124,7 +124,8 @@ router.put(
 );
 
 // get day
-router.get("/client/day",
+router.get(
+  "/client/day",
   validateParams(
     [
       {
@@ -146,79 +147,10 @@ router.get("/client/day",
     "query"
   ),
   getDayClientId
-)
+);
 
-router.get("/client/lastdays",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-getLastDayClientId
-)
-
-/* get month */
-router.get("/client/month",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-  getMonthClientId
-)
-
-/* get all clients */
-router.get("/clients/allclients",
-  validateParams(
-    [
-      {
-        param_key: "page",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
-        type: "string",
-      },
-    ],
-    "params"
-  ),
-  getAllClientsId
-)
-
-/* get workers */
-router.get("/worker/day",
+router.get(
+  "/client/lastdays",
   validateParams(
     [
       {
@@ -236,40 +168,113 @@ router.get("/worker/day",
         required: false,
         type: "string",
       },
+    ],
+    "query"
+  ),
+  getLastDayClientId
+);
 
+/* get month */
+router.get(
+  "/client/month",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getMonthClientId
+);
+
+/* get all clients */
+router.get(
+  "/clients/allclients",
+  validateParams(
+    [
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getAllClientsId
+);
+
+/* get workers */
+router.get(
+  "/worker/day",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
     ],
     "query"
   ),
   getDayWorkers
-)
+);
 
-router.get("/worker/listdays", 
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-
-  ],
-  "query"
-),
-getListDayWorkers
-)
+router.get(
+  "/worker/listdays",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getListDayWorkers
+);
 
 /* get allworkers  */
-router.get("/worker/allworkers",
+router.get(
+  "/worker/allworkers",
   validateParams(
     [
       {
@@ -286,10 +291,11 @@ router.get("/worker/allworkers",
     "params"
   ),
   getAllworkers
-)
+);
 
 /* get specific place */
-router.get("/business/time",
+router.get(
+  "/business/time",
   validateParams(
     [
       {
@@ -317,10 +323,11 @@ router.get("/business/time",
     "query"
   ),
   getTimeBusiness
-)
+);
 
 /* get all business */
-router.get("/business/allbusiness",
+router.get(
+  "/business/allbusiness",
   validateParams(
     [
       {
@@ -337,10 +344,11 @@ router.get("/business/allbusiness",
     "query"
   ),
   getAllBusiness
-)
+);
 
 /* get year business */
-router.get("/business/year",
+router.get(
+  "/business/year",
   validateParams(
     [
       {
@@ -362,10 +370,11 @@ router.get("/business/year",
     "query"
   ),
   getYearBusiness
-)
+);
 
 /* get month business */
-router.get("/business/month",
+router.get(
+  "/business/month",
   validateParams(
     [
       {
@@ -387,56 +396,72 @@ router.get("/business/month",
     "query"
   ),
   getMonthBusiness
-)
+);
 
 /* get any date business */
-router.get("/business/anydate",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-getNextDaysBusiness
-)
+router.get(
+  "/business/anydate",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getNextDaysBusiness
+);
 
 /* get any month business */
-router.get("/business/anymonth",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-getNextMonthBusiness
-)
+router.get(
+  "/business/anymonth",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getNextMonthBusiness
+);
 
+router.put(
+  "/cancel/:bookingId",
+  validateParams(
+    [
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  cancelBooking
+);
 export default router;

@@ -1,6 +1,10 @@
 import { createError } from "../config/error.js";
 import Booking from "../models/booking.js";
+import User from "../models/user.js";
+import Subservice from "../models/subservice.js";
 import { sendEmailPaymentConfirmation } from "../services/aws_ses.js";
+import moment from "moment-timezone";
+import { refund } from "../services/stripe.js";
 
 function optionsBooking(page, limit) {
   const populate = [
@@ -480,6 +484,64 @@ export const getNextMonthBusiness = async (req, res, next) => {
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Month business booking not found");
+    res.status(200).json(booking);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const cancelBooking = async (req, res, next) => {
+  global.logger.info("---CANCEL BOOKING---");
+  try {
+    const id = req.user._id;
+
+    const user = await User.findOne({ _id: id }).exec();
+    if (user.type == "business") throw createError(401, "Unauthorized");
+    const bookingId = req.params.bookingId;
+    const booking = await Booking.findOne({ _id: bookingId }).exec();
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.status === "canceled")
+      throw createError(400, "Booking already canceled");
+    if (booking.status === "completed")
+      throw createError(400, "Booking already completed");
+    if (booking.status === "failed")
+      throw createError(400, "Booking already failed");
+
+    var brazilTime = moment().tz("America/Sao_Paulo");
+    console.log("hora actual", brazilTime);
+    console.log("hora booking", booking.startTime.isoTime);
+    if (user.type == "worker") {
+      console.log("worker");
+      var bookingStartTime = moment(booking.startTime.isoTime).subtract(
+        4,
+        "hours"
+      );
+      if (brazilTime.isSameOrAfter(bookingStartTime))
+        throw createError(400, "You can't cancel this booking");
+    }
+    if (user.type == "personal") {
+      console.log("personal");
+      var bookingStartTime = moment(booking.startTime.isoTime).subtract(
+        12,
+        "hours"
+      );
+      if (brazilTime.isSameOrAfter(bookingStartTime))
+        throw createError(400, "You can't cancel this booking");
+    }
+
+    // const subservice= await Subservice.findOne({_id:booking.subservice}).exec()
+    // let originalPrice = subservice.price
+
+    // let amount = booking.currency != "BRL" ? o * 100 : 0;
+
+    booking.status = "canceled";
+    const data = {
+      id: booking.payment.paymentId,
+      amount: booking.payment.price * 100 * 0.93,
+    };
+    const refundData = await refund(data);
+    console.log("el refund", refundData);
+    await booking.save();
     res.status(200).json(booking);
   } catch (err) {
     next(err);
