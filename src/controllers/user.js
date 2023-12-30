@@ -389,8 +389,8 @@ export const galleryPhoto = async (req, res, next) => {
     Jimp.read(elbuffer)
       .then(async (image) => {
         image
-          .resize(320, Jimp.AUTO) // resize
-          .quality(70); // set JPEG quality
+          //.resize(320, Jimp.AUTO) // resize
+          .quality(90); // set JPEG quality
         let imagenReducida = await image.getBufferAsync(Jimp.MIME_JPEG);
         let lastIndex = file.originalname.lastIndexOf(".");
         let name = file.originalname.slice(0, lastIndex);

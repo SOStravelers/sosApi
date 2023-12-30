@@ -434,6 +434,7 @@ export const getMonthBusiness = async (req, res, next) => {
       },
       /*   "status": { $in: ['canceled', 'completed', 'failed'] } */
     };
+    console.log(query);
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Month business booking not found");
     res.status(200).json(booking);
