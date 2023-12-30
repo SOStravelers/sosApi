@@ -181,7 +181,7 @@ export const loginEmail = async (req, res, next) => {
       { lastLogin: Date.now(), lastLoginType: "email" },
       { new: true }
     ).select(
-      "about email img type language type personalData username workerData _id security.hasPassword"
+      "about email img type language  personalData username workerData _id security.hasPassword"
     );
     delete updatedUser.password;
     let userToCreateToken = {
@@ -203,7 +203,7 @@ export const loginEmail = async (req, res, next) => {
 //Login user by email only businness
 export const loginEmailBusiness = async (req, res, next) => {
   global.logger.info({
-    message: "--- LOGIN USER BY EMAIL AND REFRESH TOKEN ---",
+    message: "--- LOGIN USER BY EMAIL AND REFRESH TOKEN BUSINESS ---",
   });
   try {
     let { email, password } = req.body;
@@ -761,6 +761,7 @@ export const workerByTimeAndService = async (req, res, next) => {
     const query = {
       $and: [
         { isActive: true },
+        { type: "worker" },
         { "workerData.isActive": true },
         { "workerData.services.subServices": subservice },
       ],
