@@ -395,6 +395,11 @@ router.get(
   validateParams(
     [
       {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
         param_key: "page",
         required: false,
         type: "string",

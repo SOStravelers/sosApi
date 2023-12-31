@@ -301,8 +301,8 @@ export const getLastDayClientId = async (req, res, next) => {
   }
 };
 
-/* get month by client  */
-export const getMonthClientId = async (req, res, next) => {
+ /* get month by client  */
+ export const getMonthClientId = async (req, res, next) => {
   global.logger.info("---GET CLIENT MONTH BOOKING---");
   try {
     const user = req.user;
@@ -499,17 +499,22 @@ export const getTimeBusiness = async (req, res, next) => {
   }
 };
 
-/* get all business */
+/* get last all business */
 export const getAllBusiness = async (req, res, next) => {
   global.logger.info("---GET ALL BUSINESS BOOKING---");
   try {
     const user = req.user;
     /* if (user.type != "business") throw createError(401, "Unauthorized"); */
-    const { page, limit } = req.query;
+    const { page, limit, date} = req.query;
+    const [year, month, day] = date.split("-");
+    const endDate = new Date(Date.UTC(year, month - 1, day));
+    console.log(endDate)
     let options = optionsBooking(page, limit);
+    
     let query = {
       businessUser: user._id.toString(),
-      /*   "status": { $in: ['canceled', 'completed', 'failed'] } */
+      "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
+      "date.stringData": { $lt: date },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
@@ -691,10 +696,11 @@ export const getMonthServiceMoney = async (req, res, next) => {
     const { date } = req.query;
     validateFormatDate(date);
     const [year, month, day] = date.split("-");
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const startDate = new Date(Date.UTC(year, month, 1));
     const endDate = new Date(Date.UTC(year, month, 0));
+    console.log(startDate, endDate);
     let query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
-    const result = await Booking.aggregate(query)
+    const result = await Booking.aggregate(query);
     console.log(result, result.length);
     if (!result) throw createError(404, "Monthly business service and incoming booking not found");
     if (result.length === 0) res.status(200).json({ totalAmount: 0, totalBookings: 0 });
@@ -770,7 +776,10 @@ export const getMonthProjection = async (req, res, next) => {
     const result = await Booking.aggregate(query);
     if (!result) throw createError(404, "Monthly business projection booking not found");
     const { daysPassed, daysRemaining } = calculateDaysRemainingInMonth(date);
-    console.log(result, daysPassed, daysRemaining);
+    console.log(result);
+    console.log(daysPassed);
+    console.log(daysRemaining);
+    console.log(result[0].totalAmount);
     let projection = 0;
     const resultOp = { projection: projection }
     if (result.length != 0) projection = (result[0].totalAmount / daysPassed) * (daysPassed + daysRemaining + 1);
