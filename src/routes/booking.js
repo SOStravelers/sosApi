@@ -5,9 +5,9 @@ import {
   getBookings,
   updateOne,
   /* getDayClientId, */
-  getMonthClientId,
-  getAllClientsId,
-  getLastDayClientId,
+ /*  getMonthClientId, */
+ /*  getAllClientsId, */
+ /*  getLastDayClientId, */
   getAllworkers,
   getDayWorkers,
   getMonthWorkers,
@@ -34,7 +34,15 @@ import {
   cancelBooking,
 } from "../controllers/booking.js";
 
-import {getDayClientId} from "../controllers/bookings/personal.js"
+import {
+  getLastDaysClientId, 
+  getDayClientId, 
+  getNextDaysClientId,
+  getWeekClientId,
+  getMonthClientId, 
+  getAllClientsId
+} from "../controllers/bookings/personal.js"
+
 import validateParams from "../middleware/validate.js";
 
 const router = Router();
@@ -139,7 +147,33 @@ router.put(
   updateOne
 );
 
-// get day
+// personal last days
+router.get(
+  "/client/lastdays",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getLastDaysClientId
+);
+
+// personal day 
 router.get(
   "/client/day",
   validateParams(
@@ -165,8 +199,9 @@ router.get(
   getDayClientId
 );
 
+// personal next days
 router.get(
-  "/client/lastdays",
+  "/client/nextdays",
   validateParams(
     [
       {
@@ -187,7 +222,33 @@ router.get(
     ],
     "query"
   ),
-  getLastDayClientId
+  getNextDaysClientId
+);
+
+// personal week
+router.get(
+  "/client/week",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getWeekClientId
 );
 
 /* get month */
@@ -263,6 +324,8 @@ router.get(
   getDayWorkers
 );
 
+
+/*  */
 router.get(
   "/worker/listdays",
   validateParams(

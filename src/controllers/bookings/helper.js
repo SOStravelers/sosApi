@@ -1,5 +1,6 @@
 import moment from "moment-timezone";
 import { createError } from "../../config/error.js";
+
 export const optionsBooking = (page, limit) => {
     const populate = [
         {
@@ -30,18 +31,16 @@ export const optionsBooking = (page, limit) => {
         limit: limit || 5,
         sort: { updatedAt: -1 },
     };
-}
+};
 
 export const validateFormatDate = (dateString, dateEndString) => {
     if (dateEndString) {
         if (!moment(dateString, 'YYYY-MM-DD', true).isValid() || !moment(dateEndString, 'YYYY-MM-DD', true).isValid())
             {
-                console.log("helper de dos ", moment(dateString, 'YYYY-MM-DD', true).isValid(), moment(dateEndString, 'YYYY-MM-DD', true).isValid())
                 throw createError(400, "invalid date format");
             }
     } else if (!moment(dateString, 'YYYY-MM-DD', true).isValid()){
-        console.log("helper de uno ", moment(dateString, 'YYYY-MM-DD', true).isValid())
         throw createError(404, "invalid date format");
     }
         
-}
+};

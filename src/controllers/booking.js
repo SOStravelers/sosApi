@@ -301,8 +301,9 @@ export const getLastDayClientId = async (req, res, next) => {
   }
 };
 
- /* get month by client  */
- export const getMonthClientId = async (req, res, next) => {
+/* get month by client  */
+
+export const getMonthClientId = async (req, res, next) => {
   global.logger.info("---GET CLIENT MONTH BOOKING---");
   try {
     const user = req.user;
@@ -505,12 +506,12 @@ export const getAllBusiness = async (req, res, next) => {
   try {
     const user = req.user;
     /* if (user.type != "business") throw createError(401, "Unauthorized"); */
-    const { page, limit, date} = req.query;
+    const { page, limit, date } = req.query;
     const [year, month, day] = date.split("-");
     const endDate = new Date(Date.UTC(year, month - 1, day));
     console.log(endDate)
     let options = optionsBooking(page, limit);
-    
+
     let query = {
       businessUser: user._id.toString(),
       "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
