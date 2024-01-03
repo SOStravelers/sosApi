@@ -4,7 +4,7 @@ import {
   getById,
   getBookings,
   updateOne,
-  getDayClientId,
+  /* getDayClientId, */
   getMonthClientId,
   getAllClientsId,
   getLastDayClientId,
@@ -31,9 +31,10 @@ import {
   getSpecificServiceMoney,
   getSpecificProjection,
   getSpecificAverage,
-  
   cancelBooking,
 } from "../controllers/booking.js";
+
+import {getDayClientId} from "../controllers/bookings/personal.js"
 import validateParams from "../middleware/validate.js";
 
 const router = Router();
