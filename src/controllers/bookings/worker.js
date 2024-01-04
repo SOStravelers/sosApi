@@ -44,7 +44,7 @@ export const getNextWorkers = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-}
+};
 
 export const getMonthWorkers = async (req, res, next) => {
     global.logger.info("---GET WORKER MONTH BOOKING---");
@@ -134,7 +134,7 @@ export const getDayWorkers = async (req, res, next) => {
             "date.stringData": date,
         };
         const booking = await Booking.paginate(query, options);
-        if (!booking) throw createError(404, "Client booking not found ");
+        if (!booking) throw createError(404, "Worker booking not found ");
         res.status(200).json(booking);
     } catch (err) {
         next(err);
@@ -142,6 +142,7 @@ export const getDayWorkers = async (req, res, next) => {
 };
 
 export const getLastWorkers = async (req, res, next) => {
+    global.logger.info("---GET NEXT WORKERS BY BOOKING---");
     try {
         const user = req.user;
         if (user.type != "worker") throw createError(401, "Unauthorized");
@@ -160,3 +161,4 @@ export const getLastWorkers = async (req, res, next) => {
         next(err)
     }
 };  
+

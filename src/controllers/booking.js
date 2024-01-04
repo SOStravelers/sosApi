@@ -489,7 +489,7 @@ export const getTimeBusiness = async (req, res, next) => {
         $gte: startDate,
         $lte: endDate,
       },
-      /* "status": { $in: ['canceled', 'completed', 'failed'] }  */
+      /*  "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] }, */
     };
     const booking = await Booking.paginate(query, options);
     if (!booking)

@@ -13,10 +13,10 @@ import {
  /*  getMonthWorkers, */
  /*  getListDayWorkers, */
  /*  getLastWorkers, */
-  getTimeBusiness,
-  getAllBusiness,
-  getYearBusiness,
-  getMonthBusiness,
+ /*  getTimeBusiness, */
+ /*  getAllBusiness, */
+ /*  getYearBusiness, */
+  /* getMonthBusiness, */
   getNextDaysBusiness,
   getNextMonthBusiness,
   getMonthServiceMoney,
@@ -52,6 +52,18 @@ import {
   getDayWorkers,
   getLastWorkers,
 }from "../controllers/bookings/worker.js"
+
+import {
+  getAllBusiness,
+  getTimeBusiness,
+  getYearBusiness,
+  getMonthBusiness,
+  getWeekBusiness,
+  getDayBusiness,
+  getNextBusiness,
+  getLastBusiness
+
+} from "../controllers/bookings/business.js"
 
 import validateParams from "../middleware/validate.js";
 
@@ -433,7 +445,7 @@ validateParams(
   ],
   "query"
 ),
-getMonthWorkers)
+getMonthWorkers);
 
 /* get LastWorkers */
 router.get("/worker/lastworker",
@@ -457,7 +469,7 @@ validateParams(
   ],
   "query"
 ),
-getLastWorkers)
+getLastWorkers);
 
 /* get allworkers  */
 router.get(
@@ -589,6 +601,107 @@ router.get(
   ),
   getMonthBusiness
 );
+
+/* get week business */
+router.get(
+  "/business/week",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getWeekBusiness
+);
+
+/* get day business */
+router.get(
+  "/business/day",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getDayBusiness
+);
+
+/* get next business */
+router.get("/business/nextdays",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+), 
+getNextBusiness
+);
+
+/* get last business */
+router.get("/business/lastbusiness",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+getLastBusiness);
 
 /* get any date business */
 router.get(
