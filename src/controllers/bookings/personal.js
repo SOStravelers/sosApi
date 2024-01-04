@@ -8,7 +8,6 @@ export const getAllClientsId = async (req, res, next) => {
     global.logger.info("---GET TO CLIENT ALL BOOKING---");
     try {
       const user = req.user;
-      console.log(user)
       if (user.type != "personal") throw createError(401, "Unauthorized");
       const { page, limit } = req.query;
       let options = optionsBooking(page, limit);
@@ -52,10 +51,10 @@ export const getWeekClientId = async (req, res, next) => {
         const user = req.user;
         if (user.type != "personal") throw createError(401, "Unauthorized");
         const { date, page, limit } = req.query;
+        validateFormatDate(date);
         const dateMoment = moment(date, 'YYYY-MM-DD').add(7, 'day').format('YYYY-MM-DD');
         const startWeek = moment.utc(date).format();
         const endWeek =  moment.utc(dateMoment).format();
-        validateFormatDate(date);
         let options = optionsBooking(page, limit);
         let query = {
             clientUser: user._id.toString(),
@@ -73,7 +72,7 @@ export const getWeekClientId = async (req, res, next) => {
 };
 
 export const getNextDaysClientId = async (req, res, next) => {
-    global.logger.info("---GET NEXT DAY CLIENT---");
+    global.logger.info("---GET NEXT DAYS CLIENT---");
     try {
         const user = req.user;
         if (user.type != "personal") throw createError(401, "Unauthorized");

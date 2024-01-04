@@ -8,11 +8,11 @@ import {
  /*  getMonthClientId, */
  /*  getAllClientsId, */
  /*  getLastDayClientId, */
-  getAllworkers,
-  getDayWorkers,
-  getMonthWorkers,
-  getListDayWorkers,
-  getLastWorkers,
+ /*  getAllworkers, */
+ /*  getDayWorkers, */
+ /*  getMonthWorkers, */
+ /*  getListDayWorkers, */
+ /*  getLastWorkers, */
   getTimeBusiness,
   getAllBusiness,
   getYearBusiness,
@@ -42,6 +42,16 @@ import {
   getMonthClientId, 
   getAllClientsId
 } from "../controllers/bookings/personal.js"
+
+import {
+  getAllworkers,
+  getNextWorkers,
+  getMonthWorkers,
+  getWeekWorkers,
+  getListDayWorkers,
+  getDayWorkers,
+  getLastWorkers,
+}from "../controllers/bookings/worker.js"
 
 import validateParams from "../middleware/validate.js";
 
@@ -279,7 +289,7 @@ router.get(
 
 /* get all clients */
 router.get(
-  "/clients/allclients",
+  "/clients/allbookings",
   validateParams(
     [
       {
@@ -298,7 +308,7 @@ router.get(
   getAllClientsId
 );
 
-/* get workers */
+/* get day workers */
 router.get(
   "/worker/day",
   validateParams(
@@ -324,8 +334,32 @@ router.get(
   getDayWorkers
 );
 
+/* get next workers */
+router.get("/worker/nextdays",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+), 
+getNextWorkers
+);
 
-/*  */
+/* get  three days next of the date worker*/
 router.get(
   "/worker/listdays",
   validateParams(
@@ -351,8 +385,33 @@ router.get(
   getListDayWorkers
 );
 
-/* get MonthWorkers */
+/* get week workers */
+router.get(
+  "/worker/week",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getWeekWorkers
+);
 
+/* get MonthWorkers */
 router.get("/worker/month",
 validateParams(
   [
