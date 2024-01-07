@@ -563,7 +563,7 @@ router.get(
     [
       {
         param_key: "date",
-        required: true,
+        required: false,
         type: "string",
       },
       {

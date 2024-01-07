@@ -40,11 +40,9 @@ export const getAllBusiness = async (req, res, next) => {
         const user = req.user;
         if (user.type != "business") throw createError(401, "Unauthorized");
         const { page, limit, date } = req.query;
-        const dateMoment = moment(date, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
         let options = optionsBooking(page, limit);
         let query = {
             businessUser: user._id.toString(),
-            "date.stringData": { $lt: dateMoment },
             "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
         };
         const booking = await Booking.paginate(query, options);
@@ -207,7 +205,7 @@ export const getLastBusiness = async (req, res, next) => {
     global.logger.info("---GET NEXT BUSINESS BY BOOKING---");
     try {
         const user = req.user;
-        if (user.type != "Business") throw createError(401, "Unauthorized");
+        if (user.type != "business") throw createError(401, "Unauthorized");
         const { date, page, limit } = req.query;
         validateFormatDate(date);
         const dateMoment = moment(date, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
@@ -278,7 +276,7 @@ export const getMonthMoney = async (req, res, next) => {
         validateFormatDate(date_start);
         if (duration === 'month') {
             const startDate = moment(date_start, 'YYYY-MM-DD').startOf('month');
-            const endDate = moment(date_start, 'YYYY-MM-DD').endOf('month');
+            const endDate = moment(date_start, 'YYYY-MM-DD').add(1, 'day');
             query = countDateBookings(startDate, endDate, user._id.toString());
         }
         else if (duration === 'year') {
@@ -292,6 +290,7 @@ export const getMonthMoney = async (req, res, next) => {
         }
         else if (duration === 'specific') {
             const startDate = moment(date_start, 'YYYY-MM-DD');
+            if(date_end == undefined) throw createError(400, "not found date_end");
             const endDate = moment(date_end, 'YYYY-MM-DD').add(1, 'day');
             const greaterDate = endDate.isAfter(startDate);
             console.log(greaterDate, startDate, endDate)
@@ -375,6 +374,7 @@ export const getMonthAvegare = async (req, res, next) => {
                 } else {
                     const init = date1.startOf('month');
                     const finish = date2.startOf('month');
+                    console.log(init, finish)
                     divider = differenceInMonths;
                     query = countDateBookings(init, finish, user._id.toString());
                 }
@@ -406,10 +406,12 @@ export const getMonthAvegare = async (req, res, next) => {
             const sumaTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
             const average = sumaTotal / differenceInMonths;
             res.status(200).json({average: average});
+
         } else if (duration === 'specific') {
             let query = {}, divider;
             const startDate = moment(date_start, 'YYYY-MM-DD');
             const endDate = moment(date_end, 'YYYY-MM-DD').add(1, 'day');
+            if(date_end == undefined) throw createError(400, "not found date_end");
             const differenceInMonths = endDate.diff(startDate, 'months');
             const diferenciaEnDias = date2.diff(date1, 'days', false);
             if (differenceInMonths === 0) {
@@ -495,6 +497,7 @@ export const getMonthProjection = async (req, res, next) => {
         }else if(duration === 'specific'){
 
             const startDate = moment(date_start, 'YYYY-MM-DD');
+            if(date_end == undefined) throw createError(400, "not found date_end");
             const endDate = moment(date_end, 'YYYY-MM-DD').add(1, 'day');
             const differenceInMonths = endDate.diff(startDate, 'months');
             let difer = 0;
@@ -505,7 +508,8 @@ export const getMonthProjection = async (req, res, next) => {
             }
             let query = countDateBookings(startDate, endDate, user._id.toString());
             console.log(difer)
-            await calculateBookingProjection(query, difer-1, 1, res); 
+            /* incognita  */
+            await calculateBookingProjection(query, difer, 1, res); 
         }
       
     } catch (err) {
