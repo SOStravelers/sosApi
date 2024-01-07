@@ -33,6 +33,79 @@ export const optionsBooking = (page, limit) => {
     };
 };
 
+export const buildBookingStatisticsQuery = (startDate, endDate, userId) => {
+    if (startDate != null && endDate != null) {
+      return [
+        {
+          $match: {
+            'date.isoDate': {
+              $gte: startDate,
+              $lte: endDate,
+            },
+            'businessUser': userId,
+            "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
+            'payment.status': { $in: ['paid'] }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: '$payment.priceBRL' }
+          }
+        }
+      ];
+    }
+  
+    return [
+      {
+        $match: {
+          'businessUser': userId,
+          "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
+          'payment.status': { $in: ['paid'] }
+        }
+      },
+      {
+        $sort: {
+          'date.isoDate': -1  // Ordenar en orden descendente por la fecha
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          date: { $first: '$date.isoDate' },
+          totalAmount: { $sum: '$payment.priceBRL' },
+          totalBookings: { $sum: 1 }
+        }
+      }
+    ];
+};
+
+export const countDateBookings = (startDate, endDate, userId) =>{
+  
+  return {
+    'date.isoDate': {    
+    $gte: moment.utc(startDate).format(),
+    $lte: moment.utc(endDate).format(),
+    },
+    'businessUser': userId,
+     "status": { $in: ['canceled', 'completed', 'failed', 'confirmed'] },
+     'payment.status': { $in: ['paid'] },
+  }
+
+}
+
+export const countAllBookings = (userId) =>{
+  
+  return {
+    'businessUser': userId,
+     "status": { $in: ['canceled', 'completed', 'failed', 'confirmed'] },
+     'payment.status': { $in: ['paid'] },
+  }
+
+}
+
+
+
 export const validateFormatDate = (dateString, dateEndString) => {
     if (dateEndString) {
         if (!moment(dateString, 'YYYY-MM-DD', true).isValid() || !moment(dateEndString, 'YYYY-MM-DD', true).isValid())
@@ -44,3 +117,4 @@ export const validateFormatDate = (dateString, dateEndString) => {
     }
         
 };
+

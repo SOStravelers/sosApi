@@ -96,8 +96,6 @@ function buildBookingStatisticsQuery(startDate, endDate, userId) {
       }
     }
   ];
-
-
 }
 
 function getFirstDayOfMonth(dateString) {

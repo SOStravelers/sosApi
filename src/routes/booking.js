@@ -18,10 +18,10 @@ import {
  /*  getYearBusiness, */
   /* getMonthBusiness, */
   getNextDaysBusiness,
-  getNextMonthBusiness,
-  getMonthServiceMoney,
-  getMonthAvegare,
-  getMonthProjection,
+  /* getNextMonthBusiness, */
+/*   getMonthServiceMoney, */
+ /*  getMonthAvegare, */
+ /*  getMonthProjection, */
   getYearServiceMoney,
   getYearAvegare,
   getYearProjection,
@@ -46,6 +46,7 @@ import {
 import {
   getAllworkers,
   getNextWorkers,
+  getNextMonthWorker,
   getMonthWorkers,
   getWeekWorkers,
   getListDayWorkers,
@@ -61,7 +62,12 @@ import {
   getWeekBusiness,
   getDayBusiness,
   getNextBusiness,
-  getLastBusiness
+  getNextMonthBusiness,
+  getLastBusiness,
+  getMonthServiceMoney,
+  getMonthMoney,
+  getMonthAvegare,
+  getMonthProjection
 
 } from "../controllers/bookings/business.js"
 
@@ -369,6 +375,32 @@ validateParams(
   "query"
 ), 
 getNextWorkers
+);
+
+/* get next month worker */
+router.get(
+  "/worker/nextmonth",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getNextMonthWorker
 );
 
 /* get  three days next of the date worker*/
@@ -729,9 +761,9 @@ router.get(
   getNextDaysBusiness
 );
 
-/* get any month business */
+/* get next month business */
 router.get(
-  "/business/anymonth",
+  "/business/nextmonth",
   validateParams(
     [
       {
@@ -775,7 +807,17 @@ router.get("/business/getMSM",
 validateParams(
   [
     {
-      param_key: "date",
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
       required: true,
       type: "string",
     }
@@ -783,12 +825,49 @@ validateParams(
   "query"),
 getMonthServiceMoney);
 
+
+/* get money service */
+router.get("/business/getMM",
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
+      required: true,
+      type: "string",
+    }
+
+  ],
+  "query"),
+  getMonthMoney);
+
+
+
 /* get Month Avegare */
 router.get("/business/getMA",
 validateParams(
   [
     {
-      param_key: "date",
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
       required: true,
       type: "string",
     }
@@ -801,7 +880,17 @@ router.get("/business/getMP",
 validateParams(
   [
     {
-      param_key: "date",
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
       required: true,
       type: "string",
     }

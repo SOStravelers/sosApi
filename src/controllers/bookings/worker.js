@@ -46,6 +46,30 @@ export const getNextWorkers = async (req, res, next) => {
     }
 };
 
+export const getNextMonthWorker = async (req, res, next) => {
+    global.logger.info("---GET NEXT MONTH WORKER BOOKING---");
+    try {
+      const user = req.user;
+      if (user.type != "worker") throw createError(401, "Unauthorized");
+      const { date, page, limit } = req.query;
+      validateFormatDate(date);
+      const newDate = moment.utc(date, 'YYYY-MM-DD').add(1, 'month');
+      let options = optionsBooking(page, limit);
+      const query = {
+        workerUser: user._id.toString(),
+        "date.isoDate": {
+            $gte: moment(newDate, 'YYYY-MM-DD').startOf('month'),
+            $lte: moment(newDate, 'YYYY-MM-DD').endOf('month'),
+        },
+      };
+      const booking = await Booking.paginate(query, options);
+      if (!booking) throw createError(404, "Next month worker booking not found");
+      res.status(200).json(booking);
+    } catch (err) {
+      next(err);
+    }
+};
+
 export const getMonthWorkers = async (req, res, next) => {
     global.logger.info("---GET WORKER MONTH BOOKING---");
     try {
