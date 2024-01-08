@@ -538,7 +538,7 @@ export const cancelBooking = async (req, res, next) => {
     booking.status = "canceled";
     const data = {
       id: booking.payment.paymentId,
-      amount: booking.payment.price * 100 * 0.93,
+      amount: Math.round(booking.payment.price * 100 * 0.9),
     };
     const refundData = await refund(data);
     console.log("el refund", refundData);
