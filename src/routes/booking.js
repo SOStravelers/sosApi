@@ -8,13 +8,13 @@ import {
 } from "../controllers/booking.js";
 
 import {
-  getLastDaysClientId, 
-  getDayClientId, 
+  getLastDaysClientId,
+  getDayClientId,
   getNextDaysClientId,
   getWeekClientId,
-  getMonthClientId, 
-  getAllClientsId
-} from "../controllers/bookings/personal.js"
+  getMonthClientId,
+  getAllClientsId,
+} from "../controllers/bookings/personal.js";
 
 import {
   getAllworkers,
@@ -25,7 +25,7 @@ import {
   getListDayWorkers,
   getDayWorkers,
   getLastWorkers,
-}from "../controllers/bookings/worker.js"
+} from "../controllers/bookings/worker.js";
 
 import {
   getAllBusiness,
@@ -38,9 +38,7 @@ import {
   getNextMonthBusiness,
   getLastBusiness,
   getIndicators,
-  
-
-} from "../controllers/bookings/business.js"
+} from "../controllers/bookings/business.js";
 
 import validateParams from "../middleware/validate.js";
 
@@ -117,7 +115,7 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "byId/:id",
   validateParams(
     [
       {
@@ -172,7 +170,7 @@ router.get(
   getLastDaysClientId
 );
 
-// personal day 
+// personal day
 router.get(
   "/client/day",
   validateParams(
@@ -324,28 +322,29 @@ router.get(
 );
 
 /* get next workers */
-router.get("/worker/nextdays",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-), 
-getNextWorkers
+router.get(
+  "/worker/nextdays",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getNextWorkers
 );
 
 /* get next month worker */
@@ -427,52 +426,56 @@ router.get(
 );
 
 /* get MonthWorkers */
-router.get("/worker/month",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-getMonthWorkers);
+router.get(
+  "/worker/month",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getMonthWorkers
+);
 
 /* get LastWorkers */
-router.get("/worker/lastworker",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-getLastWorkers);
+router.get(
+  "/worker/lastworker",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getLastWorkers
+);
 
 /* get allworkers  */
 router.get(
@@ -658,54 +661,56 @@ router.get(
 );
 
 /* get next business */
-router.get("/business/nextdays",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-), 
-getNextBusiness
+router.get(
+  "/business/nextdays",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getNextBusiness
 );
 
 /* get last business */
-router.get("/business/lastbusiness",
-validateParams(
-  [
-    {
-      param_key: "date",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "page",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "limit",
-      required: false,
-      type: "string",
-    },
-  ],
-  "query"
-),
-getLastBusiness);
-
+router.get(
+  "/business/lastbusiness",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getLastBusiness
+);
 
 /* get next month business */
 router.get(
@@ -748,30 +753,30 @@ router.put(
   cancelBooking
 );
 
-
 /* get indicators */
-router.get("/business/getIndicators",
-validateParams(
-  [
-    {
-      param_key: "date_start",
-      required: true,
-      type: "string",
-    },
-    {
-      param_key: "date_end",
-      required: false,
-      type: "string",
-    },
-    {
-      param_key: "duration",
-      required: true,
-      type: "string",
-    }
-
-  ],
-  "query"),
-  getIndicators);
-
+router.get(
+  "/business/getIndicators",
+  validateParams(
+    [
+      {
+        param_key: "date_start",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "date_end",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "duration",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getIndicators
+);
 
 export default router;
