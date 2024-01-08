@@ -115,7 +115,7 @@ router.get(
 );
 
 router.get(
-  "byId/:id",
+  "/byId/:id",
   validateParams(
     [
       {

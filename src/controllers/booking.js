@@ -6,7 +6,6 @@ import { sendEmailPaymentConfirmation } from "../services/aws_ses.js";
 import moment from "moment-timezone";
 import { refund } from "../services/stripe.js";
 
-
 //Crear booking
 export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW BOOKING---");
@@ -62,7 +61,30 @@ export const create = async (req, res, next) => {
 export const getById = async (req, res, next) => {
   global.logger.info("---GET BOOKING BY ID---");
   try {
-    const booking = await Booking.findOne({ _id: req.params.id }).exec();
+    const booking = await Booking.findOne({ _id: req.params.id })
+      .populate([
+        {
+          path: "businessUser",
+          select: "businessData personalData img",
+        },
+        {
+          path: "workerUser",
+          select: "workerData personalData img",
+        },
+        {
+          path: "service",
+          select: "name isActive coverImg",
+        },
+        {
+          path: "subservice",
+          select: "name isActive coverImg duration",
+        },
+        {
+          path: "clientUser",
+          select: "personalData img",
+        },
+      ])
+      .exec();
     if (!booking) throw createError(404, "Booking not found");
     res.send(booking);
   } catch (err) {
@@ -70,7 +92,7 @@ export const getById = async (req, res, next) => {
   }
 };
 
- //Obtener bookings con paginate por cliente, hotel, Worker,
+//Obtener bookings con paginate por cliente, hotel, Worker,
 
 export const getBookings = async (req, res, next) => {
   global.logger.info("---GET BOOKINGS---");
@@ -191,4 +213,3 @@ export const cancelBooking = async (req, res, next) => {
     next(err);
   }
 };
-
