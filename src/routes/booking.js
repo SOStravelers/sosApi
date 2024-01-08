@@ -4,21 +4,73 @@ import {
   getById,
   getBookings,
   updateOne,
-  getDayClientId,
-  getMonthClientId,
-  getAllClientsId,
-  getLastDayClientId,
-  getAllworkers,
-  getDayWorkers,
-  getListDayWorkers,
-  getTimeBusiness,
-  getAllBusiness,
-  getYearBusiness,
-  getMonthBusiness,
+  /* getDayClientId, */
+ /*  getMonthClientId, */
+ /*  getAllClientsId, */
+ /*  getLastDayClientId, */
+ /*  getAllworkers, */
+ /*  getDayWorkers, */
+ /*  getMonthWorkers, */
+ /*  getListDayWorkers, */
+ /*  getLastWorkers, */
+ /*  getTimeBusiness, */
+ /*  getAllBusiness, */
+ /*  getYearBusiness, */
+  /* getMonthBusiness, */
   getNextDaysBusiness,
-  getNextMonthBusiness,
+  /* getNextMonthBusiness, */
+/*   getMonthServiceMoney, */
+ /*  getMonthAvegare, */
+ /*  getMonthProjection, */
+  getYearServiceMoney,
+  getYearAvegare,
+  getYearProjection,
+  getAlltimeServiceMoney,
+  getAlltimeAverage,
+  getAlltimeProjection,
+  getSpecificServiceMoney,
+  getSpecificProjection,
+  getSpecificAverage,
   cancelBooking,
 } from "../controllers/booking.js";
+
+import {
+  getLastDaysClientId, 
+  getDayClientId, 
+  getNextDaysClientId,
+  getWeekClientId,
+  getMonthClientId, 
+  getAllClientsId
+} from "../controllers/bookings/personal.js"
+
+import {
+  getAllworkers,
+  getNextWorkers,
+  getNextMonthWorker,
+  getMonthWorkers,
+  getWeekWorkers,
+  getListDayWorkers,
+  getDayWorkers,
+  getLastWorkers,
+}from "../controllers/bookings/worker.js"
+
+import {
+  getAllBusiness,
+  getTimeBusiness,
+  getYearBusiness,
+  getMonthBusiness,
+  getWeekBusiness,
+  getDayBusiness,
+  getNextBusiness,
+  getNextMonthBusiness,
+  getLastBusiness,
+  getMonthServiceMoney,
+  getMonthMoney,
+  getMonthAvegare,
+  getMonthProjection
+
+} from "../controllers/bookings/business.js"
+
 import validateParams from "../middleware/validate.js";
 
 const router = Router();
@@ -123,7 +175,33 @@ router.put(
   updateOne
 );
 
-// get day
+// personal last days
+router.get(
+  "/client/lastdays",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getLastDaysClientId
+);
+
+// personal day 
 router.get(
   "/client/day",
   validateParams(
@@ -149,8 +227,9 @@ router.get(
   getDayClientId
 );
 
+// personal next days
 router.get(
-  "/client/lastdays",
+  "/client/nextdays",
   validateParams(
     [
       {
@@ -171,7 +250,33 @@ router.get(
     ],
     "query"
   ),
-  getLastDayClientId
+  getNextDaysClientId
+);
+
+// personal week
+router.get(
+  "/client/week",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getWeekClientId
 );
 
 /* get month */
@@ -202,7 +307,7 @@ router.get(
 
 /* get all clients */
 router.get(
-  "/clients/allclients",
+  "/clients/allbookings",
   validateParams(
     [
       {
@@ -221,7 +326,7 @@ router.get(
   getAllClientsId
 );
 
-/* get workers */
+/* get day workers */
 router.get(
   "/worker/day",
   validateParams(
@@ -247,6 +352,58 @@ router.get(
   getDayWorkers
 );
 
+/* get next workers */
+router.get("/worker/nextdays",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+), 
+getNextWorkers
+);
+
+/* get next month worker */
+router.get(
+  "/worker/nextmonth",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getNextMonthWorker
+);
+
+/* get  three days next of the date worker*/
 router.get(
   "/worker/listdays",
   validateParams(
@@ -271,6 +428,80 @@ router.get(
   ),
   getListDayWorkers
 );
+
+/* get week workers */
+router.get(
+  "/worker/week",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getWeekWorkers
+);
+
+/* get MonthWorkers */
+router.get("/worker/month",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+getMonthWorkers);
+
+/* get LastWorkers */
+router.get("/worker/lastworker",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+getLastWorkers);
 
 /* get allworkers  */
 router.get(
@@ -330,6 +561,11 @@ router.get(
   "/business/allbusiness",
   validateParams(
     [
+      {
+        param_key: "date",
+        required: false,
+        type: "string",
+      },
       {
         param_key: "page",
         required: false,
@@ -398,6 +634,107 @@ router.get(
   getMonthBusiness
 );
 
+/* get week business */
+router.get(
+  "/business/week",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getWeekBusiness
+);
+
+/* get day business */
+router.get(
+  "/business/day",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getDayBusiness
+);
+
+/* get next business */
+router.get("/business/nextdays",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+), 
+getNextBusiness
+);
+
+/* get last business */
+router.get("/business/lastbusiness",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "page",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "limit",
+      required: false,
+      type: "string",
+    },
+  ],
+  "query"
+),
+getLastBusiness);
+
 /* get any date business */
 router.get(
   "/business/anydate",
@@ -424,9 +761,9 @@ router.get(
   getNextDaysBusiness
 );
 
-/* get any month business */
+/* get next month business */
 router.get(
-  "/business/anymonth",
+  "/business/nextmonth",
   validateParams(
     [
       {
@@ -464,4 +801,218 @@ router.put(
   ),
   cancelBooking
 );
+
+/* get money service */
+router.get("/business/getMSM",
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"),
+getMonthServiceMoney);
+
+
+/* get money service */
+router.get("/business/getMM",
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
+      required: true,
+      type: "string",
+    }
+
+  ],
+  "query"),
+  getMonthMoney);
+
+
+
+/* get Month Avegare */
+router.get("/business/getMA",
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"),
+getMonthAvegare);
+
+/* get Month Projection */
+router.get("/business/getMP",
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+    {
+      param_key: "date_end",
+      required: false,
+      type: "string",
+    },
+    {
+      param_key: "duration",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"),
+getMonthProjection
+);
+
+/* get year service money */
+router.get("/business/getYSM",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"),
+getYearServiceMoney);
+
+/* get Year Avegare */
+router.get("/business/getYA",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"),
+getYearAvegare);
+
+/* get Year Projection */
+router.get("/business/getYP",
+validateParams(
+  [
+    {
+      param_key: "date",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"),
+getYearProjection);
+
+/* get All time Service Money */
+router.get("/business/getATSM",
+getAlltimeServiceMoney);
+
+/* get all time average */
+router.get("/business/getATA", 
+getAlltimeAverage);
+
+/* get All time Projection */
+router.get("/business/getATP", 
+getAlltimeProjection);
+
+
+/* get Specific Service Money */
+
+router.get("/business/getSSM", 
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+
+    {
+      param_key: "date_end",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"
+),
+getSpecificServiceMoney);
+
+
+/* getSpecificAverage */
+router.get("/business/getSA", 
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+
+    {
+      param_key: "date_end",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"
+),
+getSpecificAverage);
+
+/* getSpecificProjection */
+
+router.get("/business/getSP",
+validateParams(
+  [
+    {
+      param_key: "date_start",
+      required: true,
+      type: "string",
+    },
+
+    {
+      param_key: "date_end",
+      required: true,
+      type: "string",
+    }
+  ],
+  "query"
+),
+getSpecificProjection)
+
+
 export default router;
