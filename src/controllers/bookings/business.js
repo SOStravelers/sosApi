@@ -1,10 +1,7 @@
 import moment from "moment-timezone";
 import Booking from "../../models/booking.js";
-import User from "../../models/user.js";
 import { optionsBooking, countDateBookings, validateFormatDate, countAllBookings } from "./helper.js";
 import { createError } from "../../config/error.js";
-
-
 
 
 export const getTimeBusiness = async (req, res, next) => {
@@ -223,296 +220,86 @@ export const getLastBusiness = async (req, res, next) => {
     }
 };
 
+/* Indicators */
 
-/* todos los servicios divididos por parametros diferentes  */
-export const getMonthServiceMoney = async (req, res, next) => {
-    global.logger.info("---GET MONTHLY BUSINESS SERVICES---");
-    try {
-        const user = req.user;
-        if (user.type != "business") throw createError(401, "Unauthorized");
-        const { date_start, date_end, duration } = req.query;
-        let query = {};
-        validateFormatDate(date_start);
-        if (duration === 'month') {
-            const startDate = moment(date_start, 'YYYY-MM-DD').startOf('month');
-            const endDate = moment(date_start, 'YYYY-MM-DD').endOf('month');
-            query = countDateBookings(startDate, endDate, user._id.toString());
-        }
-        else if (duration === 'year') {
-            const year = moment.utc(date_start, 'YYYY-MM-DD').year();
-            const startDate = moment.utc(`${year}-01-01`).format();
-            const endDate = moment.utc(`${year}-12-31`).format();
-            query = countDateBookings(startDate, endDate, user._id.toString());
-        }
-        else if (duration === 'alltime') {
-            query = countAllBookings(user._id.toString());
-        }
-        else if (duration === 'specific') {
-            const startDate = moment(date_start, 'YYYY-MM-DD');
-            const endDate = moment(date_end, 'YYYY-MM-DD').add(1, 'day');
-            const greaterDate = endDate.isAfter(startDate);
-            console.log(greaterDate, startDate, endDate)
-            if (greaterDate) query = countDateBookings(startDate, endDate, user._id.toString());
-            else throw createError(400, "invalid range of date");
-        }
-        else throw createError(400, "invalid duration format");
-        const result = await Booking.countDocuments(query);
-        if (!result) throw createError(404, "Monthly business service not found");
-        else res.status(200).json({ totalBookings: result });
-    } catch (err) {
-        next(err)
-    }
-};
-
-
-/* cantidad de dinero segun los parametros funciona para las 4 interfaces */
-export const getMonthMoney = async (req, res, next) => {
-    global.logger.info("---GET MONTHLY BUSINESS MONEY---");
-    try {
-        const user = req.user;
-        if (user.type != "business") throw createError(401, "Unauthorized");
-        const { date_start, date_end, duration } = req.query;
-        let query = {};
-        validateFormatDate(date_start);
-        if (duration === 'month') {
-            const startDate = moment(date_start, 'YYYY-MM-DD').startOf('month');
-            const endDate = moment(date_start, 'YYYY-MM-DD').add(1, 'day');
-            query = countDateBookings(startDate, endDate, user._id.toString());
-        }
-        else if (duration === 'year') {
-            const year = moment.utc(date_start, 'YYYY-MM-DD').year();
-            const startDate = moment.utc(`${year}-01-01`).format();
-            const endDate = moment.utc(`${year}-12-31`).format();
-            query = countDateBookings(startDate, endDate, user._id.toString());
-        }
-        else if (duration === 'alltime') {
-            query = countAllBookings(user._id.toString());
-        }
-        else if (duration === 'specific') {
-            const startDate = moment(date_start, 'YYYY-MM-DD');
-            if(date_end == undefined) throw createError(400, "not found date_end");
-            const endDate = moment(date_end, 'YYYY-MM-DD').add(1, 'day');
-            const greaterDate = endDate.isAfter(startDate);
-            console.log(greaterDate, startDate, endDate)
-            if (greaterDate) query = countDateBookings(startDate, endDate, user._id.toString());
-            else throw createError(400, "invalid range of date");
-        }
-        else throw createError(400, "invalid duration format");
-        const result = await Booking.find(query);
-        // console.log('result: ', result.length, result); 
-        if (!result) throw createError(404, "Monthly business service and incoming booking not found");
-        const sumaTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
-        res.status(200).json({ countBookings: result.length, totalAmount: sumaTotal });
-    } catch (err) {
-        next(err)
-    }
-};
-
-
-
-/* Avegare  promedio mes*/
-
-const calculateBookingAverage = async (query, divider, res) => {
+const calculateAvegare = async (pastMonth, user) => {
+    console.log('*** Function calculate averange ***')
+    const initMonth = await Booking.findOne(
+        { 'businessUser': user },
+        { 'date.isoDate': 1, '_id': 0 }
+    ).sort({ 'date.isoDate': 1 });
+    if (!initMonth) return 0;
+    const init = moment(initMonth.date.isoDate).startOf('month');
+    let months = pastMonth.diff(init, 'month') + 1;
+    if (months < 2) months = 1;
+    const query = countDateBookings(init, pastMonth, user);
     const result = await Booking.find(query);
-    if (!result || result.length === 0) {
-        throw createError(404, "Monthly business average booking not found");
-    }
-
-    const sumaTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
-    console.log(sumaTotal)
-    const average = sumaTotal / divider;
-    res.status(200).json({average: average});
+    const sumTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
+    return sumTotal / months;
 };
 
+const countBookingsForMonth = (dateMonth, user) => {
+    const startMonth = moment(dateMonth, 'YYYY-MM-DD').startOf('month');
+    const endMOnth = moment(dateMonth, 'YYYY-MM-DD').endOf('month');
+    return countDateBookings(startMonth, endMOnth, user);
+};
 
-const calculateBookingProjection = async (query, dateBefore, dateAfter, res) => {
-    const result = await Booking.find(query);
-    if (!result || result.length === 0) {
-        throw createError(404, "Monthly business average booking not found");
-    }
-   const sumaTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
-   const dateTotal = dateBefore+dateAfter;
-   console.log(sumaTotal)
-   const projection = (sumaTotal/dateBefore) * dateTotal;
-   res.status(200).json({projection: projection});
-}
-
-const countBookingsForYear = (year, userId) => {
+const countBookingsForYear = (dateYear, userId) => {
+    const year = moment.utc(dateYear, 'YYYY-MM-DD').year();
     const startOfYear = moment.utc(`${year}-01-01`).format();
     const endOfYear = moment.utc(`${year}-12-31`).format();
     return countDateBookings(startOfYear, endOfYear, userId);
 };
 
-export const getMonthAvegare = async (req, res, next) => {
-    global.logger.info("---GET MONTHLY BUSINESS AVERAGE BOOKING ---");
-    try {
-        const user = req.user;
-        if (user.type !== "business") {
-            throw createError(401, "Unauthorized");
-        }
-        const { date_start, date_end, duration } = req.query;
-        validateFormatDate(date_start);
-        const userDoc = await User.findById(user._id.toString()).select('createdAt').exec();
-        if (!userDoc) {
-            throw createError(404, "Monthly business average booking not found");
-        }
-        const originalDate = moment.utc(userDoc.createdAt);
-        const date1 = originalDate.startOf('day');
-        const date2 = moment.utc(date_start).startOf('day');
-        const differenceInMonths = date2.diff(date1, 'months');
-        const greaterDate = date2.isAfter(date1);
-        if (duration === 'month') {
-            if (greaterDate) {
-                let query = {}, divider = 0;
-                if (differenceInMonths === 0) {
-                    const diferenciaEnDias = date2.diff(date1, 'days', false);
-                    divider = diferenciaEnDias;
-                    query = countDateBookings(date1, date2, user._id.toString());
-                } else if (differenceInMonths > 11) {
-                    divider = differenceInMonths;
-                    query = countDateBookings(moment.utc(date_start).subtract(11, 'month').startOf('day').format(), date2, user._id.toString());
-                } else {
-                    const init = date1.startOf('month');
-                    const finish = date2.startOf('month');
-                    console.log(init, finish)
-                    divider = differenceInMonths;
-                    query = countDateBookings(init, finish, user._id.toString());
-                }
-                await calculateBookingAverage(query, divider, res);
-            } else {
-                throw createError(400, "Invalid range of date");
-            }
-        } else if (duration === 'year') {
-            let query = {}, divider = 0;
-            if (differenceInMonths === 0) {
-                const diferenciaEnDias = date2.diff(date1, 'days', false);
-                divider = diferenciaEnDias;
-                query = countDateBookings(date1, date2, user._id.toString());
-            } else {
-                const year = moment.utc(date_start, 'YYYY-MM-DD').year();
-                divider = 12;
-                query = countBookingsForYear(year, user._id.toString());
-            }
-            await calculateBookingAverage(query, divider, res);
-        } else if (duration === 'alltime') {
-            const query = countAllBookings(user._id.toString());
-            const result = await Booking.find(query);
-            /* incognita  */
-            const differenceInMonths = date2.diff(date1, 'months');
-
-            if (!result || result.length === 0) {
-                throw createError(404, "Monthly business average booking not found");
-            }
-            const sumaTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
-            const average = sumaTotal / differenceInMonths;
-            res.status(200).json({average: average});
-
-        } else if (duration === 'specific') {
-            let query = {}, divider;
-            const startDate = moment(date_start, 'YYYY-MM-DD');
-            const endDate = moment(date_end, 'YYYY-MM-DD').add(1, 'day');
-            if(date_end == undefined) throw createError(400, "not found date_end");
-            const differenceInMonths = endDate.diff(startDate, 'months');
-            const diferenciaEnDias = date2.diff(date1, 'days', false);
-            if (differenceInMonths === 0) {
-                divider = diferenciaEnDias;
-            } else {
-                divider = differenceInMonths;
-            }
-            const greaterDate = endDate.isAfter(startDate);
-            if (greaterDate) {
-                query = countDateBookings(startDate, endDate, user._id.toString());
-            }
-            await calculateBookingAverage(query, divider, res);
-        }
-    } catch (err) {
-        next(err);
-    }
+const countBookingsForSpecific = (dateInit, dateFinish, user) => {
+    const startDate = moment(dateInit, 'YYYY-MM-DD');
+    if (dateFinish == undefined) throw createError(400, "not found date_end");
+    const endDate = moment(dateFinish, 'YYYY-MM-DD').add(1, 'day');
+    return countDateBookings(startDate, endDate, user);
 };
 
+const calculateBookingProjection = async (date, dateBefore, dateAfter, user) => {
+    const query = countBookingsForMonth(date, user);
+    const result = await Booking.find(query);
+    if (!result || result.length === 0) return 0;
+    const sumTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
+    const dateTotal = dateBefore + dateAfter;
+    return (sumTotal / dateBefore) * dateTotal;
+};
 
-
-/* Projection porjecion mes */
-
-
-export const getMonthProjection = async (req, res, next) => {
-    global.logger.info("---GET MONTHLY BUSINESS PROJECTION BOOKING---");
+export const getIndicators = async (req, res, next) => {
+    global.logger.info("---GET INDICATORS BOOKINGS---");
     try {
         const user = req.user;
         if (user.type != "business") throw createError(401, "Unauthorized");
         const { date_start, date_end, duration } = req.query;
+        let query = {}, avegare = 0;
         validateFormatDate(date_start);
-        if(duration === 'month'){
-            const startDate = moment(date_start, 'YYYY-MM-DD').startOf('month');
-            const endDate = moment(date_start, 'YYYY-MM-DD').add(1, 'day');
-            const query = countDateBookings(startDate, endDate, user._id.toString());
-            const diasPasados = moment(date_start, 'YYYY-MM-DD').date();
-            const diasEnElMes = moment(date_start, 'YYYY-MM-DD').daysInMonth();
-            const diasRestantes = diasEnElMes - diasPasados;
-            console.log(startDate, endDate);
-            console.log(diasPasados, diasRestantes);
-            await calculateBookingProjection(query, diasPasados, diasRestantes, res); 
-
-        }else if(duration === 'year'){
-            const userDoc = await User.findById(user._id.toString()).select('createdAt').exec();
-            if (!userDoc) {
-                throw createError(404, "Monthly business average booking not found");
-            }
-            const originalDate = moment.utc(userDoc.createdAt);
-            const date1 = originalDate.startOf('day');
-            const date2 = moment.utc(date_start).startOf('day');
-            const greaterDate = date2.isAfter(date1);
-            if (greaterDate){
-                const year = moment.utc(date_start, 'YYYY-MM-DD').year();
-                const query = countBookingsForYear(year, user._id.toString());
-                const firstMonth = moment.utc(`${year}-01-01`);
-                const dateMonth = moment.utc(date_start, 'YYYY-MM-DD');
-                const mesesPasados = dateMonth.diff(firstMonth, 'months', false);
-                const mesesRestantes = 11 - mesesPasados;
-                await calculateBookingProjection(query, mesesPasados+1, mesesRestantes, res); 
-            }else throw createError(404, "Monthly business average booking not found");        
-
-        }else if(duration === 'alltime'){
-
-            const userDoc = await User.findById(user._id.toString()).select('createdAt').exec();
-            if (!userDoc) {
-                throw createError(404, "Monthly business average booking not found");
-            }
-            const originalDate = moment.utc(userDoc.createdAt);
-            const date2 = moment.utc(date_start);
-            /* incognita */
-            const dateBefore = date2.diff(originalDate, 'months', false);
-            const differenceInMonths = date2.diff(originalDate, 'months');
-            const dateAfter = differenceInMonths - dateBefore;
-            const query = countAllBookings(user._id.toString());
-            const result = await Booking.find(query);
-            if (!result || result.length === 0) {
-                throw createError(404, "Monthly business average booking not found");
-            }
-           const sumaTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
-           const dateTotal = dateBefore+dateAfter;
-           const projection = (sumaTotal/dateBefore) * dateTotal;
-           res.status(200).json({projection: projection});
-
-        }else if(duration === 'specific'){
-
-            const startDate = moment(date_start, 'YYYY-MM-DD');
-            if(date_end == undefined) throw createError(400, "not found date_end");
-            const endDate = moment(date_end, 'YYYY-MM-DD').add(1, 'day');
-            const differenceInMonths = endDate.diff(startDate, 'months');
-            let difer = 0;
-            if (differenceInMonths === 0) {
-                difer = 1;
-            } else {
-                difer = differenceInMonths;
-            }
-            let query = countDateBookings(startDate, endDate, user._id.toString());
-            console.log(difer)
-            /* incognita  */
-            await calculateBookingProjection(query, difer, 1, res); 
+        if (duration === 'month') {
+            query = countBookingsForMonth(date_start, user._id.toString());
         }
-      
+        else if (duration === 'year') {
+            query = countBookingsForYear(date_start, user._id.toString());
+        }
+        else if (duration === 'alltime') {
+            query = countAllBookings(user._id.toString());
+        }
+        else if (duration === 'specific') {
+            if (date_end == undefined) throw createError(400, "not found date_end");
+            query = countBookingsForSpecific(date_start, date_end, user._id.toString());
+            avegare = await calculateAvegare(moment(date_start, 'YYYY-MM-DD').endOf('month'), user._id.toString());
+        }
+        else throw createError(400, "invalid duration format");
+        const result = await Booking.find(query);
+        if (!result) throw createError(404, "Monthly business service and incoming booking not found");
+        const sumTotal = result.reduce((count, price) => count + price.payment.priceBRL, 0);
+        if (avegare == 0) avegare = await calculateAvegare(moment(date_start, 'YYYY-MM-DD').startOf('month'), user._id.toString());
+        const diasPasados = moment(date_start, 'YYYY-MM-DD').date();
+        const diasEnElMes = moment(date_start, 'YYYY-MM-DD').daysInMonth();
+        const diasRestantes = diasEnElMes - diasPasados;
+        const projection = await calculateBookingProjection(date_start, diasPasados, diasRestantes, user._id.toString());
+        res.status(200).json({ NBookings: result.length, MoneyIncoming: sumTotal, Average: avegare, Projection: projection });
     } catch (err) {
         next(err)
     }
-}
+};
