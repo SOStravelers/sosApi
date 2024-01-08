@@ -55,46 +55,46 @@ function buildBookingStatisticsQuery(startDate, endDate, userId) {
     return [
       {
         $match: {
-          'date.isoDate': {
+          "date.isoDate": {
             $gte: startDate,
             $lte: endDate,
           },
-          'businessUser': userId,
-          "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
-          'payment.status': { $in: ['paid'] }
-        }
+          businessUser: userId,
+          status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+          "payment.status": { $in: ["paid"] },
+        },
       },
       {
         $group: {
           _id: null,
-          totalAmount: { $sum: '$payment.priceBRL' },
-          totalBookings: { $sum: 1 }
-        }
-      }
+          totalAmount: { $sum: "$payment.priceBRL" },
+          totalBookings: { $sum: 1 },
+        },
+      },
     ];
   }
 
   return [
     {
       $match: {
-        'businessUser': userId,
-        "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
-        'payment.status': { $in: ['paid'] }
-      }
+        businessUser: userId,
+        status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+        "payment.status": { $in: ["paid"] },
+      },
     },
     {
       $sort: {
-        'date.isoDate': -1  // Ordenar en orden descendente por la fecha
-      }
+        "date.isoDate": -1, // Ordenar en orden descendente por la fecha
+      },
     },
     {
       $group: {
         _id: null,
-        date: { $first: '$date.isoDate' },
-        totalAmount: { $sum: '$payment.priceBRL' },
-        totalBookings: { $sum: 1 }
-      }
-    }
+        date: { $first: "$date.isoDate" },
+        totalAmount: { $sum: "$payment.priceBRL" },
+        totalBookings: { $sum: 1 },
+      },
+    },
   ];
 }
 
@@ -111,15 +111,18 @@ function calculateDaysRemainingInMonth(dateString) {
   const year = currentDate.getUTCFullYear();
   const month = currentDate.getUTCMonth();
   const lastDayOfMonth = new Date(Date.UTC(year, month + 1, 0));
-  const daysPassed = Math.floor((currentDate - new Date(Date.UTC(year, month, 1))) / (24 * 60 * 60 * 1000));
-  const daysRemaining = Math.floor((lastDayOfMonth - currentDate) / (24 * 60 * 60 * 1000));
+  const daysPassed = Math.floor(
+    (currentDate - new Date(Date.UTC(year, month, 1))) / (24 * 60 * 60 * 1000)
+  );
+  const daysRemaining = Math.floor(
+    (lastDayOfMonth - currentDate) / (24 * 60 * 60 * 1000)
+  );
 
   return {
     daysPassed,
     daysRemaining,
   };
 }
-
 
 function calculateMonthsPassedRemainingInYear(dateString) {
   const currentDate = new Date(dateString + "T00:00:00Z");
@@ -187,7 +190,30 @@ export const create = async (req, res, next) => {
 export const getById = async (req, res, next) => {
   global.logger.info("---GET BOOKING BY ID---");
   try {
-    const booking = await Booking.findOne({ _id: req.params.id }).exec();
+    const booking = await Booking.findOne({ _id: req.params.id })
+      .populate([
+        {
+          path: "businessUser",
+          select: "businessData personalData",
+        },
+        {
+          path: "workerUser",
+          select: "workerData personalData",
+        },
+        {
+          path: "service",
+          select: "name isActive coverImg",
+        },
+        {
+          path: "subservice",
+          select: "name isActive coverImg duration",
+        },
+        {
+          path: "clientUser",
+          select: "personalData",
+        },
+      ])
+      .exec();
     if (!booking) throw createError(404, "Booking not found");
     res.send(booking);
   } catch (err) {
@@ -332,7 +358,7 @@ export const getAllClientsId = async (req, res, next) => {
   global.logger.info("---GET TO CLIENT ALL BOOKING---");
   try {
     const user = req.user;
-    console.log(user)
+    console.log(user);
     /* if (user.type != "personal") throw createError(401, "Unauthorized"); */
     const { page, limit } = req.query;
     let options = optionsBooking(page, limit);
@@ -439,13 +465,12 @@ export const getMonthWorkers = async (req, res, next) => {
     if (!booking) throw createError(404, "Worker booking not found");
     res.status(200).json(booking);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* get last worker ############*/
 export const getLastWorkers = async (req, res, next) => {
-
   try {
     const user = req.user;
     /*   if (user.type != "worker") throw createError(401, "Unauthorized"); */
@@ -460,9 +485,9 @@ export const getLastWorkers = async (req, res, next) => {
     if (!booking) throw createError(404, "Worker booking not found ");
     res.status(200).json(booking);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* get the business day for a specific place. */
 export const getTimeBusiness = async (req, res, next) => {
@@ -507,12 +532,12 @@ export const getAllBusiness = async (req, res, next) => {
     const { page, limit, date } = req.query;
     const [year, month, day] = date.split("-");
     const endDate = new Date(Date.UTC(year, month - 1, day));
-    console.log(endDate)
+    console.log(endDate);
     let options = optionsBooking(page, limit);
 
     let query = {
       businessUser: user._id.toString(),
-      "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
+      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
       "date.stringData": { $lt: date },
     };
     const booking = await Booking.paginate(query, options);
@@ -685,7 +710,6 @@ export const cancelBooking = async (req, res, next) => {
   }
 };
 
-
 /* monthly number of services and money incoming business */
 export const getMonthServiceMoney = async (req, res, next) => {
   global.logger.info("---GET MONTHLY BUSINESS SERVICE AND INCOMING BOOKING---");
@@ -698,16 +722,29 @@ export const getMonthServiceMoney = async (req, res, next) => {
     const startDate = new Date(Date.UTC(year, month, 1));
     const endDate = new Date(Date.UTC(year, month, 0));
     console.log(startDate, endDate);
-    let query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+    let query = buildBookingStatisticsQuery(
+      startDate,
+      endDate,
+      user._id.toString()
+    );
     const result = await Booking.aggregate(query);
     console.log(result, result.length);
-    if (!result) throw createError(404, "Monthly business service and incoming booking not found");
-    if (result.length === 0) res.status(200).json({ totalAmount: 0, totalBookings: 0 });
-    else res.status(200).json({ totalAmount: result[0].totalAmount, totalBookings: result[0].totalBookings });
+    if (!result)
+      throw createError(
+        404,
+        "Monthly business service and incoming booking not found"
+      );
+    if (result.length === 0)
+      res.status(200).json({ totalAmount: 0, totalBookings: 0 });
+    else
+      res.status(200).json({
+        totalAmount: result[0].totalAmount,
+        totalBookings: result[0].totalBookings,
+      });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* monthly avegare business*/
 export const getMonthAvegare = async (req, res, next) => {
@@ -718,37 +755,55 @@ export const getMonthAvegare = async (req, res, next) => {
     const { date } = req.query;
     validateFormatDate(date);
     const find = user._id.toString();
-    const userDoc = await User.findById(find)
-      .select('createdAt')
-      .exec();
-    if (!userDoc) throw createError(404, "Monthly business average booking not found");
+    const userDoc = await User.findById(find).select("createdAt").exec();
+    if (!userDoc)
+      throw createError(404, "Monthly business average booking not found");
     const date_start = new Date(userDoc.createdAt);
-    const [year_start, month_start, day_start] = date_start.toISOString().split("T")[0].split("-");
+    const [year_start, month_start, day_start] = date_start
+      .toISOString()
+      .split("T")[0]
+      .split("-");
     const [year_end, month_end, day_end] = date.split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference);
     let query = [];
     if (monthsDifference === 0) {
       const endDate = new Date(Date.UTC(year_end, month_end, day_end));
       const startDate = new Date(Date.UTC(year_start, month_start, day_start));
-      query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+      query = buildBookingStatisticsQuery(
+        startDate,
+        endDate,
+        user._id.toString()
+      );
       monthsDifference = 1;
     } else if (monthsDifference > 11) {
       let newStartDate = new Date(Date.UTC(year_end, month_end - 1, day_end));
       newStartDate.setMonth(newStartDate.getMonth() - 11);
       const endDate = new Date(Date.UTC(year_end, month_end - 1, 0));
-      query = buildBookingStatisticsQuery(newStartDate, endDate, user._id.toString());
+      query = buildBookingStatisticsQuery(
+        newStartDate,
+        endDate,
+        user._id.toString()
+      );
     } else {
       const endDate = new Date(Date.UTC(year_end, month_end, 0));
-      const startDate = new Date(Date.UTC(year_start, month_start - 1, day_start));
+      const startDate = new Date(
+        Date.UTC(year_start, month_start - 1, day_start)
+      );
       console.log(endDate, startDate);
-      query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+      query = buildBookingStatisticsQuery(
+        startDate,
+        endDate,
+        user._id.toString()
+      );
     }
     const result = await Booking.aggregate(query);
-    if (!result) throw createError(404, "Monthly business average booking not found");
+    if (!result)
+      throw createError(404, "Monthly business average booking not found");
     let average = 0;
-    const resultOp = { average: average }
-    console.log(result, result.length)
+    const resultOp = { average: average };
+    console.log(result, result.length);
     if (result.length != 0) average = result[0].totalAmount / monthsDifference;
     /* console.log(result[0].totalAmount, result); */
     resultOp.average = average;
@@ -756,7 +811,7 @@ export const getMonthAvegare = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 /* monthly projection business*/
 export const getMonthProjection = async (req, res, next) => {
@@ -767,31 +822,46 @@ export const getMonthProjection = async (req, res, next) => {
     const { date } = req.query;
     validateFormatDate(date);
     let firstDay = getFirstDayOfMonth(date);
-    const [year_start, month_start, day_start] = firstDay.split("T")[0].split("-");
+    const [year_start, month_start, day_start] = firstDay
+      .split("T")[0]
+      .split("-");
     const [year_end, month_end, day_end] = date.split("-");
-    const startDate = new Date(Date.UTC(year_start, month_start - 1, parseInt(day_start)));
-    const endDate = new Date(Date.UTC(year_end, month_end - 1, parseInt(day_end)));
-    let query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+    const startDate = new Date(
+      Date.UTC(year_start, month_start - 1, parseInt(day_start))
+    );
+    const endDate = new Date(
+      Date.UTC(year_end, month_end - 1, parseInt(day_end))
+    );
+    let query = buildBookingStatisticsQuery(
+      startDate,
+      endDate,
+      user._id.toString()
+    );
     const result = await Booking.aggregate(query);
-    if (!result) throw createError(404, "Monthly business projection booking not found");
+    if (!result)
+      throw createError(404, "Monthly business projection booking not found");
     const { daysPassed, daysRemaining } = calculateDaysRemainingInMonth(date);
     console.log(result);
     console.log(daysPassed);
     console.log(daysRemaining);
     console.log(result[0].totalAmount);
     let projection = 0;
-    const resultOp = { projection: projection }
-    if (result.length != 0) projection = (result[0].totalAmount / daysPassed) * (daysPassed + daysRemaining + 1);
+    const resultOp = { projection: projection };
+    if (result.length != 0)
+      projection =
+        (result[0].totalAmount / daysPassed) * (daysPassed + daysRemaining + 1);
     resultOp.projection = projection;
     res.status(200).json(resultOp);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* year number of services and money incoming business */
 export const getYearServiceMoney = async (req, res, next) => {
-  global.logger.info("---GET YEAR BUSINESS NUMBER SERVICE AND INCOMING BOOKING BOOKING---");
+  global.logger.info(
+    "---GET YEAR BUSINESS NUMBER SERVICE AND INCOMING BOOKING BOOKING---"
+  );
   try {
     const user = req.user;
     if (user.type != "business") throw createError(401, "Unauthorized");
@@ -800,16 +870,29 @@ export const getYearServiceMoney = async (req, res, next) => {
     const [year, month, day] = date.split("-");
     const startDate = new Date(Date.UTC(year, 0, 1));
     const endDate = new Date(Date.UTC(year, 11, 31));
-    let query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
-    const result = await Booking.aggregate(query)
-    if (!result) throw createError(404, "Year business service and incoming booking not found");
+    let query = buildBookingStatisticsQuery(
+      startDate,
+      endDate,
+      user._id.toString()
+    );
+    const result = await Booking.aggregate(query);
+    if (!result)
+      throw createError(
+        404,
+        "Year business service and incoming booking not found"
+      );
     console.log(result, result.length);
-    if (result.length === 0) res.status(200).json({ totalAmount: 0, totalBookings: 0 });
-    else res.status(200).json({ totalAmount: result[0].totalAmount, totalBookings: result[0].totalBookings });
+    if (result.length === 0)
+      res.status(200).json({ totalAmount: 0, totalBookings: 0 });
+    else
+      res.status(200).json({
+        totalAmount: result[0].totalAmount,
+        totalBookings: result[0].totalBookings,
+      });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* year avegare business */
 export const getYearAvegare = async (req, res, next) => {
@@ -820,45 +903,63 @@ export const getYearAvegare = async (req, res, next) => {
     const { date } = req.query;
     validateFormatDate(date);
     const find = user._id.toString();
-    const userDoc = await User.findById(find)
-      .select('createdAt')
-      .exec();
-    if (!userDoc) throw createError(404, "Year business average booking not found");
+    const userDoc = await User.findById(find).select("createdAt").exec();
+    if (!userDoc)
+      throw createError(404, "Year business average booking not found");
     const date_start = new Date(userDoc.createdAt);
-    const [year_start, month_start, day_start] = date_start.toISOString().split("T")[0].split("-");
+    const [year_start, month_start, day_start] = date_start
+      .toISOString()
+      .split("T")[0]
+      .split("-");
     const [year_end, month_end, day_end] = date.split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference);
     let query = [];
     if (monthsDifference === 0) {
       const endDate = new Date(Date.UTC(year_end, month_end, day_end));
       const startDate = new Date(Date.UTC(year_start, month_start, day_start));
-      query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
-      console.log(startDate, endDate)
+      query = buildBookingStatisticsQuery(
+        startDate,
+        endDate,
+        user._id.toString()
+      );
+      console.log(startDate, endDate);
     } else if (monthsDifference < 13) {
       const endDate = new Date(Date.UTC(year_end, month_end - 2, day_end));
-      const startDate = new Date(Date.UTC(year_start, month_start - 1, day_start));
+      const startDate = new Date(
+        Date.UTC(year_start, month_start - 1, day_start)
+      );
       console.log("Years Average < 12", startDate, endDate);
-      query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+      query = buildBookingStatisticsQuery(
+        startDate,
+        endDate,
+        user._id.toString()
+      );
     } else {
       let newStartDate = new Date(Date.UTC(year_end, month_end - 1, day_end));
       newStartDate.setMonth(newStartDate.getMonth() - 12);
       const endDate = new Date(Date.UTC(year_end, month_end - 1, 0));
       console.log("Years Average > 12", newStartDate, endDate);
-      query = buildBookingStatisticsQuery(newStartDate, endDate, user._id.toString());
+      query = buildBookingStatisticsQuery(
+        newStartDate,
+        endDate,
+        user._id.toString()
+      );
     }
     const result = await Booking.aggregate(query);
-    if (!result) throw createError(404, "Monthly Year average booking not found");
+    if (!result)
+      throw createError(404, "Monthly Year average booking not found");
     let average = 0;
-    const resultOp = { average: average }
-    console.log(result, result.length)
+    const resultOp = { average: average };
+    console.log(result, result.length);
     if (result.length != 0) average = result[0].totalAmount / monthsDifference;
     resultOp.average = average;
     res.status(200).json(resultOp);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* year projection business */
 export const getYearProjection = async (req, res, next) => {
@@ -869,46 +970,68 @@ export const getYearProjection = async (req, res, next) => {
     const { date } = req.query;
     validateFormatDate(date);
     const find = user._id.toString();
-    const userDoc = await User.findById(find)
-      .select('createdAt')
-      .exec();
-    if (!userDoc) throw createError(404, "Year business projection booking not found");
+    const userDoc = await User.findById(find).select("createdAt").exec();
+    if (!userDoc)
+      throw createError(404, "Year business projection booking not found");
     const date_start = new Date(userDoc.createdAt);
-    const [year_start, month_start, day_start] = date_start.toISOString().split("T")[0].split("-");
+    const [year_start, month_start, day_start] = date_start
+      .toISOString()
+      .split("T")[0]
+      .split("-");
     const [year_end, month_end, day_end] = date.split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference);
     let query = [];
     if (monthsDifference === 0) {
       const endDate = new Date(Date.UTC(year_end, month_end, day_end));
       const startDate = new Date(Date.UTC(year_start, month_start, day_start));
-      query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
-      console.log(startDate, endDate)
+      query = buildBookingStatisticsQuery(
+        startDate,
+        endDate,
+        user._id.toString()
+      );
+      console.log(startDate, endDate);
     } else if (monthsDifference < 13) {
       const endDate = new Date(Date.UTC(year_end, month_end - 2, day_end));
-      const startDate = new Date(Date.UTC(year_start, month_start - 1, day_start));
+      const startDate = new Date(
+        Date.UTC(year_start, month_start - 1, day_start)
+      );
       console.log("Years Average < 12", startDate, endDate);
-      query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+      query = buildBookingStatisticsQuery(
+        startDate,
+        endDate,
+        user._id.toString()
+      );
     } else {
       let newStartDate = new Date(Date.UTC(year_end, month_end - 1, day_end));
       newStartDate.setMonth(newStartDate.getMonth() - 12);
       const endDate = new Date(Date.UTC(year_end, month_end - 1, 0));
       console.log("Years Average > 12", newStartDate, endDate);
-      query = buildBookingStatisticsQuery(newStartDate, endDate, user._id.toString());
+      query = buildBookingStatisticsQuery(
+        newStartDate,
+        endDate,
+        user._id.toString()
+      );
     }
     const result = await Booking.aggregate(query);
-    if (!result) throw createError(404, "Year business projection booking not found");
-    const { monthsPassed, monthsRemaining } = calculateMonthsPassedRemainingInYear(date);
+    if (!result)
+      throw createError(404, "Year business projection booking not found");
+    const { monthsPassed, monthsRemaining } =
+      calculateMonthsPassedRemainingInYear(date);
     console.log(result, monthsPassed, monthsRemaining);
     let projection = 0;
-    const resultOp = { projection: projection }
-    if (result.length != 0) projection = (result[0].totalAmount / monthsPassed) * (monthsPassed + monthsRemaining + 1);
+    const resultOp = { projection: projection };
+    if (result.length != 0)
+      projection =
+        (result[0].totalAmount / monthsPassed) *
+        (monthsPassed + monthsRemaining + 1);
     resultOp.projection = projection;
     res.status(200).json(resultOp);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* all time number of services and money incoming business */
 export const getAlltimeServiceMoney = async (req, res, next) => {
@@ -917,15 +1040,24 @@ export const getAlltimeServiceMoney = async (req, res, next) => {
     const user = req.user;
     if (user.type != "business") throw createError(401, "Unauthorized");
     let query = buildBookingStatisticsQuery(null, null, user._id.toString());
-    const result = await Booking.aggregate(query)
+    const result = await Booking.aggregate(query);
     console.log(result, result.length);
-    if (!result) throw createError(404, "All time business service and incoming booking not found");
-    if (result.length === 0) res.status(200).json({ totalAmount: 0, totalBookings: 0 });
-    else res.status(200).json({ totalAmount: result[0].totalAmount, totalBookings: result[0].totalBookings });
+    if (!result)
+      throw createError(
+        404,
+        "All time business service and incoming booking not found"
+      );
+    if (result.length === 0)
+      res.status(200).json({ totalAmount: 0, totalBookings: 0 });
+    else
+      res.status(200).json({
+        totalAmount: result[0].totalAmount,
+        totalBookings: result[0].totalBookings,
+      });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* all time avegare business */
 export const getAlltimeAverage = async (req, res, next) => {
@@ -934,26 +1066,34 @@ export const getAlltimeAverage = async (req, res, next) => {
     const user = req.user;
     if (user.type !== "business") throw createError(401, "Unauthorized");
     const find = user._id.toString();
-    const userDoc = await User.findById(find).select('createdAt').exec();
+    const userDoc = await User.findById(find).select("createdAt").exec();
     if (!userDoc) throw createError(404, "All time avegare booking not found");
     const date_start = new Date(userDoc.createdAt);
-    const [year_start, month_start, day_start] = date_start.toISOString().split("T")[0].split("-");
+    const [year_start, month_start, day_start] = date_start
+      .toISOString()
+      .split("T")[0]
+      .split("-");
     const query = buildBookingStatisticsQuery(null, null, user._id.toString());
     const result = await Booking.aggregate(query);
-    if (!result || result.length === 0) throw createError(404, "All time avegare booking not found");
+    if (!result || result.length === 0)
+      throw createError(404, "All time avegare booking not found");
     let average = 0;
     const resultOp = { average };
     const date_end = new Date(result[0].date);
-    const [year_end, month_end, day_end] = date_end.toISOString().split("T")[0].split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const [year_end, month_end, day_end] = date_end
+      .toISOString()
+      .split("T")[0]
+      .split("-");
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference, date_start, date_end);
     average = result[0].totalAmount / monthsDifference;
     resultOp.average = average;
     res.status(200).json(resultOp);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* all time projection business */
 export const getAlltimeProjection = async (req, res, next) => {
@@ -962,34 +1102,44 @@ export const getAlltimeProjection = async (req, res, next) => {
     const user = req.user;
     if (user.type != "business") throw createError(401, "Unauthorized");
     const find = user._id.toString();
-    const userDoc = await User.findById(find)
-      .select('createdAt')
-      .exec();
-    if (!userDoc) throw createError(404, "All time business projection booking not found");
+    const userDoc = await User.findById(find).select("createdAt").exec();
+    if (!userDoc)
+      throw createError(404, "All time business projection booking not found");
     const date_start = new Date(userDoc.createdAt);
-    const [year_start, month_start, day_start] = date_start.toISOString().split("T")[0].split("-");
+    const [year_start, month_start, day_start] = date_start
+      .toISOString()
+      .split("T")[0]
+      .split("-");
     const query = buildBookingStatisticsQuery(null, null, user._id.toString());
     const result = await Booking.aggregate(query);
-    if (!result) throw createError(404, "All time business projection booking not found");
+    if (!result)
+      throw createError(404, "All time business projection booking not found");
     const date_end = new Date(result[0].date);
-    const [year_end, month_end, day_end] = date_end.toISOString().split("T")[0].split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const [year_end, month_end, day_end] = date_end
+      .toISOString()
+      .split("T")[0]
+      .split("-");
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference, date_start, date_end);
     console.log(result);
     let projection = 0;
-    const resultOp = { projection: projection }
-    if (result.length != 0) projection = (result[0].totalAmount / monthsDifference) * (monthsDifference);
+    const resultOp = { projection: projection };
+    if (result.length != 0)
+      projection =
+        (result[0].totalAmount / monthsDifference) * monthsDifference;
     resultOp.projection = projection;
     res.status(200).json(resultOp);
   } catch (err) {
-    next(err)
+    next(err);
   }
-
-}
+};
 
 /* specific time number of services and money incoming business */
 export const getSpecificServiceMoney = async (req, res, next) => {
-  global.logger.info("---GET SPECIFIC BUSINESS SERVICE AND INCOMING BOOKING---");
+  global.logger.info(
+    "---GET SPECIFIC BUSINESS SERVICE AND INCOMING BOOKING---"
+  );
   try {
     const user = req.user;
     if (user.type != "business") throw createError(401, "Unauthorized");
@@ -997,7 +1147,8 @@ export const getSpecificServiceMoney = async (req, res, next) => {
     validateFormatDate(date_start, date_end);
     const [year_start, month_start, day_start] = date_start.split("-");
     const [year_end, month_end, day_end] = date_end.split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference);
     const startDate = new Date(
       Date.UTC(year_start, month_start - 1, parseInt(day_start))
@@ -1005,16 +1156,29 @@ export const getSpecificServiceMoney = async (req, res, next) => {
     const endDate = new Date(
       Date.UTC(year_end, month_end - 1, parseInt(day_end))
     );
-    let query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
-    const result = await Booking.aggregate(query)
+    let query = buildBookingStatisticsQuery(
+      startDate,
+      endDate,
+      user._id.toString()
+    );
+    const result = await Booking.aggregate(query);
     console.log(result, result.length);
-    if (!result) throw createError(404, "Specific business service and incoming booking not found");
-    if (result.length === 0) res.status(200).json({ totalAmount: 0, totalBookings: 0 });
-    else res.status(200).json({ totalAmount: result[0].totalAmount, totalBookings: result[0].totalBookings });
+    if (!result)
+      throw createError(
+        404,
+        "Specific business service and incoming booking not found"
+      );
+    if (result.length === 0)
+      res.status(200).json({ totalAmount: 0, totalBookings: 0 });
+    else
+      res.status(200).json({
+        totalAmount: result[0].totalAmount,
+        totalBookings: result[0].totalBookings,
+      });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* specific time avegare business */
 export const getSpecificAverage = async (req, res, next) => {
@@ -1026,7 +1190,8 @@ export const getSpecificAverage = async (req, res, next) => {
     validateFormatDate(date_start, date_end);
     const [year_start, month_start, day_start] = date_start.split("-");
     const [year_end, month_end, day_end] = date_end.split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference);
     const startDate = new Date(
       Date.UTC(year_start, month_start - 1, parseInt(day_start))
@@ -1034,9 +1199,14 @@ export const getSpecificAverage = async (req, res, next) => {
     const endDate = new Date(
       Date.UTC(year_end, month_end - 1, parseInt(day_end))
     );
-    let query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+    let query = buildBookingStatisticsQuery(
+      startDate,
+      endDate,
+      user._id.toString()
+    );
     const result = await Booking.aggregate(query);
-    if (!result || result.length === 0) throw createError(404, "All time avegare booking not found");
+    if (!result || result.length === 0)
+      throw createError(404, "All time avegare booking not found");
     let average = 0;
     const resultOp = { average };
     average = result[0].totalAmount / monthsDifference;
@@ -1044,9 +1214,9 @@ export const getSpecificAverage = async (req, res, next) => {
     // Hacer algo con resultOp, por ejemplo, devolverlo en la respuesta
     res.status(200).json(resultOp);
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 /* specific time projection business */
 export const getSpecificProjection = async (req, res, next) => {
@@ -1058,7 +1228,8 @@ export const getSpecificProjection = async (req, res, next) => {
     validateFormatDate(date_start, date_end);
     const [year_start, month_start, day_start] = date_start.split("-");
     const [year_end, month_end, day_end] = date_end.split("-");
-    const monthsDifference = (year_end - year_start) * 12 + (month_end - month_start);
+    const monthsDifference =
+      (year_end - year_start) * 12 + (month_end - month_start);
     console.log("Number of months:", monthsDifference);
     const startDate = new Date(
       Date.UTC(year_start, month_start - 1, parseInt(day_start))
@@ -1066,17 +1237,21 @@ export const getSpecificProjection = async (req, res, next) => {
     const endDate = new Date(
       Date.UTC(year_end, month_end - 1, parseInt(day_end))
     );
-    let query = buildBookingStatisticsQuery(startDate, endDate, user._id.toString());
+    let query = buildBookingStatisticsQuery(
+      startDate,
+      endDate,
+      user._id.toString()
+    );
     const result = await Booking.aggregate(query);
     console.log(result);
     let projection = 0;
-    const resultOp = { projection: projection }
-    if (result.length != 0) projection = (result[0].totalAmount / monthsDifference) * (monthsDifference);
+    const resultOp = { projection: projection };
+    if (result.length != 0)
+      projection =
+        (result[0].totalAmount / monthsDifference) * monthsDifference;
     resultOp.projection = projection;
     res.status(200).json(resultOp);
   } catch (err) {
-    next(err)
+    next(err);
   }
-
-}
-
+};
