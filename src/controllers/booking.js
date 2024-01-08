@@ -194,11 +194,11 @@ export const getById = async (req, res, next) => {
       .populate([
         {
           path: "businessUser",
-          select: "businessData personalData",
+          select: "businessData personalData img",
         },
         {
           path: "workerUser",
-          select: "workerData personalData",
+          select: "workerData personalData img",
         },
         {
           path: "service",
