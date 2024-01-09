@@ -44,10 +44,23 @@ const bookingSchema = new Schema(
     },
     duration: { type: Number },
     coverImg: { type: String, default: "" },
+    canceledData: {
+      canceledBy: { type: String, ref: "User" },
+      canceledAtUTC: { type: Date },
+      timeZone: { type: String },
+      previusStatus: { type: String },
+    },
     status: {
       type: String,
       default: "requested",
-      enum: ["requested", "confirmed", "canceled", "completed", "failed"],
+      enum: [
+        "requested",
+        "available",
+        "confirmed",
+        "canceled",
+        "completed",
+        "failed",
+      ],
     },
     observations: Array({
       creator: { type: String, ref: "User" },

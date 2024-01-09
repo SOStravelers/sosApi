@@ -6,6 +6,10 @@ import {
   updateOne,
   cancelBooking,
   confirmBookingWorker,
+  completeBookingWorker,
+  cancelBookingWorker,
+  cancelBookingUser,
+  completeBookingUser,
 } from "../controllers/booking.js";
 
 import {
@@ -752,6 +756,62 @@ router.put(
     "params"
   ),
   confirmBookingWorker
+);
+router.put(
+  "/completeWorker/:bookingId",
+  validateParams(
+    [
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  completeBookingWorker
+);
+router.put(
+  "/completeUser/:bookingId",
+  validateParams(
+    [
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  completeBookingUser
+);
+router.put(
+  "/cancelWorker/:bookingId",
+  validateParams(
+    [
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  cancelBookingWorker
+);
+router.put(
+  "/cancelUser/:bookingId",
+  validateParams(
+    [
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  cancelBookingUser
 );
 
 router.put(

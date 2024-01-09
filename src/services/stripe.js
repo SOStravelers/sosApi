@@ -67,8 +67,14 @@ export const createPaymentIntent = async (data, user) => {
     throw error;
   }
 };
+
 //CAPTURE PAYMENT INTENT
-export const capturePaymentIntent = async (booking) => {
+export const capturePaymentIntent = async (
+  booking,
+  percentage = 1,
+  statusBooking = "confirmed",
+  canceledData = null
+) => {
   logger.info("---CAPTURE PAYMENT INTENT STRIPE ---");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
@@ -76,8 +82,13 @@ export const capturePaymentIntent = async (booking) => {
     }
 
     // Captura el pago
+    console.log("el precio", booking.price);
+    const finalCost = booking.payment.price * 100 * percentage;
     const paymentIntent = await stripe.paymentIntents.capture(
-      booking.payment.paymentId
+      booking.payment.paymentId,
+      {
+        amount_to_capture: finalCost, // Captura solo $10.00 del monto autorizado
+      }
     );
     // Obtiene el cargo y balanceTransaction
     const chargeId = paymentIntent.latest_charge;
@@ -90,8 +101,9 @@ export const capturePaymentIntent = async (booking) => {
 
     //Update booking
     booking.payment.status = "paid";
-    booking.status = "confirmed";
+    booking.status = statusBooking;
     booking.payment.priceBRL = balanceTransaction.net / 100;
+    canceledData ? (booking.canceledData = canceledData) : "";
     const updatedBooking = await Booking.findByIdAndUpdate(
       booking._id,
       booking,
