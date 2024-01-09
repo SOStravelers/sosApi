@@ -213,3 +213,31 @@ export const cancelBooking = async (req, res, next) => {
     next(err);
   }
 };
+
+export const confirmBookingWorker = async (req, res, next) => {
+  global.logger.info("---CONFIRM BOOKING WORKER---");
+  try {
+    const userId = req.user._id;
+    const bookingId = req.params.bookingId;
+    const user = await User.findOne({ _id: userId }).exec();
+    const booking = await Booking.findOne({ _id: bookingId }).exec();
+    if (user && user.type != "business") throw createError(401, "Unauthorized");
+    if (user && user._id != booking.workerUser)
+      throw createError(401, "Unauthorized");
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.status != "requested")
+      throw createError(400, "Booking can't be confirmed");
+    const newBooking = await Booking.findOneAndUpdate(
+      {
+        _id: bookingId,
+      },
+      { status: "confirmed" },
+      {
+        new: true,
+      }
+    ).exec();
+    res.status(200).json(newBooking);
+  } catch (err) {
+    next(err);
+  }
+};

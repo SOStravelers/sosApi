@@ -5,6 +5,7 @@ import {
   getBookings,
   updateOne,
   cancelBooking,
+  confirmBookingWorker,
 } from "../controllers/booking.js";
 
 import {
@@ -736,6 +737,21 @@ router.get(
     "query"
   ),
   getNextMonthBusiness
+);
+
+router.put(
+  "/confirmWorker/:bookingId",
+  validateParams(
+    [
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  confirmBookingWorker
 );
 
 router.put(
