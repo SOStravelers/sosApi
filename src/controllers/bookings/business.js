@@ -122,7 +122,7 @@ export const getWeekBusiness = async (req, res, next) => {
      query[0].$match.status =  { $in: ["canceled", "completed", "failed", "confirmed"] }
      const result = await Booking.aggregate(query);
     console.log('Resultados agrupados por día:', result);
-    if (!result) throw createError(404, "Worker week booking not found ");
+    if (!result) throw createError(404, "Business week booking not found ");
     res.status(200).json(result);
   } catch (err) {
     next(err);
