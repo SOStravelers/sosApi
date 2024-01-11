@@ -4,6 +4,7 @@ import {
   optionsBooking,
   countDateBookings,
   validateFormatDate,
+  countWeekBookings,
   countAllBookings,
 } from "./helper.js";
 import { createError } from "../../config/error.js";
@@ -110,28 +111,19 @@ export const getWeekBusiness = async (req, res, next) => {
   try {
     const user = req.user;
     if (user.type != "business") throw createError(401, "Unauthorized");
-    const { date, page, limit } = req.query;
+    const { date } = req.query;
     validateFormatDate(date);
     const dateMoment = moment(date, "YYYY-MM-DD")
       .add(7, "day")
       .format("YYYY-MM-DD");
     const startWeek = moment.utc(date).format();
     const endWeek = moment.utc(dateMoment).format();
-    console.log(startWeek);
-    console.log(endWeek);
-    console.log(user);
-    let options = optionsBooking(page, limit);
-    let query = {
-      businessUser: user._id.toString(),
-      "date.isoDate": {
-        $gte: startWeek,
-        $lte: endWeek,
-      },
-      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
-    };
-    const booking = await Booking.paginate(query, options);
-    if (!booking) throw createError(404, "Business week booking not found");
-    res.status(200).json(booking);
+    let query = countWeekBookings('businessUser', user._id.toString(), startWeek, endWeek);
+     query[0].$match.status =  { $in: ["canceled", "completed", "failed", "confirmed"] }
+     const result = await Booking.aggregate(query);
+    console.log('Resultados agrupados por día:', result);
+    if (!result) throw createError(404, "Worker week booking not found ");
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }

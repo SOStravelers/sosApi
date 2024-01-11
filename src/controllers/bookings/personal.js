@@ -2,23 +2,23 @@ import moment from "moment-timezone";
 import Booking from "../../models/booking.js";
 /* import User from "../../models/user.js"; */
 import { createError } from "../../config/error.js"
-import { optionsBooking, validateFormatDate } from "./helper.js";
+import { optionsBooking, validateFormatDate, countWeekBookings } from "./helper.js";
 
 export const getAllClientsId = async (req, res, next) => {
     global.logger.info("---GET TO CLIENT ALL BOOKING---");
     try {
-      const user = req.user;
-      if (user.type != "personal") throw createError(401, "Unauthorized");
-      const { page, limit } = req.query;
-      let options = optionsBooking(page, limit);
-      let query = {
-        clientUser: user._id.toString(),
-      };
-      const booking = await Booking.paginate(query, options);
-      if (!booking) throw createError(404, "Client booking not found");
-      res.status(200).json(booking);
+        const user = req.user;
+        if (user.type != "personal") throw createError(401, "Unauthorized");
+        const { page, limit } = req.query;
+        let options = optionsBooking(page, limit);
+        let query = {
+            clientUser: user._id.toString(),
+        };
+        const booking = await Booking.paginate(query, options);
+        if (!booking) throw createError(404, "Client booking not found");
+        res.status(200).json(booking);
     } catch (err) {
-      next(err);
+        next(err);
     }
 };
 
@@ -50,22 +50,16 @@ export const getWeekClientId = async (req, res, next) => {
     try {
         const user = req.user;
         if (user.type != "personal") throw createError(401, "Unauthorized");
-        const { date, page, limit } = req.query;
+        const { date} = req.query;
         validateFormatDate(date);
         const dateMoment = moment(date, 'YYYY-MM-DD').add(7, 'day').format('YYYY-MM-DD');
         const startWeek = moment.utc(date).format();
-        const endWeek =  moment.utc(dateMoment).format();
-        let options = optionsBooking(page, limit);
-        let query = {
-            clientUser: user._id.toString(),
-            "date.isoDate": {
-                $gte: startWeek,
-                $lte: endWeek,
-            },
-        };
-        const booking = await Booking.paginate(query, options);
-        if (!booking) throw createError(404, "Client day booking not found ");
-        res.status(200).json(booking);
+        const endWeek = moment.utc(dateMoment).format();
+        const query = countWeekBookings('clientUser', user._id.toString(), startWeek, endWeek);
+        const result = await Booking.aggregate(query);
+        console.log('Resultados agrupados por día:', result);
+        if (!result) throw createError(404, "Personal week booking not found ");
+        res.status(200).json(result);
     } catch (err) {
         next(err);
     }
@@ -82,7 +76,7 @@ export const getNextDaysClientId = async (req, res, next) => {
         const dateMoment = moment(date, 'YYYY-MM-DD').subtract(1, 'day').format('YYYY-MM-DD');
         let query = {
             clientUser: user._id.toString(),
-            "date.stringData": { $gt: dateMoment},
+            "date.stringData": { $gt: dateMoment },
         };
         const booking = await Booking.paginate(query, options);
         if (!booking) throw createError(404, "Client next booking not found ");
@@ -134,4 +128,3 @@ export const getLastDaysClientId = async (req, res, next) => {
 };
 
 
-  

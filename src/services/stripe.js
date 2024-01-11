@@ -4,6 +4,29 @@ import Stripe from "stripe";
 import Booking from "../models/booking.js";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 
+const populate = [
+  {
+    path: "businessUser",
+    select: "businessData personalData img",
+  },
+  {
+    path: "workerUser",
+    select: "workerData personalData img",
+  },
+  {
+    path: "service",
+    select: "name isActive coverImg",
+  },
+  {
+    path: "subservice",
+    select: "name isActive coverImg duration",
+  },
+  {
+    path: "clientUser",
+    select: "personalData img",
+  },
+];
+
 //CREATE CUSTOMER ID
 export const createCustomerId = async (id) => {
   logger.info("---CREATE CUSTOMER ID STRIPE ---");
@@ -73,7 +96,8 @@ export const capturePaymentIntent = async (
   booking,
   percentage = 1,
   statusBooking = "confirmed",
-  canceledData = null
+  canceledData = null,
+  completedData = null
 ) => {
   logger.info("---CAPTURE PAYMENT INTENT STRIPE ---");
   try {
@@ -104,11 +128,14 @@ export const capturePaymentIntent = async (
     booking.status = statusBooking;
     booking.payment.priceBRL = balanceTransaction.net / 100;
     canceledData ? (booking.canceledData = canceledData) : "";
+    completedData ? (booking.completedData = completedData) : "";
     const updatedBooking = await Booking.findByIdAndUpdate(
       booking._id,
       booking,
       { new: true }
-    );
+    )
+      .populate(populate)
+      .exec();
     return updatedBooking;
 
     // const invoiceItem = await stripe.invoiceItems.create({

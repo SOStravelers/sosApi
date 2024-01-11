@@ -1,7 +1,6 @@
 import moment from "moment-timezone";
 import Booking from "../../models/booking.js";
-/* import User from "../../models/user.js"; */
-import { optionsBooking, validateFormatDate } from "./helper.js";
+import { optionsBooking, validateFormatDate, countWeekBookings } from "./helper.js";
 import { createError } from "../../config/error.js";
 
 export const getAllworkers = async (req, res, next) => {
@@ -99,23 +98,20 @@ export const getWeekWorkers = async (req, res, next) => {
   try {
     const user = req.user;
     if (user.type != "worker") throw createError(401, "Unauthorized");
-    const { date, page, limit } = req.query;
+    const { date } = req.query;
     validateFormatDate(date);
     const dateMoment = moment(date, "YYYY-MM-DD")
       .add(7, "day")
       .format("YYYY-MM-DD");
     const startWeek = moment.utc(date).format();
-    const endWeek = moment.utc(dateMoment).format();
-    let query = {
-      workerUser: user._id.toString(),
-      "date.isoDate": {
-        $gte: startWeek,
-        $lte: endWeek,
-      },
-    };
-    const booking = await Booking.find(query);
-    if (!booking) throw createError(404, "Worker week booking not found ");
-    res.status(200).json(booking);
+    const endWeek = moment.utc(dateMoment).format(); 
+    console.log(moment.utc(startWeek).toISOString());
+    console.log(moment.utc(endWeek).format(), endWeek);
+    let query = countWeekBookings('workerUser', user._id.toString(), startWeek, endWeek);
+    const result = await Booking.aggregate(query);
+    console.log('Resultados agrupados por día:', result);
+    if (!result) throw createError(404, "Worker week booking not found ");
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }
