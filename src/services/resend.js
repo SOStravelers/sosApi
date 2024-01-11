@@ -12,7 +12,7 @@ export const resendEmail = async (email, numbers) => {
     console.log("el email", email);
     const data = await resend.emails.send({
       from: "SOS Travelers <info@sostvl.com>",
-      to: [email],
+      to: [email], // va dirigido al usuario
       subject: "SOS Travelers - Validate your email address",
       html: htmlToSend,
     });
@@ -28,19 +28,22 @@ export const resendSupport = async (data) => {
   const sEmail = email ?? data.user.email;
   const sType = user ? user.type : "not registered";
 
+  // definir templateHtml
   const htmlString = templateHtml("supportEmail");
   const template = Handlebars.compile(htmlString);
   const htmlToSend = template({
+    // variables que envio al template del html
     message: message,
     sName: sName,
     userType: sType,
+    Email: sEmail,
   });
 
   try {
     const mailData = await resend.emails.send({
       from: "Support prueba SOS <support.prueba@sostvl.com>",
-      to: "sostravelbr@gmail.com",
-      subject: subject + sEmail,
+      to: "sostravelbr@gmail.com", // email va dirigido siempre a SOS travelers
+      subject: subject,
       html: htmlToSend,
     });
 

@@ -237,16 +237,6 @@ router.get(
         required: true,
         type: "string",
       },
-      {
-        param_key: "page",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
-        type: "string",
-      },
     ],
     "query"
   ),
@@ -412,16 +402,6 @@ router.get(
       {
         param_key: "date",
         required: true,
-        type: "string",
-      },
-      {
-        param_key: "page",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
         type: "string",
       },
     ],
@@ -621,16 +601,6 @@ router.get(
       {
         param_key: "date",
         required: true,
-        type: "string",
-      },
-      {
-        param_key: "page",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
         type: "string",
       },
     ],
