@@ -4,6 +4,29 @@ import Stripe from "stripe";
 import Booking from "../models/booking.js";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 
+const populate = [
+  {
+    path: "businessUser",
+    select: "businessData personalData img",
+  },
+  {
+    path: "workerUser",
+    select: "workerData personalData img",
+  },
+  {
+    path: "service",
+    select: "name isActive coverImg",
+  },
+  {
+    path: "subservice",
+    select: "name isActive coverImg duration",
+  },
+  {
+    path: "clientUser",
+    select: "personalData img",
+  },
+];
+
 //CREATE CUSTOMER ID
 export const createCustomerId = async (id) => {
   logger.info("---CREATE CUSTOMER ID STRIPE ---");
@@ -67,8 +90,15 @@ export const createPaymentIntent = async (data, user) => {
     throw error;
   }
 };
+
 //CAPTURE PAYMENT INTENT
-export const capturePaymentIntent = async (booking) => {
+export const capturePaymentIntent = async (
+  booking,
+  percentage = 1,
+  statusBooking = "confirmed",
+  canceledData = null,
+  completedData = null
+) => {
   logger.info("---CAPTURE PAYMENT INTENT STRIPE ---");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
@@ -76,8 +106,13 @@ export const capturePaymentIntent = async (booking) => {
     }
 
     // Captura el pago
+    console.log("el precio", booking.price);
+    const finalCost = booking.payment.price * 100 * percentage;
     const paymentIntent = await stripe.paymentIntents.capture(
-      booking.payment.paymentId
+      booking.payment.paymentId,
+      {
+        amount_to_capture: finalCost, // Captura solo $10.00 del monto autorizado
+      }
     );
     // Obtiene el cargo y balanceTransaction
     const chargeId = paymentIntent.latest_charge;
@@ -90,13 +125,17 @@ export const capturePaymentIntent = async (booking) => {
 
     //Update booking
     booking.payment.status = "paid";
-    booking.status = "confirmed";
+    booking.status = statusBooking;
     booking.payment.priceBRL = balanceTransaction.net / 100;
+    canceledData ? (booking.canceledData = canceledData) : "";
+    completedData ? (booking.completedData = completedData) : "";
     const updatedBooking = await Booking.findByIdAndUpdate(
       booking._id,
       booking,
       { new: true }
-    );
+    )
+      .populate(populate)
+      .exec();
     return updatedBooking;
 
     // const invoiceItem = await stripe.invoiceItems.create({
