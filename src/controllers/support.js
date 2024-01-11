@@ -21,6 +21,7 @@ export const supportEmail = async (req, res, next) => {
       email: data.email,
       user: user.user,
     };
+    // funcion que manda el email
     await resendSupport(aux);
 
     res.status(200).json({ msg: "email sent", respuesta: respuesta });
