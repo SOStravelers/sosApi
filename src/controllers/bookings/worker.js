@@ -129,7 +129,7 @@ export const getListDayWorkers = async (req, res, next) => {
     const { date, page, limit } = req.query;
     validateFormatDate(date);
     const dateMoment = moment(date, "YYYY-MM-DD")
-      .add(3, "day")
+      .add(7, "day")
       .format("YYYY-MM-DD");
     const startDay = moment.utc(date).format();
     const lastDay = moment.utc(dateMoment).format();
