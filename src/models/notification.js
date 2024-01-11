@@ -1,27 +1,29 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
-import uniqueValidator from 'mongoose-unique-validator';
-
-
+import uniqueValidator from "mongoose-unique-validator";
+import mongoosePaginate from "mongoose-paginate-v2";
+import paginateConfig from "../config/paginate.js";
 const notificationSchema = new Schema(
   {
     title: { type: String, required: true },
+    subtitle: { type: String, ref: "Subtitle" },
+    booking: { type: String, ref: "Booking" },
+    type: { type: String, required: true },
     body: { type: String },
-    from: {
-      user: { type: String, ref: "User" },
-      other: { type: String }
-    },
-    user: { type: String, ref: "User" },
-    users: Array({ type: String, ref: "User" }),
-    event: { type: String, ref: "Event"  },
     isRead: { type: Boolean, default: false },
-    subtitle:{ type: String, ref: "Subtitle" },
+    toWorkers: { type: Boolean, default: false },
+    toBusiness: { type: Boolean, default: false },
+    toUsers: { type: Boolean, default: false },
+    to: Array({ type: String, ref: "User" }),
+    link: { type: String },
+    imgUrl: { type: String },
   },
   { timestamps: true }
 );
-
-
-
+notificationSchema.plugin(uniqueValidator, {
+  message: "This {PATH} is already in use.",
+});
+notificationSchema.plugin(mongoosePaginate);
+mongoosePaginate.paginate.options = paginateConfig;
 const Notification = mongoose.model("Notification", notificationSchema);
-
 export default Notification;

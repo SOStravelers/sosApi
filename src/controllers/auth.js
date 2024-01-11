@@ -525,7 +525,7 @@ export const sendValidationCode = async (req, res, next) => {
     //Funcion de amazon
     //await sendEmailTemplate(params);
     //Funcion de resend
-    await resendEmail(updatedUser.email, {
+    resendEmail(updatedUser.email, {
       number1: digitosArray[0],
       number2: digitosArray[1],
       number3: digitosArray[2],

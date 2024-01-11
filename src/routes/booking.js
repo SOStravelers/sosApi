@@ -53,16 +53,16 @@ router.post(
   "/",
   validateParams(
     [
-      // {
-      //   param_key: "location",
-      //   required: true,
-      //   type: "string",
-      // },
-      // {
-      //   param_key: "subservice",
-      //   required: true,
-      //   type: "string",
-      // },
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "subservice",
+        required: true,
+        type: "string",
+      },
       {
         param_key: "businessUser",
         required: true,

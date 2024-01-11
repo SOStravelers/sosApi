@@ -7,9 +7,9 @@ import subservice from "./subservice.js";
 import test from "./test.js";
 import payment from "./payment.js";
 import user from "./user.js";
+import notification from "./notification.js";
 import favorite from "./favorite.js";
 import admin from "./admin.js";
-import notification from "./notification.js";
 import schedule from "./schedule.js";
 import holliday from "./holliday.js";
 import support from "./support.js";
@@ -29,6 +29,10 @@ routes.get("/isAuth", isAuth, (req, res) => {
 routes.post("/renew", renewToken);
 routes.use("/auth", auth);
 
+routes.use("/notification", notification);
+
+routes.use("/notificationAuth", isAuth, notification);
+
 routes.use("/users", isAuth, user);
 routes.use("/usersfree", user);
 routes.use("/admin", isAuth, isAdmin, admin);
@@ -41,8 +45,6 @@ routes.use("/services", service);
 routes.use("/services2", isAuth, service);
 routes.use("/serviceAdmin", isAuth, isAdmin, service);
 routes.use("/subservices", subservice);
-
-routes.use("/notification", notification);
 
 routes.use("/schedules", isAuth, schedule);
 routes.use("/schedules2", schedule);

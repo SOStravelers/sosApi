@@ -7,6 +7,7 @@ const bookingSchema = new Schema(
   {
     businessUser: { type: String, ref: "User" },
     workerUser: { type: String, ref: "User" },
+    firstWorker: { type: String, ref: "User" },
     clientUser: { type: String, ref: "User" },
     creatorUser: { type: String, ref: "User" },
     service: { type: String, ref: "Service" },

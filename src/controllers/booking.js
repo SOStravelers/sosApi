@@ -1,6 +1,7 @@
 import { createError } from "../config/error.js";
 import Booking from "../models/booking.js";
 import User from "../models/user.js";
+import Notification from "../models/notification.js";
 import Subservice from "../models/subservice.js";
 import { sendEmailPaymentConfirmation } from "../services/aws_ses.js";
 import moment from "moment-timezone";
@@ -40,7 +41,9 @@ export const create = async (req, res, next) => {
     const emailData = req.body.emailData;
     const bookingData = req.body;
     bookingData.emailData = null;
+
     let booking = new Booking(bookingData);
+    booking.firstWorker = booking.workerUser;
     let query = {
       $and: [
         {
@@ -77,6 +80,24 @@ export const create = async (req, res, next) => {
       // Asignar el nuevo idKey al booking
       booking.idKey = newIdKey;
       const newBooking = await booking.save();
+      const theBooking = await Booking.findOne({ _id: newBooking._id })
+        .populate(populate)
+        .exec();
+
+      //creando notificaciones:
+      //notification User
+      const notification1 = new Notification();
+      notification1.type = "booking";
+      notification1.booking = newBooking._id;
+      notification1.title = "New Booking";
+      notification1.date = new Date();
+      notification1.body = `You have a new reservation at the hostel: ${theBooking.businessUser.businessData.name}`;
+      notification1.fromAdmin = true;
+      notification1.to = [theBooking.clientUser, theBooking.workerUser];
+      notification1.link = `/service-details/${theBooking._id}`;
+      notification1.imgUrl = theBooking.businessUser.img.imgUrl;
+      notification1.save();
+
       if (emailData) sendEmailPaymentConfirmation(emailData);
       res.status(201).json({ booking: newBooking, msg: "new Document" });
     }
