@@ -28,8 +28,8 @@ export const optionsBooking = (page, limit) => {
     populate: populate,
     select: "payment idKey startTime currency status endTime date duration ",
     page: page || 1,
-    limit: limit || 5,
-    sort: {'startTime.isoTime': 1 },
+    limit: 100,
+    sort: { "startTime.isoTime": 1 },
   };
 };
 
@@ -38,70 +38,66 @@ export const buildBookingStatisticsQuery = (startDate, endDate, userId) => {
     return [
       {
         $match: {
-          'date.isoDate': {
+          "date.isoDate": {
             $gte: startDate,
             $lte: endDate,
           },
-          'businessUser': userId,
-          "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
-          'payment.status': { $in: ['paid'] }
-        }
+          businessUser: userId,
+          status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+          "payment.status": { $in: ["paid"] },
+        },
       },
       {
         $group: {
           _id: null,
-          totalAmount: { $sum: '$payment.priceBRL' }
-        }
-      }
+          totalAmount: { $sum: "$payment.priceBRL" },
+        },
+      },
     ];
   }
 
   return [
     {
       $match: {
-        'businessUser': userId,
-        "status": { $in: ['canceled', 'completed', 'failed', "confirmed"] },
-        'payment.status': { $in: ['paid'] }
-      }
+        businessUser: userId,
+        status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+        "payment.status": { $in: ["paid"] },
+      },
     },
     {
       $sort: {
-        'date.isoDate': -1  // Ordenar en orden descendente por la fecha
-      }
+        "date.isoDate": -1, // Ordenar en orden descendente por la fecha
+      },
     },
     {
       $group: {
         _id: null,
-        date: { $first: '$date.isoDate' },
-        totalAmount: { $sum: '$payment.priceBRL' },
-        totalBookings: { $sum: 1 }
-      }
-    }
+        date: { $first: "$date.isoDate" },
+        totalAmount: { $sum: "$payment.priceBRL" },
+        totalBookings: { $sum: 1 },
+      },
+    },
   ];
 };
 
 export const countDateBookings = (startDate, endDate, userId) => {
-
   return {
-    'date.isoDate': {
+    "date.isoDate": {
       $gte: moment.utc(startDate).format(),
       $lte: moment.utc(endDate).format(),
     },
-    'businessUser': userId,
-    "status": { $in: ['canceled', 'completed', 'failed', 'confirmed'] },
-    'payment.status': { $in: ['paid'] },
-  }
-
+    businessUser: userId,
+    status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+    "payment.status": { $in: ["paid"] },
+  };
 };
 
 export const countAllBookings = (userId) => {
-
   return {
-    'businessUser': userId,
-    "status": { $in: ['canceled', 'completed', 'failed', 'confirmed'] },
-    'payment.status': { $in: ['paid'] },
-  }
-
+    businessUser: userId,
+    status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+    "payment.status": { $in: ["paid"] },
+  };
 };
 
 export const countWeekBookings = (typeUser, userId, startDate, endDate) => {
@@ -109,7 +105,7 @@ export const countWeekBookings = (typeUser, userId, startDate, endDate) => {
     {
       $match: {
         [`${typeUser}`]: userId,
-        'date.isoDate': {
+        "date.isoDate": {
           $gte: new Date(moment.utc(startDate).toISOString()),
           $lte: new Date(moment.utc(endDate).toISOString()),
         },
@@ -118,18 +114,18 @@ export const countWeekBookings = (typeUser, userId, startDate, endDate) => {
     {
       $group: {
         _id: {
-          year: { $year: '$date.isoDate' },
-          month: { $month: '$date.isoDate' },
-          day: { $dayOfMonth: '$date.isoDate' },
+          year: { $year: "$date.isoDate" },
+          month: { $month: "$date.isoDate" },
+          day: { $dayOfMonth: "$date.isoDate" },
         },
-        bookings: { $push: '$$ROOT' },
+        bookings: { $push: "$$ROOT" },
       },
     },
     {
       $sort: {
-        '_id.year': 1,
-        '_id.month': 1,
-        '_id.day': 1,
+        "_id.year": 1,
+        "_id.month": 1,
+        "_id.day": 1,
       },
     },
     {
@@ -137,19 +133,19 @@ export const countWeekBookings = (typeUser, userId, startDate, endDate) => {
         _id: 0,
         day: {
           $dateToString: {
-            format: '%Y-%m-%d',
+            format: "%Y-%m-%d",
             date: {
               $dateFromString: {
                 dateString: {
                   $concat: [
-                    { $toString: '$_id.year' },
-                    '-',
-                    { $toString: '$_id.month' },
-                    '-',
-                    { $toString: '$_id.day' },
+                    { $toString: "$_id.year" },
+                    "-",
+                    { $toString: "$_id.month" },
+                    "-",
+                    { $toString: "$_id.day" },
                   ],
                 },
-                format: '%Y-%m-%d',
+                format: "%Y-%m-%d",
               },
             },
           },
@@ -167,12 +163,13 @@ export const countWeekBookings = (typeUser, userId, startDate, endDate) => {
 
 export const validateFormatDate = (dateString, dateEndString) => {
   if (dateEndString) {
-    if (!moment(dateString, 'YYYY-MM-DD', true).isValid() || !moment(dateEndString, 'YYYY-MM-DD', true).isValid()) {
+    if (
+      !moment(dateString, "YYYY-MM-DD", true).isValid() ||
+      !moment(dateEndString, "YYYY-MM-DD", true).isValid()
+    ) {
       throw createError(400, "invalid date format");
     }
-  } else if (!moment(dateString, 'YYYY-MM-DD', true).isValid()) {
+  } else if (!moment(dateString, "YYYY-MM-DD", true).isValid()) {
     throw createError(404, "invalid date format");
   }
-
 };
-
