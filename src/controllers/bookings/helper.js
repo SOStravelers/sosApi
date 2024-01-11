@@ -29,7 +29,7 @@ export const optionsBooking = (page, limit) => {
     select: "payment idKey startTime currency status endTime date duration ",
     page: page || 1,
     limit: limit || 5,
-    sort: { updatedAt: -1 },
+    sort: {'startTime.isoTime': 1 },
   };
 };
 

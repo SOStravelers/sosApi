@@ -109,9 +109,24 @@ export const getWeekWorkers = async (req, res, next) => {
     console.log(moment.utc(endWeek).format(), endWeek);
     let query = countWeekBookings('workerUser', user._id.toString(), startWeek, endWeek);
     const result = await Booking.aggregate(query);
-    console.log('Resultados agrupados por día:', result);
     if (!result) throw createError(404, "Worker week booking not found ");
-    res.status(200).json(result);
+    let response = [];
+    if(result.length < 7){
+      const sumDays = (date, day) => {
+        return moment(date).add(day, 'days').format('YYYY-MM-DD');
+      };
+      let days = 1;
+      while(days <= 7){
+        const position = result.findIndex(e => e.day === sumDays(startWeek, days));
+        if(position !== -1){
+          response.push({day: sumDays(startWeek, days), bookings: result[position].bookings.length}); 
+        }else{
+          response.push({day: sumDays(startWeek, days), bookings: 0}); 
+        } 
+       days++;
+      }
+    };
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
