@@ -136,6 +136,7 @@ export const getListDayWorkers = async (req, res, next) => {
         $gte: startDay,
         $lte: lastDay,
       },
+      status: { $in: ["requested", "confirmed", "available"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found");
