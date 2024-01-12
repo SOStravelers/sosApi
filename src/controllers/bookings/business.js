@@ -70,9 +70,7 @@ export const getYearBusiness = async (req, res, next) => {
         $gte: moment.utc(`${year}-01-01`).format(),
         $lte: moment.utc(`${year}-12-31`).format(),
       },
-      status: {
-        $in: ["requested", "canceled", "completed", "failed", "confirmed"],
-      },
+      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
