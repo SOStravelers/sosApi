@@ -388,8 +388,8 @@ export const completeBookingWorker = async (req, res, next) => {
       throw createError(400, "Booking can't be completed");
     const brazilTime = moment().tz("America/Sao_Paulo");
     const completedData = {
-      canceledBy: userId,
-      canceledAtUTC: brazilTime,
+      completedBy: userId,
+      completedAtUTC: brazilTime,
       timeZone: "America/Sao_Paulo",
       previusStatus: booking.status,
     };

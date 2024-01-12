@@ -8,7 +8,10 @@ import bodyParser from "body-parser";
 import localeMiddleware from "express-locale";
 import db from "./db.js";
 import routes from "./routes/index.js";
-
+import schedule from "node-schedule";
+import moment from "moment-timezone";
+import Booking from "./models/booking.js";
+import { capturePaymentIntent } from "./services/stripe.js";
 // check connection
 db.once("open", () => {
   global.logger.info(`Connnected to mongodb`);
@@ -26,17 +29,6 @@ app.use(morgan("tiny"));
 //Para realizar solicitudes de un servidor externo e impedir el bloqueo por CORS
 
 app.use(cors());
-
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method"
-//   );
-//   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-//   res.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
-//   next();
-// });
 
 app.use(localeMiddleware());
 
@@ -123,11 +115,77 @@ app.get("/", (req, res) => {
   `;
   res.send(htmlResponse);
 });
-// app.use((err, req, res, next) => {
-//   res.status(err.statusCode || 500).json({
-//     error: err.message || "Internal Server Error.",
-//   });
-// });
+
+// Programa una tarea para ejecutarse cada 2 minutos entre las 9 AM y las 10 PM
+const rule = new schedule.RecurrenceRule();
+rule.tz = "America/Sao_Paulo"; // Zona horaria de Brasil
+rule.minute = new schedule.Range(0, 59, 58); // Cada 58 minutos
+rule.hour = new schedule.Range(9, 22); // Entre las 9 AM y las 10 PM
+
+const job = schedule.scheduleJob(rule, async function () {
+  global.logger.info("---CHANGE TO AVAILABLE---");
+  // tomar todos los booking en requested creados hace media hora o mas y cambiarlos a available
+  try {
+    const now = moment().tz("America/Sao_Paulo");
+    console.log("Hola, la hora actual en Brasil es: " + now.format("HH:mm:ss"));
+    console.log(moment().subtract(30, "minutes").toDate());
+    const result = await Booking.updateMany(
+      {
+        status: "requested",
+        createdAt: {
+          $lte: moment().subtract(30, "minutes").toDate(),
+        },
+      },
+      {
+        status: "available",
+      }
+    );
+    console.log(result);
+    console.log({ msg: "ok", updatedCount: result.nModified });
+  } catch (err) {
+    console.error(err);
+  }
+});
+// Puedes cancelar la tarea usando job.cancel()
+job.cancel();
+
+//Ahora quiero una función que cambie todos los bookings en confirmed a completed a las 01:00 AM de brasil todos los dias
+const rule2 = new schedule.RecurrenceRule();
+rule2.tz = "America/Sao_Paulo"; // Zona horaria de Brasil
+rule2.minute = 0; // Cada 2 minutos
+rule2.hour = 1; // Entre las 9 AM y las 10 PM
+const job2 = schedule.scheduleJob(rule2, async function () {
+  global.logger.info("---CHANGE TO COMPLETED---");
+  // tomar todos los booking en requested creados hace media hora o mas y cambiarlos a available
+  try {
+    const now = moment().tz("America/Sao_Paulo");
+    console.log("Hola, la hora actual en Brasil es: " + now.format("HH:mm:ss"));
+    const result = await Booking.find({
+      status: "confirmed",
+    });
+    for (let booking of result) {
+      const brazilTime = moment().tz("America/Sao_Paulo");
+      const completedData = {
+        completedBy: userId,
+        completedAtUTC: brazilTime,
+        timeZone: "America/Sao_Paulo",
+        previusStatus: booking.status,
+      };
+      const newBooking = await capturePaymentIntent(
+        booking,
+        1, // percentage
+        "completed", // statusBooking
+        null, // canceledData,
+        completedData // completedData
+      );
+    }
+    console.log(result);
+    console.log({ msg: "ok", updatedCount: result.nModified });
+  } catch (err) {
+    console.error(err);
+  }
+});
+job2.cancel();
 
 app.use(errorHandling);
 app.use(history());

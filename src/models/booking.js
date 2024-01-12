@@ -51,6 +51,13 @@ const bookingSchema = new Schema(
       timeZone: { type: String },
       previusStatus: { type: String },
     },
+    completedData: {
+      completedBy: { type: String, ref: "User" },
+      completedSOS: { type: Boolean, default: false },
+      completedAtUTC: { type: Date },
+      timeZone: { type: String },
+      previusStatus: { type: String },
+    },
     status: {
       type: String,
       default: "requested",
