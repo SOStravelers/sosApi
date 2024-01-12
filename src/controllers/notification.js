@@ -27,11 +27,12 @@ export const getByUser = async (req, res, next) => {
     const userId = req.user._id.toString();
     const options = {
       sort: { createdAt: -1 },
-      limit: 10,
+      limit: req.query.limit || 10,
       page: req.query.page || 1,
       select: "title booking type body isRead to link imgUrl createdAt",
       populate: populateBooking,
     };
+    console.log(options);
     const notifications = await Notification.paginate({ to: userId }, options);
     res.send(notifications);
   } catch (err) {
@@ -52,7 +53,6 @@ export const setIsRead = async (req, res, next) => {
     next(err);
   }
 };
-
 //funcion para saber si un usuario tiene notificaciones sin leer (is Read = false)
 export const checkNotification = async (req, res) => {
   global.logger.info("=== CHECK NOTIFICATION ===");
