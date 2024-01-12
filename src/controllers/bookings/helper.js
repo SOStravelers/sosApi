@@ -28,57 +28,11 @@ export const optionsBooking = (page, limit) => {
     populate: populate,
     select: "payment idKey startTime currency status endTime date duration ",
     page: page || 1,
-    limit: 100,
+    limit: limit || 100,
     sort: { "startTime.isoTime": 1 },
   };
 };
 
-export const buildBookingStatisticsQuery = (startDate, endDate, userId) => {
-  if (startDate != null && endDate != null) {
-    return [
-      {
-        $match: {
-          "date.isoDate": {
-            $gte: startDate,
-            $lte: endDate,
-          },
-          businessUser: userId,
-          status: { $in: ["canceled", "completed", "failed", "confirmed"] },
-          "payment.status": { $in: ["paid"] },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalAmount: { $sum: "$payment.priceBRL" },
-        },
-      },
-    ];
-  }
-
-  return [
-    {
-      $match: {
-        businessUser: userId,
-        status: { $in: ["canceled", "completed", "failed", "confirmed"] },
-        "payment.status": { $in: ["paid"] },
-      },
-    },
-    {
-      $sort: {
-        "date.isoDate": -1, // Ordenar en orden descendente por la fecha
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        date: { $first: "$date.isoDate" },
-        totalAmount: { $sum: "$payment.priceBRL" },
-        totalBookings: { $sum: 1 },
-      },
-    },
-  ];
-};
 
 export const countDateBookings = (startDate, endDate, userId) => {
   return {
@@ -173,3 +127,30 @@ export const validateFormatDate = (dateString, dateEndString) => {
     throw createError(404, "invalid date format");
   }
 };
+
+const sumDays = (date, day) => {
+  return moment(date).add(day, "days").format("YYYY-MM-DD");
+};
+
+export const daysOfweek = (result, startWeek) => {
+  if (result.length < 7) {
+  let days = 1, response = [];
+  while (days <= 7) {
+    const position = result.findIndex(
+      (e) => e.day === sumDays(startWeek, days)
+    );
+    if (position !== -1) {
+      response.push({
+        day: sumDays(startWeek, days),
+        bookings: result[position].bookings.length,
+      });
+    } else {
+      response.push({ day: sumDays(startWeek, days), bookings: 0 });
+    }
+    days++;
+  }
+  return response;
+}
+};
+
+
