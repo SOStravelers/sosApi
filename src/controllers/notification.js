@@ -4,7 +4,7 @@ import User from "../models/user.js";
 const populateBooking = [
   {
     path: "booking",
-    select: "businessUser service subservice startTime",
+    select: "businessUser service subservice startTime createdAt",
     populate: [
       {
         path: "businessUser.businessData",
@@ -22,20 +22,47 @@ const populateBooking = [
   },
 ];
 export const getByUser = async (req, res, next) => {
+  global.logger.info("=== GET NOTIFICATIONS BY USER ===");
   try {
+    const userId = req.user._id.toString();
     const options = {
       sort: { createdAt: -1 },
       limit: 10,
       page: req.query.page || 1,
-      select: "title booking type body isRead to link imgUrl",
+      select: "title booking type body isRead to link imgUrl createdAt",
       populate: populateBooking,
     };
-    const notifications = await Notification.paginate(
-      { to: req.user._id },
-      options
-    );
+    const notifications = await Notification.paginate({ to: userId }, options);
     res.send(notifications);
   } catch (err) {
     next(err);
   }
+};
+//actualiza el campo isRead a true
+export const setIsRead = async (req, res, next) => {
+  global.logger.info("=== SET IS READ NOTIFICATION ===");
+  try {
+    const notification = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { isRead: true },
+      { new: true }
+    );
+    res.send(notification);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//funcion para saber si un usuario tiene notificaciones sin leer (is Read = false)
+export const checkNotification = async (req, res) => {
+  global.logger.info("=== CHECK NOTIFICATION ===");
+  console.log(req.user._id.toString());
+  const userId = req.user._id.toString(); // o quizás req.user._id, dependiendo de tu configuración
+  const notifications = await Notification.find({
+    to: userId,
+    isRead: false,
+  }).exec();
+  console.log(notifications);
+  const result = notifications.length > 0;
+  return res.send(result);
 };

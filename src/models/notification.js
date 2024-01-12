@@ -14,7 +14,7 @@ const notificationSchema = new Schema(
     toWorkers: { type: Boolean, default: false },
     toBusiness: { type: Boolean, default: false },
     toUsers: { type: Boolean, default: false },
-    to: Array({ type: String, ref: "User" }),
+    to: [{ type: String, ref: "User", _id: false }],
     link: { type: String },
     imgUrl: { type: String },
   },

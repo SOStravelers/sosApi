@@ -91,9 +91,12 @@ export const create = async (req, res, next) => {
       notification1.booking = newBooking._id;
       notification1.title = "New Booking";
       notification1.date = new Date();
-      notification1.body = `You have a new reservation at the hostel: ${theBooking.businessUser.businessData.name}`;
+      notification1.body = `New reservation at : ${theBooking.businessUser.businessData.name}`;
       notification1.fromAdmin = true;
-      notification1.to = [theBooking.clientUser, theBooking.workerUser];
+      notification1.to = [
+        newBooking.clientUser.toString(),
+        newBooking.workerUser.toString(),
+      ];
       notification1.link = `/service-details/${theBooking._id}`;
       notification1.imgUrl = theBooking.businessUser.img.imgUrl;
       notification1.save();
@@ -397,6 +400,7 @@ export const completeBookingWorker = async (req, res, next) => {
       null, // canceledData,
       completedData // completedData
     );
+
     res.status(200).json(newBooking);
   } catch (err) {
     next(err);
