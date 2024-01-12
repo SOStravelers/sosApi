@@ -70,7 +70,9 @@ export const getYearBusiness = async (req, res, next) => {
         $gte: moment.utc(`${year}-01-01`).format(),
         $lte: moment.utc(`${year}-12-31`).format(),
       },
-      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+      status: {
+        $in: ["requested", "canceled", "completed", "failed", "confirmed"],
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
@@ -118,29 +120,40 @@ export const getWeekBusiness = async (req, res, next) => {
       .format("YYYY-MM-DD");
     const startWeek = moment.utc(date).format();
     const endWeek = moment.utc(dateMoment).format();
-    let query = countWeekBookings('businessUser', user._id.toString(), startWeek, endWeek);
-     query[0].$match.status =  { $in: ["canceled", "completed", "failed", "confirmed"] }
-     const result = await Booking.aggregate(query);
-    console.log('Resultados agrupados por día:', result);
+    let query = countWeekBookings(
+      "businessUser",
+      user._id.toString(),
+      startWeek,
+      endWeek
+    );
+    query[0].$match.status = {
+      $in: ["canceled", "completed", "failed", "confirmed"],
+    };
+    const result = await Booking.aggregate(query);
+    console.log("Resultados agrupados por día:", result);
     if (!result) throw createError(404, "Business week booking not found ");
     let response = [];
-    if(result.length < 7){
+    if (result.length < 7) {
       const sumDays = (date, day) => {
-        return moment(date).add(day, 'days').format('YYYY-MM-DD');
+        return moment(date).add(day, "days").format("YYYY-MM-DD");
       };
       let days = 1;
-      while(days <= 7){
-        const position = result.findIndex(e => e.day === sumDays(startWeek, days));
-        if(position !== -1){
-          response.push({day: sumDays(startWeek, days), bookings: result[position].bookings.length}); 
-        }else{
-          response.push({day: sumDays(startWeek, days), bookings: 0}); 
-        } 
-       days++;
+      while (days <= 7) {
+        const position = result.findIndex(
+          (e) => e.day === sumDays(startWeek, days)
+        );
+        if (position !== -1) {
+          response.push({
+            day: sumDays(startWeek, days),
+            bookings: result[position].bookings.length,
+          });
+        } else {
+          response.push({ day: sumDays(startWeek, days), bookings: 0 });
+        }
+        days++;
       }
-    };
+    }
     res.status(200).json(response);
-
 
     res.status(200).json(result);
   } catch (err) {
@@ -210,7 +223,6 @@ export const getDayBusiness = async (req, res, next) => {
     let query = {
       businessUser: user._id.toString(),
       "date.stringData": date,
-      
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Business booking not found ");
