@@ -199,6 +199,7 @@ export const getDayBusiness = async (req, res, next) => {
     let query = {
       businessUser: user._id.toString(),
       "date.stringData": date,
+      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Business booking not found ");

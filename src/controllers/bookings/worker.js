@@ -1,6 +1,11 @@
 import moment from "moment-timezone";
 import Booking from "../../models/booking.js";
-import { optionsBooking, validateFormatDate, countWeekBookings, daysOfweek } from "./helper.js";
+import {
+  optionsBooking,
+  validateFormatDate,
+  countWeekBookings,
+  daysOfweek,
+} from "./helper.js";
 import { createError } from "../../config/error.js";
 
 export const getAllworkers = async (req, res, next) => {
@@ -104,10 +109,15 @@ export const getWeekWorkers = async (req, res, next) => {
       .add(7, "day")
       .format("YYYY-MM-DD");
     const startWeek = moment.utc(date).format();
-    const endWeek = moment.utc(dateMoment).format(); 
+    const endWeek = moment.utc(dateMoment).format();
     console.log(moment.utc(startWeek).toISOString());
     console.log(moment.utc(endWeek).format(), endWeek);
-    let query = countWeekBookings('workerUser', user._id.toString(), startWeek, endWeek);
+    let query = countWeekBookings(
+      "workerUser",
+      user._id.toString(),
+      startWeek,
+      endWeek
+    );
     const result = await Booking.aggregate(query);
     if (!result) throw createError(404, "Worker week booking not found ");
     const response = daysOfweek(result, startWeek);
