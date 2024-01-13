@@ -198,3 +198,22 @@ export const getLastWorkers = async (req, res, next) => {
     next(err);
   }
 };
+
+export const availableBookings = async (req, res, next) => {
+  global.logger.info("---AVAILABLE BOOKING WORKER---");
+  try {
+    const userId = req.user._id;
+    const user = await User.findOne({ _id: userId }).exec();
+    if (user.type != "worker") throw createError(401, "Unauthorized");
+    const { page, limit } = req.query;
+    let options = optionsBooking(page, limit);
+    const query = {
+      status: "available",
+    };
+    const bookings = await Booking.paginate(query, options);
+    if (!bookings) throw createError(404, "Available booking not found");
+    res.status(200).json(bookings);
+  } catch (err) {
+    next(err);
+  }
+};

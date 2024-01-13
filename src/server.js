@@ -147,7 +147,7 @@ const job = schedule.scheduleJob(rule, async function () {
   }
 });
 // Puedes cancelar la tarea usando job.cancel()
-job.cancel();
+// job.cancel();
 
 //Ahora quiero una función que cambie todos los bookings en confirmed a completed a las 01:00 AM de brasil todos los dias
 const rule2 = new schedule.RecurrenceRule();
@@ -185,7 +185,46 @@ const job2 = schedule.scheduleJob(rule2, async function () {
     console.error(err);
   }
 });
-job2.cancel();
+// job2.cancel();
+
+//ahora lo que quiero es que cada 30 min entre las 9 am y 10 pm se revise si hay booking en requested o available que comienzen en 30 min o menos y se cambien a canceled
+const rule3 = new schedule.RecurrenceRule();
+rule3.tz = "America/Sao_Paulo"; // Zona horaria de Brasil
+rule3.minute = new schedule.Range(0, 59, 30); // Cada 30 minutos
+rule3.hour = new schedule.Range(9, 22); // Entre las 9 AM y las 10 PM
+const job3 = schedule.scheduleJob(rule3, async function () {
+  global.logger.info("---CHANGE TO CANCELED---");
+  // tomar todos los booking en requested creados hace media hora o mas y cambiarlos a available
+  try {
+    const now = moment().tz("America/Sao_Paulo");
+    console.log("Hola, la hora actual en Brasil es: " + now.format("HH:mm:ss"));
+    const result = await Booking.updateMany(
+      {
+        $or: [
+          {
+            status: "requested",
+            "date.isoDate": {
+              $lte: moment().add(60, "minutes").toDate(),
+            },
+          },
+          {
+            status: "available",
+            "date.isoDate": {
+              $lte: moment().add(60, "minutes").toDate(),
+            },
+          },
+        ],
+      },
+      {
+        status: "canceled",
+      }
+    );
+    console.log(result);
+    console.log({ msg: "ok", updatedCount: result.nModified });
+  } catch (err) {
+    console.error(err);
+  }
+});
 
 app.use(errorHandling);
 app.use(history());

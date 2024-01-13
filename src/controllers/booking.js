@@ -436,6 +436,35 @@ export const confirmBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
+export const confirmBookingWorkerExternal = async (req, res, next) => {
+  global.logger.info("---CONFIRM BOOKING WORKER EXTERNAL---");
+  try {
+    const userId = req.user._id;
+    const bookingId = req.params.bookingId;
+    console.log(userId, bookingId);
+    const user = await User.findOne({ _id: userId.toString() }).exec();
+    const booking = await Booking.findOne({ _id: bookingId }).exec();
+    if (user && user.type != "worker") throw createError(401, "Unauthorized");
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.status != "available") {
+      console.log(booking.status);
+      throw createError(400, "Booking can't be confirmed");
+    }
+
+    const newBooking = await Booking.findOneAndUpdate(
+      {
+        _id: bookingId,
+      },
+      { status: "confirmed", wokerId: userId.toString() },
+      {
+        new: true,
+      }
+    ).populate(populate);
+    res.status(200).json(newBooking);
+  } catch (err) {
+    next(err);
+  }
+};
 export const cancelBookingWorker = async (req, res, next) => {
   global.logger.info("---CANCEL BOOKING WORKER---");
   try {
