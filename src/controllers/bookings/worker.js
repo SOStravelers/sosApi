@@ -1,6 +1,11 @@
 import moment from "moment-timezone";
 import Booking from "../../models/booking.js";
-import { optionsBooking, validateFormatDate, countWeekBookings } from "./helper.js";
+import User from "../../models/user.js";
+import {
+  optionsBooking,
+  validateFormatDate,
+  countWeekBookings,
+} from "./helper.js";
 import { createError } from "../../config/error.js";
 
 export const getAllworkers = async (req, res, next) => {
@@ -104,28 +109,38 @@ export const getWeekWorkers = async (req, res, next) => {
       .add(7, "day")
       .format("YYYY-MM-DD");
     const startWeek = moment.utc(date).format();
-    const endWeek = moment.utc(dateMoment).format(); 
+    const endWeek = moment.utc(dateMoment).format();
     console.log(moment.utc(startWeek).toISOString());
     console.log(moment.utc(endWeek).format(), endWeek);
-    let query = countWeekBookings('workerUser', user._id.toString(), startWeek, endWeek);
+    let query = countWeekBookings(
+      "workerUser",
+      user._id.toString(),
+      startWeek,
+      endWeek
+    );
     const result = await Booking.aggregate(query);
     if (!result) throw createError(404, "Worker week booking not found ");
     let response = [];
-    if(result.length < 7){
+    if (result.length < 7) {
       const sumDays = (date, day) => {
-        return moment(date).add(day, 'days').format('YYYY-MM-DD');
+        return moment(date).add(day, "days").format("YYYY-MM-DD");
       };
       let days = 1;
-      while(days <= 7){
-        const position = result.findIndex(e => e.day === sumDays(startWeek, days));
-        if(position !== -1){
-          response.push({day: sumDays(startWeek, days), bookings: result[position].bookings.length}); 
-        }else{
-          response.push({day: sumDays(startWeek, days), bookings: 0}); 
-        } 
-       days++;
+      while (days <= 7) {
+        const position = result.findIndex(
+          (e) => e.day === sumDays(startWeek, days)
+        );
+        if (position !== -1) {
+          response.push({
+            day: sumDays(startWeek, days),
+            bookings: result[position].bookings.length,
+          });
+        } else {
+          response.push({ day: sumDays(startWeek, days), bookings: 0 });
+        }
+        days++;
       }
-    };
+    }
     res.status(200).json(response);
   } catch (err) {
     next(err);
@@ -199,6 +214,25 @@ export const getLastWorkers = async (req, res, next) => {
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found ");
     res.status(200).json(booking);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const availableBookings = async (req, res, next) => {
+  global.logger.info("---AVAILABLE BOOKING WORKER---");
+  try {
+    const userId = req.user._id;
+    const user = await User.findOne({ _id: userId }).exec();
+    if (user.type != "worker") throw createError(401, "Unauthorized");
+    const { page, limit } = req.query;
+    let options = optionsBooking(page, limit);
+    const query = {
+      status: "available",
+    };
+    const bookings = await Booking.paginate(query, options);
+    if (!bookings) throw createError(404, "Available booking not found");
+    res.status(200).json(bookings);
   } catch (err) {
     next(err);
   }

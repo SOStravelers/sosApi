@@ -6,6 +6,7 @@ import {
   updateOne,
   cancelBooking,
   confirmBookingWorker,
+  confirmBookingWorkerExternal,
   completeBookingWorker,
   cancelBookingWorker,
   cancelBookingUser,
@@ -30,6 +31,7 @@ import {
   getListDayWorkers,
   getDayWorkers,
   getLastWorkers,
+  availableBookings,
 } from "../controllers/bookings/worker.js";
 
 import {
@@ -483,6 +485,27 @@ router.get(
   getAllworkers
 );
 
+/* get available booking for  allworkers  */
+router.get(
+  "/worker/available",
+  validateParams(
+    [
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  availableBookings
+);
+
 /* get specific place */
 router.get(
   "/business/time",
@@ -726,6 +749,20 @@ router.put(
     "params"
   ),
   confirmBookingWorker
+);
+router.put(
+  "/confirmWorkerExternal/:bookingId",
+  validateParams(
+    [
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  confirmBookingWorkerExternal
 );
 router.put(
   "/completeWorker/:bookingId",
