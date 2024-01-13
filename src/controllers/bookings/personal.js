@@ -2,7 +2,7 @@ import moment from "moment-timezone";
 import Booking from "../../models/booking.js";
 /* import User from "../../models/user.js"; */
 import { createError } from "../../config/error.js"
-import { optionsBooking, validateFormatDate, countWeekBookings } from "./helper.js";
+import { optionsBooking, validateFormatDate, countWeekBookings, daysOfweek } from "./helper.js";
 
 export const getAllClientsId = async (req, res, next) => {
     global.logger.info("---GET TO CLIENT ALL BOOKING---");
@@ -57,9 +57,9 @@ export const getWeekClientId = async (req, res, next) => {
         const endWeek = moment.utc(dateMoment).format();
         const query = countWeekBookings('clientUser', user._id.toString(), startWeek, endWeek);
         const result = await Booking.aggregate(query);
-        console.log('Resultados agrupados por día:', result);
         if (!result) throw createError(404, "Personal week booking not found ");
-        res.status(200).json(result);
+        const response = daysOfweek(result, startWeek);
+        res.status(200).json(response);
     } catch (err) {
         next(err);
     }

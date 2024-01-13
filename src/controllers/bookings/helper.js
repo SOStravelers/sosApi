@@ -28,56 +28,9 @@ export const optionsBooking = (page, limit) => {
     populate: populate,
     select: "payment idKey startTime currency status endTime date duration ",
     page: page || 1,
-    limit: 100,
+    limit: limit || 100,
     sort: { "startTime.isoTime": 1 },
   };
-};
-
-export const buildBookingStatisticsQuery = (startDate, endDate, userId) => {
-  if (startDate != null && endDate != null) {
-    return [
-      {
-        $match: {
-          "date.isoDate": {
-            $gte: startDate,
-            $lte: endDate,
-          },
-          businessUser: userId,
-          status: { $in: ["canceled", "completed", "failed", "confirmed"] },
-          "payment.status": { $in: ["paid"] },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalAmount: { $sum: "$payment.priceBRL" },
-        },
-      },
-    ];
-  }
-
-  return [
-    {
-      $match: {
-        businessUser: userId,
-        status: { $in: ["canceled", "completed", "failed", "confirmed"] },
-        "payment.status": { $in: ["paid"] },
-      },
-    },
-    {
-      $sort: {
-        "date.isoDate": -1, // Ordenar en orden descendente por la fecha
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        date: { $first: "$date.isoDate" },
-        totalAmount: { $sum: "$payment.priceBRL" },
-        totalBookings: { $sum: 1 },
-      },
-    },
-  ];
 };
 
 export const countDateBookings = (startDate, endDate, userId) => {
@@ -171,5 +124,40 @@ export const validateFormatDate = (dateString, dateEndString) => {
     }
   } else if (!moment(dateString, "YYYY-MM-DD", true).isValid()) {
     throw createError(404, "invalid date format");
+  }
+};
+
+const sumDay = (date, day) => {
+  const formattedDate = moment(date).add(day, "days").format("YYYY-MM-DD");
+  const formattedNumber = moment(date).add(day, "days").format("DD");
+  const formattedDay = moment(date).add(day, "days").format("ddd");
+  return { date: formattedDate, number: formattedNumber, day: formattedDay };
+};
+
+export const daysOfweek = (result, startWeek) => {
+  if (result.length < 7) {
+    let days = 0,
+      response = [];
+    while (days < 7) {
+      const { date, number, day } = sumDay(startWeek, days);
+      const position = result.findIndex((e) => e.day === date);
+      if (position !== -1) {
+        response.push({
+          day: day,
+          number: number,
+          date: date,
+          bookings: result[position].bookings.length,
+        });
+      } else {
+        response.push({
+          day: day,
+          number: number,
+          date: date,
+          bookings: 0,
+        });
+      }
+      days++;
+    }
+    return response;
   }
 };

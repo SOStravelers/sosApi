@@ -6,6 +6,7 @@ import {
   validateFormatDate,
   countWeekBookings,
   countAllBookings,
+  daysOfweek,
 } from "./helper.js";
 import { createError } from "../../config/error.js";
 
@@ -128,32 +129,9 @@ export const getWeekBusiness = async (req, res, next) => {
       $in: ["canceled", "completed", "failed", "confirmed"],
     };
     const result = await Booking.aggregate(query);
-    console.log("Resultados agrupados por día:", result);
     if (!result) throw createError(404, "Business week booking not found ");
-    let response = [];
-    if (result.length < 7) {
-      const sumDays = (date, day) => {
-        return moment(date).add(day, "days").format("YYYY-MM-DD");
-      };
-      let days = 1;
-      while (days <= 7) {
-        const position = result.findIndex(
-          (e) => e.day === sumDays(startWeek, days)
-        );
-        if (position !== -1) {
-          response.push({
-            day: sumDays(startWeek, days),
-            bookings: result[position].bookings.length,
-          });
-        } else {
-          response.push({ day: sumDays(startWeek, days), bookings: 0 });
-        }
-        days++;
-      }
-    }
+    const response = daysOfweek(result, startWeek);
     res.status(200).json(response);
-
-    res.status(200).json(result);
   } catch (err) {
     next(err);
   }
