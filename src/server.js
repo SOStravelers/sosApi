@@ -147,7 +147,7 @@ const job = schedule.scheduleJob(rule, async function () {
   }
 });
 // Puedes cancelar la tarea usando job.cancel()
-job.cancel();
+// job.cancel();
 
 //Ahora quiero una función que cambie todos los bookings en confirmed a completed a las 01:00 AM de brasil todos los dias
 const rule2 = new schedule.RecurrenceRule();
@@ -185,7 +185,7 @@ const job2 = schedule.scheduleJob(rule2, async function () {
     console.error(err);
   }
 });
-job2.cancel();
+// job2.cancel();
 
 //ahora lo que quiero es que cada 30 min entre las 9 am y 10 pm se revise si hay booking en requested o available que comienzen en 30 min o menos y se cambien a canceled
 const rule3 = new schedule.RecurrenceRule();
@@ -204,13 +204,13 @@ const job3 = schedule.scheduleJob(rule3, async function () {
           {
             status: "requested",
             "date.isoDate": {
-              $lte: moment().add(30, "minutes").toDate(),
+              $lte: moment().add(60, "minutes").toDate(),
             },
           },
           {
             status: "available",
             "date.isoDate": {
-              $lte: moment().add(30, "minutes").toDate(),
+              $lte: moment().add(60, "minutes").toDate(),
             },
           },
         ],
