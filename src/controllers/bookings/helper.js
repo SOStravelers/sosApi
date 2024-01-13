@@ -33,7 +33,6 @@ export const optionsBooking = (page, limit) => {
   };
 };
 
-
 export const countDateBookings = (startDate, endDate, userId) => {
   return {
     "date.isoDate": {
@@ -134,23 +133,22 @@ const sumDays = (date, day) => {
 
 export const daysOfweek = (result, startWeek) => {
   if (result.length < 7) {
-  let days = 1, response = [];
-  while (days <= 7) {
-    const position = result.findIndex(
-      (e) => e.day === sumDays(startWeek, days)
-    );
-    if (position !== -1) {
-      response.push({
-        day: sumDays(startWeek, days),
-        bookings: result[position].bookings.length,
-      });
-    } else {
-      response.push({ day: sumDays(startWeek, days), bookings: 0 });
+    let days = 0,
+      response = [];
+    while (days < 7) {
+      const position = result.findIndex(
+        (e) => e.day === sumDays(startWeek, days)
+      );
+      if (position !== -1) {
+        response.push({
+          day: sumDays(startWeek, days),
+          bookings: result[position].bookings.length,
+        });
+      } else {
+        response.push({ day: sumDays(startWeek, days), bookings: 0 });
+      }
+      days++;
     }
-    days++;
+    return response;
   }
-  return response;
-}
 };
-
-
