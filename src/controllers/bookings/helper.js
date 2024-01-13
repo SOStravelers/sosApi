@@ -127,8 +127,11 @@ export const validateFormatDate = (dateString, dateEndString) => {
   }
 };
 
-const sumDays = (date, day) => {
-  return moment(date).add(day, "days").format("YYYY-MM-DD");
+const sumDay = (date, day) => {
+  const formattedDate = moment(date).add(day, "days").format("YYYY-MM-DD");
+  const formattedNumber = moment(date).add(day, "days").format("DD");
+  const formattedDay = moment(date).add(day, "days").format("ddd");
+  return { date: formattedDate, number: formattedNumber, day: formattedDay };
 };
 
 export const daysOfweek = (result, startWeek) => {
@@ -136,16 +139,22 @@ export const daysOfweek = (result, startWeek) => {
     let days = 0,
       response = [];
     while (days < 7) {
-      const position = result.findIndex(
-        (e) => e.day === sumDays(startWeek, days)
-      );
+      const { date, number, day } = sumDay(startWeek, days);
+      const position = result.findIndex((e) => e.day === date);
       if (position !== -1) {
         response.push({
-          day: sumDays(startWeek, days),
+          day: day,
+          number: number,
+          date: date,
           bookings: result[position].bookings.length,
         });
       } else {
-        response.push({ day: sumDays(startWeek, days), bookings: 0 });
+        response.push({
+          day: day,
+          number: number,
+          date: date,
+          bookings: 0,
+        });
       }
       days++;
     }
