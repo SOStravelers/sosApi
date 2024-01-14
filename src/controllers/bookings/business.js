@@ -96,7 +96,7 @@ export const getMonthBusiness = async (req, res, next) => {
         $lte: moment(date, "YYYY-MM-DD").endOf("month"),
       },
       status: {
-        $in: ["canceled", "completed", "failed", "confirmed", "requested"],
+        $in: ["canceled", "completed", "failed", "confirmed"],
       },
     };
     const booking = await Booking.paginate(query, options);
