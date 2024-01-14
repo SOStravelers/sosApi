@@ -5,15 +5,11 @@ import {
   getBookings,
   updateOne,
   cancelBooking,
-  confirmBookingWorker,
-  confirmBookingWorkerExternal,
-  completeBookingWorker,
-  cancelBookingWorker,
-  cancelBookingUser,
-  completeBookingUser,
 } from "../controllers/booking.js";
 
 import {
+  cancelBookingUser,
+  completeBookingUser,
   getLastDaysClientId,
   getDayClientId,
   getNextDaysClientId,
@@ -23,6 +19,10 @@ import {
 } from "../controllers/bookings/personal.js";
 
 import {
+  completeBookingWorker,
+  confirmBookingWorker,
+  confirmBookingWorkerExternal,
+  cancelBookingWorker,
   getAllworkers,
   getNextWorkers,
   getNextMonthWorker,

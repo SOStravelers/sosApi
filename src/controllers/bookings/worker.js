@@ -1,5 +1,6 @@
 import moment from "moment-timezone";
 import Booking from "../../models/booking.js";
+import User from "../../models/user.js";
 import {
   optionsBooking,
   validateFormatDate,
@@ -7,6 +8,18 @@ import {
   daysOfweek,
 } from "./helper.js";
 import { createError } from "../../config/error.js";
+
+import {
+  cancelPaymentIntent,
+  capturePaymentIntent,
+  refund,
+} from "../../services/stripe.js";
+
+import {
+  cancelBookingNotification,
+  completeBookingNotification,
+  confirmBookingNotification,
+} from "../../services/notification.js";
 
 export const getAllworkers = async (req, res, next) => {
   global.logger.info("---GET TO WORKER ALL BOOKING---");
@@ -213,6 +226,187 @@ export const availableBookings = async (req, res, next) => {
     const bookings = await Booking.paginate(query, options);
     if (!bookings) throw createError(404, "Available booking not found");
     res.status(200).json(bookings);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//------------------WORKER BOOKING STATUS---------------------------
+export const completeBookingWorker = async (req, res, next) => {
+  global.logger.info("---COMPLETE BOOKING WORKER---");
+  try {
+    const userId = req.user._id;
+    const bookingId = req.params.bookingId;
+    console.log(userId, bookingId);
+    const user = await User.findOne({ _id: userId }).exec();
+    const booking = await Booking.findOne({ _id: bookingId }).exec();
+    if (user && user.type != "worker") throw createError(401, "Unauthorized");
+    if (user && user._id.toString() != booking.workerUser)
+      throw createError(401, "Unauthorized");
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.status != "confirmed")
+      throw createError(400, "Booking can't be completed");
+    const brazilTime = moment().tz("America/Sao_Paulo");
+    const completedData = {
+      completedBy: userId,
+      completedAtUTC: brazilTime,
+      timeZone: "America/Sao_Paulo",
+      previusStatus: booking.status,
+    };
+    const newBooking = await capturePaymentIntent(
+      booking,
+      1, // percentage
+      "completed", // statusBooking
+      null, // canceledData,
+      completedData // completedData
+    );
+    completeBookingNotification(newBooking);
+    res.status(200).json(newBooking);
+  } catch (err) {
+    next(err);
+  }
+};
+export const confirmBookingWorker = async (req, res, next) => {
+  global.logger.info("---CONFIRM BOOKING WORKER---");
+  try {
+    const userId = req.user._id;
+    const bookingId = req.params.bookingId;
+    console.log(userId, bookingId);
+    const user = await User.findOne({ _id: userId }).exec();
+    const booking = await Booking.findOne({ _id: bookingId }).exec();
+    if (user && user.type != "worker") throw createError(401, "Unauthorized");
+    if (user && user._id.toString() != booking.workerUser)
+      throw createError(401, "Unauthorized");
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.status != "requested") {
+      throw createError(400, "Booking can't be confirmed");
+    }
+
+    const newBooking = await Booking.findOneAndUpdate(
+      {
+        _id: bookingId,
+      },
+      { status: "confirmed" },
+      {
+        new: true,
+      }
+    ).populate(populate);
+    confirmBookingNotification(newBooking);
+    res.status(200).json(newBooking);
+  } catch (err) {
+    next(err);
+  }
+};
+export const confirmBookingWorkerExternal = async (req, res, next) => {
+  global.logger.info("---CONFIRM BOOKING WORKER EXTERNAL---");
+  try {
+    const userId = req.user._id;
+    const bookingId = req.params.bookingId;
+    console.log(userId, bookingId);
+    const user = await User.findOne({ _id: userId.toString() }).exec();
+    const booking = await Booking.findOne({ _id: bookingId }).exec();
+    if (user && user.type != "worker") throw createError(401, "Unauthorized");
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.status != "available") {
+      console.log(booking.status);
+      throw createError(400, "Booking can't be confirmed");
+    }
+
+    const newBooking = await Booking.findOneAndUpdate(
+      {
+        _id: bookingId,
+      },
+      { status: "confirmed", wokerId: userId.toString() },
+      {
+        new: true,
+      }
+    ).populate(populate);
+    confirmBookingNotification(newBooking);
+    res.status(200).json(newBooking);
+  } catch (err) {
+    next(err);
+  }
+};
+export const cancelBookingWorker = async (req, res, next) => {
+  global.logger.info("---CANCEL BOOKING WORKER---");
+  try {
+    const userId = req.user._id;
+    const bookingId = req.params.bookingId;
+    console.log(userId, bookingId);
+    const user = await User.findOne({ _id: userId }).exec();
+    const booking = await Booking.findOne({ _id: bookingId }).exec();
+    if (user && user.type != "worker") throw createError(401, "Unauthorized");
+    if (user && user._id.toString() != booking.workerUser)
+      throw createError(401, "Unauthorized");
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.status != "confirmed" && booking.status != "requested") {
+      throw createError(400, "Booking can't be cancel");
+    }
+
+    const brazilTime = moment().tz("America/Sao_Paulo");
+
+    var bookingSaveTime = moment(booking.startTime.isoTime).subtract(
+      2,
+      "hours"
+    );
+
+    const canceledData = {
+      canceledBy: userId,
+      canceledAtUTC: brazilTime,
+      timeZone: "America/Sao_Paulo",
+      previusStatus: booking.status,
+    };
+    if (booking.status === "confirmed") {
+      console.log("cancelar el booking y el pago de un booking confirmado");
+      //si la hora actual es mayor a la hora de inicio de la reserva menos 4 horas
+      if (!brazilTime.isSameOrAfter(bookingSaveTime)) {
+        console.log("puede cancelar sin penalidad de plata");
+        await cancelPaymentIntent(booking.payment.paymentId);
+        const newBooking = await Booking.findOneAndUpdate(
+          {
+            _id: bookingId,
+          },
+          {
+            status: "canceled",
+            canceledData: canceledData,
+            payment: {
+              ...booking.payment,
+              status: "canceled",
+            },
+          },
+          {
+            new: true,
+          }
+        ).populate(populate);
+        cancelBookingNotification(newBooking);
+        return res.status(200).json(newBooking);
+      } else {
+        throw createError(400, "Booking can't be cancel");
+      }
+    } else {
+      console.log(
+        "cancelar el booking y el pago de un booking requested o available"
+      );
+      await cancelPaymentIntent(booking.payment.paymentId);
+      const newBooking = await Booking.findOneAndUpdate(
+        {
+          _id: bookingId,
+        },
+        {
+          status: "canceled",
+          canceledData: canceledData,
+          payment: {
+            ...booking.payment,
+            status: "canceled",
+          },
+        },
+        {
+          new: true,
+        }
+      ).populate(populate);
+      cancelBookingNotification(newBooking);
+      return res.status(200).json(newBooking);
+    }
   } catch (err) {
     next(err);
   }
