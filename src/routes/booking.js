@@ -42,7 +42,7 @@ import {
   getWeekBusiness,
   getDayBusiness,
   getNextBusiness,
-  getNextMonthBusiness,
+  getLastMonthBusiness,
   getLastBusiness,
   getIndicators,
 } from "../controllers/bookings/business.js";
@@ -712,7 +712,7 @@ router.get(
 
 /* get next month business */
 router.get(
-  "/business/nextmonth",
+  "/business/lastmonth",
   validateParams(
     [
       {
@@ -733,7 +733,7 @@ router.get(
     ],
     "query"
   ),
-  getNextMonthBusiness
+  getLastMonthBusiness
 );
 
 router.put(
