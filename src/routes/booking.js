@@ -5,7 +5,7 @@ import {
   getBookings,
   updateOne,
   cancelBooking,
-} from "../controllers/booking.js";
+} from "../controllers/bookings/index.js";
 
 import {
   cancelBookingUser,

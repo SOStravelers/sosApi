@@ -1,14 +1,9 @@
-import { createError } from "../config/error.js";
-import Booking from "../models/booking.js";
-import User from "../models/user.js";
-import { newBookingNotification } from "../services/notification.js";
-import { sendEmailPaymentConfirmation } from "../services/aws_ses.js";
+import { createError } from "../../config/error.js";
+import Booking from "../../models/booking.js";
+import User from "../../models/user.js";
+import { newBookingNotification } from "../../services/notification.js";
+import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 import moment from "moment-timezone";
-import {
-  cancelPaymentIntent,
-  capturePaymentIntent,
-  refund,
-} from "../services/stripe.js";
 
 const populate = [
   {
@@ -107,8 +102,6 @@ export const getById = async (req, res, next) => {
     next(err);
   }
 };
-
-//Obtener bookings con paginate por cliente, hotel, Worker,
 
 export const getBookings = async (req, res, next) => {
   global.logger.info("---GET BOOKINGS---");
