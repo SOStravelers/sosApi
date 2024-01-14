@@ -42,11 +42,16 @@ export const getAllBusiness = async (req, res, next) => {
   try {
     const user = req.user;
     if (user.type != "business") throw createError(401, "Unauthorized");
-    const { page, limit, date } = req.query;
+    const { date, page, limit } = req.query;
+    validateFormatDate(date);
+    const newDate = moment.utc(date, "YYYY-MM-DD");
     let options = optionsBooking(page, limit);
-    let query = {
+    const query = {
       businessUser: user._id.toString(),
-      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+      "date.isoDate": {
+        $lte: moment(newDate, "YYYY-MM-DD"),
+      },
+      status: { $in: ["canceled", "completed", "failed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
@@ -64,14 +69,15 @@ export const getYearBusiness = async (req, res, next) => {
     const { date, page, limit } = req.query;
     validateFormatDate(date);
     const year = moment.utc(date, "YYYY-MM-DD").year();
+    const newDate = moment.utc(date, "YYYY-MM-DD");
     let options = optionsBooking(page, limit);
-    let query = {
+    const query = {
       businessUser: user._id.toString(),
       "date.isoDate": {
         $gte: moment.utc(`${year}-01-01`).format(),
-        $lte: moment.utc(`${year}-12-31`).format(),
+        $lte: moment(newDate, "YYYY-MM-DD"),
       },
-      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+      status: { $in: ["canceled", "completed", "failed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
@@ -96,7 +102,7 @@ export const getMonthBusiness = async (req, res, next) => {
         $lte: moment(date, "YYYY-MM-DD").endOf("month"),
       },
       status: {
-        $in: ["canceled", "completed", "failed", "confirmed", "requested"],
+        $in: ["canceled", "completed", "failed", "confirmed"],
       },
     };
     const booking = await Booking.paginate(query, options);
@@ -162,22 +168,22 @@ export const getNextBusiness = async (req, res, next) => {
   }
 };
 
-export const getNextMonthBusiness = async (req, res, next) => {
-  global.logger.info("---GET NEXT MONTH BUSINESS BOOKING---");
+export const getLastMonthBusiness = async (req, res, next) => {
+  global.logger.info("---GET LAST MONTH BUSINESS BOOKING---");
   try {
     const user = req.user;
     if (user.type != "business") throw createError(401, "Unauthorized");
     const { date, page, limit } = req.query;
     validateFormatDate(date);
-    const newDate = moment.utc(date, "YYYY-MM-DD").add(1, "month");
+    const newDate = moment.utc(date, "YYYY-MM-DD");
     let options = optionsBooking(page, limit);
     const query = {
       businessUser: user._id.toString(),
       "date.isoDate": {
         $gte: moment(newDate, "YYYY-MM-DD").startOf("month"),
-        $lte: moment(newDate, "YYYY-MM-DD").endOf("month"),
+        $lte: moment(newDate, "YYYY-MM-DD"),
       },
-      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+      status: { $in: ["canceled", "completed", "failed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking)
@@ -199,6 +205,7 @@ export const getDayBusiness = async (req, res, next) => {
     let query = {
       businessUser: user._id.toString(),
       "date.stringData": date,
+      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Business booking not found ");
