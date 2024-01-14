@@ -308,13 +308,13 @@ export const getIndicators = async (req, res, next) => {
     let query = {},
       avegare = 0;
     validateFormatDate(date_start);
-    if (duration === "month") {
+    if (duration === "1") {
       query = countBookingsForMonth(date_start, user._id.toString());
-    } else if (duration === "year") {
+    } else if (duration === "2") {
       query = countBookingsForYear(date_start, user._id.toString());
-    } else if (duration === "alltime") {
+    } else if (duration === "3") {
       query = countAllBookings(user._id.toString());
-    } else if (duration === "specific") {
+    } else if (duration === "4") {
       if (date_end == undefined) throw createError(400, "not found date_end");
       query = countBookingsForSpecific(
         date_start,
@@ -355,6 +355,7 @@ export const getIndicators = async (req, res, next) => {
       MoneyIncoming: sumTotal,
       Average: avegare,
       Projection: projection,
+      Duration: duration,
     });
   } catch (err) {
     next(err);
