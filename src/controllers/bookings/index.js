@@ -88,7 +88,7 @@ export const create = async (req, res, next) => {
       newBookingNotification(theBooking);
 
       if (emailData) sendEmailPaymentConfirmation(emailData);
-      res.status(201).json({ booking: newBooking, msg: "new Document" });
+      res.status(201).json({ booking: theBooking, msg: "new Document" });
     }
   } catch (err) {
     next(err);
