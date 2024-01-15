@@ -54,13 +54,17 @@ export const countAllBookings = (userId) => {
 };
 
 export const countWeekBookings = (typeUser, userId, startDate, endDate) => {
+  console.log("countWeekBookings");
+
+  console.log(moment.tz(startDate, "America/Sao_Paulo").toDate());
+  console.log(moment.tz(endDate, "America/Sao_Paulo").toDate());
   return [
     {
       $match: {
         [`${typeUser}`]: userId,
         "date.isoDate": {
-          $gte: new Date(moment.utc(startDate).toISOString()),
-          $lte: new Date(moment.utc(endDate).toISOString()),
+          $gte: new Date(moment.tz(startDate, "America/Sao_Paulo").toDate()),
+          $lte: new Date(moment.tz(endDate, "America/Sao_Paulo").toDate()),
         },
       },
     },

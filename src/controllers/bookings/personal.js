@@ -96,6 +96,7 @@ export const getWeekClientId = async (req, res, next) => {
       .format("YYYY-MM-DD");
     const startWeek = moment.utc(date).format();
     const endWeek = moment.utc(dateMoment).format();
+    console.log("la fecha", startWeek, endWeek);
     const query = countWeekBookings(
       "clientUser",
       user._id.toString(),
