@@ -13,6 +13,11 @@ const populate = [
   {
     path: "workerUser",
     select: "workerData personalData img",
+    populate: {
+      path: "workerData.services.id",
+      select: "name",
+      model: "Service", // Asegúrate de que este es el nombre correcto de tu modelo de servicio
+    },
   },
   {
     path: "service",
@@ -91,7 +96,7 @@ export const create = async (req, res, next) => {
 };
 //Obtener reserva por ID
 export const getById = async (req, res, next) => {
-  global.logger.info("---GET BOOKING BY ID---");
+  global.logger.info("---GET BOOKING BY Id---");
   try {
     const booking = await Booking.findOne({ _id: req.params.id })
       .populate(populate)
