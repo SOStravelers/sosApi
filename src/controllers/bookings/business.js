@@ -258,7 +258,7 @@ const calculateAvegare = async (pastMonth, user) => {
     (count, price) => count + price.payment.priceBRL,
     0
   );
-  return sumTotal / months;
+  return (sumTotal * 0.2) / months;
 };
 
 const countBookingsForMonth = (dateMonth, user) => {
@@ -296,7 +296,7 @@ const calculateBookingProjection = async (
     0
   );
   const dateTotal = dateBefore + dateAfter;
-  return (sumTotal / dateBefore) * dateTotal;
+  return ((sumTotal * 0.2) / dateBefore) * dateTotal;
 };
 
 export const getIndicators = async (req, res, next) => {
@@ -308,13 +308,13 @@ export const getIndicators = async (req, res, next) => {
     let query = {},
       avegare = 0;
     validateFormatDate(date_start);
-    if (duration === "month") {
+    if (duration === "1") {
       query = countBookingsForMonth(date_start, user._id.toString());
-    } else if (duration === "year") {
+    } else if (duration === "2") {
       query = countBookingsForYear(date_start, user._id.toString());
-    } else if (duration === "alltime") {
+    } else if (duration === "3") {
       query = countAllBookings(user._id.toString());
-    } else if (duration === "specific") {
+    } else if (duration === "4") {
       if (date_end == undefined) throw createError(400, "not found date_end");
       query = countBookingsForSpecific(
         date_start,
@@ -352,7 +352,7 @@ export const getIndicators = async (req, res, next) => {
     );
     res.status(200).json({
       NBookings: result.length,
-      MoneyIncoming: sumTotal,
+      MoneyIncoming: sumTotal * 0.2,
       Average: avegare,
       Projection: projection,
     });
