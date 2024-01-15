@@ -20,6 +20,29 @@ import {
   completeBookingNotification,
 } from "../../services/notification.js";
 
+const populate = [
+  {
+    path: "businessUser",
+    select: "businessData personalData img",
+  },
+  {
+    path: "workerUser",
+    select: "workerData personalData img",
+  },
+  {
+    path: "service",
+    select: "name isActive coverImg",
+  },
+  {
+    path: "subservice",
+    select: "name isActive coverImg duration",
+  },
+  {
+    path: "clientUser",
+    select: "personalData img",
+  },
+];
+
 export const getAllClientsId = async (req, res, next) => {
   global.logger.info("---GET TO CLIENT ALL BOOKING---");
   try {
