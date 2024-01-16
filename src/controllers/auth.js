@@ -364,6 +364,46 @@ export const createPassword = async (req, res, next) => {
     next(err);
   }
 };
+// función para crear contraseña para usuario que no tienen creada
+export const createPassToken = async (req, res, next) => {
+  global.logger.info({
+    message: "--- CREATE PASSWORD TOKEN ---",
+  });
+  try {
+    const id = req.user._id.toString();
+    const newPassword = req.body.password.trim();
+    if (!newPassword) {
+      throw createError(400, "a field is missing");
+    }
+    const encryptPassword = await User.hash(newPassword);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: id },
+      {
+        password: encryptPassword,
+        isActive: true,
+        "security.hasPassword": true,
+        "security.updatedAt": new Date(),
+      },
+      { new: true }
+    ).select("isActive _id isValidate security email personalData _id img");
+    console.log("el user", updatedUser);
+    let userToCreateToken = {
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      type: updatedUser.type,
+    };
+    let userRefresh = {
+      _id: updatedUser._id,
+    };
+    res.json({
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userRefresh),
+      user: updatedUser,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
   global.logger.info({
@@ -568,8 +608,16 @@ export const verifyValidationCode = async (req, res, next) => {
         { new: true }
       ).select("isActive isValidate security email personalData _id");
 
-      // Realiza cualquier operación adicional aquí, como la conexión a SES AWS
-      res.status(200).json({ msg: "code valid" });
+      let userToCreateToken = {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        type: updatedUser.type,
+      };
+
+      res.send({
+        msg: "login success",
+        access_token: accessTokenGen(userToCreateToken, true),
+      });
     } else {
       throw createError(
         400,

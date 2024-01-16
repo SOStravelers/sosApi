@@ -35,6 +35,7 @@ import {
   getServicesWorker,
   getById,
 } from "../controllers/user.js";
+import { createPassToken } from "../controllers/auth.js";
 
 //get users by type and isActive
 router.get(
@@ -172,6 +173,21 @@ router.post(
     "body"
   ),
   changePassword
+);
+//crear contraseña
+router.post(
+  "/createPassToken",
+  validateParams(
+    [
+      {
+        param_key: "password",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  createPassToken
 );
 //Actualizar un usuario por id
 router.put(
