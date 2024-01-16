@@ -212,6 +212,11 @@ router.get(
         required: true,
         type: "string",
       },
+      {
+        param_key: "newEmail",
+        required: false,
+        type: "string",
+      },
     ],
     "query"
   ),
@@ -236,6 +241,11 @@ router.post(
         param_key: "code",
         required: true,
         type: "number",
+      },
+      {
+        param_key: "email",
+        required: true,
+        type: "string",
       },
     ],
     "body"

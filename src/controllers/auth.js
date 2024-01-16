@@ -526,7 +526,7 @@ export const sendValidationCode = async (req, res, next) => {
     message: "--- SEND VALIDATION CODE ---",
   });
   try {
-    const { id, email } = req.query;
+    const { id, email, newEmail } = req.query;
     const user = await User.findById(id).exec();
     if (!user) {
       throw createError(404, "User not found or invalid credentials");
@@ -550,7 +550,7 @@ export const sendValidationCode = async (req, res, next) => {
     const params = {
       Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS
       Destination: {
-        ToAddresses: [updatedUser.email], // Lista de destinatarios
+        ToAddresses: [newEmail ? newEmail : updatedUser.email], // Lista de destinatarios
         CcAddresses: [envar().SES_EMAIL_AUTH], // Lista de copias
       },
       Template: "validationCode", // Nombre del template a usar
@@ -565,7 +565,8 @@ export const sendValidationCode = async (req, res, next) => {
     //Funcion de amazon
     //await sendEmailTemplate(params);
     //Funcion de resend
-    resendEmail(updatedUser.email, {
+    console.log(newEmail);
+    resendEmail(newEmail ? newEmail : updatedUser.email, {
       number1: digitosArray[0],
       number2: digitosArray[1],
       number3: digitosArray[2],
@@ -599,11 +600,13 @@ export const verifyValidationCode = async (req, res, next) => {
       diferenciaEnMinutos < user.validation.expTime &&
       number == user.validation.code
     ) {
+      console.log("wena");
       const updatedUser = await User.findOneAndUpdate(
         { _id: user._id },
         {
           isValidate: true,
           isActive: true,
+          ...(req.body.email ? { email: req.body.email } : {}),
         },
         { new: true }
       ).select("isActive isValidate security email personalData _id");
