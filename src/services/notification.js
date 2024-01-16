@@ -5,17 +5,18 @@ import User from "../models/user.js";
 
 export const newBookingNotification = async (booking) => {
   try {
+    global.logger.info("---NEW BOOKING NOTIFICATION---");
     const notificationClient = new Notification({
       title: "New booking",
       body: `New reservation at : ${booking.businessUser.businessData.name}`,
-      to: [booking.clientUser],
+      to: [booking.clientUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
     const notificationWorker = new Notification({
       title: "Nova reserva",
       body: `Nova reserva em : ${booking.businessUser.businessData.name}`,
-      to: [booking.workerUser],
+      to: [booking.workerUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
