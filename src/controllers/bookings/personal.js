@@ -52,6 +52,7 @@ export const getAllClientsId = async (req, res, next) => {
     let options = optionsBooking(page, limit);
     let query = {
       clientUser: user._id.toString(),
+      status: { $in: ["requested", "confirmed", "canceled", "completed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client booking not found");
@@ -75,6 +76,7 @@ export const getMonthClientId = async (req, res, next) => {
         $gte: moment(date, "YYYY-MM-DD").startOf("month"),
         $lte: moment(date, "YYYY-MM-DD").endOf("month"),
       },
+      status: { $in: ["requested", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client month booking not found");
@@ -135,6 +137,34 @@ export const getNextDaysClientId = async (req, res, next) => {
   }
 };
 
+export const getListDayClient = async (req, res, next) => {
+  global.logger.info("---GET LIST DAYS TO ClIENT BOOKING---");
+  try {
+    const user = req.user;
+    if (user.type != "personal") throw createError(401, "Unauthorized");
+    const { date, page, limit } = req.query;
+    validateFormatDate(date);
+    const dateMoment = moment(date, "YYYY-MM-DD")
+      .add(7, "day")
+      .format("YYYY-MM-DD");
+    const startDay = moment.utc(date).format();
+    const lastDay = moment.utc(dateMoment).format();
+    let options = optionsBooking(page, limit);
+    let query = {
+      clientUser: user._id.toString(),
+      "date.isoDate": {
+        $gte: startDay,
+        $lte: lastDay,
+      },
+      status: { $in: ["requested", "confirmed"] },
+    };
+    const booking = await Booking.paginate(query, options);
+    if (!booking) throw createError(404, "Worker booking not found");
+    res.status(200).json(booking);
+  } catch (err) {
+    next(err);
+  }
+};
 export const getDayClientId = async (req, res, next) => {
   global.logger.info("---GET DAY BOOKING BY CLIENT---");
   try {
@@ -146,6 +176,7 @@ export const getDayClientId = async (req, res, next) => {
     let query = {
       clientUser: user._id.toString(),
       "date.stringData": date,
+      status: { $in: ["requested", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client day booking not found ");

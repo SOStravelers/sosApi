@@ -16,6 +16,7 @@ import {
   getWeekClientId,
   getMonthClientId,
   getAllClientsId,
+  getListDayClient,
 } from "../controllers/bookings/personal.js";
 
 import {
@@ -394,6 +395,32 @@ router.get(
     "query"
   ),
   getListDayWorkers
+);
+
+/* get  three days next of the date client*/
+router.get(
+  "/client/listdays",
+  validateParams(
+    [
+      {
+        param_key: "date",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  getListDayClient
 );
 
 /* get week workers */
