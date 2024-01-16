@@ -33,14 +33,14 @@ export const cancelBookingNotification = async (booking) => {
     const notificationClient = new Notification({
       title: "Cancelled booking",
       body: `Your booking has been canceled at : ${booking.businessUser.businessData.name}`,
-      to: [booking.clientUser],
+      to: [booking.clientUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
     const notificationWorker = new Notification({
       title: "Reserva cancelada",
       body: `Sua reserva foi cancelada em : ${booking.businessUser.businessData.name}`,
-      to: [booking.workerUser],
+      to: [booking.workerUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
@@ -57,14 +57,14 @@ export const confirmBookingNotification = async (booking) => {
     const notificationClient = new Notification({
       title: "Confirmed booking",
       body: `Your reservation has been confirmed at : ${booking.businessUser.businessData.name}`,
-      to: [booking.clientUser],
+      to: [booking.clientUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
     const notificationWorker = new Notification({
       title: "Reserva confirmada",
       body: `Sua reserva foi confirmada em: ${booking.businessUser.businessData.name}`,
-      to: [booking.workerUser],
+      to: [booking.workerUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
@@ -81,14 +81,14 @@ export const completeBookingNotification = async (booking) => {
     const notificationClient = new Notification({
       title: "Completed booking",
       body: `Your reservation has been completed at : ${booking.businessUser.businessData.name}`,
-      to: [booking.clientUser],
+      to: [booking.clientUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
     const notificationWorker = new Notification({
       title: "Reserva terminada",
       body: `Sua reserva foi terminada em : ${booking.businessUser.businessData.name}`,
-      to: [booking.workerUser],
+      to: [booking.workerUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
