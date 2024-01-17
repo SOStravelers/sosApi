@@ -43,27 +43,7 @@ export const createUser = async (req, res, next) => {
       user.security.hasPassword = true;
       user.security.updatedAt = new Date();
     }
-    if (user.username && user.username.length > 0) {
-      let exists = await User.findOne({
-        username: user.username,
-      }).exec();
-      if (exists) {
-        // user.username= mongoose.Types.ObjectId()
-        user.username = user.email
-          .toLowerCase()
-          .trim()
-          .replace(/@/g, "_")
-          .replace(".", "_");
-      } else {
-        user.username = user.username.toLowerCase().trim();
-      }
-    } else {
-      user.username = user.email
-        .toLowerCase()
-        .trim()
-        .replace(/@/g, "_")
-        .replace(".", "_");
-    }
+    user.username = Math.random().toString(36).substring(2, 12);
     console.log("saving user...");
     const newUser = await user.save();
     res.status(200).json(newUser);
@@ -106,27 +86,7 @@ export const registerEmail = async (req, res, next) => {
         name[0].charAt(0).toUpperCase() + name[0].slice(1).toLowerCase().trim();
     }
     user.email = theEmail;
-    if (user.username && user.username.length > 0) {
-      let exists = await User.findOne({
-        username: user.username,
-      }).exec();
-      if (exists) {
-        // user.username= mongoose.Types.ObjectId()
-        user.username = user.email
-          .toLowerCase()
-          .trim()
-          .replace(/@/g, "_")
-          .replace(".", "_");
-      } else {
-        user.username = user.username.toLowerCase().trim();
-      }
-    } else {
-      user.username = user.email
-        .toLowerCase()
-        .trim()
-        .replace(/@/g, "_")
-        .replace(".", "_");
-    }
+    user.username = Math.random().toString(36).substring(2, 12);
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
       "about email type img language personalData type username workerData _id security.hasPassword"
