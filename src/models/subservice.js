@@ -22,9 +22,9 @@ const subserviceSchema = new Schema(
     },
     price: {
       _id: false,
-      category1: { type: Number },
-      category2: { type: Number },
-      category3: { type: Number },
+      category1: { type: Number, default: 0 },
+      category2: { type: Number, default: 0 },
+      category3: { type: Number, default: 0 },
     },
     // price: {
     //   value: { type: String, default: "$ 0" },
