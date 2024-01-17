@@ -33,8 +33,6 @@ export const resendCancel = async (info) => {
         const htmlToSend = template({
             name: name,
         });
-        console.log("resendEmail");
-        console.log("el email", email);
         const data = await resend.emails.send({
             from: "SOS Travelers <info@sostvl.com>",
             to: [email], // va dirigido al usuario
@@ -49,7 +47,7 @@ export const resendCancel = async (info) => {
 export const resendComplete = async (info) => {
     try {
         const { email, name } = info;
-        const htmlString = templateHtml("confirmBooking");
+        const htmlString = templateHtml("completedBooking");
         const template = Handlebars.compile(htmlString);
         const htmlToSend = template({
             name: name,
@@ -57,7 +55,7 @@ export const resendComplete = async (info) => {
         const data = await resend.emails.send({
             from: "SOS Travelers <info@sostvl.com>",
             to: [email], // va dirigido al usuario
-            subject: "SOS Travelers - Complete booking",
+            subject: "SOS Travelers - Completed booking",
             html: htmlToSend,
         });
     } catch (error) {
