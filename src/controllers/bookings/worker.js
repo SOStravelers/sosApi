@@ -291,6 +291,8 @@ export const completeBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
+
+
 export const confirmBookingWorker = async (req, res, next) => {
   global.logger.info("---CONFIRM BOOKING WORKER---");
   try {

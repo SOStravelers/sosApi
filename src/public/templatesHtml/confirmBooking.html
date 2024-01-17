@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
-  <title>Unabase - Confirmación de Correo</title>
+  <title>Unabase - Confirm booking</title>
   <style>
     body {
       margin: 0;
@@ -101,26 +101,16 @@
     <div class="main">
       <img src="https://sosappfiles.s3.amazonaws.com/icons/email/nin%CC%83a.png" class="img-main" />
 
-      <div class="section">
-        <span>Message:</span>
-        {{message}}
-      </div>
-
 
       <div class="section">
         <span>Name:</span>
-        {{sName}}
+        {{name}}
       </div>
 
       <div class="section">
-        <span>User type:</span>
-        {{userType}}
+        <span>Confirm booking:</span>
+        Congratulations! Your booking has been successfully confirmed. We are excited to have you with us. If you have any further questions or need more information, feel free to get in touch. We look forward to providing you with an amazing experience!
       </div>
-
-
-      <p class="parrafo2">
-        {{Email}}
-      </p>
 
       <p class="lastParrafo">
         If you give up using this email, ignore this message.
@@ -136,7 +126,5 @@
     <div class="footer">Copyright 2023 SOS Travelers</div>
   </div>
 </body>
-
-<script src="src/test.js"></script>
 
 </html>
