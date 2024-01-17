@@ -565,8 +565,10 @@ export const sendValidationCode = async (req, res, next) => {
     //Funcion de amazon
     //await sendEmailTemplate(params);
     //Funcion de resend
-    console.log(newEmail);
-    resendEmail(newEmail ? newEmail : updatedUser.email, {
+    var elEmail = "";
+    newEmail != "null" ? (elEmail = newEmail) : (elEmail = updatedUser.email);
+
+    resendEmail(elEmail, {
       number1: digitosArray[0],
       number2: digitosArray[1],
       number3: digitosArray[2],
@@ -600,13 +602,14 @@ export const verifyValidationCode = async (req, res, next) => {
       diferenciaEnMinutos < user.validation.expTime &&
       number == user.validation.code
     ) {
-      console.log("wena");
       const updatedUser = await User.findOneAndUpdate(
         { _id: user._id },
         {
           isValidate: true,
           isActive: true,
-          ...(req.body.email ? { email: req.body.email } : {}),
+          ...(req.body.email && req.body.email != ""
+            ? { email: req.body.email }
+            : {}),
         },
         { new: true }
       ).select("isActive isValidate security email personalData _id");
