@@ -256,11 +256,13 @@ export const loginGoogle = async (req, res, next) => {
   });
   try {
     let { email, name, image } = req.body;
+    console.log(req.body);
     email = email.toLowerCase().trim();
-    var user = await User.findOne({ email }).exec();
-    User.findOne({ email }).exec();
+    var user = await User.findOne({ email: email }).exec();
     let newValue = false;
+    console.log(user);
     if (!user) {
+      console.log("nuevo");
       newValue = true;
       user = new User();
       user.email = email;
@@ -269,12 +271,9 @@ export const loginGoogle = async (req, res, next) => {
       user.personalData.name.first = names[0];
       user.personalData.name.last = names[1];
       !user.type ? (user.type = "personal") : "";
-      user.username = user.email
-        .toLowerCase()
-        .trim()
-        .replace(/@/g, "_")
-        .replace(".", "_");
+      user.username = Math.random().toString(36).substring(2, 12);
     }
+    console.log("existe");
     !user.img.imgUrl ? (user.img.imgUrl = image) : "";
     user.lastLogin = Date.now();
     user.lastLoginType = "google";
