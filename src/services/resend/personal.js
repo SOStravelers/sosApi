@@ -4,7 +4,7 @@ import Handlebars from "handlebars";
 import { templateHtml } from "../../utils/externalFiles.js";
 
 
-export const resendConfirm = async (info) => {
+export const resendConfirmPersonal = async (info) => {
     try {
         const { email, name } = info;
         const htmlString = templateHtml("confirmBooking");
@@ -25,7 +25,7 @@ export const resendConfirm = async (info) => {
     }
 }
 
-export const resendCancel = async (info) => {
+export const resendCancelPersonal = async (info) => {
     try {
         const { email, name } = info;
         const htmlString = templateHtml("cancelBooking");
@@ -44,7 +44,7 @@ export const resendCancel = async (info) => {
     }
 }
 
-export const resendComplete = async (info) => {
+export const resendCompletedPersonal = async (info) => {
     try {
         const { email, name } = info;
         const htmlString = templateHtml("completedBooking");

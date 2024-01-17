@@ -2,7 +2,7 @@ import { createError } from "../../config/error.js";
 import Booking from "../../models/booking.js";
 import User from "../../models/user.js";
 import { newBookingNotification } from "../../services/notification.js";
-import { resendComplete } from "../../services/resend/personal.js";
+import { resendCompletedPersonal } from "../../services/resend/personal.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 import moment from "moment-timezone";
 
@@ -87,7 +87,7 @@ export const create = async (req, res, next) => {
       //creando notificaciones:
       //notification User and Worker
       newBookingNotification(theBooking);
-      resendComplete({name: req.user.username, email: req.user.email});
+      resendCompletedPersonal({name: req.user.username, email: req.user.email});
       if (emailData) sendEmailPaymentConfirmation(emailData);
       res.status(201).json({ booking: theBooking, msg: "new Document" });
     }

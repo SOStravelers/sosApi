@@ -21,9 +21,9 @@ import {
 } from "../../services/notification.js";
 
 import { 
-  resendConfirm, 
-  resendComplete, 
-  resendCancel 
+  resendConfirmPersonal, 
+  resendCompletedPersonal,
+  resendCancelPersonal 
 } from "../../services/resend/personal.js";
 
 const populate = [
@@ -270,7 +270,7 @@ export const cancelBookingUser = async (req, res, next) => {
           }
         ).populate(populate);
         cancelBookingNotification(newBooking);
-        resendCancel({name: req.user.username, email: req.user.email});
+        resendCancelPersonal({name: req.user.username, email: req.user.email});
 
         return res.status(200).json(newBooking);
       } else {
@@ -307,7 +307,7 @@ export const cancelBookingUser = async (req, res, next) => {
         }
       ).populate(populate);
       cancelBookingNotification(newBooking);
-      resendCancel({name: req.user.username, email: req.user.email});
+      resendCancelPersonal({name: req.user.username, email: req.user.email});
       return res.status(200).json(newBooking);
     }
   } catch (err) {
@@ -345,7 +345,7 @@ export const completeBookingUser = async (req, res, next) => {
 
     completeBookingNotification(newBooking);
     console.log('estoy en dev')
-    resendComplete({name: req.user.username, email: req.user.email});
+    resendCompletedPersonal({name: req.user.username, email: req.user.email});
     res.status(200).json(newBooking);
   } catch (err) {
     next(err);
