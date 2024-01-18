@@ -33,6 +33,7 @@ import {
   getDayWorkers,
   getLastWorkers,
   availableBookings,
+  createBookingWorker,
 } from "../controllers/bookings/worker.js";
 
 import {
@@ -105,6 +106,60 @@ router.post(
     "body"
   ),
   create
+);
+router.post(
+  "/worker/create",
+  validateParams(
+    [
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "subservice",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "businessUser",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "workerUser",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "clientUser",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "creatorUser",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "startTime",
+        required: true,
+        type: "object",
+      },
+      {
+        param_key: "endTime",
+        required: true,
+        type: "object",
+      },
+      {
+        param_key: "date",
+        required: true,
+        type: "object",
+      },
+    ],
+    "body"
+  ),
+  createBookingWorker
 );
 
 router.get(

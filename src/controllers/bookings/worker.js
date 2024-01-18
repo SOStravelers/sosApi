@@ -436,3 +436,76 @@ export const cancelBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
+
+//Crear booking
+export const createBookingWorker = async (req, res, next) => {
+  global.logger.info("---CREATE NEW  BOOKING WORKER---");
+  try {
+    const bookingData = req.body;
+    let booking = new Booking(bookingData);
+    booking.firstWorker = booking.workerUser;
+    booking.creatorUser = req.user._id.toString();
+    booking.workerUser = req.user._id.toString();
+
+    // Buscar el último booking ordenado por idKey en orden descendente
+    let lastBooking = await Booking.findOne().sort({ idKey: -1 });
+
+    let newIdKey;
+    if (!lastBooking || !lastBooking.idKey) {
+      // Si no hay bookings, o si el último booking no tiene un idKey, usar "B-1000" como el primer idKey
+      newIdKey = "B-1000";
+    } else {
+      // Si hay bookings, incrementar el número en el último idKey en 1
+      let lastIdNumber = Number(lastBooking.idKey.split("-")[1]);
+      newIdKey = "B-" + (lastIdNumber + 1);
+    }
+    // Asignar el nuevo idKey al booking
+    booking.idKey = newIdKey;
+    booking.status = "completed";
+    booking.payment.status = "paid";
+    booking.payment.method = "cash";
+
+    if (!req.body.clientName && req.body.clientEmail) {
+      throw createError(400, "clientName and clientEmail is required");
+    }
+    console.log("el user1", req.body.clientEmail);
+    const user = await User.findOne({ email: req.body.clientEmail }).exec();
+    console.log("el user", user);
+    if (user) {
+      console.log("hay user");
+      booking.clientUser = user._id;
+    } else {
+      console.log("no hay user");
+      // necesito una variable que sea un array que separe el nombre en dos la primera palabra y el resto y elimine los espacios alfinal y el principio
+      const name = req.body.clientName.split(" ");
+      const firstName = name[0];
+      const lastName = name[1];
+      const clientUser = new User({
+        email: req.body.clientEmail,
+        personalData: {
+          name: {
+            first: firstName,
+            last: lastName,
+          },
+        },
+        username: Math.random().toString(36).substring(2, 12),
+      });
+      await clientUser.save();
+      booking.clientUser = clientUser._id;
+    }
+
+    const newBooking = await booking.save();
+    const theBooking = await Booking.findOne({ _id: newBooking._id })
+      .populate(populate)
+      .exec();
+
+    //creando notificaciones:
+    //notification User and Worker
+    // newBookingNotification(theBooking);
+
+    // if (emailData) sendEmailPaymentConfirmation(emailData);
+    res.status(201).json({ booking: theBooking, msg: "new Document" });
+  } catch (err) {
+    next(err);
+  }
+};
