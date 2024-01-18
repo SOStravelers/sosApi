@@ -22,7 +22,7 @@ export const getByService = async (req, res, next) => {
   try {
     let options = {
       // populate,
-      select: "name price duration",
+      select: "name price duration imgUrl",
       page: Number(req.query.page) || 1,
       limit: Number(req.query.limit) || 50,
       sort: { updatedAt: -1 },
