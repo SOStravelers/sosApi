@@ -14,8 +14,8 @@ const scheduleSchema = new Schema(
         day: {
           type: Number,
           required: true,
-          min: 1,
-          max: 7,
+          min: 0,
+          max: 6,
         },
         isActive: { type: Boolean, default: true },
         intervals: [
