@@ -415,24 +415,24 @@ export const cancelBookingWorker = async (req, res, next) => {
       console.log(
         "cancelar el booking y el pago de un booking requested o available"
       );
-      await cancelPaymentIntent(booking.payment.paymentId);
+      // await cancelPaymentIntent(booking.payment.paymentId);
       const newBooking = await Booking.findOneAndUpdate(
         {
           _id: bookingId,
         },
         {
-          status: "canceled",
+          status: "available",
           canceledData: canceledData,
-          payment: {
-            ...booking.payment,
-            status: "canceled",
-          },
+          // payment: {
+          //   ...booking.payment,
+          //   status: "canceled",
+          // },
         },
         {
           new: true,
         }
       ).populate(populate);
-      cancelBookingNotification(newBooking);
+      // cancelBookingNotification(newBooking);
       return res.status(200).json(newBooking);
     }
   } catch (err) {
