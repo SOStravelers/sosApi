@@ -253,6 +253,7 @@ export const businessSchedule = async (req, res, next) => {
     const bookings = await Booking.find({
       service: serviceId,
       businessUser: businessId,
+      status: { $ne: "canceled" },
       //subservice: subserviceId,
       "date.isoDate": { $gte: startDate, $lt: endDate },
     });
@@ -263,6 +264,7 @@ export const businessSchedule = async (req, res, next) => {
     if (workerId) {
       bookingWorker = await Booking.find({
         workerUser: workerId,
+        status: { $ne: "canceled" },
         "date.isoDate": { $gte: startDate, $lt: endDate },
       });
     }

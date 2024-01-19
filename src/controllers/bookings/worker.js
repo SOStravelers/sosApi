@@ -245,8 +245,10 @@ export const availableBookings = async (req, res, next) => {
     if (user.type != "worker") throw createError(401, "Unauthorized");
     const { page, limit } = req.query;
     let options = optionsBooking(page, limit);
+    const userServices = user.workerData.services.map((service) => service.id);
     const query = {
       status: "available",
+      service: { $in: userServices },
     };
     const bookings = await Booking.paginate(query, options);
     if (!bookings) throw createError(404, "Available booking not found");
@@ -291,7 +293,6 @@ export const completeBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
-
 
 export const confirmBookingWorker = async (req, res, next) => {
   global.logger.info("---CONFIRM BOOKING WORKER---");
@@ -438,8 +439,7 @@ export const cancelBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
-
-//Crear booking
+//Crear booking por el worker by cash
 export const createBookingWorker = async (req, res, next) => {
   global.logger.info("---CREATE NEW  BOOKING WORKER---");
   try {
