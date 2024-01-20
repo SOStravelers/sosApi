@@ -401,7 +401,7 @@ export const getBussinesId = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.params.id, type: "business" })
       .select(
-        "about email  img language personalData username  businessData.services businessData.location businessData.name _id "
+        "about email  img language personalData username businessData.owner  businessData.services businessData.location businessData.name _id "
       )
       .populate({
         path: "businessData.services.service",

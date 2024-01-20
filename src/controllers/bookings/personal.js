@@ -20,8 +20,8 @@ import {
   completeBookingNotification,
 } from "../../services/notification.js";
 
-import { 
-  resendConfirmPersonal, 
+import {
+  resendConfirmPersonal,
   resendCompletedPersonal,
   resendCancelPersonal 
 } from "../../services/emails/personal.js";
@@ -59,7 +59,9 @@ export const getAllClientsId = async (req, res, next) => {
     let options = optionsBooking(page, limit);
     let query = {
       clientUser: user._id.toString(),
-      status: { $in: ["requested", "confirmed", "canceled", "completed"] },
+      status: {
+        $in: ["requested", "confirmed", "canceled", "completed", "available"],
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client booking not found");
@@ -83,7 +85,7 @@ export const getMonthClientId = async (req, res, next) => {
         $gte: moment(date, "YYYY-MM-DD").startOf("month"),
         $lte: moment(date, "YYYY-MM-DD").endOf("month"),
       },
-      status: { $in: ["requested", "confirmed"] },
+      status: { $in: ["requested", "confirmed", "available"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client month booking not found");
@@ -163,7 +165,7 @@ export const getListDayClient = async (req, res, next) => {
         $gte: startDay,
         $lte: lastDay,
       },
-      status: { $in: ["requested", "confirmed"] },
+      status: { $in: ["requested", "confirmed", "available"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found");
@@ -183,7 +185,7 @@ export const getDayClientId = async (req, res, next) => {
     let query = {
       clientUser: user._id.toString(),
       "date.stringData": date,
-      status: { $in: ["requested", "confirmed"] },
+      status: { $in: ["requested", "confirmed", "available"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client day booking not found ");
@@ -271,7 +273,10 @@ export const cancelBookingUser = async (req, res, next) => {
           }
         ).populate(populate);
         cancelBookingNotification(newBooking);
-        resendCancelPersonal({name: req.user.username, email: req.user.email});
+        resendCancelPersonal({
+          name: req.user.username,
+          email: req.user.email,
+        });
 
         return res.status(200).json(newBooking);
       } else {
@@ -308,7 +313,7 @@ export const cancelBookingUser = async (req, res, next) => {
         }
       ).populate(populate);
       cancelBookingNotification(newBooking);
-      resendCancelPersonal({name: req.user.username, email: req.user.email});
+      resendCancelPersonal({ name: req.user.username, email: req.user.email });
       return res.status(200).json(newBooking);
     }
   } catch (err) {
