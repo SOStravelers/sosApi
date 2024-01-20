@@ -23,8 +23,9 @@ import {
 import {
   resendConfirmPersonal,
   resendCompletedPersonal,
-  resendCancelPersonal,
-} from "../../services/resend/personal.js";
+  resendCancelPersonal 
+} from "../../services/emails/personal.js";
+import { completedWorker } from "../../services/emails/worker.js";
 
 const populate = [
   {
@@ -349,8 +350,9 @@ export const completeBookingUser = async (req, res, next) => {
     );
 
     completeBookingNotification(newBooking);
-    console.log("estoy en dev");
-    resendCompletedPersonal({ name: req.user.username, email: req.user.email });
+  
+    resendCompletedPersonal({name: req.user.username, email: req.user.email});
+   
     res.status(200).json(newBooking);
   } catch (err) {
     next(err);

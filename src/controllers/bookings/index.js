@@ -2,7 +2,8 @@ import { createError } from "../../config/error.js";
 import Booking from "../../models/booking.js";
 import User from "../../models/user.js";
 import { newBookingNotification } from "../../services/notification.js";
-import { resendCompletedPersonal } from "../../services/resend/personal.js";
+import { resendCompletedPersonal } from "../../services/emails/personal.js";
+import { completedWorker } from "../../services/emails/worker.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 import moment from "moment-timezone";
 
@@ -13,7 +14,7 @@ const populate = [
   },
   {
     path: "workerUser",
-    select: "workerData personalData img",
+    select: "workerData personalData img email",
     populate: {
       path: "workerData.services.id",
       select: "name",
@@ -87,7 +88,16 @@ export const create = async (req, res, next) => {
       //creando notificaciones:
       //notification User and Worker
       newBookingNotification(theBooking);
-      resendCompletedPersonal({name: req.user.username, email: req.user.email});
+      resendCompletedPersonal({ name: req.user.username, email: req.user.email });
+      console.log('#### estoy en dev  ####');
+      console.log(theBooking.workerUser.email, theBooking.workerUser.personalData.name.first);
+      console.log('#### estoy en dev  ####');
+      completedWorker({
+        email: theBooking.workerUser.email, 
+        name: theBooking.workerUser.personalData.name.first, 
+        service: theBooking.service.name 
+       });
+        
       if (emailData) sendEmailPaymentConfirmation(emailData);
       res.status(201).json({ booking: theBooking, msg: "new Document" });
     }
