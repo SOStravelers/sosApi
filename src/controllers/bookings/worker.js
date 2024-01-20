@@ -344,7 +344,7 @@ export const confirmBookingWorkerExternal = async (req, res, next) => {
       {
         _id: bookingId,
       },
-      { status: "confirmed", wokerId: userId.toString() },
+      { status: "confirmed", workerId: userId.toString() },
       {
         new: true,
       }
