@@ -100,6 +100,8 @@ export const addOrUpdateBusiness = async (req, res, next) => {
     if (existSchedule) {
       console.log("update", schedules);
       const update = {
+        creator: req.user._id.toString(),
+        default: false,
         $set: { schedules: schedules },
       };
 
@@ -146,6 +148,7 @@ export const getByUser = async (req, res, next) => {
 
       let newSchedule = new Schedule(template);
       newSchedule.user = id;
+      req.query.service ? (newSchedule.service = req.query.service) : "";
       newSchedule.creator = "default";
       newSchedule.save();
     }
