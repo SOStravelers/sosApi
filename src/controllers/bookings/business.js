@@ -263,17 +263,21 @@ const calculateAvegare = async (pastMonth, user) => {
 
 const countBookingsForMonth = (dateMonth, user) => {
   const startMonth = moment(dateMonth, "YYYY-MM-DD").startOf("month");
-  const endMOnth = moment(dateMonth, "YYYY-MM-DD").endOf("month");
+  const endMOnth = moment.utc(dateMonth).format();
   return countDateBookings(startMonth, endMOnth, user);
 };
 
 const countBookingsForYear = (dateYear, userId) => {
   const year = moment.utc(dateYear, "YYYY-MM-DD").year();
   const startOfYear = moment.utc(`${year}-01-01`).format();
-  const endOfYear = moment.utc(`${year}-12-31`).format();
+  const endOfYear = moment.utc(dateYear).format();
   return countDateBookings(startOfYear, endOfYear, userId);
 };
-
+const countBookingsForAll = (dateYear, userId) => {
+  const startOfYear = moment.utc(`$2024-01-01`).format(); // arreglar a fecha de cracion de cuenta
+  const endOfYear = moment.utc(dateYear).format();
+  return countDateBookings(startOfYear, endOfYear, userId);
+};
 const countBookingsForSpecific = (dateInit, dateFinish, user) => {
   const startDate = moment(dateInit, "YYYY-MM-DD");
   if (dateFinish == undefined) throw createError(400, "not found date_end");
@@ -313,7 +317,7 @@ export const getIndicators = async (req, res, next) => {
     } else if (duration === "2") {
       query = countBookingsForYear(date_start, user._id.toString());
     } else if (duration === "3") {
-      query = countAllBookings(user._id.toString());
+      query = countBookingsForAll(date_start, user._id.toString());
     } else if (duration === "4") {
       if (date_end == undefined) throw createError(400, "not found date_end");
       query = countBookingsForSpecific(

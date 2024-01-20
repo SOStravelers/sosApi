@@ -41,7 +41,7 @@ export const resendSupport = async (data) => {
 
   try {
     const mailData = await resend.emails.send({
-      from: "Support prueba SOS <support.prueba@sostvl.com>",
+      from: "Support prueba SOS <support@sostvl.com>",
       to: "sostravelbr@gmail.com", // email va dirigido siempre a SOS travelers
       subject: subject,
       html: htmlToSend,
