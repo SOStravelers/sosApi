@@ -328,7 +328,7 @@ export const confirmBookingWorker = async (req, res, next) => {
 export const confirmBookingWorkerExternal = async (req, res, next) => {
   global.logger.info("---CONFIRM BOOKING WORKER EXTERNAL---");
   try {
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
     const bookingId = req.params.bookingId;
     console.log(userId, bookingId);
     const user = await User.findOne({ _id: userId.toString() }).exec();
@@ -344,7 +344,7 @@ export const confirmBookingWorkerExternal = async (req, res, next) => {
       {
         _id: bookingId,
       },
-      { status: "confirmed", workerId: userId.toString() },
+      { status: "confirmed", workerUser: userId },
       {
         new: true,
       }
