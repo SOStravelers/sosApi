@@ -5,7 +5,7 @@ const scheduleSchema = new Schema(
   {
     user: { type: String, ref: "User" },
     isActive: { type: Boolean, default: true },
-    default: { type: String, default: false },
+    default: { type: Boolean, default: false },
     service: { type: String, ref: "Service" },
     location: { type: String },
     timeZone: { type: String },
