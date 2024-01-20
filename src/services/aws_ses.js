@@ -128,7 +128,7 @@ export const createTemplateFile = async (params) => {
       if (err) {
         console.error(err); // Mostrar el error si ocurre
       } else {
-        console.log(data); // Mostrar la respuesta de AWS si tiene éxito
+        console.log(data, 'sucessfull'); // Mostrar la respuesta de AWS si tiene éxito
       }
     });
   } catch (err) {
@@ -145,10 +145,18 @@ export const getTemplate = async (name) => {
     const response = await SES.send(getCommand);
     if (response.$metadata.httpStatusCode === 200 && response.Template) {
       return response;
-    } else {
-      throw new Error("Error al enviar informacion");
+    } else{
+      return null;
     }
   } catch (err) {
+    
+    console.log('*** catch ***');
+    console.log(err.message);
+    if(err.message === 'Template completedBookingWorker does not exist.'){
+      return null;
+    }
+    console.log('*** catch ***');
+
     throw err;
   }
 };
@@ -159,7 +167,6 @@ export const sendEmailTemplate = async (params) => {
     console.log(params);
     const sendCommand = new SendTemplatedEmailCommand(params);
     const response = await SES.send(sendCommand);
-
     if (response.$metadata.httpStatusCode === 200) {
       return response;
     } else {
@@ -171,6 +178,7 @@ export const sendEmailTemplate = async (params) => {
     throw err;
   }
 };
+
 // Crear el comando para actualizar el template
 export const updateTemplate = async (file) => {
   console.log("entrando5");
