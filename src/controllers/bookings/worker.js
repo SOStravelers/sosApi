@@ -125,7 +125,16 @@ export const getMonthWorkers = async (req, res, next) => {
         $gte: moment(date, "YYYY-MM-DD").startOf("month"),
         $lte: moment(date, "YYYY-MM-DD").endOf("month"),
       },
-      status: { $in: ["requested", "confirmed"] },
+      status: {
+        $in: [
+          "canceled",
+          "completed",
+          "failed",
+          "confirmed",
+          "requested",
+          "available",
+        ],
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found");
@@ -155,6 +164,16 @@ export const getWeekWorkers = async (req, res, next) => {
       startWeek,
       endWeek
     );
+    query[0].$match.status = {
+      $in: [
+        "canceled",
+        "completed",
+        "requested",
+        "failed",
+        "confirmed",
+        "available",
+      ],
+    };
     const result = await Booking.aggregate(query);
     if (!result) throw createError(404, "Worker week booking not found ");
     const response = daysOfweek(result, startWeek);
@@ -183,7 +202,7 @@ export const getListDayWorkers = async (req, res, next) => {
         $gte: startDay,
         $lte: lastDay,
       },
-      status: { $in: ["requested", "confirmed"] },
+      status: { $in: ["requested", "confirmed", "available"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found");
@@ -204,7 +223,16 @@ export const getDayWorkers = async (req, res, next) => {
     let query = {
       workerUser: user._id.toString(),
       "date.stringData": date,
-      status: { $in: ["requested", "confirmed"] },
+      status: {
+        $in: [
+          "canceled",
+          "completed",
+          "requested",
+          "failed",
+          "confirmed",
+          "available",
+        ],
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Worker booking not found ");
