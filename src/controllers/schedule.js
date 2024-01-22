@@ -161,12 +161,12 @@ export const getById = async (req, res, next) => {
   global.logger.info("---GET SCHEDULE BY ID---");
   try {
     const schedule = await Schedule.findOne({ _id: req.params.id })
-      .populate([
-        {
-          path: "hotel",
-          //   select: "isActive name  email phone creator user imgUrl emails type",
-        },
-      ])
+      // .populate([
+      //   {
+      //     path: "hotel",
+      //     //   select: "isActive name  email phone creator user imgUrl emails type",
+      //   },
+      // ])
       .exec();
     if (!schedule) throw createError(404, "Schedule not found");
     res.status(200).json(schedule);
