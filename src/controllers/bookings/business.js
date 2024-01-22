@@ -6,6 +6,7 @@ import {
   countDateProjectionBookings,
   validateFormatDate,
   countWeekBookings,
+  countAllDateBookings,
   countAllBookings,
   daysOfweek,
 } from "./helper.js";
@@ -275,9 +276,8 @@ const countBookingsForYear = (dateYear, userId) => {
   return countDateBookings(startOfYear, endOfYear, userId);
 };
 const countBookingsForAll = (dateYear, userId) => {
-  const startOfYear = moment.utc(`$2024-01-01`).format(); // arreglar a fecha de cracion de cuenta
   const endOfYear = moment.utc(dateYear).format();
-  return countDateBookings(startOfYear, endOfYear, userId);
+  return countAllDateBookings(endOfYear, userId);
 };
 const countBookingsForSpecific = (dateInit, dateFinish, user) => {
   const startDate = moment(dateInit, "YYYY-MM-DD");

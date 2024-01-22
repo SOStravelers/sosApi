@@ -45,6 +45,17 @@ export const countDateBookings = (startDate, endDate, userId) => {
   };
 };
 
+export const countAllDateBookings = (endDate, userId) => {
+  return {
+    "date.isoDate": {
+      $lte: moment.utc(endDate).add(1, "day").format(),
+    },
+    businessUser: userId,
+
+    status: { $in: ["canceled", "completed", "failed", "confirmed"] },
+  };
+};
+
 export const countDateProjectionBookings = (startDate, endDate, userId) => {
   return {
     "date.isoDate": {
