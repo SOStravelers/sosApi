@@ -3,6 +3,7 @@ import Booking from "../../models/booking.js";
 import {
   optionsBooking,
   countDateBookings,
+  countDateProjectionBookings,
   validateFormatDate,
   countWeekBookings,
   countAllBookings,
@@ -18,7 +19,7 @@ export const getTimeBusiness = async (req, res, next) => {
     const { date_start, date_end, page, limit } = req.query;
     validateFormatDate(date_start, date_end);
     const startDate = moment.utc(date_start).format();
-    const endDate = moment.utc(date_end).format();
+    const endDate = moment.utc(date_end).format().add(1, "day");
     let options = optionsBooking(page, limit);
     let query = {
       businessUser: user._id.toString(),
@@ -44,14 +45,14 @@ export const getAllBusiness = async (req, res, next) => {
     if (user.type != "business") throw createError(401, "Unauthorized");
     const { date, page, limit } = req.query;
     validateFormatDate(date);
-    const newDate = moment.utc(date, "YYYY-MM-DD");
+    const newDate = moment.utc(date, "YYYY-MM-DD").add(1, "day");
     let options = optionsBooking(page, limit);
     const query = {
       businessUser: user._id.toString(),
       "date.isoDate": {
         $lte: moment(newDate, "YYYY-MM-DD"),
       },
-      status: { $in: ["canceled", "completed", "failed"] },
+      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
@@ -69,7 +70,7 @@ export const getYearBusiness = async (req, res, next) => {
     const { date, page, limit } = req.query;
     validateFormatDate(date);
     const year = moment.utc(date, "YYYY-MM-DD").year();
-    const newDate = moment.utc(date, "YYYY-MM-DD");
+    const newDate = moment.utc(date, "YYYY-MM-DD").add(1, "day");
     let options = optionsBooking(page, limit);
     const query = {
       businessUser: user._id.toString(),
@@ -77,7 +78,7 @@ export const getYearBusiness = async (req, res, next) => {
         $gte: moment.utc(`${year}-01-01`).format(),
         $lte: moment(newDate, "YYYY-MM-DD"),
       },
-      status: { $in: ["canceled", "completed", "failed"] },
+      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Booking business not found");
@@ -175,7 +176,7 @@ export const getLastMonthBusiness = async (req, res, next) => {
     if (user.type != "business") throw createError(401, "Unauthorized");
     const { date, page, limit } = req.query;
     validateFormatDate(date);
-    const newDate = moment.utc(date, "YYYY-MM-DD");
+    const newDate = moment.utc(date, "YYYY-MM-DD").add(1, "day");
     let options = optionsBooking(page, limit);
     const query = {
       businessUser: user._id.toString(),
@@ -183,7 +184,7 @@ export const getLastMonthBusiness = async (req, res, next) => {
         $gte: moment(newDate, "YYYY-MM-DD").startOf("month"),
         $lte: moment(newDate, "YYYY-MM-DD"),
       },
-      status: { $in: ["canceled", "completed", "failed"] },
+      status: { $in: ["canceled", "completed", "failed", "confirmed"] },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking)
@@ -241,7 +242,7 @@ export const getLastBusiness = async (req, res, next) => {
 
 /* Indicators */
 
-const calculateAvegare = async (pastMonth, user) => {
+const calculateAverage = async (pastMonth, user) => {
   console.log("*** Function calculate averange ***");
   const initMonth = await Booking.findOne(
     { businessUser: user },
@@ -281,7 +282,7 @@ const countBookingsForAll = (dateYear, userId) => {
 const countBookingsForSpecific = (dateInit, dateFinish, user) => {
   const startDate = moment(dateInit, "YYYY-MM-DD");
   if (dateFinish == undefined) throw createError(400, "not found date_end");
-  const endDate = moment(dateFinish, "YYYY-MM-DD").add(1, "day");
+  const endDate = moment(dateFinish, "YYYY-MM-DD");
   return countDateBookings(startDate, endDate, user);
 };
 
@@ -292,13 +293,23 @@ const calculateBookingProjection = async (
   user
 ) => {
   const startMonth = moment(date, "YYYY-MM-DD").startOf("month");
-  const query = countDateBookings(startMonth, date, user);
+  const query = countDateProjectionBookings(startMonth, date, user);
   const result = await Booking.find(query);
   if (!result || result.length === 0) return 0;
-  const sumTotal = result.reduce(
+  const subTotal = result.reduce(
     (count, price) => count + price.payment.priceBRL,
     0
   );
+  const confirmedBookings = result.filter(
+    (booking) => booking.status === "confirmed"
+  );
+  const subTotalConfirmed = confirmedBookings.reduce(
+    (count, price) => count + price.payment.price,
+    0
+  );
+
+  const sumTotal = subTotal + subTotalConfirmed;
+  console.log(subTotal, subTotalConfirmed);
   const dateTotal = dateBefore + dateAfter;
   return ((sumTotal * 0.2) / dateBefore) * dateTotal;
 };
@@ -310,7 +321,7 @@ export const getIndicators = async (req, res, next) => {
     if (user.type != "business") throw createError(401, "Unauthorized");
     const { date_start, date_end, duration } = req.query;
     let query = {},
-      avegare = 0;
+      average = 0;
     validateFormatDate(date_start);
     if (duration === "1") {
       query = countBookingsForMonth(date_start, user._id.toString());
@@ -325,7 +336,7 @@ export const getIndicators = async (req, res, next) => {
         date_end,
         user._id.toString()
       );
-      avegare = await calculateAvegare(
+      average = await calculateAverage(
         moment(date_start, "YYYY-MM-DD").endOf("month"),
         user._id.toString()
       );
@@ -340,8 +351,8 @@ export const getIndicators = async (req, res, next) => {
       (count, price) => count + price.payment.priceBRL,
       0
     );
-    if (avegare == 0)
-      avegare = await calculateAvegare(
+    if (average == 0)
+      average = await calculateAverage(
         moment(date_start, "YYYY-MM-DD").startOf("month"),
         user._id.toString()
       );
@@ -357,7 +368,7 @@ export const getIndicators = async (req, res, next) => {
     res.status(200).json({
       NBookings: result.length,
       MoneyIncoming: sumTotal * 0.2,
-      Average: avegare,
+      Average: average,
       Projection: projection,
     });
   } catch (err) {

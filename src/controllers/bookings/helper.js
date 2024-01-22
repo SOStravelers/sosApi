@@ -37,11 +37,31 @@ export const countDateBookings = (startDate, endDate, userId) => {
   return {
     "date.isoDate": {
       $gte: moment.utc(startDate).format(),
-      $lte: moment.utc(endDate).format(),
+      $lte: moment.utc(endDate).add(1, "day").format(),
     },
     businessUser: userId,
+
     status: { $in: ["canceled", "completed", "failed", "confirmed"] },
-    "payment.status": { $in: ["paid"] },
+  };
+};
+
+export const countDateProjectionBookings = (startDate, endDate, userId) => {
+  return {
+    "date.isoDate": {
+      $gte: moment.utc(startDate).format(),
+      $lte: moment.utc(endDate).add(1, "day").format(),
+    },
+    businessUser: userId,
+    $or: [
+      {
+        status: { $in: ["canceled", "completed", "failed"] },
+        "payment.status": { $in: ["paid"] },
+      },
+      {
+        status: { $in: ["confirmed"] },
+        "payment.status": { $in: ["pending"] },
+      },
+    ],
   };
 };
 
