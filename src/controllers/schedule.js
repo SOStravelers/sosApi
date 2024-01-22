@@ -58,6 +58,7 @@ export const addOrUpdateWorker = async (req, res, next) => {
     }
     const schedule = await Schedule.findOne({ user: id });
     if (schedule) {
+      console.log("editar");
       const update = {
         $set: { schedules: schedules.schedules },
       };
@@ -71,10 +72,12 @@ export const addOrUpdateWorker = async (req, res, next) => {
       ).exec();
       res.status(200).json(updatedSchedule);
     } else {
+      console.log("guardar");
       let newSchedule = new Schedule(schedules);
       newSchedule.user = id;
       newSchedule.creator = id;
-      newSchedule.save();
+      console.log("horario", newSchedule);
+      await newSchedule.save();
       res.status(200).json(newSchedule);
     }
   } catch (err) {
@@ -146,11 +149,11 @@ export const getByUser = async (req, res, next) => {
       const schedule = await Schedule.findOne({ default: true }).exec();
       schedule.schedules ? res.send(schedule) : res.send({ schedules: [] });
 
-      let newSchedule = new Schedule(template);
-      newSchedule.user = id;
-      req.query.service ? (newSchedule.service = req.query.service) : "";
-      newSchedule.creator = "default";
-      newSchedule.save();
+      // let newSchedule = new Schedule(template);
+      // newSchedule.user = id;
+      // req.query.service ? (newSchedule.service = req.query.service) : "";
+      // newSchedule.creator = "default";
+      // newSchedule.save();
     }
   } catch (err) {
     next(err);
