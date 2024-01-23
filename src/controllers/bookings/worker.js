@@ -26,12 +26,14 @@ import {
 import { 
   awsCancelWorker, 
   awsConfirmWorker,
-  awsUpdateTemplate 
+  awsUpdateTemplate, 
+  awsXternarWorker
 } from "../../services/emails/worker.js";
 
 import {
  resendCancelPersonal,
- resendConfirmPersonal
+ resendConfirmPersonal,
+ resendExternalPersonal
 } from "../../services/emails/personal.js";
 
 const populate = [
@@ -401,8 +403,20 @@ export const confirmBookingWorkerExternal = async (req, res, next) => {
       {
         new: true,
       }
-    ).populate(populate);
+    ).populate(bookingPopulate());
     confirmBookingNotification(newBooking);
+    awsXternarWorker({
+      email: newBooking.workerUser.email, 
+      name: newBooking.workerUser.personalData.name.first, 
+      service: newBooking.service.name, 
+      subservice: newBooking.subservice.name 
+    });
+    resendExternalPersonal({
+      email: newBooking.workerUser.email, 
+      name: newBooking.workerUser.personalData.name.first, 
+      service: newBooking.service.name, 
+      subservice: newBooking.subservice.name 
+    });
     res.status(200).json(newBooking);
   } catch (err) {
     next(err);

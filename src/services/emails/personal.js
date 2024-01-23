@@ -71,4 +71,25 @@ export const resendCompletedPersonal = async (info) => {
     }
 };
 
+export const resendExternalPersonal = async (info) => {
+    try {
+        const { email, name, subservice, service} = info;
+        console.log('*** Resend completed ***');
+        const htmlString = templateHtml("availabilityBooking");
+        const template = Handlebars.compile(htmlString);
+        const htmlToSend = template({
+            name: name,
+            service: service,
+            subservice: subservice
+        });
+        const data = await resend.emails.send({
+            from: "SOS Travelers <booking@sostvl.com>",
+            to: [email], // va dirigido al usuario
+            subject: "SOS Travelers - Reservations have been changed due to availability",
+            html: htmlToSend,
+        });
+    } catch (error) {
+        console.log(error);
+    }   
+};
 
