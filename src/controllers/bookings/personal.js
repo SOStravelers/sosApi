@@ -22,7 +22,7 @@ import {
 
 import {
   resendCompletedPersonal,
-  resendCancelPersonal 
+  resendCancelPersonal,
 } from "../../services/emails/personal.js";
 
 import { 
@@ -91,7 +91,16 @@ export const getMonthClientId = async (req, res, next) => {
         $gte: moment(date, "YYYY-MM-DD").startOf("month"),
         $lte: moment(date, "YYYY-MM-DD").endOf("month"),
       },
-      status: { $in: ["requested", "confirmed", "available"] },
+      status: {
+        $in: [
+          "canceled",
+          "completed",
+          "requested",
+          "failed",
+          "confirmed",
+          "available",
+        ],
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client month booking not found");
@@ -114,12 +123,22 @@ export const getWeekClientId = async (req, res, next) => {
     const startWeek = moment.utc(date).format();
     const endWeek = moment.utc(dateMoment).format();
     console.log("la fecha", startWeek, endWeek);
-    const query = countWeekBookings(
+    let query = countWeekBookings(
       "clientUser",
       user._id.toString(),
       startWeek,
       endWeek
     );
+    query[0].$match.status = {
+      $in: [
+        "canceled",
+        "completed",
+        "requested",
+        "failed",
+        "confirmed",
+        "available",
+      ],
+    };
     const result = await Booking.aggregate(query);
     if (!result) throw createError(404, "Personal week booking not found ");
     const response = daysOfweek(result, startWeek);
@@ -191,7 +210,16 @@ export const getDayClientId = async (req, res, next) => {
     let query = {
       clientUser: user._id.toString(),
       "date.stringData": date,
-      status: { $in: ["requested", "confirmed", "available"] },
+      status: {
+        $in: [
+          "canceled",
+          "completed",
+          "requested",
+          "failed",
+          "confirmed",
+          "available",
+        ],
+      },
     };
     const booking = await Booking.paginate(query, options);
     if (!booking) throw createError(404, "Client day booking not found ");
@@ -357,9 +385,9 @@ export const completeBookingUser = async (req, res, next) => {
     );
 
     completeBookingNotification(newBooking);
-  
-    resendCompletedPersonal({name: req.user.username, email: req.user.email});
-   
+
+    resendCompletedPersonal({ name: req.user.username, email: req.user.email });
+
     res.status(200).json(newBooking);
   } catch (err) {
     next(err);
