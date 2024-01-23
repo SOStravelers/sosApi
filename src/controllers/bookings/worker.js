@@ -458,7 +458,7 @@ export const cancelBookingWorker = async (req, res, next) => {
         });
         
         resendCancelPersonal({
-          email: req.user.email,
+          email: newBooking.clientUser.email,
           name: newBooking.clientUser.personalData.name.first,
           service: newBooking.service.name,
           subservice: newBooking.subservice.name
@@ -498,7 +498,7 @@ export const cancelBookingWorker = async (req, res, next) => {
       });
       
       resendCancelPersonal({
-        email: req.user.email,
+        email: newBooking.clientUser.email,
         name: newBooking.clientUser.personalData.name.first,
         service: newBooking.service.name,
         subservice: newBooking.subservice.name

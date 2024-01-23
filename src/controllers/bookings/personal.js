@@ -356,26 +356,17 @@ export const cancelBookingUser = async (req, res, next) => {
 
       console.log(" *** datos del worker *** ");
       
-      console.log('email ', newBooking.workerUser.email);
-      console.log('name ', newBooking.workerUser.personalData.name.first);
-      console.log('service ', newBooking.service.name);
-      console.log('subservice ', newBooking.subservice.name);
-      
       awsCancelWorker({
         email: newBooking.workerUser.email, 
         name: newBooking.workerUser.personalData.name.first, 
         service: newBooking.service.name, 
         subservice: newBooking.subservice.name 
-      })
+      });
+
       console.log(" *** datos del usuario *** ");
 
-      console.log('email ', req.user.email);
-      console.log('name ', newBooking.clientUser.personalData.name.first);
-      console.log('service ', newBooking.service.name);
-      console.log('subservice ', newBooking.subservice.name);
-
       resendCancelPersonal({  
-        email: req.user.email,
+        email: newBooking.clientUser.email,
         name: newBooking.clientUser.personalData.name.first,
         service: newBooking.service.name,
         subservice: newBooking.subservice.name
