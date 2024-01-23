@@ -26,8 +26,8 @@ import {
   resendCancelPersonal,
 } from "../../services/emails/personal.js";
 
-import { 
-  awsCompletedWorker, 
+import {
+  awsCompletedWorker,
   awsCancelWorker,
   awsUpdateTemplate,
   awsConfirmWorker
@@ -286,38 +286,21 @@ export const cancelBookingUser = async (req, res, next) => {
             new: true,
           }
         ).populate(bookingPopulate());
-
-
         cancelBookingNotification(newBooking);
-        
         console.log(" *** datos del worker *** ");
-        console.log('email w ', newBooking.workerUser.email);
-        console.log('name ', newBooking.workerUser.personalData.name.first);
-        console.log('service ', newBooking.service.name);
-        console.log('subservice ', newBooking.subservice.name);
-        
-        console.log(" *** datos del usuario *** ");
-
-        console.log('email ', newBooking.clientUser.email);
-        console.log('name ', newBooking.clientUser.personalData.name.first);
-        console.log('service ', newBooking.service.name);
-        console.log('subservice ', newBooking.subservice.name);
-
- 
-        
-     /*    resendCancelPersonal({
-          name: req.user.username,
-          email: req.user.email,
-          
-        });
-
         awsCancelWorker({
-          email, 
-          name, 
-          subservice, 
-          service
-        }) */
-
+          email: newBooking.workerUser.email,
+          name: newBooking.workerUser.personalData.name.first,
+          service: newBooking.service.name,
+          subservice: newBooking.subservice.name
+        });
+        console.log(" *** datos del usuario *** ");
+        resendCancelPersonal({
+          email: newBooking.clientUser.email,
+          name: newBooking.clientUser.personalData.name.first,
+          service: newBooking.service.name,
+          subservice: newBooking.subservice.name
+        });
         return res.status(200).json(newBooking);
       } else {
         console.log("no puede cancelar sin penalidad, 50% de penalidad");
@@ -353,25 +336,21 @@ export const cancelBookingUser = async (req, res, next) => {
         }
       ).populate(bookingPopulate());
       cancelBookingNotification(newBooking);
-
       console.log(" *** datos del worker *** ");
-      
       awsCancelWorker({
-        email: newBooking.workerUser.email, 
-        name: newBooking.workerUser.personalData.name.first, 
-        service: newBooking.service.name, 
-        subservice: newBooking.subservice.name 
+        email: newBooking.workerUser.email,
+        name: newBooking.workerUser.personalData.name.first,
+        service: newBooking.service.name,
+        subservice: newBooking.subservice.name
       });
-
       console.log(" *** datos del usuario *** ");
-
-      resendCancelPersonal({  
+      resendCancelPersonal({
         email: newBooking.clientUser.email,
         name: newBooking.clientUser.personalData.name.first,
         service: newBooking.service.name,
         subservice: newBooking.subservice.name
       });
-      
+
       return res.status(200).json(newBooking);
     }
   } catch (err) {

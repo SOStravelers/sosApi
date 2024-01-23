@@ -6,7 +6,7 @@ export const awsConfirmWorker = async (info) => {
   try {
     // verificar si existe el template
     console.log('###### confirmedBookingWorker verificate template ######');
-    const { email, name, service, subservice} = info;
+    const {email, name, service, subservice} = info;
     const response = await getTemplate('completedBookingWorker');
     if (response === null) {
       // crear el templete
@@ -16,17 +16,17 @@ export const awsConfirmWorker = async (info) => {
       });
     };
     /* params del email */
-    const information = ` Parabéns, você tem uma nova reserva, estamos aguardando a confirmação do seu serviço ${service} - ${subservice}`;
     const emailParams = {
-      Source: 'booking@sostvl.com', // Dirección de correo verificada con AWS
+      Source: 'booking@sostvl.com',
       Destination: {
-        ToAddresses: [email], // Lista de destinatarios
-        CcAddresses: 'booking@sostvl.com', // Lista de copias
+        ToAddresses: [email], 
+        CcAddresses: 'booking@sostvl.com', 
       },
-      Template: "completedBookingWorker", // Nombre del template a usar
+      Template: "completedBookingWorker", 
       TemplateData: JSON.stringify({
-        name: name, // Valor de la variable {{name}}
-        information: information, // Valor de la variable information
+        name: name,  
+        service: service,  
+        subservice: subservice  
       }),
     };
     /* Enviar el email */

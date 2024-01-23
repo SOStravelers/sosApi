@@ -24,13 +24,14 @@ import {
 } from "../../services/notification.js";
 
 import { 
-  awsCompletedWorker,
   awsCancelWorker, 
+  awsConfirmWorker,
   awsUpdateTemplate 
 } from "../../services/emails/worker.js";
 
 import {
- resendCancelPersonal
+ resendCancelPersonal,
+ resendConfirmPersonal
 } from "../../services/emails/personal.js";
 
 const populate = [
@@ -348,8 +349,7 @@ export const confirmBookingWorker = async (req, res, next) => {
     if (!booking) throw createError(404, "Booking not found");
     if (booking.status != "requested") {
       throw createError(400, "Booking can't be confirmed");
-    }
-
+    };
     const newBooking = await Booking.findOneAndUpdate(
       {
         _id: bookingId,
@@ -358,7 +358,19 @@ export const confirmBookingWorker = async (req, res, next) => {
       {
         new: true,
       }
-    ).populate(populate);
+    ).populate(bookingPopulate());
+    awsConfirmWorker({
+      email: newBooking.workerUser.email, 
+      name: newBooking.workerUser.personalData.name.first, 
+      service: newBooking.service.name, 
+      subservice: newBooking.subservice.name 
+    });
+    resendConfirmPersonal({
+      email: newBooking.clientUser.email,
+      name: newBooking.clientUser.personalData.name.first,
+      service: newBooking.service.name,
+      subservice: newBooking.subservice.name
+    });
     confirmBookingNotification(newBooking);
     res.status(200).json(newBooking);
   } catch (err) {
@@ -412,14 +424,11 @@ export const cancelBookingWorker = async (req, res, next) => {
     if (booking.status != "confirmed" && booking.status != "requested") {
       throw createError(400, "Booking can't be cancel");
     }
-
     const brazilTime = moment().tz("America/Sao_Paulo");
-
     var bookingSaveTime = moment(booking.startTime.isoTime).subtract(
       2,
       "hours"
     );
-
     const canceledData = {
       canceledBy: userId,
       canceledAtUTC: brazilTime,
@@ -449,14 +458,12 @@ export const cancelBookingWorker = async (req, res, next) => {
           }
         ).populate(bookingPopulate());
         cancelBookingNotification(newBooking);
-    
         awsCancelWorker({
           email: newBooking.workerUser.email, 
           name: newBooking.workerUser.personalData.name.first, 
           service: newBooking.service.name, 
           subservice: newBooking.subservice.name 
         });
-        
         resendCancelPersonal({
           email: newBooking.clientUser.email,
           name: newBooking.clientUser.personalData.name.first,
@@ -496,7 +503,6 @@ export const cancelBookingWorker = async (req, res, next) => {
         service: newBooking.service.name, 
         subservice: newBooking.subservice.name 
       });
-      
       resendCancelPersonal({
         email: newBooking.clientUser.email,
         name: newBooking.clientUser.personalData.name.first,
@@ -508,7 +514,7 @@ export const cancelBookingWorker = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
+}; 
 
 //Crear booking por el worker by cash
 export const createBookingWorker = async (req, res, next) => {
