@@ -1,5 +1,6 @@
 import Notification from "../models/notification.js";
 import User from "../models/user.js";
+import webpush from "web-push";
 
 const populateBooking = [
   {
@@ -63,4 +64,37 @@ export const checkNotification = async (req, res) => {
   }).exec();
   const result = notifications.length > 0;
   return res.send(result);
+};
+
+export const getPublicKey = async (req, res) => {
+  global.logger.info("=== GET PUBLIC KEY ===");
+  const publicKey = process.env.PUBLIC_KEY;
+  return res.status(200).send({ publicKey });
+};
+
+export const sendExampleNotification = async (req, res) => {
+  global.logger.info("=== SEND EXAMPLE NOTIFICATION ===");
+  const subscription = req.body;
+  const vapidKeys = {
+    publicKey: process.env.PUBLIC_KEY,
+    privateKey: process.env.PRIVATE_KEY,
+  };
+
+  webpush.setVapidDetails(
+    "mailto:info@sostvl.com",
+    vapidKeys.publicKey,
+    vapidKeys.privateKey
+  );
+
+  const notificationPayload = {
+    notification: {
+      title: "New Notification",
+      body: "Notificacion de prueba",
+      // icon: 'icon.png'
+    },
+  };
+  webpush
+    .sendNotification(subscription, JSON.stringify(notificationPayload))
+    .catch((err) => console.error("Error sending notification, reason: ", err));
+  console.log("hola", webpush, notificationPayload, subscription);
 };

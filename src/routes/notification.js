@@ -5,6 +5,8 @@ import {
   getByUser,
   setIsRead,
   checkNotification,
+  getPublicKey,
+  sendExampleNotification,
 } from "../controllers/notification.js";
 import validateParams from "../middleware/validate.js";
 router.get(
@@ -41,3 +43,6 @@ router.put(
   ),
   setIsRead
 );
+
+router.get("/getkey", getPublicKey);
+router.post("/createSub", sendExampleNotification);
