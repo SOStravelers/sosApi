@@ -33,7 +33,6 @@ export const resendCancelPersonal = async (info) => {
         const { email, name, subservice, service} = info;
         const htmlString = templateHtml("cancelBooking");
         const template = Handlebars.compile(htmlString);
-        
         const htmlToSend = template({
             name: name,
             service: service,
@@ -42,7 +41,7 @@ export const resendCancelPersonal = async (info) => {
         const data = await resend.emails.send({
             from: "SOS Travelers <booking@sostvl.com>",
             to: [email], // va dirigido al usuario
-            subject: "SOS Travelers - Cancel booking",
+            subject: "SOS Travelers - Your booking was canceled",
             html: htmlToSend,
         });
     } catch (error) {

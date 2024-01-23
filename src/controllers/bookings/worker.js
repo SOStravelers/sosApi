@@ -3,6 +3,7 @@ import Booking from "../../models/booking.js";
 import User from "../../models/user.js";
 import {
   optionsBooking,
+  bookingPopulate,
   validateFormatDate,
   countWeekBookings,
   daysOfweek,
@@ -23,9 +24,14 @@ import {
 } from "../../services/notification.js";
 
 import { 
-  awsCompletedWorker, 
+  awsCompletedWorker,
+  awsCancelWorker, 
   awsUpdateTemplate 
 } from "../../services/emails/worker.js";
+
+import {
+ resendCancelPersonal
+} from "../../services/emails/personal.js";
 
 const populate = [
   {
@@ -441,8 +447,22 @@ export const cancelBookingWorker = async (req, res, next) => {
           {
             new: true,
           }
-        ).populate(populate);
+        ).populate(bookingPopulate());
         cancelBookingNotification(newBooking);
+    
+        awsCancelWorker({
+          email: newBooking.workerUser.email, 
+          name: newBooking.workerUser.personalData.name.first, 
+          service: newBooking.service.name, 
+          subservice: newBooking.subservice.name 
+        });
+        
+        resendCancelPersonal({
+          email: req.user.email,
+          name: newBooking.clientUser.personalData.name.first,
+          service: newBooking.service.name,
+          subservice: newBooking.subservice.name
+        });
         return res.status(200).json(newBooking);
       } else {
         throw createError(400, "Booking can't be cancel");
@@ -469,6 +489,20 @@ export const cancelBookingWorker = async (req, res, next) => {
         }
       ).populate(populate);
       // cancelBookingNotification(newBooking);
+      
+   /*    awsCancelWorker({
+        email: newBooking.workerUser.email, 
+        name: newBooking.workerUser.personalData.name.first, 
+        service: newBooking.service.name, 
+        subservice: newBooking.subservice.name 
+      });
+      
+      resendCancelPersonal({
+        email: req.user.email,
+        name: newBooking.clientUser.personalData.name.first,
+        service: newBooking.service.name,
+        subservice: newBooking.subservice.name
+      }); */
       return res.status(200).json(newBooking);
     }
   } catch (err) {

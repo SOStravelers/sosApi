@@ -51,17 +51,17 @@ export const awsCancelWorker = async (info) => {
       });
     };
      /* Generar los params */
-        /* Enviar el email */
         const emailParams = {
-          Source: 'booking@sostvl.com', // Dirección de correo verificada con AWS
+          Source: envar().SES_EMAIL_AUTH, 
           Destination: {
-            ToAddresses: [email], // Lista de destinatarios
-            CcAddresses: 'booking@sostvl.com', // Lista de copias
+            ToAddresses: [email], 
+            CcAddresses: ['booking@sostvl.com'],
           },
-          Template: "completedBookingWorker", // Nombre del template a usar
+          Template: "completedBookingWorker", 
           TemplateData: JSON.stringify({
-            name: name, // Valor de la variable {{name}}
-            information: information, // Valor de la variable information
+            name: name, 
+            service: service ,
+            subservice: subservice
           }),
         };
 
