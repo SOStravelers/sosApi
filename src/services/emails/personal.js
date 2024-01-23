@@ -7,6 +7,7 @@ import { templateHtml } from "../../utils/externalFiles.js";
 export const resendConfirmPersonal = async (info) => {
     try {
         const { email, name, subservice, service } = info;
+        console.log('*** resend confirmed ***');
         const htmlString = templateHtml("confirmBooking");
         const template = Handlebars.compile(htmlString);
         const htmlToSend = template({
@@ -14,15 +15,12 @@ export const resendConfirmPersonal = async (info) => {
             service: service,
             subservice: subservice
         });
-        console.log("el email", email);
         const data = await resend.emails.send({
             from: "SOS Travelers <booking@sostvl.com>",
             to: [email], // va dirigido al usuario
             subject: "SOS Travelers - Confirm booking",
             html: htmlToSend,
         });
-        
-        console.log(data);
     } catch (error) {
         console.error(error);
     }
@@ -31,6 +29,7 @@ export const resendConfirmPersonal = async (info) => {
 export const resendCancelPersonal = async (info) => {
     try {
         const { email, name, subservice, service} = info;
+        console.log('***resend cancel ***');
         const htmlString = templateHtml("cancelBooking");
         const template = Handlebars.compile(htmlString);
         const htmlToSend = template({
@@ -52,6 +51,7 @@ export const resendCancelPersonal = async (info) => {
 export const resendCompletedPersonal = async (info) => {
     try {
         const { email, name, subservice, service} = info;
+        console.log('***resend completed ***');
         const htmlString = templateHtml("completedBooking");
         const template = Handlebars.compile(htmlString);
         const htmlToSend = template({

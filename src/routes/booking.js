@@ -890,7 +890,7 @@ router.put(
   cancelBookingWorker
 );
 
-/* Update templated worker */
+/* Update template worker */
 
 router.get("/updateTemplateWorker", 
 validateParams(

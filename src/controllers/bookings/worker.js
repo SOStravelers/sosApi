@@ -489,8 +489,8 @@ export const cancelBookingWorker = async (req, res, next) => {
         }
       ).populate(populate);
       // cancelBookingNotification(newBooking);
-      
-   /*    awsCancelWorker({
+
+      awsCancelWorker({
         email: newBooking.workerUser.email, 
         name: newBooking.workerUser.personalData.name.first, 
         service: newBooking.service.name, 
@@ -502,7 +502,7 @@ export const cancelBookingWorker = async (req, res, next) => {
         name: newBooking.clientUser.personalData.name.first,
         service: newBooking.service.name,
         subservice: newBooking.subservice.name
-      }); */
+      });
       return res.status(200).json(newBooking);
     }
   } catch (err) {
