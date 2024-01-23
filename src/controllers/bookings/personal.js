@@ -21,11 +21,17 @@ import {
 } from "../../services/notification.js";
 
 import {
-  resendConfirmPersonal,
   resendCompletedPersonal,
   resendCancelPersonal 
 } from "../../services/emails/personal.js";
-import { completedWorker } from "../../services/emails/worker.js";
+
+import { 
+  awsCompletedWorker, 
+  awsCancelWorker,
+  awsUpdateTemplate,
+  awsConfirmWorker
+} from "../../services/emails/worker.js";
+
 
 const populate = [
   {
@@ -276,6 +282,7 @@ export const cancelBookingUser = async (req, res, next) => {
         resendCancelPersonal({
           name: req.user.username,
           email: req.user.email,
+          
         });
 
         return res.status(200).json(newBooking);

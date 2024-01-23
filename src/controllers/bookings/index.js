@@ -3,7 +3,7 @@ import Booking from "../../models/booking.js";
 import User from "../../models/user.js";
 import { newBookingNotification } from "../../services/notification.js";
 import { resendCompletedPersonal } from "../../services/emails/personal.js";
-import { completedWorker } from "../../services/emails/worker.js";
+import { awsCompletedWorker } from "../../services/emails/worker.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 import moment from "moment-timezone";
 
@@ -31,7 +31,7 @@ const populate = [
   },
   {
     path: "clientUser",
-    select: "personalData img",
+    select: "personalData img, email",
   },
 ];
 
@@ -42,7 +42,6 @@ export const create = async (req, res, next) => {
     const emailData = req.body.emailData;
     const bookingData = req.body;
     bookingData.emailData = null;
-
     let booking = new Booking(bookingData);
     booking.firstWorker = booking.workerUser;
     let query = {
@@ -67,7 +66,6 @@ export const create = async (req, res, next) => {
     } else {
       // Buscar el último booking ordenado por idKey en orden descendente
       let lastBooking = await Booking.findOne().sort({ idKey: -1 });
-
       let newIdKey;
       if (!lastBooking || !lastBooking.idKey) {
         // Si no hay bookings, o si el último booking no tiene un idKey, usar "B-1000" como el primer idKey
@@ -77,27 +75,30 @@ export const create = async (req, res, next) => {
         let lastIdNumber = Number(lastBooking.idKey.split("-")[1]);
         newIdKey = "B-" + (lastIdNumber + 1);
       }
-
       // Asignar el nuevo idKey al booking
       booking.idKey = newIdKey;
       const newBooking = await booking.save();
       const theBooking = await Booking.findOne({ _id: newBooking._id })
         .populate(populate)
         .exec();
-
       //creando notificaciones:
       //notification User and Worker
       newBookingNotification(theBooking);
-      resendCompletedPersonal({ name: req.user.username, email: req.user.email });
-      console.log('#### estoy en dev  ####');
-      console.log(theBooking.workerUser.email, theBooking.workerUser.personalData.name.first);
-      console.log('#### estoy en dev  ####');
-      completedWorker({
+      
+     resendCompletedPersonal({
+        email: theBooking.clientUser.email, 
+        name: theBooking.clientUser.personalData.name.first, 
+        service: theBooking.service.name, 
+        subservice: theBooking.subservice.name
+      });
+      
+     awsCompletedWorker({
         email: theBooking.workerUser.email, 
         name: theBooking.workerUser.personalData.name.first, 
-        service: theBooking.service.name 
+        service: theBooking.service.name, 
+        subservice: theBooking.subservice.name
        });
-        
+
       if (emailData) sendEmailPaymentConfirmation(emailData);
       res.status(201).json({ booking: theBooking, msg: "new Document" });
     }
@@ -105,6 +106,7 @@ export const create = async (req, res, next) => {
     next(err);
   }
 };
+
 //Obtener reserva por ID
 export const getById = async (req, res, next) => {
   global.logger.info("---GET BOOKING BY Id---");
@@ -158,6 +160,7 @@ export const getBookings = async (req, res, next) => {
     next(err);
   }
 };
+
 //Actualizar data de un booking
 export const updateOne = async (req, res, next) => {
   global.logger.info("---UPDATE BOOKING---");
@@ -180,6 +183,7 @@ export const updateOne = async (req, res, next) => {
     next(err);
   }
 };
+
 export const cancelBooking = async (req, res, next) => {
   global.logger.info("---CANCEL BOOKING---");
   try {

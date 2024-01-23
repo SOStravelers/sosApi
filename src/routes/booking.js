@@ -34,6 +34,7 @@ import {
   getLastWorkers,
   availableBookings,
   createBookingWorker,
+  updateTemplateWorker
 } from "../controllers/bookings/worker.js";
 
 import {
@@ -888,6 +889,28 @@ router.put(
   ),
   cancelBookingWorker
 );
+
+/* Update templated worker */
+
+router.get("/updateTemplateWorker", 
+validateParams(
+  [
+    {
+      param_key: "type",
+      required: true,
+      type: "string"
+    },
+    {
+      param_key: "subject",
+      required: true,
+      type: "string"      
+    }
+  ],
+  "query"
+),
+updateTemplateWorker
+);
+
 router.put(
   "/cancelUser/:bookingId",
   validateParams(
@@ -943,5 +966,7 @@ router.get(
   ),
   getIndicators
 );
+
+
 
 export default router;

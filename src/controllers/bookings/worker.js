@@ -7,6 +7,7 @@ import {
   countWeekBookings,
   daysOfweek,
 } from "./helper.js";
+
 import { createError } from "../../config/error.js";
 
 import {
@@ -20,6 +21,11 @@ import {
   completeBookingNotification,
   confirmBookingNotification,
 } from "../../services/notification.js";
+
+import { 
+  awsCompletedWorker, 
+  awsUpdateTemplate 
+} from "../../services/emails/worker.js";
 
 const populate = [
   {
@@ -325,10 +331,11 @@ export const confirmBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
+
 export const confirmBookingWorkerExternal = async (req, res, next) => {
   global.logger.info("---CONFIRM BOOKING WORKER EXTERNAL---");
   try {
-    const userId = req.user._id.toString();
+    const userId = req.user._id;
     const bookingId = req.params.bookingId;
     console.log(userId, bookingId);
     const user = await User.findOne({ _id: userId.toString() }).exec();
@@ -344,7 +351,7 @@ export const confirmBookingWorkerExternal = async (req, res, next) => {
       {
         _id: bookingId,
       },
-      { status: "confirmed", workerUser: userId },
+      { status: "confirmed", wokerId: userId.toString() },
       {
         new: true,
       }
@@ -355,6 +362,7 @@ export const confirmBookingWorkerExternal = async (req, res, next) => {
     next(err);
   }
 };
+
 export const cancelBookingWorker = async (req, res, next) => {
   global.logger.info("---CANCEL BOOKING WORKER---");
   try {
@@ -439,6 +447,7 @@ export const cancelBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
+
 //Crear booking por el worker by cash
 export const createBookingWorker = async (req, res, next) => {
   global.logger.info("---CREATE NEW  BOOKING WORKER---");
@@ -511,3 +520,29 @@ export const createBookingWorker = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateTemplateWorker = async (req, res, next) => {
+  try {
+    const {type, subject}  = req.query;
+    if(type === 'completed'){
+       awsUpdateTemplate({
+        template:'completedBookingWorker', 
+        subject: subject
+      });
+       res.status(201).json({msg: "the worker template was updated"});
+    }else if(type === 'cancel'){
+      awsUpdateTemplate('canceldBookingWorker', subject);
+      res.status(201).json({msg: "the worker template was updated"});
+    }else if(type === 'confirmed'){
+      awsUpdateTemplate('confirmedBookingWorker', subject);
+      res.status(201).json({msg: "the worker template was updated"});
+    }else if(type === 'availability'){
+      awsUpdateTemplate('availabilityBookingWorker', subject);
+      res.status(201).json({msg: "the worker template was updated"});
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  
+
+}
