@@ -74,6 +74,7 @@ export const getPublicKey = async (req, res) => {
 
 export const sendExampleNotification = async (req, res) => {
   global.logger.info("=== SEND EXAMPLE NOTIFICATION ===");
+  console.log(process.env.NODE_ENV);
   const subscription = req.body;
   const vapidKeys = {
     publicKey: process.env.PUBLIC_KEY,
