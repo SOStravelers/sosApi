@@ -152,8 +152,8 @@ const job = schedule.scheduleJob(rule, async function () {
 //Ahora quiero una función que cambie todos los bookings en confirmed a completed a las 01:00 AM de brasil todos los dias
 const rule2 = new schedule.RecurrenceRule();
 rule2.tz = "America/Sao_Paulo"; // Zona horaria de Brasil
-rule2.minute = 0; // Cada 2 minutos
-rule2.hour = 1; // Entre las 9 AM y las 10 PM
+rule2.minute = 10; //  minutos
+rule2.hour = 1; // hora
 const job2 = schedule.scheduleJob(rule2, async function () {
   global.logger.info("---CHANGE TO COMPLETED---");
   // tomar todos los booking en requested creados hace media hora o mas y cambiarlos a available
@@ -166,7 +166,7 @@ const job2 = schedule.scheduleJob(rule2, async function () {
     for (let booking of result) {
       const brazilTime = moment().tz("America/Sao_Paulo");
       const completedData = {
-        completedBy: userId,
+        completedBy: "SOSTEAM",
         completedAtUTC: brazilTime,
         timeZone: "America/Sao_Paulo",
         previusStatus: booking.status,
