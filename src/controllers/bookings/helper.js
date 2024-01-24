@@ -5,11 +5,11 @@ export const optionsBooking = (page, limit) => {
   const populate = [
     {
       path: "businessUser",
-      select: "businessData personalData img",
+      select: "businessData personalData img email",
     },
     {
       path: "workerUser",
-      select: "workerData personalData img",
+      select: "workerData personalData img email",
     },
     {
       path: "service",
@@ -21,7 +21,7 @@ export const optionsBooking = (page, limit) => {
     },
     {
       path: "clientUser",
-      select: "personalData",
+      select: "personalData email",
     },
   ];
   return {
@@ -32,6 +32,33 @@ export const optionsBooking = (page, limit) => {
     sort: { "startTime.isoTime": 1 },
   };
 };
+
+export const bookingPopulate = () => {
+
+  const populate = [
+    {
+      path: "businessUser",
+      select: "businessData personalData img email",
+    },
+    {
+      path: "workerUser",
+      select: "workerData personalData img email",
+    },
+    {
+      path: "service",
+      select: "name isActive coverImg",
+    },
+    {
+      path: "subservice",
+      select: "name isActive coverImg duration",
+    },
+    {
+      path: "clientUser",
+      select: "personalData email",
+    },
+  ];
+  return populate;
+}
 
 export const countDateBookings = (startDate, endDate, userId) => {
   return {

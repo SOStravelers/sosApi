@@ -81,10 +81,10 @@ export const sendTemplateExample = async (file) => {
   try {
     // Definir los parámetros del correo electrónico usando el template
     const emailParams = {
-      Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS
+      Source: 'booking@sostvl.com', // Dirección de correo verificada con AWS
       Destination: {
         ToAddresses: ["jschacosta@gmail.com", "methalcon@gmail.com"], // Lista de destinatarios
-        CcAddresses: [envar().SES_EMAIL_AUTH], // Lista de copias
+        CcAddresses: 'booking@sostvl.com', // Lista de copias
       },
       Template: "MiTemplateHTML", // Nombre del template a usar
       TemplateData: JSON.stringify({
@@ -129,7 +129,7 @@ export const createTemplateFile = async (params) => {
         console.error(err); // Mostrar el error si ocurre
       } else {
         console.log(data, 'sucessfull'); // Mostrar la respuesta de AWS si tiene éxito
-      }
+      };
     });
   } catch (err) {
     console.log("Error", err);
@@ -149,12 +149,20 @@ export const getTemplate = async (name) => {
       return null;
     }
   } catch (err) {
-    
+     
     console.log('*** catch ***');
     console.log(err.message);
+
     if(err.message === 'Template completedBookingWorker does not exist.'){
       return null;
-    }
+    }else if (err.message === 'Template confirmedBookingWorker does not exist.'){
+      return nul;
+    }else if(err.message === 'Template cancelBookingWorker does not exist.'){
+      return null;
+    }else if (err.message === 'Template availabilityBookingWorker does not exist.'){
+      return null;
+    };
+
     console.log('*** catch ***');
 
     throw err;
@@ -182,12 +190,13 @@ export const sendEmailTemplate = async (params) => {
 // Crear el comando para actualizar el template
 export const updateTemplate = async (file) => {
   console.log("entrando5");
+  const {templateName, subject} = file;
   try {
     const templateParams = {
       Template: {
-        TemplateName: "validationCode", // Nombre del template a crear
-        SubjectPart: "Confirm your email address", // Asunto del correo con una variable {{name}}
-        HtmlPart: templateHtml("validationCode"),
+        TemplateName: templateName, // Nombre del template a crear
+        SubjectPart: subject, // Asunto del correo con una variable {{name}}
+        HtmlPart: templateHtml(templateName),
       },
     };
     // Crear el comando para borrar el template

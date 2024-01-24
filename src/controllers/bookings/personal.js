@@ -4,6 +4,7 @@ import User from "../../models/user.js";
 import { createError } from "../../config/error.js";
 import {
   optionsBooking,
+  bookingPopulate,
   validateFormatDate,
   countWeekBookings,
   daysOfweek,
@@ -21,34 +22,18 @@ import {
 } from "../../services/notification.js";
 
 import {
-  resendConfirmPersonal,
   resendCompletedPersonal,
   resendCancelPersonal,
 } from "../../services/emails/personal.js";
-import { completedWorker } from "../../services/emails/worker.js";
 
-const populate = [
-  {
-    path: "businessUser",
-    select: "businessData personalData img",
-  },
-  {
-    path: "workerUser",
-    select: "workerData personalData img",
-  },
-  {
-    path: "service",
-    select: "name isActive coverImg",
-  },
-  {
-    path: "subservice",
-    select: "name isActive coverImg duration",
-  },
-  {
-    path: "clientUser",
-    select: "personalData img",
-  },
-];
+import {
+  awsCompletedWorker,
+  awsCancelWorker,
+  awsUpdateTemplate,
+  awsConfirmWorker
+} from "../../services/emails/worker.js";
+
+
 
 export const getAllClientsId = async (req, res, next) => {
   global.logger.info("---GET TO CLIENT ALL BOOKING---");
@@ -193,6 +178,7 @@ export const getListDayClient = async (req, res, next) => {
     next(err);
   }
 };
+
 export const getDayClientId = async (req, res, next) => {
   global.logger.info("---GET DAY BOOKING BY CLIENT---");
   try {
@@ -299,13 +285,22 @@ export const cancelBookingUser = async (req, res, next) => {
           {
             new: true,
           }
-        ).populate(populate);
+        ).populate(bookingPopulate());
         cancelBookingNotification(newBooking);
-        resendCancelPersonal({
-          name: req.user.username,
-          email: req.user.email,
+        console.log(" *** datos del worker *** ");
+        awsCancelWorker({
+          email: newBooking.workerUser.email,
+          name: newBooking.workerUser.personalData.name.first,
+          service: newBooking.service.name,
+          subservice: newBooking.subservice.name
         });
-
+        console.log(" *** datos del usuario *** ");
+        resendCancelPersonal({
+          email: newBooking.clientUser.email,
+          name: newBooking.clientUser.personalData.name.first,
+          service: newBooking.service.name,
+          subservice: newBooking.subservice.name
+        });
         return res.status(200).json(newBooking);
       } else {
         console.log("no puede cancelar sin penalidad, 50% de penalidad");
@@ -339,15 +334,30 @@ export const cancelBookingUser = async (req, res, next) => {
         {
           new: true,
         }
-      ).populate(populate);
+      ).populate(bookingPopulate());
       cancelBookingNotification(newBooking);
-      resendCancelPersonal({ name: req.user.username, email: req.user.email });
+      console.log(" *** datos del worker *** ");
+      awsCancelWorker({
+        email: newBooking.workerUser.email,
+        name: newBooking.workerUser.personalData.name.first,
+        service: newBooking.service.name,
+        subservice: newBooking.subservice.name
+      });
+      console.log(" *** datos del usuario *** ");
+      resendCancelPersonal({
+        email: newBooking.clientUser.email,
+        name: newBooking.clientUser.personalData.name.first,
+        service: newBooking.service.name,
+        subservice: newBooking.subservice.name
+      });
+
       return res.status(200).json(newBooking);
     }
   } catch (err) {
     next(err);
   }
 };
+
 export const completeBookingUser = async (req, res, next) => {
   global.logger.info("---COMPLETE BOOKING USER---");
   try {
