@@ -52,3 +52,31 @@ export const resendSupport = async (data) => {
     console.error(error);
   }
 };
+
+export const resendRequest = async (data) => {
+  const { subject, message, userType, email, user } = data;
+
+  // definir templateHtml
+  const htmlString = templateHtml("supportEmail");
+  const template = Handlebars.compile(htmlString);
+  const htmlToSend = template({
+    // variables que envio al template del html
+    message: message,
+    sName: user,
+    userType: userType,
+    Email: email,
+  });
+
+  try {
+    const mailData = await resend.emails.send({
+      from: "Support SOS <contact@sostvl.com>",
+      to: "sostravelbr@gmail.com", // email va dirigido siempre a SOS travelers
+      subject: subject,
+      html: htmlToSend,
+    });
+
+    console.log("resendSupport data: ", mailData);
+  } catch (error) {
+    console.error(error);
+  }
+};

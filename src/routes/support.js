@@ -1,7 +1,8 @@
 import Router from "express";
 const router = Router();
-import { supportEmail } from "../controllers/support.js";
+import { supportEmail, contactClient } from "../controllers/support.js";
 
 router.post("/supportEmail", supportEmail);
+router.post("/sendRequest", contactClient);
 
 export default router;
