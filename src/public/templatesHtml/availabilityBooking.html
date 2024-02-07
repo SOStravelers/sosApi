@@ -1,132 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>We have changed the availability of your booking</title>
     <style>
-        body {
-          margin: 0;
-          padding: 0;
-          font-family: Arial, sans-serif;
-        }
-        
-        .container {
-          width: 100%;
-          margin: 0 auto;
-        }
-    
-        .header,
-        .footer {
-          width: 90%;
-          margin: 0 auto;
-          padding: 10px;
-          text-align: center;
-          border-bottom: 4px solid #00a0d5;
-        }
-    
-        ul {
-          width: 100%;
-          margin: 0 auto;
-          list-style: none;
-          padding: 0;
-          overflow: hidden;
-        }
-    
-        li {
-          float: left;
-          margin-right: 10%;
-        }
-    
-        li img {
-          width: 26px;
-          height: auto;
-          margin-top: -5px;
-        }
-    
-        li:last-child {
-          float: left;
-          margin-right: 0;
-          margin-left: 20%;
-        }
-    
-        .main {
-          padding: 20px;
-          text-align: center;
-          margin-bottom: 20px;
-          color: #001C25;
-        }
-    
-        .section {
-          width: 50%;
-          padding: 5px;
-          margin: 0 auto;
-    
-        }
-    
-        .section span {
-          font-weight: bold;
-          padding: 5px;
-        }
-    
-        .img-main {
-          max-width: 300px;
-          margin: 0 auto;
-        }
-    
-        .footer {
-          background-color: none;
-    
-        }
-        
-      </style>
-    </head>
-    
-    <body>
-      <div class="container">
-        <div class="header">
-    
-          <ul>
-            <li>
-              <img src="https://sosappfiles.s3.amazonaws.com/icons/email/sosWhite.png" alt="" />
-              <span style="font-size: 24px; font-weight: bold; margin-left: 5px; ">Sos Travelers</span>
-            </li>
-            <li style=" float: left; margin-right: 0; margin-left: 40%; font-style: oblique;">The best travel app</li>
-          </ul>
-        </div>
-        <div class="main">
-          <img src="https://sosappfiles.s3.amazonaws.com/icons/email/nin%CC%83a.png" class="img-main" />
-          <div class="section">
-            <span>Dear costumer </span>
-            {{name}}
-          </div>
-          <div class="section">
-            <span>We have changed the availability of your reservation</span>
-            Get ready for an exciting surprise, because your booking availability has undergone a 
-            magical transformation! 🌟🔮
-            Now you have the opportunity to explore new options and live an even more fascinating 
-            experience! ✨🎉
-          </div>
-           <div class="section">
-           <span>Service: </span>
-            {{service}} -
-             <span>Subservice</span>
-             {{subservice}}
-      </div> 
-          <p class="lastParrafo">
-            Se você desistir de usar esse e-mail, ignore esta mensagem.
-          </p>
-        </div>
-        <div style="flex: auto; text-align: center">
-          <a href="https://www.instagram.com/sos.travelers/">
-            <img src="https://sosappfiles.s3.amazonaws.com/icons/email/instaBlue.png" alt="" />
-          </a>
-          <div style="flex: auto; text-align: center"> @sosTravelers</div>
-        </div>
-        <div class="footer">Copyright 2023 SOS Travelers</div>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .header,
+      .footer {
+        width: 90%;
+        margin: 0 auto;
+        padding: 10px;
+        text-align: center;
+        border-bottom: 4px solid #00a0d5;
+      }
+
+      ul {
+        width: 100%;
+        margin: 0 auto;
+        list-style: none;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      li {
+        float: left;
+        margin-right: 10%;
+      }
+
+      li img {
+        width: 26px;
+        height: auto;
+        margin-top: -5px;
+      }
+
+      li:last-child {
+        float: left;
+        margin-right: 0;
+        margin-left: 20%;
+      }
+
+      .main {
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #001c25;
+      }
+
+      .section {
+        width: 50%;
+        padding: 5px;
+        margin: 0 auto;
+      }
+
+      .section span {
+        font-weight: bold;
+        padding: 5px;
+      }
+
+      .img-main {
+        max-width: 300px;
+        margin: 0 auto;
+      }
+
+      .footer {
+        background-color: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <ul>
+          <li>
+            <img
+              src="https://sosappfiles.s3.amazonaws.com/icons/email/sosWhite.png"
+              alt=""
+            />
+            <span style="font-size: 24px; font-weight: bold; margin-left: 5px"
+              >Sos Travelers</span
+            >
+          </li>
+          <li
+            style="
+              float: left;
+              margin-right: 0;
+              margin-left: 40%;
+              font-style: oblique;
+            "
+          >
+            The best travel app
+          </li>
+        </ul>
       </div>
-    </body>
-    
-    <script src="src/test.js"></script>
-    
-    </html>
+      <div class="main">
+        <img
+          src="https://sosappfiles.s3.amazonaws.com/icons/email/nin%CC%83a.png"
+          class="img-main"
+        />
+        <div class="section">
+          <span>Dear costumer </span>
+          {{name}}
+        </div>
+        <div class="section">
+          <span>We have changed the availability of your reservation</span>
+          Get ready for an exciting surprise, because your booking availability
+          has undergone a magical transformation! 🌟🔮 Now you have the
+          opportunity to explore new options and live an even more fascinating
+          experience! ✨🎉
+        </div>
+        <div class="section">
+          <span>Service: </span>
+          {{service}} -
+          <span>Subservice</span>
+          {{subservice}}
+        </div>
+        <p class="lastParrafo">
+          Consulte o aplicativo para ver os detalhes da reserva
+        </p>
+      </div>
+      <div style="flex: auto; text-align: center">
+        <a href="https://www.instagram.com/sos.travelers/">
+          <img
+            src="https://sosappfiles.s3.amazonaws.com/icons/email/instaBlue.png"
+            alt=""
+          />
+        </a>
+        <div style="flex: auto; text-align: center">@sosTravelers</div>
+      </div>
+      <div class="footer">Copyright 2023 SOS Travelers</div>
+    </div>
+  </body>
+
+  <script src="src/test.js"></script>
+</html>

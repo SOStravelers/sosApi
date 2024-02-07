@@ -26,12 +26,8 @@ const subserviceSchema = new Schema(
       category2: { type: Number, default: 0 },
       category3: { type: Number, default: 0 },
     },
-    // price: {
-    //   value: { type: String, default: "$ 0" },
-    //   lastValue: { type: String, default: "$ 0" },
-    //   number: { type: Number, default: 0 },
-    //   lastNumber: { type: Number, default: 0 },
-    // },
+    type: { type: String, default: "personal", enum: ["personal", "group"] },
+    limit: { type: Number, default: 1 },
   },
   { timestamps: true }
 );
