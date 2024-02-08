@@ -10,7 +10,25 @@ const subserviceSchema = new Schema(
     service: { type: String, ref: "Service" },
     isActive: { type: Boolean, default: true },
     duration: { type: Number },
-    details: { type: String },
+    details: {
+      en: {
+        type: String,
+        default: "",
+      },
+      es: {
+        type: String,
+        default: "",
+      },
+      fr: {
+        type: String,
+        default: "",
+      },
+      pt: {
+        type: String,
+        default: "",
+      },
+    },
+
     imgUrl: { type: String },
     creator: { type: String, ref: "User" },
     updated: {

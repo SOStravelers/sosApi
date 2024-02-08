@@ -27,7 +27,7 @@ const populate = [
   },
   {
     path: "subservice",
-    select: "name isActive coverImg duration",
+    select: "name isActive coverImg duration details",
   },
   {
     path: "clientUser",
@@ -84,20 +84,20 @@ export const create = async (req, res, next) => {
       //creando notificaciones:
       //notification User and Worker
       newBookingNotification(theBooking);
-      
-     resendCompletedPersonal({
-        email: theBooking.clientUser.email, 
-        name: theBooking.clientUser.personalData.name.first, 
-        service: theBooking.service.name, 
-        subservice: theBooking.subservice.name
+
+      resendCompletedPersonal({
+        email: theBooking.clientUser.email,
+        name: theBooking.clientUser.personalData.name.first,
+        service: theBooking.service.name,
+        subservice: theBooking.subservice.name,
       });
-      
-     awsCompletedWorker({
-        email: theBooking.workerUser.email, 
-        name: theBooking.workerUser.personalData.name.first, 
-        service: theBooking.service.name, 
-        subservice: theBooking.subservice.name
-       });
+
+      awsCompletedWorker({
+        email: theBooking.workerUser.email,
+        name: theBooking.workerUser.personalData.name.first,
+        service: theBooking.service.name,
+        subservice: theBooking.subservice.name,
+      });
 
       if (emailData) sendEmailPaymentConfirmation(emailData);
       res.status(201).json({ booking: theBooking, msg: "new Document" });

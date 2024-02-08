@@ -31,7 +31,7 @@ export const getServices = async (req, res, next) => {
       sort: { updatedAt: -1 },
     };
     let query = {};
-    body.isActive ? (query.isActive = body.isActive) : "";
+    body.isActive ? (query.isActive = body.isActive) : (query.isActive = true);
     const services = await Service.paginate(query, options);
     res.status(200).json(services);
   } catch (err) {

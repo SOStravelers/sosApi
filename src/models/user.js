@@ -116,10 +116,29 @@ const userSchema = new Schema(
         enum: ["category1", "category2", "category3"],
         default: "category1",
       },
+      details: {
+        en: {
+          type: String,
+          default: "",
+        },
+        es: {
+          type: String,
+          default: "",
+        },
+        fr: {
+          type: String,
+          default: "",
+        },
+        pt: {
+          type: String,
+          default: "",
+        },
+      },
       location: {
         _id: false,
         country: { type: String },
         city: { type: String },
+        url: { type: String },
       },
       type: {
         type: String,
