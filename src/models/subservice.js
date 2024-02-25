@@ -28,7 +28,6 @@ const subserviceSchema = new Schema(
         default: "",
       },
     },
-
     imgUrl: { type: String },
     creator: { type: String, ref: "User" },
     updated: {
