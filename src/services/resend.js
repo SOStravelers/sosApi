@@ -53,6 +53,31 @@ export const resendSupport = async (data) => {
   }
 };
 
+export const resendJohann = async (data) => {
+  const { message, name, email } = data;
+  console.log("wena", data);
+  // definir templateHtml
+  const htmlString = templateHtml("emailJohannUser");
+  const template = Handlebars.compile(htmlString);
+  const htmlToSend = template({
+    message: message,
+    sName: name,
+    Email: email,
+  });
+  try {
+    const mailData = await resend.emails.send({
+      from: "johann@sostvl.com",
+      to: ["jschacosta@gmail.com", email], // email va dirigido siempre a SOS travelers
+      subject: "Contact johann Schwarze",
+      html: htmlToSend,
+    });
+
+    console.log("resendSupport data: ", mailData);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const resendRequest = async (data) => {
   const { subject, message, userType, email, user } = data;
 

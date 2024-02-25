@@ -1,6 +1,10 @@
 import Support from "../models/support.js";
 import User from "../models/user.js";
-import { resendSupport, resendRequest } from "../services/resend.js";
+import {
+  resendSupport,
+  resendRequest,
+  resendJohann,
+} from "../services/resend.js";
 
 export const supportEmail = async (req, res, next) => {
   try {
@@ -46,6 +50,29 @@ export const contactClient = async (req, res, next) => {
     await resendRequest(aux);
 
     res.status(200).json({ msg: "email sent" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const johannEmail = async (req, res, next) => {
+  try {
+    global.logger.info("---SEND JOHANN EMAIL---");
+
+    const data = req.body;
+    const support = new Support(data);
+    const respuesta = await support.save();
+    const aux = {
+      message: data.message,
+      name: data.name,
+      email: data.email,
+    };
+    const res = await resendJohann(aux);
+    if (res) {
+      res.status(200).json({ msg: "email sent", respuesta: respuesta });
+    } else {
+      next(err);
+    }
   } catch (err) {
     next(err);
   }
