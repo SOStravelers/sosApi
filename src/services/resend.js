@@ -57,7 +57,7 @@ export const resendJohann = async (data) => {
   try {
     const { message, name, email } = data;
     console.log("wena", data);
-    const htmlString = templateHtml("emailJohannUser");
+    const htmlString = templateHtml("emailJohann");
     const template = Handlebars.compile(htmlString);
     const htmlToSend = template({
       message: message,
