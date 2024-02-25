@@ -67,6 +67,7 @@ export const johannEmail = async (req, res, next) => {
     const response = await resendJohann(aux);
     res.status(200).json(response);
   } catch (err) {
+    console.log("error en johannEmail:", err);
     next(err);
   }
 };
