@@ -73,7 +73,7 @@ export const resendJohann = async (data) => {
     console.log("resendSupport datas: ", mailData);
     return { msg: "email sent", respuesta: mailData };
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 
