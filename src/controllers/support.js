@@ -58,10 +58,7 @@ export const contactClient = async (req, res, next) => {
 export const johannEmail = async (req, res, next) => {
   try {
     global.logger.info("---SEND JOHANN EMAIL---");
-
     const data = req.body;
-    const support = new Support(data);
-    const respuesta = await support.save();
     const aux = {
       message: data.message,
       name: data.name,

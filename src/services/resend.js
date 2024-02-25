@@ -54,17 +54,16 @@ export const resendSupport = async (data) => {
 };
 
 export const resendJohann = async (data) => {
-  const { message, name, email } = data;
-  console.log("wena", data);
-  // definir templateHtml
-  const htmlString = templateHtml("emailJohannUser");
-  const template = Handlebars.compile(htmlString);
-  const htmlToSend = template({
-    message: message,
-    sName: name,
-    Email: email,
-  });
   try {
+    const { message, name, email } = data;
+    console.log("wena", data);
+    const htmlString = templateHtml("emailJohannUser");
+    const template = Handlebars.compile(htmlString);
+    const htmlToSend = template({
+      message: message,
+      sName: name,
+      Email: email,
+    });
     const mailData = await resend.emails.send({
       from: "johann@sostvl.com",
       to: ["jschacosta@gmail.com", email], // email va dirigido siempre a SOS travelers
@@ -74,7 +73,7 @@ export const resendJohann = async (data) => {
     console.log("resendSupport datas: ", mailData);
     return { msg: "email sent", respuesta: mailData };
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 };
 
