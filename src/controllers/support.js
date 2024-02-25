@@ -67,12 +67,8 @@ export const johannEmail = async (req, res, next) => {
       name: data.name,
       email: data.email,
     };
-    const res = await resendJohann(aux);
-    if (res) {
-      res.status(200).json({ msg: "email sent", respuesta: respuesta });
-    } else {
-      next(err);
-    }
+    const response = await resendJohann(aux);
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
