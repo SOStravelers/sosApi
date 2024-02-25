@@ -71,7 +71,7 @@ export const resendJohann = async (data) => {
       subject: "Contact johann Schwarze",
       html: htmlToSend,
     });
-    console.log("resendSupport data: ", mailData);
+    console.log("resendSupport datas: ", mailData);
     return { msg: "email sent", respuesta: mailData };
   } catch (error) {
     console.error(error);
