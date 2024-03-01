@@ -16,7 +16,7 @@ const populate = [
     path: "workerUser",
     select: "workerData personalData img email",
     populate: {
-      path: "workerData.services.id",
+      path: "workerData.services.id", //details
       select: "name",
       model: "Service", // Asegúrate de que este es el nombre correcto de tu modelo de servicio
     },
