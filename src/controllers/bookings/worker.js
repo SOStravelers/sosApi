@@ -23,17 +23,17 @@ import {
   confirmBookingNotification,
 } from "../../services/notification.js";
 
-import { 
-  awsCancelWorker, 
+import {
+  awsCancelWorker,
   awsConfirmWorker,
-  awsUpdateTemplate, 
-  awsXternarWorker
+  awsUpdateTemplate,
+  awsXternarWorker,
 } from "../../services/emails/worker.js";
 
 import {
- resendCancelPersonal,
- resendConfirmPersonal,
- resendExternalPersonal
+  resendCancelPersonal,
+  resendConfirmPersonal,
+  resendExternalPersonal,
 } from "../../services/emails/personal.js";
 
 const populate = [
@@ -67,6 +67,7 @@ export const getAllworkers = async (req, res, next) => {
     if (user.type != "worker") throw createError(401, "Unauthorized");
     const { page, limit } = req.query;
     let options = optionsBooking(page, limit);
+    options.sort = { "startTime.isoTime": -1 };
     let query = {
       workerUser: user._id.toString(),
     };
@@ -351,7 +352,7 @@ export const confirmBookingWorker = async (req, res, next) => {
     if (!booking) throw createError(404, "Booking not found");
     if (booking.status != "requested") {
       throw createError(400, "Booking can't be confirmed");
-    };
+    }
     const newBooking = await Booking.findOneAndUpdate(
       {
         _id: bookingId,
@@ -362,16 +363,16 @@ export const confirmBookingWorker = async (req, res, next) => {
       }
     ).populate(bookingPopulate());
     awsConfirmWorker({
-      email: newBooking.workerUser.email, 
-      name: newBooking.workerUser.personalData.name.first, 
-      service: newBooking.service.name, 
-      subservice: newBooking.subservice.name 
+      email: newBooking.workerUser.email,
+      name: newBooking.workerUser.personalData.name.first,
+      service: newBooking.service.name,
+      subservice: newBooking.subservice.name,
     });
     resendConfirmPersonal({
       email: newBooking.clientUser.email,
       name: newBooking.clientUser.personalData.name.first,
       service: newBooking.service.name,
-      subservice: newBooking.subservice.name
+      subservice: newBooking.subservice.name,
     });
     confirmBookingNotification(newBooking);
     res.status(200).json(newBooking);
@@ -406,16 +407,16 @@ export const confirmBookingWorkerExternal = async (req, res, next) => {
     ).populate(bookingPopulate());
     confirmBookingNotification(newBooking);
     awsXternarWorker({
-      email: newBooking.workerUser.email, 
-      name: newBooking.workerUser.personalData.name.first, 
-      service: newBooking.service.name, 
-      subservice: newBooking.subservice.name 
+      email: newBooking.workerUser.email,
+      name: newBooking.workerUser.personalData.name.first,
+      service: newBooking.service.name,
+      subservice: newBooking.subservice.name,
     });
     resendExternalPersonal({
-      email: newBooking.workerUser.email, 
-      name: newBooking.workerUser.personalData.name.first, 
-      service: newBooking.service.name, 
-      subservice: newBooking.subservice.name 
+      email: newBooking.workerUser.email,
+      name: newBooking.workerUser.personalData.name.first,
+      service: newBooking.service.name,
+      subservice: newBooking.subservice.name,
     });
     res.status(200).json(newBooking);
   } catch (err) {
@@ -473,16 +474,16 @@ export const cancelBookingWorker = async (req, res, next) => {
         ).populate(bookingPopulate());
         cancelBookingNotification(newBooking);
         awsCancelWorker({
-          email: newBooking.workerUser.email, 
-          name: newBooking.workerUser.personalData.name.first, 
-          service: newBooking.service.name, 
-          subservice: newBooking.subservice.name 
+          email: newBooking.workerUser.email,
+          name: newBooking.workerUser.personalData.name.first,
+          service: newBooking.service.name,
+          subservice: newBooking.subservice.name,
         });
         resendCancelPersonal({
           email: newBooking.clientUser.email,
           name: newBooking.clientUser.personalData.name.first,
           service: newBooking.service.name,
-          subservice: newBooking.subservice.name
+          subservice: newBooking.subservice.name,
         });
         return res.status(200).json(newBooking);
       } else {
@@ -512,23 +513,23 @@ export const cancelBookingWorker = async (req, res, next) => {
       // cancelBookingNotification(newBooking);
 
       awsCancelWorker({
-        email: newBooking.workerUser.email, 
-        name: newBooking.workerUser.personalData.name.first, 
-        service: newBooking.service.name, 
-        subservice: newBooking.subservice.name 
+        email: newBooking.workerUser.email,
+        name: newBooking.workerUser.personalData.name.first,
+        service: newBooking.service.name,
+        subservice: newBooking.subservice.name,
       });
       resendCancelPersonal({
         email: newBooking.clientUser.email,
         name: newBooking.clientUser.personalData.name.first,
         service: newBooking.service.name,
-        subservice: newBooking.subservice.name
+        subservice: newBooking.subservice.name,
       });
       return res.status(200).json(newBooking);
     }
   } catch (err) {
     next(err);
   }
-}; 
+};
 
 //Crear booking por el worker by cash
 export const createBookingWorker = async (req, res, next) => {
@@ -605,26 +606,24 @@ export const createBookingWorker = async (req, res, next) => {
 
 export const updateTemplateWorker = async (req, res, next) => {
   try {
-    const {type, subject}  = req.query;
-    if(type === 'completed'){
-       awsUpdateTemplate({
-        template:'completedBookingWorker', 
-        subject: subject
+    const { type, subject } = req.query;
+    if (type === "completed") {
+      awsUpdateTemplate({
+        template: "completedBookingWorker",
+        subject: subject,
       });
-       res.status(201).json({msg: "the worker template was updated"});
-    }else if(type === 'cancel'){
-      awsUpdateTemplate('canceldBookingWorker', subject);
-      res.status(201).json({msg: "the worker template was updated"});
-    }else if(type === 'confirmed'){
-      awsUpdateTemplate('confirmedBookingWorker', subject);
-      res.status(201).json({msg: "the worker template was updated"});
-    }else if(type === 'availability'){
-      awsUpdateTemplate('availabilityBookingWorker', subject);
-      res.status(201).json({msg: "the worker template was updated"});
+      res.status(201).json({ msg: "the worker template was updated" });
+    } else if (type === "cancel") {
+      awsUpdateTemplate("canceldBookingWorker", subject);
+      res.status(201).json({ msg: "the worker template was updated" });
+    } else if (type === "confirmed") {
+      awsUpdateTemplate("confirmedBookingWorker", subject);
+      res.status(201).json({ msg: "the worker template was updated" });
+    } else if (type === "availability") {
+      awsUpdateTemplate("availabilityBookingWorker", subject);
+      res.status(201).json({ msg: "the worker template was updated" });
     }
   } catch (error) {
     console.log(error);
   }
-  
-
-}
+};

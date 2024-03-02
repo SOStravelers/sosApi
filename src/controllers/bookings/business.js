@@ -48,6 +48,7 @@ export const getAllBusiness = async (req, res, next) => {
     validateFormatDate(date);
     const newDate = moment.utc(date, "YYYY-MM-DD").add(1, "day");
     let options = optionsBooking(page, limit);
+    options.sort = { "startTime.isoTime": -1 };
     const query = {
       businessUser: user._id.toString(),
       "date.isoDate": {
@@ -73,6 +74,7 @@ export const getYearBusiness = async (req, res, next) => {
     const year = moment.utc(date, "YYYY-MM-DD").year();
     const newDate = moment.utc(date, "YYYY-MM-DD").add(1, "day");
     let options = optionsBooking(page, limit);
+    options.sort = { "startTime.isoTime": -1 };
     const query = {
       businessUser: user._id.toString(),
       "date.isoDate": {
@@ -179,6 +181,7 @@ export const getLastMonthBusiness = async (req, res, next) => {
     validateFormatDate(date);
     const newDate = moment.utc(date, "YYYY-MM-DD").add(1, "day");
     let options = optionsBooking(page, limit);
+    options.sort = { "startTime.isoTime": -1 };
     const query = {
       businessUser: user._id.toString(),
       "date.isoDate": {
