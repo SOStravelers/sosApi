@@ -128,7 +128,7 @@ const job = schedule.scheduleJob(rule, async function () {
   try {
     const now = moment().tz("America/Sao_Paulo");
     console.log("Hola, la hora actual en Brasil es: " + now.format("HH:mm:ss"));
-    console.log(moment().subtract(30, "minutes").toDate());
+    console.log(moment().subtract(60, "minutes").toDate());
     const result = await Booking.updateMany(
       {
         status: "requested",
@@ -156,7 +156,7 @@ rule2.minute = 10; //  minutos
 rule2.hour = 1; // hora
 const job2 = schedule.scheduleJob(rule2, async function () {
   global.logger.info("---CHANGE TO COMPLETED---");
-  // tomar todos los booking en requested creados hace media hora o mas y cambiarlos a available
+  // tomar todos los booking en confrimerd creados hace media hora o mas y cambiarlos a completed
   try {
     const now = moment().tz("America/Sao_Paulo");
     console.log("Hola, la hora actual en Brasil es: " + now.format("HH:mm:ss"));
@@ -190,7 +190,7 @@ const job2 = schedule.scheduleJob(rule2, async function () {
 //ahora lo que quiero es que cada 30 min entre las 9 am y 10 pm se revise si hay booking en requested o available que comienzen en 30 min o menos y se cambien a canceled
 const rule3 = new schedule.RecurrenceRule();
 rule3.tz = "America/Sao_Paulo"; // Zona horaria de Brasil
-rule3.minute = new schedule.Range(0, 59, 30); // Cada 30 minutos
+rule3.minute = new schedule.Range(0, 59, 15); // Cada 30 minutos
 rule3.hour = new schedule.Range(9, 22); // Entre las 9 AM y las 10 PM
 const job3 = schedule.scheduleJob(rule3, async function () {
   global.logger.info("---CHANGE TO CANCELED---");
@@ -204,13 +204,13 @@ const job3 = schedule.scheduleJob(rule3, async function () {
           {
             status: "requested",
             "date.isoDate": {
-              $lte: moment().add(60, "minutes").toDate(),
+              $lte: moment().add(15, "minutes").toDate(),
             },
           },
           {
             status: "available",
             "date.isoDate": {
-              $lte: moment().add(60, "minutes").toDate(),
+              $lte: moment().add(15, "minutes").toDate(),
             },
           },
         ],
