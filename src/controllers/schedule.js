@@ -8,6 +8,8 @@ import Subservice from "../models/subservice.js";
 import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
 import moment from "moment-timezone";
 
+const arrayExeptions = ["663039e1dbd84508c88f9074"];
+
 //Crear horario
 export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW SCHEDULE---");
@@ -213,6 +215,8 @@ export const activateMany = async (req, res, next) => {
 export const businessSchedule = async (req, res, next) => {
   global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE MAIN FLOW---");
   const { businessId, serviceId, subserviceId, workerId } = req.query;
+  const idInclude = arrayExeptions.includes(serviceId);
+  console.log("idInclude", idInclude);
   //----variables para bucles de dias-----
   const today = new Date(); // dia de hoy
   let dayContinue = 0; // variable para saber si saltar dias
@@ -255,7 +259,15 @@ export const businessSchedule = async (req, res, next) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 15); // Add 15 days
     endDate.setUTCHours(0, 0, 0, 0); // Set the time to 00:00:00.000
-    console.log("wena", startDate, endDate, subserviceId, businessId, workerId);
+    console.log(
+      "wena",
+      startDate,
+      endDate,
+      serviceId,
+      subserviceId,
+      businessId,
+      workerId
+    );
     const bookings = await Booking.find({
       service: serviceId,
       businessUser: businessId,
@@ -414,11 +426,22 @@ export const businessSchedule = async (req, res, next) => {
           //1. no existe un booking en ese horario
           //2. la hora final es menor o igual a la hora maxima
           //3. la hora inicial es mayor o igual a las 9am
+          if (idInclude) {
+            bookingExists = false;
+          }
+          console.log(
+            "a analizar",
+            bookingExists,
+            onlyHour,
+            horaMinDia,
+            bookingExists
+          );
           if (
             !bookingExists &&
             onlyHour >= horaMinDia &&
             startHourDate <= maxHour
           ) {
+            console.log("pushea", hour, endHour);
             allIntervals.push({
               startTimeIso: hour.toISOString(),
               startTime: hour.toISOString().slice(11, 16),
