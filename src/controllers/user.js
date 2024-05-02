@@ -624,6 +624,8 @@ export const updateOneBusiness = async (req, res, next) => {
   try {
     let user = req.body;
     console.log("user", user.personalData.name);
+    user.businessData.isActive = true;
+    console.log("user", user.businessData);
     let newUser = await User.findOneAndUpdate(
       {
         _id: req.params.id,

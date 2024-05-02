@@ -959,8 +959,11 @@ export const businessByService = async (req, res, next) => {
         { isActive: true },
         { type: "business" },
         { "businessData.isActive": true },
-        { "businessData.services.service": service },
-        { "businessData.services.isActive": true },
+        {
+          "businessData.services": {
+            $elemMatch: { service: service, isActive: true },
+          },
+        },
       ],
     };
     const options = {
