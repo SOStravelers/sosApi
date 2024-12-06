@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import Holiday from "../models/holliday.js";
 import Booking from "../models/booking.js";
 import Schedule from "../models/schedule.js";
+import ScheduleMultiple from "../models/scheduleMultiple.js";
 import { template } from "../lib/schedule.js";
 import { createError } from "../config/error.js";
 import Subservice from "../models/subservice.js";
@@ -211,8 +212,135 @@ export const activateMany = async (req, res, next) => {
     next(err);
   }
 };
-// Horario de negocio por servicio
+
 export const businessSchedule = async (req, res, next) => {
+  console.log("Fetching schedules...");
+  const subService = "6547f61545d6ccde7ac65fd0"; // SubService ID
+  const startDate = new Date();
+  startDate.setUTCHours(0, 0, 0, 0); // Start of the day
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 15); // Add 15 days
+  endDate.setUTCHours(23, 59, 59, 999); // End of the day
+
+  console.log(
+    "SubService:",
+    subService,
+    "Start Date:",
+    startDate,
+    "End Date:",
+    endDate
+  );
+
+  try {
+    // Fetch schedules for the subService
+    const schedules = await ScheduleMultiple.find({
+      subService,
+      isActive: true, // Main schedule active
+      "schedules.isActive": true, // Active schedules
+    });
+
+    console.log("Schedules fetched:", schedules.length);
+
+    // Generate an array of days in the range
+    const daysInRange = [];
+    let currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      daysInRange.push({
+        day: currentDate.getUTCDay(), // Get day of the week (0-6)
+        date: new Date(currentDate),
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    console.log("Days in Range:", daysInRange);
+
+    // Filter schedules and group by date
+    const responseMap = {};
+
+    schedules.forEach((schedule) => {
+      daysInRange.forEach(({ day, date }) => {
+        const matchedSchedules = schedule.schedules.filter(
+          (entry) => entry.day === day && entry.isActive
+        );
+
+        if (matchedSchedules.length > 0) {
+          const dateString =
+            date.toISOString().split("T")[0] + "T00:00:00.000Z";
+          if (!responseMap[dateString]) {
+            responseMap[dateString] = [];
+          }
+
+          matchedSchedules.forEach((entry) => {
+            console.log("Processing entry:", entry);
+
+            const currentDateString = date.toISOString().split("T")[0]; // "2024-12-07"
+            const isoTime = entry.iso.slice(1); // "13:55:00.000Z"
+
+            const startTimeBase = new Date(`${currentDateString}T${isoTime}`);
+            if (isNaN(startTimeBase.getTime())) {
+              console.error("Invalid startTimeBase:", {
+                currentDateString,
+                isoTime,
+              });
+              throw new Error("Invalid date value");
+            }
+
+            let intervalStart = new Date(startTimeBase);
+
+            // Validar duración y calcular `endTime`
+            const duration =
+              typeof entry.duration === "number" ? entry.duration : 0;
+            let intervalEnd = new Date(intervalStart);
+            if (duration === 0) {
+              intervalEnd = new Date(intervalStart); // `endTime` será igual a `startTime`
+            } else {
+              intervalEnd.setMinutes(intervalStart.getMinutes() + duration);
+            }
+
+            // Validar `intervalEnd`
+            if (isNaN(intervalEnd.getTime())) {
+              console.error("Invalid intervalEnd:", {
+                intervalStart,
+                intervalEnd,
+              });
+              throw new Error("Invalid time value");
+            }
+
+            responseMap[dateString].push({
+              startTimeIso: intervalStart.toISOString(),
+              startTime: intervalStart.toISOString().split("T")[1].slice(0, 5),
+              endTimeIso: intervalEnd.toISOString(),
+              endTime: intervalEnd.toISOString().split("T")[1].slice(0, 5),
+            });
+          });
+        }
+      });
+    });
+
+    // Unificar el mapa `responseMap` en una lista única por día y eliminar días vacíos
+    const response = [];
+    daysInRange.forEach(({ day, date }) => {
+      const dateString = date.toISOString().split("T")[0] + "T00:00:00.000Z";
+
+      // Si no hay intervals para este día, no lo incluimos
+      const intervals = responseMap[dateString] || [];
+      if (intervals.length > 0) {
+        response.push({
+          day: dateString,
+          intervals,
+        });
+      }
+    });
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    res.status(500).json({ message: "Error fetching schedules", error });
+  }
+};
+
+// Horario de negocio por servicio
+export const businessSchedule2 = async (req, res, next) => {
   global.logger.info("---GET SCHEDULES BUSINESS BY SERVICE MAIN FLOW---");
   const { businessId, serviceId, subserviceId, workerId } = req.query;
   const idInclude = arrayExeptions.includes(serviceId);
@@ -268,198 +396,207 @@ export const businessSchedule = async (req, res, next) => {
       businessId,
       workerId
     );
-    const bookings = await Booking.find({
-      service: serviceId,
-      businessUser: businessId,
-      status: { $ne: "canceled" },
-      //subservice: subserviceId,
-      "date.isoDate": { $gte: startDate, $lt: endDate },
-    });
-    console.log("bookings", bookings.length);
 
-    //Busca bookings de un worker en especifico solo si viene la id
-    var bookingWorker = [];
-    if (workerId) {
-      bookingWorker = await Booking.find({
-        workerUser: workerId,
+    businessScheduleMultiple(subserviceId, startDate, endDate);
+    if (!subservice.multiple) {
+      businessScheduleMultiple();
+    } else {
+      const bookings = await Booking.find({
+        service: serviceId,
+        businessUser: businessId,
         status: { $ne: "canceled" },
+        //subservice: subserviceId,
         "date.isoDate": { $gte: startDate, $lt: endDate },
       });
-    }
-    console.log("todos los booking worker", bookingWorker.length);
+      console.log("bookings", bookings.length);
 
-    while (dayContinue < untilDays) {
-      const dateDay = new Date();
-      dateDay.setDate(dateDay.getDate() + Number(nextDay));
-      dateDay.setUTCHours(0, 0, 0, 0);
-      if (dateDay > limitDate) {
-        break;
+      //Busca bookings de un worker en especifico solo si viene la id
+      var bookingWorker = [];
+      if (workerId) {
+        bookingWorker = await Booking.find({
+          workerUser: workerId,
+          status: { $ne: "canceled" },
+          "date.isoDate": { $gte: startDate, $lt: endDate },
+        });
       }
-      const formatedDay = dateDay.getUTCDay();
-      const scheduleIndex = schedule.schedules.findIndex(
-        (time) => time.day === formatedDay && time.isActive
-      );
-      if (scheduleIndex < 0) {
-        ++nextDay;
-        continue;
-      }
-      const time = schedule.schedules[scheduleIndex];
-      let skipLoop = false;
-      const allIntervals = [];
-      if (holidays && holidays.range) {
-        for (const holiday of holidays.range) {
-          if (dateDay >= holiday.from && dateDay <= holiday.to) {
-            skipLoop = true;
-            break;
-          }
+      console.log("todos los booking worker", bookingWorker.length);
+
+      while (dayContinue < untilDays) {
+        const dateDay = new Date();
+        dateDay.setDate(dateDay.getDate() + Number(nextDay));
+        dateDay.setUTCHours(0, 0, 0, 0);
+        if (dateDay > limitDate) {
+          break;
         }
-      }
-      if (skipLoop) {
-        ++nextDay;
-        continue;
-      }
-      console.log("buena", dateDay, time.intervals.length);
-      for (const interval of time.intervals) {
-        console.log(interval);
-        const startHourDate = cambioHora(
-          new Date(interval.startTimeIso),
-          dateDay
+        const formatedDay = dateDay.getUTCDay();
+        const scheduleIndex = schedule.schedules.findIndex(
+          (time) => time.day === formatedDay && time.isActive
         );
-        startHourDate.setMilliseconds(0);
-        const endHourDate = cambioHora(new Date(interval.endTimeIso), dateDay);
-        endHourDate.setMilliseconds(0);
-        for (
-          let hour = startHourDate;
-          hour <= endHourDate;
-          hour.setMinutes(hour.getMinutes() + subservice.duration)
-        ) {
-          // Obtener la hora local actual en Brasil
-          const horaLocalBrasil = moment()
-            .tz("America/Sao_Paulo")
-            .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-
-          // Convertir la hora local de Brasil a objeto Date
-          const fechaHoraLocalBrasil = new Date(horaLocalBrasil);
-          // console.log("horas", hour, horaLocalBrasil);
-
-          if (hour < fechaHoraLocalBrasil) {
-            console.log("salto");
-            continue;
-          }
-
-          const endHour = new Date(hour);
-          endHour.setMinutes(endHour.getMinutes() + subservice.duration);
-          //Si la hora actual es menor a la hora local de Brasil, se desfasa la hora para que lleguen workers
-          if (
-            bookingPosible &&
-            hour - fechaHoraLocalBrasil < minDesfase * 60 * 1000
-          ) {
-            console.log("desfase");
-            bookingPosible = false;
-            hour.setMinutes(hour.getMinutes() + minDesfase);
-            endHour.setMinutes(endHour.getMinutes() + minDesfase);
-          }
-          //Sirve para que una persona no pueda agendar el ultimo servicio del dia en menos tiempo que la duracion del servicio
-          const maxHour = new Date(
-            endHourDate.getTime() - subservice.duration * 60000 // Resta la duración en milisegundos
-          );
-          let bookingExists = false;
-          for (let i = 0; i < bookings.length; i++) {
-            const booking = bookings[i];
-            const bookingStartHour = booking.startTime.isoTime;
-            const bookingEndHour = booking.endTime.isoTime;
-
-            const strippedDate1 = stripTime(bookingStartHour);
-            const strippedDate2 = stripTime(hour);
-
-            if (
-              ((stripDate(bookingStartHour) >= stripDate(hour) &&
-                stripDate(bookingStartHour) < stripDate(endHour)) ||
-                (stripDate(bookingEndHour) > stripDate(hour) &&
-                  stripDate(bookingEndHour) <= stripDate(endHour)) ||
-                (stripDate(bookingStartHour) <= stripDate(hour) &&
-                  stripDate(bookingEndHour) >= stripDate(endHour)) ||
-                (stripDate(bookingStartHour) >= stripDate(hour) &&
-                  stripDate(bookingEndHour) <= stripDate(endHour))) &&
-              strippedDate1.getTime() === strippedDate2.getTime()
-            ) {
-              bookingExists = true;
-              console.log("verdadero");
+        if (scheduleIndex < 0) {
+          ++nextDay;
+          continue;
+        }
+        const time = schedule.schedules[scheduleIndex];
+        let skipLoop = false;
+        const allIntervals = [];
+        if (holidays && holidays.range) {
+          for (const holiday of holidays.range) {
+            if (dateDay >= holiday.from && dateDay <= holiday.to) {
+              skipLoop = true;
               break;
             }
           }
-          // console.log("booking", bookingExists);
-          const date = new Date(hour);
-          const onlyHour = date.getUTCHours();
-
-          const dayString = dateDay.toISOString().slice(0, 10);
-          const bookingWorkerDay = bookingWorker.filter(
-            (booking) => booking.date.stringData === dayString
+        }
+        if (skipLoop) {
+          ++nextDay;
+          continue;
+        }
+        console.log("buena", dateDay, time.intervals.length);
+        for (const interval of time.intervals) {
+          console.log(interval);
+          const startHourDate = cambioHora(
+            new Date(interval.startTimeIso),
+            dateDay
           );
-          console.log("bookings workerSSS", bookingWorkerDay.length);
-          console.log(hour, endHour);
-          if (bookingWorkerDay.length > 0) {
-            console.log("ENTRANDOOOOO");
-            const bookingWorkerStartHour =
-              bookingWorkerDay[0].startTime.isoTime;
-            const bookingWorkerEndHour = bookingWorkerDay[0].endTime.isoTime;
-            const strippedDate1 = stripTime(bookingWorkerStartHour);
-            const strippedDate2 = stripTime(hour);
-            if (
-              ((stripDate(bookingWorkerStartHour) >= stripDate(hour) &&
-                stripDate(bookingWorkerStartHour) < stripDate(endHour)) ||
-                (stripDate(bookingWorkerEndHour) > stripDate(hour) &&
-                  stripDate(bookingWorkerEndHour) <= stripDate(endHour)) ||
-                (stripDate(bookingWorkerStartHour) <= stripDate(hour) &&
-                  stripDate(bookingWorkerEndHour) >= stripDate(endHour)) ||
-                (stripDate(bookingWorkerStartHour) >= stripDate(hour) &&
-                  stripDate(bookingWorkerEndHour) <= stripDate(endHour))) &&
-              strippedDate1.getTime() === strippedDate2.getTime()
-            ) {
-              bookingExists = true;
-              console.log("hay booking de worker");
+          startHourDate.setMilliseconds(0);
+          const endHourDate = cambioHora(
+            new Date(interval.endTimeIso),
+            dateDay
+          );
+          endHourDate.setMilliseconds(0);
+          for (
+            let hour = startHourDate;
+            hour <= endHourDate;
+            hour.setMinutes(hour.getMinutes() + subservice.duration)
+          ) {
+            // Obtener la hora local actual en Brasil
+            const horaLocalBrasil = moment()
+              .tz("America/Sao_Paulo")
+              .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+
+            // Convertir la hora local de Brasil a objeto Date
+            const fechaHoraLocalBrasil = new Date(horaLocalBrasil);
+            // console.log("horas", hour, horaLocalBrasil);
+
+            if (hour < fechaHoraLocalBrasil) {
+              console.log("salto");
               continue;
             }
-          }
 
-          //condicion final: solo se agregan si:
-          //1. no existe un booking en ese horario
-          //2. la hora final es menor o igual a la hora maxima
-          //3. la hora inicial es mayor o igual a las 9am
-          if (idInclude) {
-            bookingExists = false;
-          }
-          console.log(
-            "a analizar",
-            bookingExists,
-            onlyHour,
-            horaMinDia,
-            bookingExists
-          );
-          if (
-            !bookingExists &&
-            onlyHour >= horaMinDia &&
-            startHourDate <= maxHour
-          ) {
-            console.log("pushea", hour, endHour);
-            allIntervals.push({
-              startTimeIso: hour.toISOString(),
-              startTime: hour.toISOString().slice(11, 16),
-              endTime: endHour.toISOString().slice(11, 16),
-              endTimeIso: endHour.toISOString(),
-            });
+            const endHour = new Date(hour);
+            endHour.setMinutes(endHour.getMinutes() + subservice.duration);
+            //Si la hora actual es menor a la hora local de Brasil, se desfasa la hora para que lleguen workers
+            if (
+              bookingPosible &&
+              hour - fechaHoraLocalBrasil < minDesfase * 60 * 1000
+            ) {
+              console.log("desfase");
+              bookingPosible = false;
+              hour.setMinutes(hour.getMinutes() + minDesfase);
+              endHour.setMinutes(endHour.getMinutes() + minDesfase);
+            }
+            //Sirve para que una persona no pueda agendar el ultimo servicio del dia en menos tiempo que la duracion del servicio
+            const maxHour = new Date(
+              endHourDate.getTime() - subservice.duration * 60000 // Resta la duración en milisegundos
+            );
+            let bookingExists = false;
+            for (let i = 0; i < bookings.length; i++) {
+              const booking = bookings[i];
+              const bookingStartHour = booking.startTime.isoTime;
+              const bookingEndHour = booking.endTime.isoTime;
+
+              const strippedDate1 = stripTime(bookingStartHour);
+              const strippedDate2 = stripTime(hour);
+
+              if (
+                ((stripDate(bookingStartHour) >= stripDate(hour) &&
+                  stripDate(bookingStartHour) < stripDate(endHour)) ||
+                  (stripDate(bookingEndHour) > stripDate(hour) &&
+                    stripDate(bookingEndHour) <= stripDate(endHour)) ||
+                  (stripDate(bookingStartHour) <= stripDate(hour) &&
+                    stripDate(bookingEndHour) >= stripDate(endHour)) ||
+                  (stripDate(bookingStartHour) >= stripDate(hour) &&
+                    stripDate(bookingEndHour) <= stripDate(endHour))) &&
+                strippedDate1.getTime() === strippedDate2.getTime()
+              ) {
+                bookingExists = true;
+                console.log("verdadero");
+                break;
+              }
+            }
+            // console.log("booking", bookingExists);
+            const date = new Date(hour);
+            const onlyHour = date.getUTCHours();
+
+            const dayString = dateDay.toISOString().slice(0, 10);
+            const bookingWorkerDay = bookingWorker.filter(
+              (booking) => booking.date.stringData === dayString
+            );
+            console.log("bookings workerSSS", bookingWorkerDay.length);
+            console.log(hour, endHour);
+            if (bookingWorkerDay.length > 0) {
+              console.log("ENTRANDOOOOO");
+              const bookingWorkerStartHour =
+                bookingWorkerDay[0].startTime.isoTime;
+              const bookingWorkerEndHour = bookingWorkerDay[0].endTime.isoTime;
+              const strippedDate1 = stripTime(bookingWorkerStartHour);
+              const strippedDate2 = stripTime(hour);
+              if (
+                ((stripDate(bookingWorkerStartHour) >= stripDate(hour) &&
+                  stripDate(bookingWorkerStartHour) < stripDate(endHour)) ||
+                  (stripDate(bookingWorkerEndHour) > stripDate(hour) &&
+                    stripDate(bookingWorkerEndHour) <= stripDate(endHour)) ||
+                  (stripDate(bookingWorkerStartHour) <= stripDate(hour) &&
+                    stripDate(bookingWorkerEndHour) >= stripDate(endHour)) ||
+                  (stripDate(bookingWorkerStartHour) >= stripDate(hour) &&
+                    stripDate(bookingWorkerEndHour) <= stripDate(endHour))) &&
+                strippedDate1.getTime() === strippedDate2.getTime()
+              ) {
+                bookingExists = true;
+                console.log("hay booking de worker");
+                continue;
+              }
+            }
+
+            //condicion final: solo se agregan si:
+            //1. no existe un booking en ese horario
+            //2. la hora final es menor o igual a la hora maxima
+            //3. la hora inicial es mayor o igual a las 9am
+            if (idInclude) {
+              bookingExists = false;
+            }
+            console.log(
+              "a analizar",
+              bookingExists,
+              onlyHour,
+              horaMinDia,
+              bookingExists
+            );
+            if (
+              !bookingExists &&
+              onlyHour >= horaMinDia &&
+              startHourDate <= maxHour
+            ) {
+              console.log("pushea", hour, endHour);
+              allIntervals.push({
+                startTimeIso: hour.toISOString(),
+                startTime: hour.toISOString().slice(11, 16),
+                endTime: endHour.toISOString().slice(11, 16),
+                endTimeIso: endHour.toISOString(),
+              });
+            }
           }
         }
-      }
 
-      allTimes.push({
-        day: dateDay,
-        intervals: allIntervals,
-      });
-      ++nextDay;
-      ++dayContinue;
+        allTimes.push({
+          day: dateDay,
+          intervals: allIntervals,
+        });
+        ++nextDay;
+        ++dayContinue;
+      }
+      res.status(200).json(allTimes);
     }
-    res.status(200).json(allTimes);
   } catch (err) {
     next(err);
   }
