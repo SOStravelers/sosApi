@@ -137,7 +137,7 @@ router.get(
         type: "string",
       },
       {
-        param_key: "businessUser",
+        param_key: "user",
         required: true,
         type: "string",
       },

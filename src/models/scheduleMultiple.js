@@ -6,6 +6,7 @@ const scheduleMultipleSchema = new Schema(
     user: { type: String, ref: "User" },
     isActive: { type: Boolean, default: true },
     default: { type: Boolean, default: false },
+
     service: { type: String, ref: "Service" },
     subService: { type: String, ref: "Subservice" },
     location: { type: String },

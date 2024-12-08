@@ -271,8 +271,6 @@ export const businessSchedule = async (req, res, next) => {
           }
 
           matchedSchedules.forEach((entry) => {
-            console.log("Processing entry:", entry);
-
             const currentDateString = date.toISOString().split("T")[0]; // "2024-12-07"
             const isoTime = entry.iso.slice(1); // "13:55:00.000Z"
 

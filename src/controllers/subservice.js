@@ -1,5 +1,6 @@
 import Subservice from "../models/subservice.js";
 import User from "../models/user.js";
+import Price from "../models/price.js";
 import { createError } from "../config/error.js";
 import { botcurrency } from "../services/botcurrency.js";
 
@@ -22,7 +23,7 @@ export const getByService = async (req, res, next) => {
   try {
     let options = {
       // populate,
-      select: "name price duration imgUrl details",
+      select: "name price duration imgUrl details multiple",
       page: Number(req.query.page) || 1,
       limit: Number(req.query.limit) || 50,
       sort: { updatedAt: -1 },
@@ -106,17 +107,30 @@ export const getPrice = async (req, res, next) => {
   console.log("query", req.query);
   try {
     const subservice = await Subservice.findById(req.query.subservice)
-      .select("price")
+      .select("price multiple")
       .exec();
-    const businessUser = await User.findById(req.query.businessUser)
-      .select("businessData")
-      .exec();
-    console.log("perro", businessUser.businessData.category);
-    const price = subservice.price[businessUser.businessData.category] || 0;
-    const currencyBase = "BRL";
-    const othersCurrency = await botcurrency(price, currencyBase);
-    console.log(othersCurrency);
-    res.status(200).json(othersCurrency);
+
+    if (!subservice.multiple) {
+      const businessUser = await User.findById(req.query.user)
+        .select("businessData")
+        .exec();
+      console.log("perro", businessUser.businessData.category);
+      const price = subservice.price[businessUser.businessData.category] || 0;
+      const currencyBase = "BRL";
+      const othersCurrency = await botcurrency(price, currencyBase);
+      console.log(othersCurrency);
+      res.status(200).json(othersCurrency);
+    } else {
+      const price = await Price.findOne({
+        subservice: req.query.subservice,
+        user: req.query.user,
+      });
+      const currencyBase = price?.currencyCode || "BRL";
+      const thePrice = price?.value || 0;
+      const othersCurrency = await botcurrency(thePrice, currencyBase);
+      console.log(othersCurrency);
+      res.status(200).json(othersCurrency);
+    }
   } catch (err) {
     next(err);
   }

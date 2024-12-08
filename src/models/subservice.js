@@ -45,6 +45,8 @@ const subserviceSchema = new Schema(
     },
     type: { type: String, default: "personal", enum: ["personal", "group"] },
     limit: { type: Number, default: 1 },
+    multiple: { type: Boolean, default: false },
+    hasLimit: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import Schedule from "../models/schedule.js";
+import ScheduleMultiple from "../models/scheduleMultiple.js";
 import Holiday from "../models/holliday.js";
 import envar from "../config/envar.js";
 import { sendEmailTemplate } from "../services/aws_ses.js";
@@ -14,6 +15,7 @@ import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
 } from "../utils/code.js";
+import Subservice from "../models/subservice.js";
 
 //Create user personal/workers/business
 export const createUser = async (req, res, next) => {
@@ -763,6 +765,179 @@ export const getWorkerForBook = async (req, res, next) => {
 
 //Entrega trabajadores segun hora solicitada y subservicio solicitado, vacaciones, calendario, booking
 export const workerByTimeAndService = async (req, res, next) => {
+  global.logger.info({
+    message: "--- GET WORKERS BY TIME AND SERVICE ---",
+  });
+  try {
+    let { startTime, endTime, subservice, page, limit } = req.body;
+
+    subservice = "6547f61545d6ccde7ac65fd0"; // SubService ID
+    const bookingStartTime = new Date(startTime.isoTime);
+    const bookingEndTime = new Date(endTime.isoTime);
+
+    const theSubservice = await Subservice.findById(subservice);
+    console.log(
+      "el multiple",
+      theSubservice.multiple,
+      theSubservice.hasLimit,
+      theSubservice.limit
+    );
+    //Users
+    const query = {
+      $and: [
+        { isActive: true },
+        { type: "worker" },
+        { "workerData.isActive": true },
+        { "workerData.services.subServices": subservice },
+      ],
+    };
+    const options = {
+      populate: {
+        path: "workerData.services.id",
+        select: "name",
+      },
+      select: "personalData.name email  workerData.services img.imgUrl _id ",
+      page: page || 1,
+      limit: limit || 100,
+      sort: { updatedAt: -1 },
+    };
+    let users = await User.paginate(query, options);
+    let workers = users.docs;
+    console.log(workers[0]._id);
+    //schedules
+    const scheduleQuery = {
+      isActive: true,
+      user: { $in: workers.map((worker) => worker._id.toString()) },
+    };
+    let schedules = null;
+    if (theSubservice.multiple) {
+      schedules = await ScheduleMultiple.find(scheduleQuery);
+    } else {
+      await Schedule.find(scheduleQuery);
+    }
+    if (!schedules) {
+      console.log("no hay calendarios");
+      workers = [];
+      return res.send({ workers });
+    }
+    //Hollidays
+    const holidays = await Holiday.find();
+    //booking
+    console.log("el isoTime", bookingStartTime);
+    const bookingQuery = {
+      workerUser: { $in: workers.map((worker) => worker._id.toString()) },
+      subservice: subservice,
+      "startTime.isoTime": bookingStartTime,
+    };
+    let bookings = [];
+    bookings = await Booking.find(bookingQuery);
+    console.log("bookings encontrados", bookings.length);
+    for (let worker of workers) {
+      console.log("---worker--------------", worker.email);
+      //aqui va la validacion de hollidays
+      const indexHolliday = holidays.findIndex(
+        (holliday) => holliday.user === worker._id.toString()
+      );
+      if (indexHolliday >= 0) {
+        console.log("hay vacaciones");
+        const holliday = holidays[indexHolliday];
+        console.log(holliday);
+        const hollidayIndex = holliday.range.findIndex(
+          (time) =>
+            new Date(time.from).getTime() <= bookingStartTime.getTime() &&
+            new Date(time.to).getTime() >= bookingEndTime.getTime()
+        );
+        if (hollidayIndex >= 0) {
+          console.log("hay vacaciones en el rango");
+          workers = workers.filter(
+            (item) => item._id.toString() != worker._id.toString()
+          );
+          continue;
+        }
+      }
+      console.log("no hay problemas de vacaciones, vamos a ver si hay booking");
+      const indexBooking = bookings.findIndex(
+        (booking) => booking.workerUser === worker._id.toString()
+      );
+      //coincidencias
+      const matches = bookings.filter(
+        (booking) => booking.workerUser === worker._id.toString()
+      );
+      if (indexBooking >= 0) {
+        console.log("hay booking");
+
+        // Si permite múltiples subservicios
+        if (theSubservice.multiple) {
+          console.log("es multiple");
+          // Si no hay un límite, pasa al siguiente trabajador
+          if (!theSubservice.hasLimit) continue;
+          console.log(
+            "tiene limite",
+            theSubservice.limit,
+            matches.length,
+            matches.length >= theSubservice.limit
+          );
+          // Si se supera el límite, elimina al trabajador y pasa al siguiente
+          if (matches.length >= theSubservice.limit) {
+            console.log("excede el limite");
+            workers = workers.filter(
+              (item) => item._id.toString() !== worker._id.toString()
+            );
+            continue;
+          }
+        } else {
+          // Si no permite múltiples subservicios, elimina al trabajador y pasa al siguiente
+          workers = workers.filter(
+            (item) => item._id.toString() !== worker._id.toString()
+          );
+          continue;
+        }
+      }
+      console.log("no hay problema de booking, analizando calendario");
+      console.log("cantidad de calendarios", schedules.length);
+      console.log("workerId", worker._id);
+      const indexSchedule = schedules.findIndex(
+        (schedule) => schedule.user === worker._id.toString()
+      );
+      if (indexSchedule >= 0) {
+        console.log("hay calendario", startTime);
+        const timeFormat = startTime.isoTime.split("T");
+        const hora = "T" + timeFormat[1];
+        const schedule = schedules[indexSchedule];
+        console.log("hay calendario");
+        const scheduleIndex = schedule.schedules.findIndex(
+          (time) =>
+            time.isActive &&
+            time.day === bookingStartTime.getUTCDay() &&
+            time.iso === hora
+        );
+
+        if (scheduleIndex >= 0) {
+          console.log("dia calendario activado");
+          continue;
+        } else {
+          console.log("dia esta apagado");
+          workers = workers.filter(
+            (item) => item._id.toString() != worker._id.toString()
+          );
+          continue;
+        }
+      } else {
+        console.log("no tiene schedule");
+        workers = workers.filter(
+          (item) => item._id.toString() != worker._id.toString()
+        );
+        continue;
+      }
+    }
+    return res.status(200).json({ workers });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Entrega trabajadores segun hora solicitada y subservicio solicitado, vacaciones, calendario, booking
+export const workerByTimeAndService2 = async (req, res, next) => {
   global.logger.info({
     message: "--- GET WORKERS BY TIME AND SERVICE ---",
   });
