@@ -1186,18 +1186,31 @@ export const getRandomUsers = async (req, res, next) => {
       .select("_id personalData workerData.services img.imgUrl")
       .populate([
         {
-          path: "workerData.services.id",
-          select: "name",
+          path: "workerData.services.id", // Poblar la referencia "id" dentro de "services"
+          select: "name isActive",
+          match: { isActive: true }, // Filtra servicios activos
+          model: "Service", // Modelo para "id"
         },
         {
           path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
-          select: "name imgUrl duration price ",
+          select: "name imgUrl duration price isActive",
           model: "Subservice", // Modelo de "SubServices"
-          match: { isActive: true }, // Solo selecciona los subservicios activos
+          match: { isActive: true }, // Filtra subservicios activos
         },
       ]);
 
-    res.send(randomUsers);
+    // Excluir usuarios cuyos `workerData.services` estén vacíos
+    const filteredUsers = randomUsers.filter((user) => {
+      // Reasignar solo los servicios válidos al usuario
+      user.workerData.services = user.workerData.services.filter(
+        (service) => service.id
+      );
+
+      // Excluir al usuario si no tiene servicios después del filtrado
+      return user.workerData.services.length > 0;
+    });
+
+    res.send(filteredUsers);
   } catch (err) {
     next(err);
   }
