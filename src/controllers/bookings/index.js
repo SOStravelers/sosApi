@@ -6,6 +6,7 @@ import { resendCompletedPersonal } from "../../services/emails/personal.js";
 import { awsCompletedWorker } from "../../services/emails/worker.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 import moment from "moment-timezone";
+import Subservice from "../../models/subservice.js";
 
 const populate = [
   {
@@ -42,27 +43,32 @@ export const create = async (req, res, next) => {
     const emailData = req.body.emailData;
     const bookingData = req.body;
     bookingData.emailData = null;
+    const subService = await Subservice.findById(req.body.subservice);
+    const multiple = subService.multiple;
     let booking = new Booking(bookingData);
     booking.firstWorker = booking.workerUser;
-    let query = {
-      $and: [
-        {
-          location: booking.location,
-        },
-        {
-          subService: booking.subService,
-        },
-        {
-          date: booking.date,
-        },
-        {
-          startTime: booking.startTime,
-        },
-      ],
-    };
+    let query = {};
+    if (!subService.multiple) {
+      query = {
+        $and: [
+          {
+            businessUser: booking.businessUser,
+          },
+          {
+            subService: booking.subService,
+          },
+          {
+            date: booking.date,
+          },
+          {
+            startTime: booking.startTime,
+          },
+        ],
+      };
+    }
     let exists = await Booking.findOne(query, {}).exec();
-    if (exists) {
-      throw createError(409, "document already exists");
+    if (exists && !subService.multiple) {
+      throw createError(409, "booking already exists");
     } else {
       // Buscar el último booking ordenado por idKey en orden descendente
       let lastBooking = await Booking.findOne().sort({ idKey: -1 });
@@ -83,7 +89,7 @@ export const create = async (req, res, next) => {
         .exec();
       //creando notificaciones:
       //notification User and Worker
-      newBookingNotification(theBooking);
+      newBookingNotification(theBooking, multiple);
 
       resendCompletedPersonal({
         email: theBooking.clientUser.email,
@@ -92,12 +98,12 @@ export const create = async (req, res, next) => {
         subservice: theBooking.subservice.name,
       });
 
-      awsCompletedWorker({
-        email: theBooking.workerUser.email,
-        name: theBooking.workerUser.personalData.name.first,
-        service: theBooking.service.name,
-        subservice: theBooking.subservice.name,
-      });
+      // awsCompletedWorker({
+      //   email: theBooking.workerUser.email,
+      //   name: theBooking.workerUser.personalData.name.first,
+      //   service: theBooking.service.name,
+      //   subservice: theBooking.subservice.name,
+      // });
 
       if (emailData) sendEmailPaymentConfirmation(emailData);
       res.status(201).json({ booking: theBooking, msg: "new Document" });

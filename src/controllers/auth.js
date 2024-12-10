@@ -771,7 +771,7 @@ export const workerByTimeAndService = async (req, res, next) => {
   try {
     let { startTime, endTime, subservice, page, limit } = req.body;
 
-    subservice = "6547f61545d6ccde7ac65fd0"; // SubService ID
+    // subservice = "6547f61545d6ccde7ac65fd0"; // SubService ID
     const bookingStartTime = new Date(startTime.isoTime);
     const bookingEndTime = new Date(endTime.isoTime);
 
@@ -803,7 +803,7 @@ export const workerByTimeAndService = async (req, res, next) => {
     };
     let users = await User.paginate(query, options);
     let workers = users.docs;
-    console.log(workers[0]._id);
+    console.log("cantidad de usuarios", workers.length);
     //schedules
     const scheduleQuery = {
       isActive: true,
@@ -841,7 +841,6 @@ export const workerByTimeAndService = async (req, res, next) => {
       if (indexHolliday >= 0) {
         console.log("hay vacaciones");
         const holliday = holidays[indexHolliday];
-        console.log(holliday);
         const hollidayIndex = holliday.range.findIndex(
           (time) =>
             new Date(time.from).getTime() <= bookingStartTime.getTime() &&

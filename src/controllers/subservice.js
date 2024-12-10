@@ -23,7 +23,7 @@ export const getByService = async (req, res, next) => {
   try {
     let options = {
       // populate,
-      select: "name price duration imgUrl details multiple",
+      select: "name price duration imgUrl details multiple shortDescription",
       page: Number(req.query.page) || 1,
       limit: Number(req.query.limit) || 50,
       sort: { updatedAt: -1 },
@@ -126,7 +126,7 @@ export const getPrice = async (req, res, next) => {
         user: req.query.user,
       });
       const currencyBase = price?.currencyCode || "BRL";
-      const thePrice = price?.value || 0;
+      const thePrice = price?.value || 1;
       const othersCurrency = await botcurrency(thePrice, currencyBase);
       console.log(othersCurrency);
       res.status(200).json(othersCurrency);

@@ -215,7 +215,9 @@ export const activateMany = async (req, res, next) => {
 
 export const businessSchedule = async (req, res, next) => {
   console.log("Fetching schedules...");
-  const subService = "6547f61545d6ccde7ac65fd0"; // SubService ID
+  // const subService = "6547f61545d6ccde7ac65fd0"; // SubService ID
+  const { businessId, serviceId, subserviceId, workerId } = req.query;
+  const subService = subserviceId;
   const startDate = new Date();
   startDate.setUTCHours(0, 0, 0, 0); // Start of the day
   const endDate = new Date();

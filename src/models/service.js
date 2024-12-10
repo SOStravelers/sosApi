@@ -6,7 +6,28 @@ import paginateConfig from "../config/paginate.js";
 
 const serviceSchema = new Schema(
   {
-    name: { type: String, unique: true },
+    name: {
+      en: {
+        type: String,
+        default: "",
+      },
+      es: {
+        type: String,
+        default: "",
+      },
+      fr: {
+        type: String,
+        default: "",
+      },
+      pt: {
+        type: String,
+        default: "",
+      },
+      de: {
+        type: String,
+        default: "",
+      },
+    },
     isActive: { type: Boolean, default: true },
     details: { type: String },
     imgUrl: { type: String },

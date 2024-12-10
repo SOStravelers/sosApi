@@ -3,19 +3,25 @@ import { createError } from "../config/error.js";
 import Booking from "../models/booking.js";
 import User from "../models/user.js";
 
-export const newBookingNotification = async (booking) => {
+export const newBookingNotification = async (booking, multiple) => {
   try {
     global.logger.info("---NEW BOOKING NOTIFICATION---");
+    const bodyClient = multiple
+      ? `New reservation with : ${booking.workerUser.personalData.name.first}`
+      : `New reservation at : ${booking.businessUser.businessData.name}`;
     const notificationClient = new Notification({
       title: "New booking",
-      body: `New reservation at : ${booking.businessUser.businessData.name}`,
+      body: bodyClient,
       to: [booking.clientUser._id.toString()],
       type: "booking",
       booking: booking._id,
     });
+    const bodyWorker = multiple
+      ? `Nova reserva of : ${booking.clientUser.personalData.name.first}`
+      : `Nova reserva of : ${booking.businessUser.businessData.name}`;
     const notificationWorker = new Notification({
       title: "Nova reserva",
-      body: `Nova reserva em : ${booking.businessUser.businessData.name}`,
+      body: bodyWorker,
       to: [booking.workerUser._id.toString()],
       type: "booking",
       booking: booking._id,
