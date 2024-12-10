@@ -62,7 +62,9 @@ export const confirmBookingNotification = async (booking) => {
   try {
     const notificationClient = new Notification({
       title: "Confirmed booking",
-      body: `Your reservation has been confirmed at : ${booking.businessUser.businessData.name}`,
+      body: `Your reservation has been confirmed at : ${
+        booking?.businessUser?.businessData?.name || ""
+      }`,
       to: [booking.clientUser._id.toString()],
       type: "booking",
       booking: booking._id,
