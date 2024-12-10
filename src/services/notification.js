@@ -56,7 +56,7 @@ export const cancelBookingNotification = async (booking) => {
     throw err;
   }
 };
-
+//cambio
 // notificacion de confirmacion de reserva
 export const confirmBookingNotification = async (booking) => {
   try {
