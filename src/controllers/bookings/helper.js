@@ -1,4 +1,8 @@
 import moment from "moment-timezone";
+import "moment/locale/es.js";
+import "moment/locale/fr.js";
+import "moment/locale/de.js";
+import "moment/locale/pt.js";
 import { createError } from "../../config/error.js";
 
 export const optionsBooking = (page, limit) => {
@@ -17,7 +21,7 @@ export const optionsBooking = (page, limit) => {
     },
     {
       path: "subservice",
-      select: "name isActive coverImg duration",
+      select: "name isActive coverImg duration imgUrl",
     },
     {
       path: "clientUser",
@@ -188,19 +192,28 @@ export const validateFormatDate = (dateString, dateEndString) => {
   }
 };
 
-const sumDay = (date, day) => {
+const sumDay = (date, day, language) => {
+  // Establecer el idioma según el parámetro `language`
+  !language ? (language = "en") : (language = language);
+  moment.locale(language);
+
+  console.log("chabela", date, day, language);
+
   const formattedDate = moment(date).add(day, "days").format("YYYY-MM-DD");
   const formattedNumber = moment(date).add(day, "days").format("DD");
-  const formattedDay = moment(date).add(day, "days").format("ddd");
+  const formattedDay = moment(date).add(day, "days").format("ddd"); // Obtiene las 3 primeras letras del día según el idioma
+
+  console.log("wena", formattedDay);
+
   return { date: formattedDate, number: formattedNumber, day: formattedDay };
 };
 
-export const daysOfweek = (result, startWeek) => {
+export const daysOfweek = (result, startWeek, language) => {
   if (result.length < 7) {
     let days = 0,
       response = [];
     while (days < 7) {
-      const { date, number, day } = sumDay(startWeek, days);
+      const { date, number, day } = sumDay(startWeek, days, language);
       const position = result.findIndex((e) => e.day === date);
       if (position !== -1) {
         response.push({

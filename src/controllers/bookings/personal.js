@@ -30,10 +30,8 @@ import {
   awsCompletedWorker,
   awsCancelWorker,
   awsUpdateTemplate,
-  awsConfirmWorker
+  awsConfirmWorker,
 } from "../../services/emails/worker.js";
-
-
 
 export const getAllClientsId = async (req, res, next) => {
   global.logger.info("---GET TO CLIENT ALL BOOKING---");
@@ -93,8 +91,10 @@ export const getWeekClientId = async (req, res, next) => {
   global.logger.info("---GET WEEK BOOKING BY CLIENT---");
   try {
     const user = req.user;
+    let { date, language } = req.query;
+    req.query.language ? req.query.language : "en";
     if (user.type != "personal") throw createError(401, "Unauthorized");
-    const { date } = req.query;
+
     validateFormatDate(date);
     const dateMoment = moment(date, "YYYY-MM-DD")
       .add(7, "day")
@@ -120,7 +120,7 @@ export const getWeekClientId = async (req, res, next) => {
     };
     const result = await Booking.aggregate(query);
     if (!result) throw createError(404, "Personal week booking not found ");
-    const response = daysOfweek(result, startWeek);
+    const response = daysOfweek(result, startWeek, language);
     res.status(200).json(response);
   } catch (err) {
     next(err);
@@ -292,14 +292,14 @@ export const cancelBookingUser = async (req, res, next) => {
           email: newBooking.workerUser.email,
           name: newBooking.workerUser.personalData.name.first,
           service: newBooking.service.name,
-          subservice: newBooking.subservice.name
+          subservice: newBooking.subservice.name,
         });
         console.log(" *** datos del usuario *** ");
         resendCancelPersonal({
           email: newBooking.clientUser.email,
           name: newBooking.clientUser.personalData.name.first,
           service: newBooking.service.name,
-          subservice: newBooking.subservice.name
+          subservice: newBooking.subservice.name,
         });
         return res.status(200).json(newBooking);
       } else {
@@ -341,14 +341,14 @@ export const cancelBookingUser = async (req, res, next) => {
         email: newBooking.workerUser.email,
         name: newBooking.workerUser.personalData.name.first,
         service: newBooking.service.name,
-        subservice: newBooking.subservice.name
+        subservice: newBooking.subservice.name,
       });
       console.log(" *** datos del usuario *** ");
       resendCancelPersonal({
         email: newBooking.clientUser.email,
         name: newBooking.clientUser.personalData.name.first,
         service: newBooking.service.name,
-        subservice: newBooking.subservice.name
+        subservice: newBooking.subservice.name,
       });
 
       return res.status(200).json(newBooking);

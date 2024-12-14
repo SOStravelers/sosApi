@@ -34,7 +34,7 @@ import {
   getLastWorkers,
   availableBookings,
   createBookingWorker,
-  updateTemplateWorker
+  updateTemplateWorker,
 } from "../controllers/bookings/worker.js";
 
 import {
@@ -294,6 +294,11 @@ router.get(
       {
         param_key: "date",
         required: true,
+        type: "string",
+      },
+      {
+        param_key: "language",
+        required: false,
         type: "string",
       },
     ],
@@ -892,23 +897,24 @@ router.put(
 
 /* Update template worker */
 
-router.get("/updateTemplateWorker", 
-validateParams(
-  [
-    {
-      param_key: "type",
-      required: true,
-      type: "string"
-    },
-    {
-      param_key: "subject",
-      required: true,
-      type: "string"      
-    }
-  ],
-  "query"
-),
-updateTemplateWorker
+router.get(
+  "/updateTemplateWorker",
+  validateParams(
+    [
+      {
+        param_key: "type",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "subject",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  updateTemplateWorker
 );
 
 router.put(
@@ -966,7 +972,5 @@ router.get(
   ),
   getIndicators
 );
-
-
 
 export default router;
