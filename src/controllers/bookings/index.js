@@ -28,7 +28,7 @@ const populate = [
   },
   {
     path: "subservice",
-    select: "name isActive coverImg duration details",
+    select: "name isActive coverImg duration details imgUrl",
   },
   {
     path: "clientUser",
