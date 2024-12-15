@@ -10,6 +10,7 @@ import {
   getByService,
   getAll,
   getPrice,
+  infoSubserviceByWorker,
 } from "../controllers/subservice.js";
 
 //Create subService
@@ -145,6 +146,27 @@ router.get(
     "query"
   ),
   getPrice
+);
+
+//Obtener los precios actuaales
+router.get(
+  "/data/byWorker/",
+  validateParams(
+    [
+      {
+        param_key: "subservice",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "user",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  infoSubserviceByWorker
 );
 
 export default router;

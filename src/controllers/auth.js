@@ -1159,7 +1159,8 @@ export const getRandomUsers = async (req, res, next) => {
     global.logger.info({
       message: "--- GET RANDOM USERS ---",
     });
-    // Obtén todos los IDs de usuario
+
+    // Obtener todos los IDs de usuario
     const userIds = await User.find({
       type: "worker",
       isActive: true,
@@ -1167,44 +1168,60 @@ export const getRandomUsers = async (req, res, next) => {
     }).select("_id");
     console.log(userIds.length);
 
-    // Selecciona aleatoriamente dos IDs
-    const randomIds = [];
-    for (let i = 0; i < 6; i++) {
-      const randomIndex = Math.floor(Math.random() * userIds.length);
-      randomIds.push(userIds[randomIndex]);
-      userIds.splice(randomIndex, 1); // Elimina el ID seleccionado para evitar duplicados
+    // Función para seleccionar aleatoriamente IDs sin duplicados
+    const selectRandomIds = (ids, count) => {
+      const randomIds = [];
+      const availableIds = [...ids];
+      for (let i = 0; i < count && availableIds.length > 0; i++) {
+        const randomIndex = Math.floor(Math.random() * availableIds.length);
+        randomIds.push(availableIds[randomIndex]);
+        availableIds.splice(randomIndex, 1); // Eliminar el ID seleccionado
+      }
+      return randomIds;
+    };
+
+    let filteredUsers = [];
+    let attempts = 0;
+
+    // Repetir el proceso hasta obtener al menos 4 usuarios o un máximo de 5 intentos
+    while (filteredUsers.length < 4 && attempts < 5) {
+      attempts++;
+
+      // Seleccionar aleatoriamente 6 IDs
+      const randomIds = selectRandomIds(userIds, 6);
+
+      // Buscar usuarios y poblar campos
+      const randomUsers = await User.find({ _id: { $in: randomIds } })
+        .select("_id personalData workerData.services img.imgUrl")
+        .populate([
+          {
+            path: "workerData.services.id",
+            select: "name isActive",
+            match: { isActive: true },
+            model: "Service",
+          },
+          {
+            path: "workerData.services.subServices",
+            select: "name imgUrl duration price isActive",
+            model: "Subservice",
+            match: { isActive: true },
+          },
+        ]);
+
+      // Filtrar usuarios cuyos servicios estén vacíos
+      filteredUsers = randomUsers.filter((user) => {
+        user.workerData.services = user.workerData.services.filter(
+          (service) => service.id
+        );
+        return user.workerData.services.length > 0;
+      });
+
+      // Si hay al menos 4 usuarios válidos, detener el bucle
+      if (filteredUsers.length >= 4) break;
     }
 
-    // Busca los usuarios con los IDs seleccionados y pobla los campos necesarios
-    const randomUsers = await User.find({ _id: { $in: randomIds } })
-      .select("_id personalData workerData.services img.imgUrl")
-      .populate([
-        {
-          path: "workerData.services.id", // Poblar la referencia "id" dentro de "services"
-          select: "name isActive",
-          match: { isActive: true }, // Filtra servicios activos
-          model: "Service", // Modelo para "id"
-        },
-        {
-          path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
-          select: "name imgUrl duration price isActive",
-          model: "Subservice", // Modelo de "SubServices"
-          match: { isActive: true }, // Filtra subservicios activos
-        },
-      ]);
-
-    // Excluir usuarios cuyos `workerData.services` estén vacíos
-    const filteredUsers = randomUsers.filter((user) => {
-      // Reasignar solo los servicios válidos al usuario
-      user.workerData.services = user.workerData.services.filter(
-        (service) => service.id
-      );
-
-      // Excluir al usuario si no tiene servicios después del filtrado
-      return user.workerData.services.length > 0;
-    });
-
-    res.send(filteredUsers);
+    // Limitar a un máximo de 6 usuarios antes de enviar
+    res.send(filteredUsers.slice(0, 6));
   } catch (err) {
     next(err);
   }

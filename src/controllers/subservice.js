@@ -110,28 +110,33 @@ export const getPrice = async (req, res, next) => {
       .select("price multiple")
       .exec();
 
-    if (!subservice.multiple) {
-      const businessUser = await User.findById(req.query.user)
-        .select("businessData")
-        .exec();
-      console.log("perro", businessUser.businessData.category);
-      const price = subservice.price[businessUser.businessData.category] || 0;
-      const currencyBase = "BRL";
-      const othersCurrency = await botcurrency(price, currencyBase);
-      console.log(othersCurrency);
-      res.status(200).json(othersCurrency);
-    } else {
-      const schedule = await ScheduleMultiple.findOne({
-        subService: req.query.subservice,
-        user: req.query.user,
-      });
-      const currencyBase = schedule?.currencyCode || "BRL";
-      const thePrice = schedule?.price || 5;
-      const othersCurrency = await botcurrency(thePrice, currencyBase);
-      console.log(othersCurrency);
-      res.status(200).json(othersCurrency);
-    }
+    const businessUser = await User.findById(req.query.user)
+      .select("businessData")
+      .exec();
+    console.log("perro", businessUser.businessData.category);
+    const price = subservice.price[businessUser.businessData.category] || 0;
+    const currencyBase = "BRL";
+    const othersCurrency = await botcurrency(price, currencyBase);
+    console.log(othersCurrency);
+    res.status(200).json(othersCurrency);
   } catch (err) {
     next(err);
   }
+};
+
+export const infoSubserviceByWorker = async (req, res, next) => {
+  global.logger.info("---GET INFO SUBSERVICE BY WORKER---");
+
+  const schedule = await ScheduleMultiple.findOne({
+    subService: req.query.subservice,
+    user: req.query.user,
+  })
+    .select("duration locationInfo mapUrl price details")
+    .lean();
+  const currencyBase = schedule?.currencyCode || "BRL";
+  const thePrice = schedule?.price || 5;
+  const othersCurrency = await botcurrency(thePrice, currencyBase);
+  schedule.prices = othersCurrency;
+
+  return res.status(200).json(schedule);
 };

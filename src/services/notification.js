@@ -58,24 +58,50 @@ export const cancelBookingNotification = async (booking) => {
 };
 //cambio
 // notificacion de confirmacion de reserva
-export const confirmBookingNotification = async (booking) => {
+export const confirmBookingNotification = async (
+  booking,
+  multiple,
+  language
+) => {
   try {
-    const notificationClient = new Notification({
-      title: "Confirmed booking",
-      body: `Your reservation has been confirmed at : ${
-        booking?.businessUser?.businessData?.name || ""
-      }`,
-      to: [booking.clientUser._id.toString()],
-      type: "booking",
-      booking: booking._id,
-    });
-    const notificationWorker = new Notification({
-      title: "Reserva confirmada",
-      body: `Sua reserva foi confirmada em: ${booking.businessUser.businessData.name}`,
-      to: [booking.workerUser._id.toString()],
-      type: "booking",
-      booking: booking._id,
-    });
+    let notificationClient;
+    let notificationWorker;
+
+    if (multiple) {
+      notificationClient = new Notification({
+        title: "Confirmed booking",
+        body: `Your reservation has been confirmed : ${
+          booking?.subservice?.name[language] || ""
+        }`,
+        to: [booking.clientUser._id.toString()],
+        type: "booking",
+        booking: booking._id,
+      });
+      notificationWorker = new Notification({
+        title: "Confirmed booking",
+        body: `New reservation confirmed for: ${booking?.subservice?.name[language]}`,
+        to: [booking.workerUser._id.toString()],
+        type: "booking",
+        booking: booking._id,
+      });
+    } else {
+      notificationClient = new Notification({
+        title: "Confirmed booking",
+        body: `Your reservation has been confirmed at : ${
+          booking?.businessUser?.businessData?.name || ""
+        }`,
+        to: [booking.clientUser._id.toString()],
+        type: "booking",
+        booking: booking._id,
+      });
+      notificationWorker = new Notification({
+        title: "Reserva confirmada",
+        body: `Sua reserva foi confirmada em: ${booking.businessUser.businessData.name}`,
+        to: [booking.workerUser._id.toString()],
+        type: "booking",
+        booking: booking._id,
+      });
+    }
     notificationClient.save();
     notificationWorker.save();
   } catch (err) {

@@ -39,7 +39,51 @@ const bookingSchema = new Schema(
       isoDate: { type: Date },
     },
     title: { type: String, default: "new Event" },
-    details: { type: String },
+    details: {
+      en: {
+        type: String,
+        default: "",
+      },
+      es: {
+        type: String,
+        default: "",
+      },
+      fr: {
+        type: String,
+        default: "",
+      },
+      pt: {
+        type: String,
+        default: "",
+      },
+      de: {
+        type: String,
+        default: "",
+      },
+    },
+    locationInfo: {
+      en: {
+        type: String,
+        default: "",
+      },
+      es: {
+        type: String,
+        default: "",
+      },
+      fr: {
+        type: String,
+        default: "",
+      },
+      pt: {
+        type: String,
+        default: "",
+      },
+      de: {
+        type: String,
+        default: "",
+      },
+    },
+    mapUrl: { type: String },
     priceUnitService: { type: Number },
     payment: {
       method: {

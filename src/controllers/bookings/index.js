@@ -1,7 +1,10 @@
 import { createError } from "../../config/error.js";
 import Booking from "../../models/booking.js";
 import User from "../../models/user.js";
-import { newBookingNotification } from "../../services/notification.js";
+import {
+  newBookingNotification,
+  confirmBookingNotification,
+} from "../../services/notification.js";
 import {
   resendCompletedPersonal,
   resendConfirmPersonal,
@@ -97,8 +100,6 @@ export const create = async (req, res, next) => {
         .populate(populate)
         .exec();
       //creando notificaciones:
-      //notification User and Worker
-      newBookingNotification(theBooking, multiple);
 
       if (emailData) sendEmailPaymentConfirmation(emailData);
       const brazilTime = moment().tz("America/Sao_Paulo");
@@ -123,7 +124,7 @@ export const create = async (req, res, next) => {
         const finalPrice = (newBooking.payment.priceBRL * (1 - 0.12)).toFixed(
           2
         );
-
+        confirmBookingNotification(theBooking, multiple, language);
         console.log("el cliente", req.user);
         resendConfirmPersonal({
           email: theBooking.clientUser.email,
@@ -185,6 +186,8 @@ export const create = async (req, res, next) => {
         //   language: language,
         // });
       } else {
+        //notification User and Worker
+        newBookingNotification(theBooking, multiple);
         resendCompletedPersonal({
           email: theBooking.clientUser.email,
           name: theBooking.clientUser.personalData.name.first,
