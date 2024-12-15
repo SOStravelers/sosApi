@@ -1,6 +1,6 @@
 import Subservice from "../models/subservice.js";
 import User from "../models/user.js";
-import Price from "../models/price.js";
+import ScheduleMultiple from "../models/scheduleMultiple.js";
 import { createError } from "../config/error.js";
 import { botcurrency } from "../services/botcurrency.js";
 
@@ -121,12 +121,12 @@ export const getPrice = async (req, res, next) => {
       console.log(othersCurrency);
       res.status(200).json(othersCurrency);
     } else {
-      const price = await Price.findOne({
-        subservice: req.query.subservice,
+      const schedule = await ScheduleMultiple.findOne({
+        subService: req.query.subservice,
         user: req.query.user,
       });
-      const currencyBase = price?.currencyCode || "BRL";
-      const thePrice = price?.value || 1;
+      const currencyBase = schedule?.currencyCode || "BRL";
+      const thePrice = schedule?.price || 5;
       const othersCurrency = await botcurrency(thePrice, currencyBase);
       console.log(othersCurrency);
       res.status(200).json(othersCurrency);

@@ -1,23 +1,14 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
+import uniqueValidator from "mongoose-unique-validator";
+import mongoosePaginate from "mongoose-paginate-v2";
+import paginateConfig from "../config/paginate.js";
 
-const scheduleMultipleSchema = new Schema(
+const subserviceDetailSchema = new Schema(
   {
-    user: { type: String, ref: "User" },
-    isActive: { type: Boolean, default: true },
-    default: { type: Boolean, default: false },
-    service: { type: String, ref: "Service" },
-    subService: { type: String, ref: "Subservice" },
-    timeZone: { type: String },
-    duration: { type: Number, default: 0 },
-    schedules: [
-      {
-        day: Number, // 0-6 (representando los días de la semana)
-        isActive: Boolean, // Habilitado/deshabilitado para ese día
-        iso: String, // Fecha y hora exacta del horario
-      },
-    ],
-    creator: { type: String, ref: "User" },
+    subService: { type: String, ref: "subService" },
+    workerUser: { type: Boolean, default: true },
+    duration: { type: Number },
     details: {
       en: {
         type: String,
@@ -72,9 +63,13 @@ const scheduleMultipleSchema = new Schema(
   },
   { timestamps: true }
 );
-
-const ScheduleMultiple = mongoose.model(
-  "ScheduleMultiple",
-  scheduleMultipleSchema
+subserviceDetailSchema.plugin(uniqueValidator, {
+  message: "This {PATH} is already in use.",
+});
+subserviceSchema.plugin(mongoosePaginate);
+mongoosePaginate.paginate.options = paginateConfig;
+const SubserviceDetail = mongoose.model(
+  "SubserviceDetail",
+  subserviceDetailSchema
 );
-export default ScheduleMultiple;
+export default SubserviceDetail;

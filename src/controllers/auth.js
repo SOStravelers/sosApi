@@ -807,19 +807,17 @@ export const workerByTimeAndService = async (req, res, next) => {
     //schedules
     const scheduleQuery = {
       isActive: true,
+      subService: theSubservice._id.toString(),
       user: { $in: workers.map((worker) => worker._id.toString()) },
     };
     let schedules = null;
-    if (theSubservice.multiple) {
-      schedules = await ScheduleMultiple.find(scheduleQuery);
-    } else {
-      await Schedule.find(scheduleQuery);
-    }
+    schedules = await ScheduleMultiple.find(scheduleQuery);
     if (!schedules) {
       console.log("no hay calendarios");
       workers = [];
       return res.send({ workers });
     }
+    console.log("calendarios", schedules.length);
     //Hollidays
     const holidays = await Holiday.find();
     //booking
@@ -829,6 +827,7 @@ export const workerByTimeAndService = async (req, res, next) => {
       subservice: subservice,
       "startTime.isoTime": bookingStartTime,
     };
+    console.log("la query", bookingQuery);
     let bookings = [];
     bookings = await Booking.find(bookingQuery);
     console.log("bookings encontrados", bookings.length);
@@ -862,30 +861,33 @@ export const workerByTimeAndService = async (req, res, next) => {
       const matches = bookings.filter(
         (booking) => booking.workerUser === worker._id.toString()
       );
+
+      const indexSchedule = schedules.findIndex(
+        (schedule) => schedule.user === worker._id.toString()
+      );
+
+      if (indexSchedule == -1) {
+        console.log("no tiene schedule");
+        workers = workers.filter(
+          (item) => item._id.toString() != worker._id.toString()
+        );
+        continue;
+      }
+
       if (indexBooking >= 0) {
         console.log("hay booking");
-
-        // Si permite múltiples subservicios
-        if (theSubservice.multiple) {
-          console.log("es multiple");
-          // Si no hay un límite, pasa al siguiente trabajador
-          if (!theSubservice.hasLimit) continue;
-          console.log(
-            "tiene limite",
-            theSubservice.limit,
-            matches.length,
-            matches.length >= theSubservice.limit
-          );
-          // Si se supera el límite, elimina al trabajador y pasa al siguiente
-          if (matches.length >= theSubservice.limit) {
-            console.log("excede el limite");
-            workers = workers.filter(
-              (item) => item._id.toString() !== worker._id.toString()
-            );
-            continue;
-          }
-        } else {
-          // Si no permite múltiples subservicios, elimina al trabajador y pasa al siguiente
+        const schedule = schedules[indexSchedule];
+        // Si no hay un límite, pasa al siguiente trabajador
+        if (!schedule.hasLimit) continue;
+        console.log(
+          "tiene limite",
+          schedule.limit,
+          matches.length,
+          matches.length >= schedule.limit
+        );
+        // Si se supera el límite, elimina al trabajador y pasa al siguiente
+        if (matches.length >= schedule.limit) {
+          console.log("excede el limite");
           workers = workers.filter(
             (item) => item._id.toString() !== worker._id.toString()
           );
@@ -895,9 +897,7 @@ export const workerByTimeAndService = async (req, res, next) => {
       console.log("no hay problema de booking, analizando calendario");
       console.log("cantidad de calendarios", schedules.length);
       console.log("workerId", worker._id);
-      const indexSchedule = schedules.findIndex(
-        (schedule) => schedule.user === worker._id.toString()
-      );
+
       if (indexSchedule >= 0) {
         console.log("hay calendario", startTime);
         const timeFormat = startTime.isoTime.split("T");
@@ -921,12 +921,6 @@ export const workerByTimeAndService = async (req, res, next) => {
           );
           continue;
         }
-      } else {
-        console.log("no tiene schedule");
-        workers = workers.filter(
-          (item) => item._id.toString() != worker._id.toString()
-        );
-        continue;
       }
     }
     return res.status(200).json({ workers });
