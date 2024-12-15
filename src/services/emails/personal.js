@@ -25,6 +25,7 @@ export const resendConfirmPersonal = async (info) => {
       isWorker,
     } = info;
     console.log("*** resend confirmed ***", isWorker ? emailWorker : email);
+    console.log("subservice", subservice);
     const htmlString = isWorker
       ? templateHtml("confirmBookingWorkerMultiple")
       : templateHtml("confirmBooking");

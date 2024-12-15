@@ -152,7 +152,10 @@ export const create = async (req, res, next) => {
         resendConfirmPersonal({
           isWorker: true,
           email: theBooking.clientUser.email,
-          name: theBooking.clientUser.personalData.name.first,
+          name:
+            theBooking.clientUser.personalData.name.first +
+            " " +
+            theBooking.clientUser.personalData.name.last,
           emailWorker: worker.email,
           workerName:
             worker?.personalData?.name?.first +
@@ -164,10 +167,10 @@ export const create = async (req, res, next) => {
             req.user?.personalData?.name?.last,
           workerPhone: worker?.workerData?.phone,
           service: theBooking.service.name[language],
+          subservice: theBooking.subservice.name[language],
           clientsNumber: theBooking.clientsNumber,
           priceUnitService: theBooking.priceUnitService,
           price: theBooking.payment.price,
-          subservice: theBooking.subservice.name[language],
           language: language,
           date: theBooking.date.stringData,
           startTime: theBooking.startTime.stringData,
