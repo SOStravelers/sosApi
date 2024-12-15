@@ -81,10 +81,10 @@ export const sendTemplateExample = async (file) => {
   try {
     // Definir los parámetros del correo electrónico usando el template
     const emailParams = {
-      Source: 'booking@sostvl.com', // Dirección de correo verificada con AWS
+      Source: "booking@sostvl.com", // Dirección de correo verificada con AWS
       Destination: {
         ToAddresses: ["jschacosta@gmail.com", "methalcon@gmail.com"], // Lista de destinatarios
-        CcAddresses: 'booking@sostvl.com', // Lista de copias
+        CcAddresses: "booking@sostvl.com", // Lista de copias
       },
       Template: "MiTemplateHTML", // Nombre del template a usar
       TemplateData: JSON.stringify({
@@ -128,8 +128,8 @@ export const createTemplateFile = async (params) => {
       if (err) {
         console.error(err); // Mostrar el error si ocurre
       } else {
-        console.log(data, 'sucessfull'); // Mostrar la respuesta de AWS si tiene éxito
-      };
+        console.log(data, "sucessfull"); // Mostrar la respuesta de AWS si tiene éxito
+      }
     });
   } catch (err) {
     console.log("Error", err);
@@ -145,25 +145,28 @@ export const getTemplate = async (name) => {
     const response = await SES.send(getCommand);
     if (response.$metadata.httpStatusCode === 200 && response.Template) {
       return response;
-    } else{
+    } else {
       return null;
     }
   } catch (err) {
-     
-    console.log('*** catch ***');
+    console.log("*** catch ***");
     console.log(err.message);
 
-    if(err.message === 'Template completedBookingWorker does not exist.'){
+    if (err.message === "Template completedBookingWorker does not exist.") {
       return null;
-    }else if (err.message === 'Template confirmedBookingWorker does not exist.'){
+    } else if (
+      err.message === "Template confirmedBookingWorker does not exist."
+    ) {
       return nul;
-    }else if(err.message === 'Template cancelBookingWorker does not exist.'){
+    } else if (err.message === "Template cancelBookingWorker does not exist.") {
       return null;
-    }else if (err.message === 'Template availabilityBookingWorker does not exist.'){
+    } else if (
+      err.message === "Template availabilityBookingWorker does not exist."
+    ) {
       return null;
-    };
+    }
 
-    console.log('*** catch ***');
+    console.log("*** catch ***");
 
     throw err;
   }
@@ -190,7 +193,7 @@ export const sendEmailTemplate = async (params) => {
 // Crear el comando para actualizar el template
 export const updateTemplate = async (file) => {
   console.log("entrando5");
-  const {templateName, subject} = file;
+  const { templateName, subject } = file;
   try {
     const templateParams = {
       Template: {

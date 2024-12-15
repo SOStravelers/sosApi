@@ -24,7 +24,7 @@ export const awsConfirmWorker = async (info) => {
       Source: "booking@sostvl.com",
       Destination: {
         ToAddresses: [email],
-        CcAddresses: "booking@sostvl.com",
+        CcAddresses: ["booking@sostvl.com"],
       },
       Template: "completedBookingWorker",
       TemplateData: JSON.stringify({
@@ -37,6 +37,7 @@ export const awsConfirmWorker = async (info) => {
     sendEmailTemplate(emailParams);
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -71,6 +72,7 @@ export const awsCancelWorker = async (info) => {
     sendEmailTemplate(emailParams);
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -105,6 +107,7 @@ export const awsCompletedWorker = async (info) => {
     sendEmailTemplate(emailParams);
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -140,6 +143,7 @@ export const awsXternarWorker = async () => {
     sendEmailTemplate(emailParams);
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 /*  Para actualizar los templates de los emails de aws  */
@@ -160,5 +164,6 @@ export const awsUpdateTemplate = async (info) => {
     }
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };

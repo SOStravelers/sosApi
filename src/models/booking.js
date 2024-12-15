@@ -9,6 +9,7 @@ const bookingSchema = new Schema(
     workerUser: { type: String, ref: "User" },
     firstWorker: { type: String, ref: "User" },
     clientUser: { type: String, ref: "User" },
+    multiple: { type: Boolean, default: false },
     clients: [
       {
         name: { type: String },
@@ -39,6 +40,7 @@ const bookingSchema = new Schema(
     },
     title: { type: String, default: "new Event" },
     details: { type: String },
+    priceUnitService: { type: Number },
     payment: {
       method: {
         type: String,

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unabase - Confirm booking</title>
+</head>
+
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9f9f9; color: #001c25;">
+  <table
+    style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-spacing: 0; border-collapse: collapse;">
+    <!-- Header -->
+    <tr>
+      <td style="text-align: center; padding: 20px; border-bottom: 4px solid #00a0d5;">
+        <img src="https://sosappfiles.s3.amazonaws.com/icons/email/sosWhite.png" alt="Sos Travelers"
+          style="width: 50px; height: auto;" />
+        <p style="margin: 10px 0 0 0; font-size: 24px; font-weight: bold;">Sos Travelers</p>
+        <p style="font-size: 14px; font-style: italic; color: #666;">The best travel app</p>
+      </td>
+    </tr>
+
+    <!-- Main Content -->
+    <tr>
+      <td style="padding: 20px; text-align: center;">
+        <!-- Imagen reintegrada -->
+        <img src="https://sosappfiles.s3.amazonaws.com/icons/email/nin%CC%83a.png" alt="Booking Illustration"
+          style="max-width: 300px; height: auto; margin-bottom: 20px;" />
+
+        <table style="width: 100%; border-spacing: 0; border-collapse: collapse;">
+          <!-- User Info -->
+          <tr>
+            <td style="font-size: 18px; font-weight: bold; padding-bottom: 10px;" colspan="2">Name:</td>
+          </tr>
+          <tr>
+            <td style="padding: 5px 0; font-size: 16px; color: #444;" colspan="2">{{name}}</td>
+          </tr>
+
+          <!-- Booking Confirmation -->
+          <tr>
+            <td style="font-size: 18px; font-weight: bold; padding: 20px 0 10px;" colspan="2">Confirm booking:</td>
+          </tr>
+          <tr>
+            <td style="font-size: 16px; color: #444;" colspan="2">Congratulations! Your booking has been successfully
+              confirmed.</td>
+          </tr>
+        </table>
+
+        <!-- Booking Details -->
+        <table style="width: 100%; margin-top: 20px; border-spacing: 0; border-collapse: collapse;">
+          <tr>
+            <td style="font-size: 18px; font-weight: bold; padding-bottom: 10px;" colspan="2">Booking details</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">Service:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">{{subservice}}</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">Client:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">{{clientName}}</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">Date - Time:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">{{date}} - {{startTime}}</td>
+          </tr>
+        </table>
+
+        <!-- Booking Total -->
+        <table style="width: 100%; margin-top: 20px; border-spacing: 0; border-collapse: collapse;">
+          <tr>
+            <td style="font-size: 18px; font-weight: bold; padding-bottom: 10px;" colspan="2">Booking Total</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">Total By User:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">R$ {{priceUnitService}}</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">N° of People:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">{{clientsNumber}}</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">Total Sale:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">R$ {{price}}</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">Total After Gateway Fee:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">R$ {{priceBRL}}</td>
+          </tr>
+          <tr>
+            <td style="width: 50%; text-align: left; font-weight: bold; padding: 5px;">Total After SOS Discount:</td>
+            <td style="width: 50%; text-align: right; padding: 5px;">R$ {{finalPrice}}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+      <td style="text-align: center; padding: 20px; background-color: #f9f9f9; color: #666; font-size: 14px;">
+        <a href="https://www.instagram.com/sos.travelers/" style="text-decoration: none; color: #00a0d5;">
+          <img src="https://sosappfiles.s3.amazonaws.com/icons/email/instaBlue.png" alt="Instagram"
+            style="width: 24px; height: auto; margin-right: 10px;" />
+          @sosTravelers
+        </a>
+        <p style="margin-top: 10px;">Copyright 2023 SOS Travelers</p>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

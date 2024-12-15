@@ -2,9 +2,16 @@ import { createError } from "../../config/error.js";
 import Booking from "../../models/booking.js";
 import User from "../../models/user.js";
 import { newBookingNotification } from "../../services/notification.js";
-import { resendCompletedPersonal } from "../../services/emails/personal.js";
-import { awsCompletedWorker } from "../../services/emails/worker.js";
+import {
+  resendCompletedPersonal,
+  resendConfirmPersonal,
+} from "../../services/emails/personal.js";
+import {
+  awsCompletedWorker,
+  awsConfirmWorker,
+} from "../../services/emails/worker.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
+import { capturePaymentIntent } from "../../services/stripe.js";
 import moment from "moment-timezone";
 import Subservice from "../../models/subservice.js";
 
@@ -41,6 +48,7 @@ export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW BOOKING---");
   try {
     const emailData = req.body.emailData;
+    const language = req.body.language;
     const bookingData = req.body;
     bookingData.emailData = null;
     const subService = await Subservice.findById(req.body.subservice);
@@ -83,6 +91,7 @@ export const create = async (req, res, next) => {
       }
       // Asignar el nuevo idKey al booking
       booking.idKey = newIdKey;
+      booking.multiple ? (booking.status = "confirmed") : "";
       const newBooking = await booking.save();
       const theBooking = await Booking.findOne({ _id: newBooking._id })
         .populate(populate)
@@ -91,21 +100,103 @@ export const create = async (req, res, next) => {
       //notification User and Worker
       newBookingNotification(theBooking, multiple);
 
-      resendCompletedPersonal({
-        email: theBooking.clientUser.email,
-        name: theBooking.clientUser.personalData.name.first,
-        service: theBooking.service.name,
-        subservice: theBooking.subservice.name,
-      });
-
-      // awsCompletedWorker({
-      //   email: theBooking.workerUser.email,
-      //   name: theBooking.workerUser.personalData.name.first,
-      //   service: theBooking.service.name,
-      //   subservice: theBooking.subservice.name,
-      // });
-
       if (emailData) sendEmailPaymentConfirmation(emailData);
+      const brazilTime = moment().tz("America/Sao_Paulo");
+      if (booking.multiple) {
+        const completedData = {
+          canceledBy: req.user._id.toString(),
+          canceledAtUTC: brazilTime,
+          timeZone: "America/Sao_Paulo",
+          previusStatus: booking.status,
+        };
+        const newBooking = await capturePaymentIntent(
+          booking,
+          1, // percentage
+          "confirmed", // statusBooking
+          null, // canceledData,
+          completedData // completedData
+        );
+      }
+
+      if (booking.multiple) {
+        const worker = await User.findById(booking.workerUser);
+        const finalPrice = (newBooking.payment.priceBRL * (1 - 0.12)).toFixed(
+          2
+        );
+
+        console.log("el cliente", req.user);
+        resendConfirmPersonal({
+          email: theBooking.clientUser.email,
+          name: theBooking.clientUser.personalData.name.first,
+          emailWorker: worker.email,
+          workerName:
+            worker?.personalData?.name?.first +
+            " " +
+            worker?.personalData?.name?.last,
+          clientName:
+            req.user?.personalData?.name?.first +
+            " " +
+            req.user?.personalData?.name?.last,
+          workerPhone: worker?.workerData?.phone,
+          service: theBooking.service.name[language],
+          clientsNumber: theBooking.clientsNumber,
+          priceUnitService: theBooking.priceUnitService,
+          subservice: theBooking.subservice.name[language],
+          language: language,
+          date: theBooking.date.stringData,
+          startTime: theBooking.startTime.stringData,
+          price: theBooking.payment.price,
+          priceBRL: newBooking.payment.priceBRL,
+          finalPrice: finalPrice,
+        });
+        resendConfirmPersonal({
+          isWorker: true,
+          email: theBooking.clientUser.email,
+          name: theBooking.clientUser.personalData.name.first,
+          emailWorker: worker.email,
+          workerName:
+            worker?.personalData?.name?.first +
+            " " +
+            worker?.personalData?.name?.last,
+          clientName:
+            req.user?.personalData?.name?.first +
+            " " +
+            req.user?.personalData?.name?.last,
+          workerPhone: worker?.workerData?.phone,
+          service: theBooking.service.name[language],
+          clientsNumber: theBooking.clientsNumber,
+          priceUnitService: theBooking.priceUnitService,
+          price: theBooking.payment.price,
+          subservice: theBooking.subservice.name[language],
+          language: language,
+          date: theBooking.date.stringData,
+          startTime: theBooking.startTime.stringData,
+          priceBRL: newBooking.payment.priceBRL,
+          finalPrice: finalPrice,
+        });
+        // awsConfirmWorker({
+        //   email: theBooking.workerUser.email,
+        //   name: theBooking.workerUser.personalData.name.first,
+        //   service: theBooking.service.name,
+        //   subservice: theBooking.subservice.name,
+        //   language: language,
+        // });
+      } else {
+        resendCompletedPersonal({
+          email: theBooking.clientUser.email,
+          name: theBooking.clientUser.personalData.name.first,
+          service: theBooking.service.name,
+          subservice: theBooking.subservice.name,
+          language: language,
+        });
+        // awsCompletedWorker({
+        //   email: theBooking.workerUser.email,
+        //   name: theBooking.workerUser.personalData.name.first,
+        //   service: theBooking.service.name,
+        //   subservice: theBooking.subservice.name,
+        //   language: language,
+        // });
+      }
       res.status(201).json({ booking: theBooking, msg: "new Document" });
     }
   } catch (err) {

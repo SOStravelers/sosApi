@@ -130,7 +130,9 @@ export const isAuth = async (req, res, next) => {
     let authUser;
     try {
       authUser = await User.findOne({ _id: decoded._id })
-        .select("isActive type security isValidate name username email imgUrl")
+        .select(
+          "isActive type security isValidate name username email imgUrl personalData"
+        )
         .exec();
       authUser.id = authUser._id.toString();
       req.user = authUser;
@@ -166,7 +168,7 @@ export const isAdmin = async (req, res, next) => {
       console.log("vamos bien");
       console.log(decoded);
       authUser = await User.findOne({ _id: decoded._id })
-        .select("isAdminUser _id isActive name username ")
+        .select("isAdminUser _id isActive name username personalData ")
         .exec();
       console.log(authUser);
       if (authUser._id && authUser.isAdminUser) {

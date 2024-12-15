@@ -89,6 +89,7 @@ const userSchema = new Schema(
       isMySchedulesOk: { type: Boolean, default: false },
       isMyWorkplacesOk: { type: Boolean, default: true },
       isActive: { type: Boolean, default: false },
+      phone: { type: String },
       languages: {
         main: {
           type: String,
