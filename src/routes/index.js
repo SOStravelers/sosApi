@@ -56,6 +56,7 @@ routes.use("/favorites", isAuth, favorite);
 routes.use("/tests", test);
 
 routes.use("/payments", isAuth, payment);
+routes.use("/paymentsAuth", payment);
 
 //rutas metal
 routes.use("/support", support);

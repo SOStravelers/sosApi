@@ -137,7 +137,7 @@ router.get(
 );
 
 router.get(
-  "/stripe/getPaymentId/:id",
+  "/stripe/getPaymentIntent/:id",
   validateParams(
     [
       {
