@@ -14,7 +14,10 @@ import {
   awsConfirmWorker,
 } from "../../services/emails/worker.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
-import { capturePaymentIntent } from "../../services/stripe.js";
+import {
+  capturePaymentIntent,
+  addIdBookingtoPI,
+} from "../../services/stripe.js";
 import moment from "moment-timezone";
 import Subservice from "../../models/subservice.js";
 
@@ -110,6 +113,13 @@ export const create = async (req, res, next) => {
           timeZone: "America/Sao_Paulo",
           previusStatus: booking.status,
         };
+
+        addIdBookingtoPI(
+          booking?.payment?.paymentId,
+          booking?._id.toString(),
+          booking?.idKey
+        );
+
         // const newBooking = await capturePaymentIntent(
         //   booking,
         //   1, // percentage

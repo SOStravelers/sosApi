@@ -361,3 +361,16 @@ export const getPaymentIntent = async (paymentIntentId) => {
     throw err;
   }
 };
+
+export const addIdBookingtoPI = async (PI, id, bookingNumber) => {
+  try {
+    await stripe.paymentIntents.update(PI, {
+      metadata: {
+        bookingId: id, // ID del booking
+        bookingNumber: bookingNumber,
+      },
+    });
+  } catch (err) {
+    throw err;
+  }
+};
