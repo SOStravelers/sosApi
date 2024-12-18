@@ -4,7 +4,11 @@ import {
   capturePaymentIntent,
   updatedPaymentIntent,
   createPaymentIntent,
+  createPaymentIntentAutomatic,
   refund,
+  transferPaymentsStripe,
+  getLoginLink,
+  getPaymentIntent,
 } from "../services/stripe.js";
 import Booking from "../models/booking.js";
 
@@ -38,10 +42,21 @@ export const aprovedOrder = async (req, res, next) => {
 export const paymentIntentStripe = async (req, res, next) => {
   try {
     const data = req.body;
-    console.log("");
+    console.log("INTENTANDO");
     const user = req.user;
-    const paymentIntent = await createPaymentIntent(data, user);
+    const paymentIntent = await createPaymentIntentAutomatic(data, user);
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const transferPayments = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const user = req.user;
+    const message = await transferPaymentsStripe(data, user);
+    res.status(200).json({ message: message });
   } catch (error) {
     next(error);
   }
@@ -83,6 +98,26 @@ export const refundStripe = async (req, res, next) => {
     const data = req.body;
     const result = await refund(data);
     res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getStripeLink = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const link = await getLoginLink(id);
+    res.status(200).json(link);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getPaymentIntentById = async (req, res, next) => {
+  try {
+    const paymentIntentId = req.params.id;
+    const link = await getPaymentIntent(paymentIntentId);
+    res.status(200).json(link);
   } catch (err) {
     next(err);
   }

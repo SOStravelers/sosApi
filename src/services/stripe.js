@@ -159,6 +159,130 @@ export const capturePaymentIntent = async (
     throw error;
   }
 };
+
+//CREATE PAYMENT INTENT AUTOMATIC FOR DIFERENTS USERS
+// CREATE PAYMENT INTENT WITH IMMEDIATE CHARGE AND PAYMENT SPLIT
+export const createPaymentIntentAutomatic = async (data, user) => {
+  logger.info("--- CREATE PAYMENT INTENT AUTOMATIC STRIPE ---");
+  try {
+    if (!envar().STRIPE_SECRET_KEY) {
+      throw new Error("MISSING_API_CREDENTIALS");
+    }
+
+    const userDB = await User.findById(user._id.toString());
+    const customerId = userDB.paymentData?.stripeCustomerId || null;
+
+    // Lógica de cálculo
+    const totalAmount = data.amount; // Monto total en centavos
+    console.log("Monto total:", totalAmount);
+    console.log("la data", data);
+    // Crear el PaymentIntent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: totalAmount,
+      currency: data.currency || "usd",
+      customer: customerId,
+      description: data.service + "-" + data.subservice,
+      metadata: {
+        clientName:
+          user?.personalData?.name?.first +
+          " " +
+          user?.personalData?.name?.last,
+        service: data?.service,
+        subservice: data?.subservice,
+        date: data?.date,
+        startTime: data?.startTime?.isoTime,
+        clientsNumber: data?.clientsNumber,
+        language: data?.language,
+      },
+      payment_method_types: ["card"], // Solo tarjetas de crédito
+      automatic_payment_methods: { enabled: false }, // Desactiva métodos automáticos con redirecciones
+    });
+
+    console.log("PaymentIntent creado:", paymentIntent.id);
+    return paymentIntent;
+  } catch (error) {
+    console.error("Error creando PaymentIntent:", error);
+    throw error;
+  }
+};
+
+export const transferPaymentsStripe = async (data) => {
+  logger.info("--- CREATE TRANSFERS STRIPE ---");
+  try {
+    const { paymentIntentId } = data;
+
+    if (!paymentIntentId) {
+      throw new Error("PaymentIntent ID is required.");
+    }
+    console.log("la id", paymentIntentId);
+    // Recuperar el PaymentIntent
+    let paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    console.log("el payment", paymentIntent);
+    // Verificar estado
+    if (paymentIntent.status !== "succeeded") {
+      if (paymentIntent.status === "requires_capture") {
+        console.log("Capturando el PaymentIntent...");
+        await stripe.paymentIntents.capture(paymentIntentId);
+        paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      } else {
+        throw new Error(
+          `El PaymentIntent no está en un estado procesable: ${paymentIntent.status}`
+        );
+      }
+    }
+    console.log("paso1");
+    // Verificar cargos
+    if (!paymentIntent.latest_charge) {
+      throw new Error("No se encontraron cargos para este PaymentIntent.");
+    }
+
+    const chargeId = paymentIntent.latest_charge;
+    console.log("Charge ID:", chargeId);
+    console.log("el precio", paymentIntent.amount);
+    // Calcular divisiones
+    const totalAmount = paymentIntent.amount;
+    const providerShare = Math.round(totalAmount * 0.5);
+    const ownerShare = Math.round(totalAmount * 0.4);
+
+    // Realizar transferencias
+    const transferProvider = await stripe.transfers.create({
+      amount: providerShare,
+      currency: paymentIntent.currency,
+      destination: "acct_1QXAPQQmwgOl0zRD",
+      source_transaction: chargeId,
+      description: "W-" + paymentIntent.description,
+    });
+
+    const loginLink1 = await stripe.accounts.createLoginLink(
+      "acct_1QXAPQQmwgOl0zRD"
+    );
+    console.log("Login Link:", loginLink1.url);
+
+    const transferOwner = await stripe.transfers.create({
+      amount: ownerShare,
+      currency: paymentIntent.currency,
+      destination: "acct_1QXB9kH25M0VH3l6",
+      source_transaction: chargeId,
+      description: "B-" + paymentIntent.description,
+    });
+
+    const loginLink2 = await stripe.accounts.createLoginLink(
+      "acct_1QXB9kH25M0VH3l6"
+    );
+    console.log("Login Link:", loginLink2.url);
+
+    logger.info("Transferencias realizadas con éxito:", {
+      provider: transferProvider,
+      owner: transferOwner,
+    });
+
+    return { provider: transferProvider, owner: transferOwner };
+  } catch (error) {
+    logger.error("Error realizando transferencias:", error.message);
+    throw error;
+  }
+};
+
 //UPDATE PAYMENT INTENT WITH METADATA
 export const updatedPaymentIntent = async (data) => {
   logger.info("---UPDATE PAYMENT INTENT STRIPE ---");
@@ -216,6 +340,23 @@ export const refund = async (data) => {
       });
       return refund;
     }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getLoginLink = async (idAccount) => {
+  try {
+    const link = await stripe.accounts.createLoginLink(idAccount);
+    return link;
+  } catch (err) {
+    throw err;
+  }
+};
+export const getPaymentIntent = async (paymentIntentId) => {
+  try {
+    let paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    return paymentIntent;
   } catch (err) {
     throw err;
   }

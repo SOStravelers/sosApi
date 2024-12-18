@@ -110,13 +110,13 @@ export const create = async (req, res, next) => {
           timeZone: "America/Sao_Paulo",
           previusStatus: booking.status,
         };
-        const newBooking = await capturePaymentIntent(
-          booking,
-          1, // percentage
-          "confirmed", // statusBooking
-          null, // canceledData,
-          completedData // completedData
-        );
+        // const newBooking = await capturePaymentIntent(
+        //   booking,
+        //   1, // percentage
+        //   "confirmed", // statusBooking
+        //   null, // canceledData,
+        //   completedData // completedData
+        // );
       }
 
       if (booking.multiple) {

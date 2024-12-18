@@ -8,6 +8,9 @@ import {
   updatedPaymentIntentStripe,
   cancelPaymentIntentStripe,
   refundStripe,
+  transferPayments,
+  getStripeLink,
+  getPaymentIntentById,
 } from "../controllers/payment.js";
 
 const router = Router();
@@ -49,6 +52,21 @@ router.get(
     "params"
   ),
   capturePaymentStripe
+);
+
+router.post(
+  "/stripe/transfer-payments",
+  validateParams(
+    [
+      {
+        param_key: "paymentIntentId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  transferPayments
 );
 router.put(
   "/stripe/update",
@@ -101,6 +119,36 @@ router.put(
     "body"
   ),
   refundStripe
+);
+
+router.get(
+  "/stripe/getLink/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getStripeLink
+);
+
+router.get(
+  "/stripe/getPaymentId/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getPaymentIntentById
 );
 
 export default router;
