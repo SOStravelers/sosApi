@@ -239,44 +239,73 @@ export const transferPaymentsStripe = async (data) => {
     const chargeId = paymentIntent.latest_charge;
     console.log("Charge ID:", chargeId);
     console.log("el precio", paymentIntent.amount);
+
+    const charge = await stripe.charges.retrieve(chargeId);
+    const balanceTransaction = await stripe.balanceTransactions.retrieve(
+      charge.balance_transaction
+    );
+
+    const priceBRL = balanceTransaction.net / 100;
+
     // Calcular divisiones
     const totalAmount = paymentIntent.amount;
     const providerShare = Math.round(totalAmount * 0.5);
     const ownerShare = Math.round(totalAmount * 0.4);
 
     // Realizar transferencias
-    const transferProvider = await stripe.transfers.create({
-      amount: providerShare,
-      currency: paymentIntent.currency,
-      destination: "acct_1QXAPQQmwgOl0zRD",
-      source_transaction: chargeId,
-      description: "W-" + paymentIntent.description,
-    });
+    // const transferProvider = await stripe.transfers.create({
+    //   amount: providerShare,
+    //   currency: paymentIntent.currency,
+    //   destination: "acct_1QXAPQQmwgOl0zRD",
+    //   source_transaction: chargeId,
+    //   description: "W-" + paymentIntent.description,
+    //   metadata: {
+    //     paymentIntentId: paymentIntentId,
+    //     clientName: paymentIntent.metadata.clientName,
+    //     service: paymentIntent.metadata.service,
+    //     subservice: paymentIntent.metadata.subservice,
+    //     date: paymentIntent.metadata.date,
+    //     startTime: paymentIntent.metadata.startTime,
+    //     clientsNumber: paymentIntent.metadata.clientsNumber,
+    //     language: paymentIntent.metadata.language,
+    //   },
+    // });
 
-    const loginLink1 = await stripe.accounts.createLoginLink(
-      "acct_1QXAPQQmwgOl0zRD"
-    );
-    console.log("Login Link:", loginLink1.url);
+    // const loginLink1 = await stripe.accounts.createLoginLink(
+    //   "acct_1QXAPQQmwgOl0zRD"
+    // );
 
-    const transferOwner = await stripe.transfers.create({
-      amount: ownerShare,
-      currency: paymentIntent.currency,
-      destination: "acct_1QXB9kH25M0VH3l6",
-      source_transaction: chargeId,
-      description: "B-" + paymentIntent.description,
-    });
+    // console.log("Login Link:", loginLink1.url);
 
-    const loginLink2 = await stripe.accounts.createLoginLink(
-      "acct_1QXB9kH25M0VH3l6"
-    );
-    console.log("Login Link:", loginLink2.url);
+    // const transferOwner = await stripe.transfers.create({
+    //   amount: ownerShare,
+    //   currency: paymentIntent.currency,
+    //   destination: "acct_1QXB9kH25M0VH3l6",
+    //   source_transaction: chargeId,
+    //   description: "B-" + paymentIntent.description,
+    //   metadata: {
+    //     paymentIntentId: paymentIntentId,
+    //     clientName: paymentIntent.metadata.clientName,
+    //     service: paymentIntent.metadata.service,
+    //     subservice: paymentIntent.metadata.subservice,
+    //     date: paymentIntent.metadata.date,
+    //     startTime: paymentIntent.metadata.startTime,
+    //     clientsNumber: paymentIntent.metadata.clientsNumber,
+    //     language: paymentIntent.metadata.language,
+    //   },
+    // });
 
-    logger.info("Transferencias realizadas con éxito:", {
-      provider: transferProvider,
-      owner: transferOwner,
-    });
+    // const loginLink2 = await stripe.accounts.createLoginLink(
+    //   "acct_1QXB9kH25M0VH3l6"
+    // );
+    // console.log("Login Link:", loginLink2.url);
 
-    return { provider: transferProvider, owner: transferOwner };
+    // logger.info("Transferencias realizadas con éxito:", {
+    //   provider: transferProvider,
+    //   owner: transferOwner,
+    // });
+
+    return { priceBRL };
   } catch (error) {
     logger.error("Error realizando transferencias:", error.message);
     throw error;
@@ -367,7 +396,7 @@ export const addIdBookingtoPI = async (PI, id, bookingNumber) => {
     await stripe.paymentIntents.update(PI, {
       metadata: {
         bookingId: id, // ID del booking
-        bookingNumber: bookingNumber,
+        bookingNumber: bookingNumber, // Número del booking
       },
     });
   } catch (err) {

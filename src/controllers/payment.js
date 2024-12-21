@@ -55,8 +55,8 @@ export const transferPayments = async (req, res, next) => {
   try {
     const data = req.body;
     const user = req.user;
-    const message = await transferPaymentsStripe(data, user);
-    res.status(200).json({ message: message });
+    const result = await transferPaymentsStripe(data, user);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }

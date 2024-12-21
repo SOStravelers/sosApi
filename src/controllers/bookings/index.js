@@ -162,11 +162,11 @@ export const create = async (req, res, next) => {
         });
         resendConfirmPersonal({
           isWorker: true,
-          email: theBooking.clientUser.email,
+          email: worker.email,
           name:
-            theBooking.clientUser.personalData.name.first +
+            worker.personalData.name.first +
             " " +
-            theBooking.clientUser.personalData.name.last,
+            worker.personalData.name.last,
           emailWorker: worker.email,
           workerName:
             worker?.personalData?.name?.first +
