@@ -1166,6 +1166,7 @@ export const getRandomUsers = async (req, res, next) => {
       isActive: true,
       "workerData.isActive": true,
     }).select("_id");
+
     console.log(userIds.length);
 
     // Función para seleccionar aleatoriamente IDs sin duplicados
@@ -1183,12 +1184,12 @@ export const getRandomUsers = async (req, res, next) => {
     let filteredUsers = [];
     let attempts = 0;
 
-    // Repetir el proceso hasta obtener al menos 4 usuarios o un máximo de 5 intentos
+    // Intentar garantizar que se obtengan al menos 4 usuarios válidos
     while (filteredUsers.length < 4 && attempts < 5) {
       attempts++;
 
-      // Seleccionar aleatoriamente 6 IDs
-      const randomIds = selectRandomIds(userIds, 6);
+      // Seleccionar un mayor número de IDs al azar para aumentar las probabilidades
+      const randomIds = selectRandomIds(userIds, 10);
 
       // Buscar usuarios y poblar campos
       const randomUsers = await User.find({ _id: { $in: randomIds } })
@@ -1202,19 +1203,54 @@ export const getRandomUsers = async (req, res, next) => {
           },
           {
             path: "workerData.services.subServices",
-            select: "name imgUrl duration price isActive",
+            select: "name imgUrl duration price isActive multiple",
             model: "Subservice",
             match: { isActive: true },
           },
         ]);
 
-      // Filtrar usuarios cuyos servicios estén vacíos
-      filteredUsers = randomUsers.filter((user) => {
-        user.workerData.services = user.workerData.services.filter(
-          (service) => service.id
-        );
-        return user.workerData.services.length > 0;
-      });
+      // Filtrar subservicios activos y mantener solo los relevantes
+      const validUsers = await Promise.all(
+        randomUsers.map(async (user) => {
+          const updatedServices = await Promise.all(
+            user.workerData.services.map(async (service) => {
+              const activeSubServices = await ScheduleMultiple.find({
+                user: user._id,
+                subService: { $in: service.subServices.map((sub) => sub._id) },
+                isActive: true,
+                "schedules.isActive": true,
+              }).select("subService");
+
+              const activeSubServiceIds = activeSubServices.map(
+                (schedule) => schedule.subService
+              );
+
+              // Filtrar los subservices activos
+              const filteredSubServices = service.subServices.filter((sub) =>
+                activeSubServiceIds.includes(sub._id.toString())
+              );
+
+              // Retornar solo si hay subservices activos
+              return filteredSubServices.length > 0
+                ? {
+                    ...service.toObject(),
+                    subServices: filteredSubServices,
+                  }
+                : null;
+            })
+          );
+
+          // Filtrar servicios sin subservices activos
+          user.workerData.services = updatedServices.filter(
+            (service) => service
+          );
+
+          return user.workerData.services.length > 0 ? user : null;
+        })
+      );
+
+      // Filtrar usuarios no válidos
+      filteredUsers = validUsers.filter((user) => user);
 
       // Si hay al menos 4 usuarios válidos, detener el bucle
       if (filteredUsers.length >= 4) break;

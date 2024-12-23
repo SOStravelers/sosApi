@@ -569,7 +569,7 @@ export const getServicesWorker = async (req, res, next) => {
         path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
         select: "name imgUrl ",
         model: "Service", // Modelo de "Service"
-        match: { isActive: true }, // Solo selecciona los servicios activos
+        // match: { isActive: true }, // Solo selecciona los servicios activos
       })
       .populate({
         path: "workerData.services.subServices", // Poblar "subServices" dentro de "services"
