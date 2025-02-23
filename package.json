@@ -45,7 +45,8 @@
     "uuid": "^9.0.0",
     "web-push": "^3.6.7",
     "whatsapp-web.js": "^1.26.0",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "wwebjs-mongo": "^1.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
