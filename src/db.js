@@ -40,8 +40,14 @@ mongoose
         backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
       puppeteer: {
-        executablePath: executablePath, // Asegúrate de que esta sea la ruta correcta de tu ejecutable
-        args: ["--no-sandbox", "--disable-setuid-sandbox", "--headless"], // Añadir estos argumentos
+        executablePath: executablePath, // Ruta de Chromium
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--headless", // Ejecutar en modo headless
+          "--disable-gpu", // Deshabilitar GPU, útil en entornos de contenedor
+          "--window-size=1280x800", // Especifica el tamaño de la ventana
+        ],
       },
     });
 
