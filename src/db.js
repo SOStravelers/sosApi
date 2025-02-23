@@ -3,11 +3,9 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
-import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
 // import qrcode from "qrcode-terminal";
 import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 import qrcode from "qrcode";
-import fs from "fs";
 // 🔹 Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
@@ -30,7 +28,6 @@ mongoose
 
     // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
     const store = new MongoStore({ mongoose });
-
     const client = new Client({
       authStrategy: new RemoteAuth({
         store,
@@ -41,6 +38,8 @@ mongoose
         args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
       },
     });
+
+    let qrGenerated = false; // Variable de control para verificar si ya se generó el QR
 
     client.on("qr", async (qr) => {
       if (qrGenerated) {
