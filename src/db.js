@@ -27,11 +27,12 @@ mongoose
   .connect(dbConfig[env], { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("✅ Conectado a MongoDB");
-
-    // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
-    const store = new MongoStore({ mongoose });
     const executablePath =
       process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
+    console.log("casa", process.env.PUPPETEER_EXECUTABLE_PATH);
+    console.log("Ejecutable de Chromium:", executablePath);
+    // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
+    const store = new MongoStore({ mongoose });
     const client = new Client({
       authStrategy: new RemoteAuth({
         store,

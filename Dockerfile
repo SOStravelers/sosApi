@@ -36,7 +36,7 @@ RUN apt-get update && \
     chromium
 
 # Verificar la instalación de Chromium
-RUN which chromium
+RUN which chromium && chromium --version
 
 # Copiar el resto de los archivos del proyecto al contenedor
 COPY . .
