@@ -7,7 +7,7 @@ import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
 import qrcode from "qrcode-terminal";
 import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 
-const fs = require("fs"); // Asegúrate de tener acceso al sistema de archivos
+import fs from "fs";
 // 🔹 Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
