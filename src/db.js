@@ -3,9 +3,11 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
-import puppeteer from "puppeteer-core"; // Asegúrate de importarlo
+import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
 import qrcode from "qrcode-terminal";
+import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 
+const fs = require("fs"); // Asegúrate de tener acceso al sistema de archivos
 // 🔹 Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
@@ -39,9 +41,26 @@ mongoose
       },
     });
 
-    client.on("qr", (qr) => {
+    client.on("qr", async (qr) => {
       console.log("🔗 Escanea este QR en WhatsApp Web:");
-      qrcode.generate(qr, { small: false }); // Cambia a 'false' para el tamaño normal
+
+      // Generar el QR y guardarlo en un archivo local
+      const qrFilePath = "./qrcode.png"; // Archivo temporal local
+      qrcode.generate(qr, { small: true }, async (qrcodeGenerated) => {
+        fs.writeFileSync(qrFilePath, qrcodeGenerated, "utf8"); // Guardar el QR como un archivo .png
+
+        // Subir el archivo QR a S3 dentro de la carpeta 'whatsappQr'
+        const file = {
+          fileName: `whatsappQr/${Date.now()}_qrcode.png`, // Nombre único con timestamp
+          buffer: fs.readFileSync(qrFilePath), // Leer el archivo QR
+        };
+
+        const uploadResult = await AwsUploadFile(file); // Usar tu función de carga a S3
+        console.log("Archivo QR cargado en S3:", uploadResult.url); // Imprimir URL de acceso
+
+        // Eliminar el archivo temporal después de subirlo a S3
+        fs.unlinkSync(qrFilePath); // Borrar el archivo local después de cargarlo
+      });
     });
 
     client.on("ready", () => {
