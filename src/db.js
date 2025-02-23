@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import envar from "./config/envar.js";
-import { Client, RemoteAuth } from "whatsapp-web.js";
 import { MongoStore } from "wwebjs-mongo";
+import pkg from "whatsapp-web.js";
+const { Client, RemoteAuth } = pkg;
 import qrcode from "qrcode-terminal";
 
 // 🔹 Definir credenciales desde variables de entorno
