@@ -21,39 +21,37 @@ console.log(`📡 Conectando a la base de datos: ${env}`);
 mongoose.set("strictQuery", false);
 mongoose
   .connect(dbConfig[env], { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ Conectado a MongoDB"))
+  .then(() => {
+    console.log("✅ Conectado a MongoDB");
+
+    // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
+    const store = new MongoStore({ mongoose });
+
+    const client = new Client({
+      authStrategy: new RemoteAuth({
+        store,
+        clientId: "whatsapp-bot",
+        backupSyncIntervalMs: 60000, // 🔹 Mínimo 1 minuto
+      }),
+    });
+
+    client.on("qr", (qr) => {
+      console.log("🔗 Escanea este QR en WhatsApp Web:");
+      qrcode.generate(qr, { small: true });
+    });
+
+    client.on("ready", () => {
+      console.log("✅ Bot conectado a WhatsApp sin necesidad de escanear QR.");
+    });
+
+    client.on("message", async (message) => {
+      if (message.body.toLowerCase() === "hola hola sos") {
+        await message.reply("Hola soy el chatbot, estoy para ayudarte 🤖");
+      }
+    });
+
+    client.initialize();
+  })
   .catch((err) => console.error("❌ Error al conectar a MongoDB:", err));
-
-const store = new MongoStore({ mongoose: mongoose });
-
-// 🔹 Configurar el cliente de WhatsApp con autenticación persistente
-const client = new Client({
-  authStrategy: new RemoteAuth({
-    store,
-    clientId: "whatsapp-bot",
-    backupSyncIntervalMs: 60000, // 🔹 Mínimo 1 minuto
-  }),
-});
-
-// 🔹 Generar QR si es necesario
-client.on("qr", (qr) => {
-  console.log("🔗 Escanea este QR en WhatsApp Web:");
-  qrcode.generate(qr, { small: true });
-});
-
-// 🔹 Confirmar que el bot está listo
-client.on("ready", () => {
-  console.log("✅ Bot conectado a WhatsApp sin necesidad de escanear QR.");
-});
-
-// 🔹 Manejo de mensajes
-client.on("message", async (message) => {
-  if (message.body.toLowerCase() === "hola hola sos") {
-    await message.reply("Hola soy el chatbot, estoy para ayudarte 🤖");
-  }
-});
-
-// 🔹 Inicializar el bot
-client.initialize();
 
 export default mongoose.connection;
