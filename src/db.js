@@ -4,7 +4,7 @@ import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
 import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
-import qrcode from "qrcode-terminal";
+// import qrcode from "qrcode-terminal";
 import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 import qrcode from "qrcode";
 import fs from "fs";
