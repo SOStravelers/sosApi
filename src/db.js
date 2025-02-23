@@ -44,28 +44,22 @@ mongoose
     client.on("qr", async (qr) => {
       console.log("🔗 Escanea este QR en WhatsApp Web:");
 
-      // Generar el QR y guardarlo en un archivo .png
-      const qrFilePath = "./qrcode.png"; // Archivo temporal local
+      try {
+        // Generar el QR como buffer de imagen (PNG)
+        const buffer = await qrcode.toBuffer(qr); // Usamos toBuffer para obtener la imagen binaria
 
-      // Usar qrcode.toFile para generar un archivo de imagen binario
-      qrcode.toFile(qrFilePath, qr, async (err) => {
-        if (err) {
-          console.error("Error generando el QR:", err);
-          return;
-        }
-
-        // Subir el archivo QR a S3 dentro de la carpeta 'whatsappQr'
+        // Crear el archivo para S3
         const file = {
           fileName: `whatsappQr/${Date.now()}_qrcode.png`, // Nombre único con timestamp
-          buffer: fs.readFileSync(qrFilePath), // Leer el archivo QR generado
+          buffer: buffer, // Buffer del QR generado
         };
 
+        // Subir el archivo QR a S3
         const uploadResult = await AwsUploadFile(file); // Usar tu función de carga a S3
         console.log("Archivo QR cargado en S3:", uploadResult.url); // Imprimir URL de acceso
-
-        // Eliminar el archivo temporal después de subirlo a S3
-        fs.unlinkSync(qrFilePath); // Borrar el archivo local después de cargarlo
-      });
+      } catch (err) {
+        console.error("Error generando el QR o subiendo a S3:", err);
+      }
     });
 
     client.on("ready", () => {
