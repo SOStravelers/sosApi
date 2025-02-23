@@ -253,57 +253,57 @@ export const transferPaymentsStripe = async (data) => {
     const ownerShare = Math.round(totalAmount * 0.4);
 
     // Realizar transferencias
-    // const transferProvider = await stripe.transfers.create({
-    //   amount: providerShare,
-    //   currency: paymentIntent.currency,
-    //   destination: "acct_1QXAPQQmwgOl0zRD",
-    //   source_transaction: chargeId,
-    //   description: "W-" + paymentIntent.description,
-    //   metadata: {
-    //     paymentIntentId: paymentIntentId,
-    //     clientName: paymentIntent.metadata.clientName,
-    //     service: paymentIntent.metadata.service,
-    //     subservice: paymentIntent.metadata.subservice,
-    //     date: paymentIntent.metadata.date,
-    //     startTime: paymentIntent.metadata.startTime,
-    //     clientsNumber: paymentIntent.metadata.clientsNumber,
-    //     language: paymentIntent.metadata.language,
-    //   },
-    // });
+    const transferProvider = await stripe.transfers.create({
+      amount: providerShare,
+      currency: paymentIntent.currency,
+      destination: "acct_1QmKoz02p3T0U7Hk",
+      source_transaction: chargeId,
+      description: "W-" + paymentIntent.description,
+      metadata: {
+        paymentIntentId: paymentIntentId,
+        clientName: paymentIntent.metadata.clientName,
+        service: paymentIntent.metadata.service,
+        subservice: paymentIntent.metadata.subservice,
+        date: paymentIntent.metadata.date,
+        startTime: paymentIntent.metadata.startTime,
+        clientsNumber: paymentIntent.metadata.clientsNumber,
+        language: paymentIntent.metadata.language,
+      },
+    });
 
-    // const loginLink1 = await stripe.accounts.createLoginLink(
-    //   "acct_1QXAPQQmwgOl0zRD"
-    // );
+    const loginLink1 = await stripe.accounts.createLoginLink(
+      "acct_1QmKoz02p3T0U7Hk"
+    );
 
-    // console.log("Login Link:", loginLink1.url);
+    console.log("Login Link:", loginLink1.url);
 
-    // const transferOwner = await stripe.transfers.create({
-    //   amount: ownerShare,
-    //   currency: paymentIntent.currency,
-    //   destination: "acct_1QXB9kH25M0VH3l6",
-    //   source_transaction: chargeId,
-    //   description: "B-" + paymentIntent.description,
-    //   metadata: {
-    //     paymentIntentId: paymentIntentId,
-    //     clientName: paymentIntent.metadata.clientName,
-    //     service: paymentIntent.metadata.service,
-    //     subservice: paymentIntent.metadata.subservice,
-    //     date: paymentIntent.metadata.date,
-    //     startTime: paymentIntent.metadata.startTime,
-    //     clientsNumber: paymentIntent.metadata.clientsNumber,
-    //     language: paymentIntent.metadata.language,
-    //   },
-    // });
+    const transferOwner = await stripe.transfers.create({
+      amount: ownerShare,
+      currency: paymentIntent.currency,
+      destination: "acct_1QXB9kH25M0VH3l6",
+      source_transaction: chargeId,
+      description: "B-" + paymentIntent.description,
+      metadata: {
+        paymentIntentId: paymentIntentId,
+        clientName: paymentIntent.metadata.clientName,
+        service: paymentIntent.metadata.service,
+        subservice: paymentIntent.metadata.subservice,
+        date: paymentIntent.metadata.date,
+        startTime: paymentIntent.metadata.startTime,
+        clientsNumber: paymentIntent.metadata.clientsNumber,
+        language: paymentIntent.metadata.language,
+      },
+    });
 
-    // const loginLink2 = await stripe.accounts.createLoginLink(
-    //   "acct_1QXB9kH25M0VH3l6"
-    // );
-    // console.log("Login Link:", loginLink2.url);
+    const loginLink2 = await stripe.accounts.createLoginLink(
+      "acct_1QXB9kH25M0VH3l6"
+    );
+    console.log("Login Link:", loginLink2.url);
 
-    // logger.info("Transferencias realizadas con éxito:", {
-    //   provider: transferProvider,
-    //   owner: transferOwner,
-    // });
+    logger.info("Transferencias realizadas con éxito:", {
+      provider: transferProvider,
+      owner: transferOwner,
+    });
 
     return { priceBRL };
   } catch (error) {
