@@ -28,7 +28,11 @@ const store = new MongoStore({ mongoose: mongoose });
 
 // 🔹 Configurar el cliente de WhatsApp con autenticación persistente
 const client = new Client({
-  authStrategy: new RemoteAuth({ store, clientId: "whatsapp-bot" }),
+  authStrategy: new RemoteAuth({
+    store,
+    clientId: "whatsapp-bot",
+    backupSyncIntervalMs: 60000, // 🔹 Mínimo 1 minuto
+  }),
 });
 
 // 🔹 Generar QR si es necesario
