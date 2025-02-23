@@ -1,26 +1,27 @@
-# Utilizar una imagen base que soporte Node.js
-FROM node:20.10.0
+# Usar una imagen base de Node.js
+FROM node:20.10.0-buster
 
-# Directorio de trabajo
+# Setear el directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Copiar los archivos necesarios
-COPY . .
+# Copiar los archivos package.json y package-lock.json al contenedor
+COPY package*.json ./
 
-# Instalar dependencias
+# Instalar las dependencias de Node.js
 RUN npm install
 
-# Instalar Chromium
-RUN apt-get update && apt-get install -y \
-    chromium \
-    libgbm1 \
-    libvulkan1
+# Instalar dependencias para Chromium
+RUN apt-get update && \
+    apt-get install -y wget ca-certificates \
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && dpkg -i google-chrome-stable_current_amd64.deb \
+    && apt-get install -f -y
 
-# Exponer el puerto en el que la app escuchará
-EXPOSE 3000
+# Copiar el resto de los archivos del proyecto al contenedor
+COPY . .
 
-# Establecer la variable de entorno que Puppeteer necesita
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+# Exponer el puerto que va a usar la aplicación
+EXPOSE 8080
 
-# Comando para iniciar la aplicación
+# Comando para ejecutar la aplicación
 CMD ["npm", "start"]
