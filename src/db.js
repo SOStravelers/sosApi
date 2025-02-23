@@ -52,7 +52,7 @@ mongoose
         ],
       },
     });
-
+    console.log("wena");
     client
       .initialize()
       .then(() => {
@@ -61,8 +61,9 @@ mongoose
       .catch((err) => {
         console.error("Error al inicializar el cliente de WhatsApp:", err);
       });
-
+    console.log("wena2");
     client.on("qr", async (qr) => {
+      console.log("wena3");
       if (qrGenerated) {
         console.log("QR ya ha sido generado y subido previamente.");
         return; // Si el QR ya se generó, no hacer nada
