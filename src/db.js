@@ -3,6 +3,7 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
+import puppeteer from "puppeteer-core"; // Asegúrate de importarlo
 import qrcode from "qrcode-terminal";
 
 // 🔹 Definir credenciales desde variables de entorno
@@ -31,8 +32,10 @@ mongoose
       authStrategy: new RemoteAuth({
         store,
         clientId: "whatsapp-bot",
-        backupSyncIntervalMs: 60000, // 🔹 Mínimo 1 minuto
       }),
+      puppeteer: {
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      },
     });
 
     client.on("qr", (qr) => {
