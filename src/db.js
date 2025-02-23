@@ -31,7 +31,7 @@ mongoose
     // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
     const store = new MongoStore({ mongoose });
     const executablePath =
-      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium"; // Asegúrate de usar Chromium
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
     const client = new Client({
       authStrategy: new RemoteAuth({
         store,

@@ -10,7 +10,7 @@ COPY package*.json ./
 # Instalar las dependencias de Node.js
 RUN npm install
 
-# Instalar las dependencias necesarias para Chromium
+# Instalar dependencias necesarias para Chromium
 RUN apt-get update && \
     apt-get install -y \
     wget \
@@ -32,13 +32,11 @@ RUN apt-get update && \
     libxfixes3 \
     libxkbcommon0 \
     libxrandr2 \
-    xdg-utils && \
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    dpkg -i google-chrome-stable_current_amd64.deb && \
-    apt-get install -f -y
+    xdg-utils \
+    chromium
 
 # Verificar la instalación de Chromium
-RUN which google-chrome-stable
+RUN which chromium
 
 # Copiar el resto de los archivos del proyecto al contenedor
 COPY . .
