@@ -76,7 +76,7 @@ mongoose
 
     client.on("message", async (message) => {
       console.log("mensaje", message);
-      if (message.body.toLowerCase() === "hola hola sos") {
+      if (message.body.toLowerCase() === "wena papito") {
         await message.reply("Hola soy el chatbot, estoy para ayudartess 🤖");
       }
     });
