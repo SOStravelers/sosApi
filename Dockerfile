@@ -35,6 +35,8 @@ RUN apt-get update && \
     xdg-utils \
     chromium
 
+
+RUN echo "Forzando la reconstrucción para ver la instalación de Chromium"
 # Verificar la instalación de Chromium
 RUN which chromium && chromium --version
 
