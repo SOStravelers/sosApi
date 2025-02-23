@@ -51,9 +51,14 @@ mongoose
         ],
       },
     });
-    client.initialize().catch((err) => {
-      console.error("Error al inicializar el cliente de WhatsApp:", err);
-    });
+    client
+      .initialize()
+      .then(() => {
+        console.log("Cliente de WhatsApp inicializado correctamente.");
+      })
+      .catch((err) => {
+        console.error("Error al inicializar el cliente de WhatsApp:", err);
+      });
     console.log("entrando2");
     client.on("qr", async (qr) => {
       console.log("entrando3");
