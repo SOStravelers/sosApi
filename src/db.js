@@ -39,7 +39,7 @@ mongoose
         backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
       puppeteer: {
-        executablePath: "/usr/bin/google-chrome-stable", // Asegúrate de que esta sea la ruta correcta de tu ejecutable
+        executablePath: executablePath, // Asegúrate de que esta sea la ruta correcta de tu ejecutable
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--headless"], // Añadir estos argumentos
       },
     });
