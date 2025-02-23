@@ -73,6 +73,9 @@ mongoose
     client.on("ready", () => {
       console.log("✅ Bot conectado a WhatsApp sin necesidad de escanear QR.");
     });
+    client.on("auth_failure", (message) => {
+      console.log("❌ Error de autenticación:", message);
+    });
 
     client.on("message", async (message) => {
       console.log("Mensaje recibido: ", message.body); // Imprime solo el texto del mensaje
