@@ -3,11 +3,12 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
-import puppeteer from "puppeteer-core"; // Asegúrate de importarlo
+import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
+// import qrcode from "qrcode-terminal";
 import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 import qrcode from "qrcode";
-
-// Definir credenciales desde variables de entorno
+import fs from "fs";
+// 🔹 Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
   local: "mongodb://localhost:27017/sosLocal",
@@ -19,7 +20,7 @@ const dbConfig = {
 const env = process.env.NODE_ENV || "dev";
 console.log(`📡 Conectando a la base de datos: ${env}`);
 
-// Conectar a MongoDB
+// 🔹 Conectar a MongoDB
 mongoose.set("strictQuery", false);
 let qrGenerated = false;
 mongoose
@@ -27,43 +28,21 @@ mongoose
   .then(() => {
     console.log("✅ Conectado a MongoDB");
 
-    // Usar Chromium desde Puppeteer
-    const executablePath =
-      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
-    console.log("Ejecutable de Chromium:", executablePath);
-
-    // Inicializar cliente de WhatsApp
+    // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
     const store = new MongoStore({ mongoose });
 
     const client = new Client({
       authStrategy: new RemoteAuth({
-        store, // Solo MongoStore como persistencia
+        store,
         clientId: "whatsapp-bot",
-        backupSyncIntervalMs: 60000, // Configura el intervalo de respaldo a 1 minuto
+        backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
       puppeteer: {
-        executablePath: executablePath, // Ruta de Chromium
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--headless", // Ejecutar en modo headless
-          "--disable-gpu", // Deshabilitar GPU
-          "--window-size=1280x800", // Especificar el tamaño de la ventana
-        ],
+        args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
       },
     });
-    console.log("wena");
-    client
-      .initialize()
-      .then(() => {
-        console.log("Cliente de WhatsApp inicializado correctamente.");
-      })
-      .catch((err) => {
-        console.error("Error al inicializar el cliente de WhatsApp:", err);
-      });
-    console.log("wena2");
+
     client.on("qr", async (qr) => {
-      console.log("wena3");
       if (qrGenerated) {
         console.log("QR ya ha sido generado y subido previamente.");
         return; // Si el QR ya se generó, no hacer nada
@@ -94,7 +73,6 @@ mongoose
     client.on("ready", () => {
       console.log("✅ Bot conectado a WhatsApp sin necesidad de escanear QR.");
     });
-
     client.on("auth_failure", (message) => {
       console.log("❌ Error de autenticación:", message);
     });
@@ -106,6 +84,8 @@ mongoose
         await message.reply("Hola soy el chatbot, estoy para ayudartess 🤖");
       }
     });
+
+    client.initialize();
   })
   .catch((err) => console.error("❌ Error al conectar a MongoDB:", err));
 
