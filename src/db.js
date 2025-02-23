@@ -32,9 +32,10 @@ mongoose
       authStrategy: new RemoteAuth({
         store,
         clientId: "whatsapp-bot",
+        backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
       puppeteer: {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
       },
     });
 
