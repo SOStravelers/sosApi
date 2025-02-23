@@ -33,6 +33,7 @@ mongoose
     console.log("Ejecutable de Chromium:", executablePath);
     // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
     const store = new MongoStore({ mongoose });
+    console.log("entrando1");
     const client = new Client({
       authStrategy: new RemoteAuth({
         store,
@@ -50,8 +51,9 @@ mongoose
         ],
       },
     });
-
+    console.log("entrando2");
     client.on("qr", async (qr) => {
+      console.log("entrando3");
       if (qrGenerated) {
         console.log("QR ya ha sido generado y subido previamente.");
         return; // Si el QR ya se generó, no hacer nada
