@@ -6,9 +6,8 @@ const { Client, RemoteAuth } = pkg;
 import puppeteer from "puppeteer-core"; // Asegúrate de importarlo
 import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 import qrcode from "qrcode";
-import fs from "fs";
 
-// 🔹 Definir credenciales desde variables de entorno
+// Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
   local: "mongodb://localhost:27017/sosLocal",
@@ -20,25 +19,27 @@ const dbConfig = {
 const env = process.env.NODE_ENV || "dev";
 console.log(`📡 Conectando a la base de datos: ${env}`);
 
-// 🔹 Conectar a MongoDB
+// Conectar a MongoDB
 mongoose.set("strictQuery", false);
 let qrGenerated = false;
 mongoose
   .connect(dbConfig[env], { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("✅ Conectado a MongoDB");
+
+    // Usar Chromium desde Puppeteer
     const executablePath =
       process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
-    console.log("casa", process.env.PUPPETEER_EXECUTABLE_PATH);
     console.log("Ejecutable de Chromium:", executablePath);
-    // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
+
+    // Inicializar cliente de WhatsApp
     const store = new MongoStore({ mongoose });
-    console.log("entrando1");
+
     const client = new Client({
       authStrategy: new RemoteAuth({
-        store,
+        store, // Solo MongoStore como persistencia
         clientId: "whatsapp-bot",
-        backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
+        backupSyncIntervalMs: 60000, // Configura el intervalo de respaldo a 1 minuto
       }),
       puppeteer: {
         executablePath: executablePath, // Ruta de Chromium
@@ -46,11 +47,12 @@ mongoose
           "--no-sandbox",
           "--disable-setuid-sandbox",
           "--headless", // Ejecutar en modo headless
-          "--disable-gpu", // Deshabilitar GPU, útil en entornos de contenedor
-          "--window-size=1280x800", // Especifica el tamaño de la ventana
+          "--disable-gpu", // Deshabilitar GPU
+          "--window-size=1280x800", // Especificar el tamaño de la ventana
         ],
       },
     });
+
     client
       .initialize()
       .then(() => {
@@ -59,9 +61,8 @@ mongoose
       .catch((err) => {
         console.error("Error al inicializar el cliente de WhatsApp:", err);
       });
-    console.log("entrando2");
+
     client.on("qr", async (qr) => {
-      console.log("entrando3");
       if (qrGenerated) {
         console.log("QR ya ha sido generado y subido previamente.");
         return; // Si el QR ya se generó, no hacer nada
@@ -104,8 +105,6 @@ mongoose
         await message.reply("Hola soy el chatbot, estoy para ayudartess 🤖");
       }
     });
-
-    client.initialize();
   })
   .catch((err) => console.error("❌ Error al conectar a MongoDB:", err));
 
