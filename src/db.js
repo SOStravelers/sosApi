@@ -3,11 +3,11 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
-import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
-// import qrcode from "qrcode-terminal";
+import puppeteer from "puppeteer-core"; // Asegúrate de importarlo
 import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 import qrcode from "qrcode";
 import fs from "fs";
+
 // 🔹 Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
@@ -38,7 +38,8 @@ mongoose
         backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
       puppeteer: {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
+        executablePath: "/usr/bin/google-chrome-stable", // Asegúrate de que esta sea la ruta correcta de tu ejecutable
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--headless"], // Añadir estos argumentos
       },
     });
 
@@ -73,6 +74,7 @@ mongoose
     client.on("ready", () => {
       console.log("✅ Bot conectado a WhatsApp sin necesidad de escanear QR.");
     });
+
     client.on("auth_failure", (message) => {
       console.log("❌ Error de autenticación:", message);
     });
