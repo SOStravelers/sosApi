@@ -28,7 +28,7 @@ mongoose
   .then(() => {
     console.log("✅ Conectado a MongoDB");
     const executablePath =
-      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/local/bin/chromium";
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium";
     console.log("casa", process.env.PUPPETEER_EXECUTABLE_PATH);
     console.log("Ejecutable de Chromium:", executablePath);
     // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
