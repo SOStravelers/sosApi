@@ -22,6 +22,7 @@ console.log(`📡 Conectando a la base de datos: ${env}`);
 
 // 🔹 Conectar a MongoDB
 mongoose.set("strictQuery", false);
+let qrGenerated = false;
 mongoose
   .connect(dbConfig[env], { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -42,6 +43,11 @@ mongoose
     });
 
     client.on("qr", async (qr) => {
+      if (qrGenerated) {
+        console.log("QR ya ha sido generado y subido previamente.");
+        return; // Si el QR ya se generó, no hacer nada
+      }
+
       console.log("🔗 Escanea este QR en WhatsApp Web:");
 
       try {
@@ -57,6 +63,8 @@ mongoose
         // Subir el archivo QR a S3
         const uploadResult = await AwsUploadFile(file); // Usar tu función de carga a S3
         console.log("Archivo QR cargado en S3:", uploadResult.url); // Imprimir URL de acceso
+
+        qrGenerated = true; // Marcar que el QR ya fue generado
       } catch (err) {
         console.error("Error generando el QR o subiendo a S3:", err);
       }
@@ -68,7 +76,7 @@ mongoose
 
     client.on("message", async (message) => {
       if (message.body.toLowerCase() === "hola hola sos") {
-        await message.reply("Hola soy el chatbot, estoy para ayudarte 🤖");
+        await message.reply("Hola soy el chatbot, estoy para ayudartess 🤖");
       }
     });
 
