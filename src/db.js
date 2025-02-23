@@ -41,7 +41,7 @@ mongoose
 
     client.on("qr", (qr) => {
       console.log("🔗 Escanea este QR en WhatsApp Web:");
-      qrcode.generate(qr, { small: true });
+      qrcode.generate(qr, { small: false }); // Cambia a 'false' para el tamaño normal
     });
 
     client.on("ready", () => {
