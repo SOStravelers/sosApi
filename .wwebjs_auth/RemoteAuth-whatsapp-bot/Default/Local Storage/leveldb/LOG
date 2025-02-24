@@ -1,5 +1,7 @@
-2025/02/23-22:17:39.696 45 Reusing MANIFEST /app/.wwebjs_auth/RemoteAuth-whatsapp-bot/Default/Local Storage/leveldb/MANIFEST-000001
-2025/02/23-22:17:39.707 45 Recovering log #3
-2025/02/23-22:17:39.707 45 (ignoring error) /app/.wwebjs_auth/RemoteAuth-whatsapp-bot/Default/Local Storage/leveldb/000003.log: dropping 32768 bytes; Corruption: checksum mismatch
-2025/02/23-22:17:39.707 45 (ignoring error) /app/.wwebjs_auth/RemoteAuth-whatsapp-bot/Default/Local Storage/leveldb/000003.log: dropping 2332 bytes; Corruption: missing start of fragmented record(2)
-2025/02/23-22:17:39.709 45 Reusing old log /app/.wwebjs_auth/RemoteAuth-whatsapp-bot/Default/Local Storage/leveldb/000003.log 
+2025/02/23-21:13:16.992 9d03 Reusing MANIFEST /Users/unabase/Desktop/SOS/2. back/sosApi/.wwebjs_auth/RemoteAuth-whatsapp-bot/Default/Local Storage/leveldb/MANIFEST-000001
+2025/02/23-21:13:16.993 9d03 Recovering log #3
+2025/02/23-21:13:16.993 9d03 Level-0 table #3: started
+2025/02/23-21:13:16.998 9d03 Level-0 table #3: 16986 bytes OK
+2025/02/23-21:13:16.998 9d03 Level-0 table #4: started
+2025/02/23-21:13:17.003 9d03 Level-0 table #4: 6735 bytes OK
+2025/02/23-21:13:17.012 9d03 Delete type=0 #3

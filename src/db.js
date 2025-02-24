@@ -38,8 +38,7 @@ mongoose
         backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
       puppeteer: {
-        browserWSEndpoint:
-          "wss://chrome.browserless.io?token=RpTXyprztNFYUla724565989a63883ae3d76fec72e", // Reemplaza con tu API Key
+        args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
       },
     });
 
