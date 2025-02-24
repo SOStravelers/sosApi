@@ -28,7 +28,7 @@ mongoose
 
     // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
     const store = new MongoStore({ mongoose });
-
+    console.log("casa1");
     const client = new Client({
       authStrategy: new RemoteAuth({
         store,
@@ -39,6 +39,7 @@ mongoose
         args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
       },
     });
+    console.log("🟢 Cliente creado, inicializando...");
 
     let qrGenerated = false; // Variable de control para verificar si ya se generó el QR
 
