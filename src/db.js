@@ -3,7 +3,7 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
-import { AwsUploadFile } from "./services/aws_s3";
+import { AwsUploadFile } from "./services/aws_s3.js";
 import qrcode from "qrcode";
 import fs from "fs";
 
