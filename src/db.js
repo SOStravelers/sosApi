@@ -3,9 +3,11 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
+import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
 // import qrcode from "qrcode-terminal";
 import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
 import qrcode from "qrcode";
+import fs from "fs";
 // 🔹 Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
@@ -28,31 +30,18 @@ mongoose
 
     // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
     const store = new MongoStore({ mongoose });
+
     const client = new Client({
       authStrategy: new RemoteAuth({
         store,
         clientId: "whatsapp-bot",
-        backupSyncIntervalMs: 60000,
+        backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
       puppeteer: {
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-gpu",
-          "--disable-dev-shm-usage",
-          "--disable-software-rasterizer",
-          "--disable-extensions",
-          "--disable-background-networking",
-          "--disable-default-apps",
-          "--mute-audio",
-          "--no-zygote",
-          "--single-process",
-          "--headless=new",
-        ],
+        browserWSEndpoint:
+          "wss://chrome.browserless.io?token=RpTXyprztNFYUla724565989a63883ae3d76fec72e", // Reemplaza con tu API Key
       },
     });
-
-    let qrGenerated = false; // Variable de control para verificar si ya se generó el QR
 
     client.on("qr", async (qr) => {
       if (qrGenerated) {
@@ -87,8 +76,7 @@ mongoose
     });
 
     client.on("message", async (message) => {
-      console.log("mensaje", message);
-      if (message.body.toLowerCase() === "wena papito") {
+      if (message.body.toLowerCase() === "hola hola sos") {
         await message.reply("Hola soy el chatbot, estoy para ayudartess 🤖");
       }
     });
