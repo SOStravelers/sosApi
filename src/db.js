@@ -35,8 +35,12 @@ mongoose
         clientId: "whatsapp-bot",
         backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
+      // puppeteer: {
+      //   args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
+      // },
       puppeteer: {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
+        browserWSEndpoint:
+          "wss://chrome.browserless.io?token=RpTXyprztNFYUla724565989a63883ae3d76fec72e", // Usa tu token de Browserless
       },
     });
     console.log("🟢 Cliente creado, inicializando...");
