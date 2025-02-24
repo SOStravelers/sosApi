@@ -2,10 +2,9 @@ import mongoose from "mongoose";
 import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
-const { Client, RemoteAuth } = pkg;
+const { Client, RemoteAuth, LocalAuth } = pkg;
 import { AwsUploadFile } from "./services/aws_s3.js";
 import qrcode from "qrcode";
-import fs from "fs";
 
 // 🔹 Definir credenciales desde variables de entorno
 const config = envar();
@@ -29,22 +28,25 @@ mongoose
     // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
     const store = new MongoStore({ mongoose });
     console.log("casa1");
+
     const client = new Client({
-      authStrategy: new RemoteAuth({
+      authStrategy: new LocalAuth({
         store,
         clientId: "whatsapp-bot",
         backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
       }),
-      // puppeteer: {
-      //   args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
-      // },
       puppeteer: {
-        browserWSEndpoint:
-          "wss://chrome.browserless.io?token=RpTXyprztNFYUla724565989a63883ae3d76fec72e", // Usa tu token de Browserless
+        args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
       },
+      // puppeteer: {
+      //   browserWSEndpoint: "wss://chrome.browserless.io?token=TU_TOKEN", // Usa tu token de Browserless
+      // },
     });
     console.log("🟢 Cliente creado, inicializando...");
 
+    // client.initialize().catch((err) => {
+    //   console.error("❌ Error al inicializar el cliente:", err);
+    // });
     let qrGenerated = false; // Variable de control para verificar si ya se generó el QR
 
     client.on("qr", async (qr) => {
