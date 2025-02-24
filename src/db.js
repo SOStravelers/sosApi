@@ -3,11 +3,10 @@ import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
 const { Client, RemoteAuth } = pkg;
-import puppeteer from "puppeteer-core"; // Asegúratxe de importarlo
-// import qrcode from "qrcode-terminal";
-import { AwsUploadFile } from "./services/aws_s3.js"; // Ajusta el path de importación si es necesario
+import { AwsUploadFile } from "./path-to-your-aws-upload-function";
 import qrcode from "qrcode";
 import fs from "fs";
+
 // 🔹 Definir credenciales desde variables de entorno
 const config = envar();
 const dbConfig = {
@@ -22,7 +21,6 @@ console.log(`📡 Conectando a la base de datos: ${env}`);
 
 // 🔹 Conectar a MongoDB
 mongoose.set("strictQuery", false);
-let qrGenerated = false;
 mongoose
   .connect(dbConfig[env], { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -41,6 +39,8 @@ mongoose
         args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
       },
     });
+
+    let qrGenerated = false; // Variable de control para verificar si ya se generó el QR
 
     client.on("qr", async (qr) => {
       if (qrGenerated) {
@@ -76,7 +76,7 @@ mongoose
 
     client.on("message", async (message) => {
       if (message.body.toLowerCase() === "hola hola sos") {
-        await message.reply("Hola soy el chatbot, estoy para ayudartess 🤖");
+        await message.reply("Hola soy el chatbot, estoy para ayudarte 🤖");
       }
     });
 

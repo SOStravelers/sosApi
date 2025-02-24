@@ -1,7 +1,7 @@
-2025/02/23-21:13:16.992 9d03 Reusing MANIFEST /Users/unabase/Desktop/SOS/2. back/sosApi/.wwebjs_auth/RemoteAuth-whatsapp-bot/Default/Local Storage/leveldb/MANIFEST-000001
-2025/02/23-21:13:16.993 9d03 Recovering log #3
-2025/02/23-21:13:16.993 9d03 Level-0 table #3: started
-2025/02/23-21:13:16.998 9d03 Level-0 table #3: 16986 bytes OK
-2025/02/23-21:13:16.998 9d03 Level-0 table #4: started
-2025/02/23-21:13:17.003 9d03 Level-0 table #4: 6735 bytes OK
-2025/02/23-21:13:17.012 9d03 Delete type=0 #3
+2025/02/23-21:18:20.203 9f03 Reusing MANIFEST /Users/unabase/Desktop/SOS/2. back/sosApi/.wwebjs_auth/RemoteAuth-whatsapp-bot/Default/Local Storage/leveldb/MANIFEST-000001
+2025/02/23-21:18:20.203 9f03 Recovering log #3
+2025/02/23-21:18:20.204 9f03 Level-0 table #3: started
+2025/02/23-21:18:20.214 9f03 Level-0 table #3: 16986 bytes OK
+2025/02/23-21:18:20.214 9f03 Level-0 table #4: started
+2025/02/23-21:18:20.219 9f03 Level-0 table #4: 6735 bytes OK
+2025/02/23-21:18:20.234 9f03 Delete type=0 #3
