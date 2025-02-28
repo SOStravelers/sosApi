@@ -41,8 +41,8 @@ export const aprovedOrder = async (req, res, next) => {
 
 export const paymentIntentStripe = async (req, res, next) => {
   try {
+    console.log("INTENTANDO wena wena");
     const data = req.body;
-    console.log("INTENTANDO");
     const user = req.user;
     const paymentIntent = await createPaymentIntentAutomatic(data, user);
     res.status(200).json({ clientSecret: paymentIntent.client_secret });

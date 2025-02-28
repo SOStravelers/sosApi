@@ -1,2 +1,3 @@
-2025/02/23-23:34:50.250 f703 Creating DB /Users/unabase/Desktop/SOS/2. back/sosApi/.wwebjs_auth/session-whatsapp-bot/Default/Local Storage/leveldb since it was missing.
-2025/02/23-23:34:50.266 f703 Reusing MANIFEST /Users/unabase/Desktop/SOS/2. back/sosApi/.wwebjs_auth/session-whatsapp-bot/Default/Local Storage/leveldb/MANIFEST-000001
+2025/02/28-14:28:20.304 f603 Reusing MANIFEST /Users/unabase/Desktop/SOS/2. back/sosApi/.wwebjs_auth/session-whatsapp-bot/Default/Local Storage/leveldb/MANIFEST-000001
+2025/02/28-14:28:20.305 f603 Recovering log #4
+2025/02/28-14:28:20.307 f603 Reusing old log /Users/unabase/Desktop/SOS/2. back/sosApi/.wwebjs_auth/session-whatsapp-bot/Default/Local Storage/leveldb/000004.log 

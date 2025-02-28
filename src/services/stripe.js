@@ -168,19 +168,20 @@ export const createPaymentIntentAutomatic = async (data, user) => {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
-
-    const userDB = await User.findById(user._id.toString());
-    const customerId = userDB.paymentData?.stripeCustomerId || null;
-
+    let userDB = null;
+    if (user && user._id) {
+      userDB = await User.findById(user._id.toString());
+    }
+    const customerId = userDB?.paymentData?.stripeCustomerId || null;
+    console.log("la ides", customerId);
     // Lógica de cálculo
     const totalAmount = data.amount; // Monto total en centavos
     console.log("Monto total:", totalAmount);
     console.log("la data", data);
     // Crear el PaymentIntent
-    const paymentIntent = await stripe.paymentIntents.create({
+    const dataPayment = {
       amount: totalAmount,
       currency: data.currency || "usd",
-      customer: customerId,
       description: data.service + "-" + data.subservice,
       metadata: {
         clientName:
@@ -196,7 +197,14 @@ export const createPaymentIntentAutomatic = async (data, user) => {
       },
       payment_method_types: ["card"], // Solo tarjetas de crédito
       automatic_payment_methods: { enabled: false }, // Desactiva métodos automáticos con redirecciones
-    });
+    };
+
+    // Agregar customer solo si no es null
+    if (customerId) {
+      dataPayment.customer = customerId;
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(dataPayment);
 
     console.log("PaymentIntent creado:", paymentIntent.id);
     return paymentIntent;
@@ -250,7 +258,7 @@ export const transferPaymentsStripe = async (data) => {
     // Calcular divisiones
     const totalAmount = paymentIntent.amount;
     const providerShare = Math.round(totalAmount * 0.5);
-    const ownerShare = Math.round(totalAmount * 0.4);
+    // const ownerShare = Math.round(totalAmount * 0.4);
 
     // Realizar transferencias
     const transferProvider = await stripe.transfers.create({
@@ -277,32 +285,32 @@ export const transferPaymentsStripe = async (data) => {
 
     console.log("Login Link:", loginLink1.url);
 
-    const transferOwner = await stripe.transfers.create({
-      amount: ownerShare,
-      currency: paymentIntent.currency,
-      destination: "acct_1QXB9kH25M0VH3l6",
-      source_transaction: chargeId,
-      description: "B-" + paymentIntent.description,
-      metadata: {
-        paymentIntentId: paymentIntentId,
-        clientName: paymentIntent.metadata.clientName,
-        service: paymentIntent.metadata.service,
-        subservice: paymentIntent.metadata.subservice,
-        date: paymentIntent.metadata.date,
-        startTime: paymentIntent.metadata.startTime,
-        clientsNumber: paymentIntent.metadata.clientsNumber,
-        language: paymentIntent.metadata.language,
-      },
-    });
+    // const transferOwner = await stripe.transfers.create({
+    //   amount: ownerShare,
+    //   currency: paymentIntent.currency,
+    //   destination: "acct_1QXB9kH25M0VH3l6",
+    //   source_transaction: chargeId,
+    //   description: "B-" + paymentIntent.description,
+    //   metadata: {
+    //     paymentIntentId: paymentIntentId,
+    //     clientName: paymentIntent.metadata.clientName,
+    //     service: paymentIntent.metadata.service,
+    //     subservice: paymentIntent.metadata.subservice,
+    //     date: paymentIntent.metadata.date,
+    //     startTime: paymentIntent.metadata.startTime,
+    //     clientsNumber: paymentIntent.metadata.clientsNumber,
+    //     language: paymentIntent.metadata.language,
+    //   },
+    // });
 
-    const loginLink2 = await stripe.accounts.createLoginLink(
-      "acct_1QXB9kH25M0VH3l6"
-    );
-    console.log("Login Link:", loginLink2.url);
+    // const loginLink2 = await stripe.accounts.createLoginLink(
+    //   "acct_1QXB9kH25M0VH3l6"
+    // );
+    // console.log("Login Link:", loginLink2.url);
 
     logger.info("Transferencias realizadas con éxito:", {
       provider: transferProvider,
-      owner: transferOwner,
+      // owner: transferOwner,
     });
 
     return { priceBRL };
