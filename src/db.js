@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { trusted } from "mongoose";
 import envar from "./config/envar.js";
 import { MongoStore } from "wwebjs-mongo";
 import pkg from "whatsapp-web.js";
@@ -82,13 +82,38 @@ mongoose
     });
 
     client.on("message", async (message) => {
-      if (message.body.toLowerCase() === "hola hola soss") {
-        await message.reply(
-          "Hola soy el chatbot, estoy para ayudartessssss 🤖"
-        );
+      // Convertir el mensaje a minúsculas y eliminar espacios innecesarios
+      const text = message.body.trim();
+
+      // Expresión regular para extraer valores clave
+      const regex =
+        /date\s*=\s*(\S+)\s*subServiceId\s*=\s*(\S+)\s*time\s*=\s*(\S+)\s*nameService\s*=\s*([\w\s]+)\s*nameSubservice\s*=\s*([\w\s]+)\s*price\s*=\s*(\S+)/;
+      const match = text.match(regex);
+
+      if (match) {
+        // Extraer valores del mensaje
+        const [, date, subServiceId, time, nameService, nameSubservice, price] =
+          match;
+
+        // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
+        const workerId = "67577f826779bb536c96fa10";
+
+        // Formatear el isoTime
+        const isoTime = `${date}T${time}:00.000Z`;
+
+        // Reemplazar espacios en `nameSubservice` por %20 para la URL
+        const encodedSubservice = encodeURIComponent(nameSubservice);
+
+        // Construir la URL
+        const url =
+          `https://dev.sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameService=${nameService}&nameSubservice=${encodedSubservice}&price=${price}`
+            .trim()
+            .replace(/\s+/g, "");
+
+        // Responder con la URL generada
+        await message.reply(url);
       }
     });
-
     client.initialize();
   })
   .catch((err) => console.error("❌ Error al conectar a MongoDB:", err));
