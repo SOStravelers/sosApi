@@ -103,7 +103,7 @@ mongoose
 
         // Reemplazar espacios en `nameSubservice` por %20 para la URL
         const encodedSubservice = encodeURIComponent(nameSubservice);
-
+        console.log("minicambio");
         // Construir la URL
         const url =
           `https://dev.sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameService=${nameService}&nameSubservice=${encodedSubservice}&price=${price}`
