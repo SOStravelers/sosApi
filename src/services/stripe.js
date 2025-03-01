@@ -257,14 +257,14 @@ export const transferPaymentsStripe = async (data) => {
 
     // Calcular divisiones
     const totalAmount = paymentIntent.amount;
-    const providerShare = Math.round(totalAmount * 0.5);
+    const providerShare = Math.round(totalAmount * 0.4);
     // const ownerShare = Math.round(totalAmount * 0.4);
 
     // Realizar transferencias
     const transferProvider = await stripe.transfers.create({
       amount: providerShare,
       currency: paymentIntent.currency,
-      destination: "acct_1QmKoz02p3T0U7Hk",
+      destination: "acct_1Qvico027lHvILlU",
       source_transaction: chargeId,
       description: "W-" + paymentIntent.description,
       metadata: {
@@ -280,7 +280,7 @@ export const transferPaymentsStripe = async (data) => {
     });
 
     const loginLink1 = await stripe.accounts.createLoginLink(
-      "acct_1QmKoz02p3T0U7Hk"
+      "acct_1Qvico027lHvILlU"
     );
 
     console.log("Login Link:", loginLink1.url);

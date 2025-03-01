@@ -106,7 +106,7 @@ mongoose
         console.log("minicambio");
         // Construir la URL
         const url =
-          `https://dev.sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameService=${nameService}&nameSubservice=${encodedSubservice}&price=${price}`
+          `http://localhost:3000/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameService=${nameService}&nameSubservice=${encodedSubservice}&price=${price}`
             .trim()
             .replace(/\s+/g, "");
 
