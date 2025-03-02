@@ -158,7 +158,7 @@ export const uploadIconService = async (req, res, next) => {
 export const serviceAndSubservice = async (req, res, next) => {
   global.logger.info("--- GET ALL SERVICES WITH SUBSERVICE ---");
   try {
-    let services = await Service.find({}).select("_id name");
+    let services = await Service.find({ isActive: true }).select("_id name");
     if (services.length > 0) {
       let result = [];
       for (let [index, service] of services.entries()) {
