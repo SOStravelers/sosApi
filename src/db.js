@@ -87,27 +87,30 @@ mongoose
 
       // Expresión regular para extraer valores clave
       const regex =
-        /date\s*=\s*(\S+)\s*subServiceId\s*=\s*(\S+)\s*time\s*=\s*(\S+)\s*nameService\s*=\s*([\w\s]+)\s*nameSubservice\s*=\s*([\w\s]+)\s*price\s*=\s*(\S+)/;
+        /date\s*=\s*(\S+)\s*subServiceId\s*=\s*(\S+)\s*time\s*=\s*(\S+)\s*nameSubservice\s*=\s*([\w\s]+)\s*price\s*=\s*(\S+)/;
       const match = text.match(regex);
 
       if (match) {
         // Extraer valores del mensaje
-        const [, date, subServiceId, time, nameSubservice, price] = match;
+        const date = match[1];
+        const subServiceId = match[2];
+        const time = match[3];
+        const nameSubservice = match[4];
+        const price = match[5];
 
-        // // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
+        console.log("Precio extraído:", price);
+
+        // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
         const workerId = "65312a63c0b1e1658a5a712c";
 
         // Formatear el isoTime
         const isoTime = `${date}T${time}:00.000Z`;
-        //minicambio
-        // Reemplazar espacios en `nameSubservice` por %20 para la URL
+
+        // Reemplazar espacios en nameSubservice por %20 para la URL
         const encodedSubservice = encodeURIComponent(nameSubservice);
-        console.log("minicambio");
+
         // Construir la URL
-        const url =
-          `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameSubservice=${encodedSubservice}&price=${price}`
-            .trim()
-            .replace(/\s+/g, "");
+        const url = `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameSubservice=${encodedSubservice}&price=${price}`;
 
         // Responder con la URL generada
         await message.reply(url);
