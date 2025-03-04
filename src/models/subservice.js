@@ -95,6 +95,7 @@ const subserviceSchema = new Schema(
     multiple: { type: Boolean, default: false },
     hasLimit: { type: Boolean, default: false },
     goChat: { type: Boolean, default: false },
+    //hloa
   },
   { timestamps: true }
 );
