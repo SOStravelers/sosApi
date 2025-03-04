@@ -108,7 +108,7 @@ mongoose
 
         // Formatear el isoTime
         const isoTime = `${date}T${time}:00.000Z`;
-
+        //minicambio
         // Reemplazar espacios en `nameSubservice` por %20 para la URL
         const encodedSubservice = encodeURIComponent(nameSubservice);
         console.log("minicambio");
