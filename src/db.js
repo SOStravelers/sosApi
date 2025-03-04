@@ -92,11 +92,19 @@ mongoose
 
       if (match) {
         // Extraer valores del mensaje
-        const [, date, subServiceId, time, nameService, nameSubservice, price] =
-          match;
+        const [
+          ,
+          date,
+          subServiceId,
+          time,
+          nameService,
+          nameSubservice,
+          price,
+          workerId,
+        ] = match;
 
-        // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
-        const workerId = "67577f826779bb536c96fa10";
+        // // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
+        // const workerId = "67577f826779bb536c96fa10";
 
         // Formatear el isoTime
         const isoTime = `${date}T${time}:00.000Z`;
