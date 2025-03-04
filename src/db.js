@@ -92,19 +92,10 @@ mongoose
 
       if (match) {
         // Extraer valores del mensaje
-        const [
-          ,
-          date,
-          subServiceId,
-          time,
-          nameService,
-          nameSubservice,
-          price,
-          workerId,
-        ] = match;
+        const [, date, subServiceId, time, nameSubservice, price] = match;
 
         // // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
-        // const workerId = "67577f826779bb536c96fa10";
+        const workerId = "65312a63c0b1e1658a5a712c";
 
         // Formatear el isoTime
         const isoTime = `${date}T${time}:00.000Z`;
@@ -114,7 +105,7 @@ mongoose
         console.log("minicambio");
         // Construir la URL
         const url =
-          `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameService=${nameService}&nameSubservice=${encodedSubservice}&price=${price}`
+          `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameSubservice=${encodedSubservice}&price=${price}`
             .trim()
             .replace(/\s+/g, "");
 
