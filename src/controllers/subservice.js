@@ -23,7 +23,8 @@ export const getByService = async (req, res, next) => {
   try {
     let options = {
       // populate,
-      select: "name price duration imgUrl details multiple shortDescription",
+      select:
+        "name price duration imgUrl details multiple shortDescription goChat",
       page: Number(req.query.page) || 1,
       limit: Number(req.query.limit) || 50,
       sort: { updatedAt: -1 },
@@ -127,16 +128,36 @@ export const getPrice = async (req, res, next) => {
 export const infoSubserviceByWorker = async (req, res, next) => {
   global.logger.info("---GET INFO SUBSERVICE BY WORKER---");
 
-  const schedule = await ScheduleMultiple.findOne({
-    subService: req.query.subservice,
-    user: req.query.user,
-  })
-    .select("duration locationInfo mapUrl price details")
-    .lean();
-  const currencyBase = schedule?.currencyCode || "BRL";
-  const thePrice = schedule?.price || 5;
-  const othersCurrency = await botcurrency(thePrice, currencyBase);
-  schedule.prices = othersCurrency;
+  let onlySubservice = strToBool(req.query.onlySubservice);
+  let info = null;
+  function strToBool(str) {
+    return str.toLowerCase() === "true";
+  }
+  if (onlySubservice) {
+    console.log("caso 1");
+    info = await Subservice.findOne({
+      _id: req.query.subservice,
+    });
+  } else {
+    console.log("caso2");
+    info = await ScheduleMultiple.findOne({
+      subService: req.query.subservice,
+      user: req.query.user,
+    })
+      .select("duration locationInfo mapUrl price details")
+      .lean();
+    const currencyBase = info?.currencyCode || "BRL";
+    const thePrice = info?.price || 5;
+    const othersCurrency = await botcurrency(thePrice, currencyBase);
+    info.prices = othersCurrency;
 
-  return res.status(200).json(schedule);
+    const subservice = await Subservice.findOne({
+      _id: req.query.subservice,
+    });
+    console.log("chao", subservice.imgUrl);
+
+    info.imgUrl = subservice.imgUrl;
+  }
+
+  return res.status(200).json(info);
 };

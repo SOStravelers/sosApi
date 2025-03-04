@@ -49,17 +49,50 @@ const populate = [
   },
 ];
 
+const byPassPolMauro = (body) => {
+  try {
+    //para cambiar si es id SOS
+    if (body.workerUser == "65312a63c0b1e1658a5a712c") {
+      //trips or matches
+      console.log("qwe1");
+      if (
+        body.service == "6757137ad2b2668720116ec9" ||
+        body.service == "67c11c4917c3a7a2c353cb1b"
+      ) {
+        console.log("qwe2");
+        //id Pohl
+        body.workerUser = "67c71578fb4fe0941fe494f0";
+        return body;
+      } else {
+        console.log("qwe3");
+        //id Mauro
+        body.workerUser = "67c721b3fb4fe0941fe4959b";
+        return body;
+      }
+    } else {
+      return body;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
 //Crear booking
 export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW BOOKING---");
   try {
     const emailData = req.body.emailData;
     const language = req.body.language;
-    const bookingData = req.body;
+    let bookingData = req.body;
     bookingData.emailData = null;
+
+    console.log("el booking1", bookingData);
+    bookingData = byPassPolMauro(bookingData);
+    console.log("el booking3", bookingData);
     const subService = await Subservice.findById(req.body.subservice);
     const multiple = subService.multiple;
     let booking = new Booking(bookingData);
+    console.log("el booking2", booking);
     booking.firstWorker = booking.workerUser;
     let query = {};
     if (!subService.multiple) {
@@ -102,6 +135,7 @@ export const create = async (req, res, next) => {
       const theBooking = await Booking.findOne({ _id: newBooking._id })
         .populate(populate)
         .exec();
+      console.log("el booking creado", theBooking._id);
       //creando notificaciones:
 
       if (emailData) sendEmailPaymentConfirmation(emailData);

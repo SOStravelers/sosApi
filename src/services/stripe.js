@@ -216,6 +216,7 @@ export const createPaymentIntentAutomatic = async (data, user) => {
 
 export const transferPaymentsStripe = async (data) => {
   logger.info("--- CREATE TRANSFERS STRIPE ---");
+  console.log("dataStripe", data);
   try {
     const { paymentIntentId } = data;
 
@@ -239,80 +240,84 @@ export const transferPaymentsStripe = async (data) => {
       }
     }
     console.log("paso1");
-    // Verificar cargos
-    if (!paymentIntent.latest_charge) {
-      throw new Error("No se encontraron cargos para este PaymentIntent.");
+
+    const cargos = false;
+    let priceBRL = 0;
+    if (cargos == true) {
+      // Verificar cargos
+      if (!paymentIntent.latest_charge) {
+        throw new Error("No se encontraron cargos para este PaymentIntent.");
+      }
+
+      const chargeId = paymentIntent.latest_charge;
+      console.log("Charge ID:", chargeId);
+      console.log("el precio", paymentIntent.amount);
+
+      const charge = await stripe.charges.retrieve(chargeId);
+      const balanceTransaction = await stripe.balanceTransactions.retrieve(
+        charge.balance_transaction
+      );
+
+      priceBRL = balanceTransaction.net / 100;
+
+      // Calcular divisiones
+      const totalAmount = paymentIntent.amount;
+      const providerShare = Math.round(totalAmount * 0.4);
+      // const ownerShare = Math.round(totalAmount * 0.4);
+
+      // Realizar transferencias
+      const transferProvider = await stripe.transfers.create({
+        amount: providerShare,
+        currency: paymentIntent.currency,
+        destination: "acct_1Qvico027lHvILlU",
+        source_transaction: chargeId,
+        description: "W-" + paymentIntent.description,
+        metadata: {
+          paymentIntentId: paymentIntentId,
+          clientName: paymentIntent.metadata.clientName,
+          service: paymentIntent.metadata.service,
+          subservice: paymentIntent.metadata.subservice,
+          date: paymentIntent.metadata.date,
+          startTime: paymentIntent.metadata.startTime,
+          clientsNumber: paymentIntent.metadata.clientsNumber,
+          language: paymentIntent.metadata.language,
+        },
+      });
+
+      const loginLink1 = await stripe.accounts.createLoginLink(
+        "acct_1Qvico027lHvILlU"
+      );
+
+      console.log("Login Link:", loginLink1.url);
+
+      // const transferOwner = await stripe.transfers.create({
+      //   amount: ownerShare,
+      //   currency: paymentIntent.currency,
+      //   destination: "acct_1QXB9kH25M0VH3l6",
+      //   source_transaction: chargeId,
+      //   description: "B-" + paymentIntent.description,
+      //   metadata: {
+      //     paymentIntentId: paymentIntentId,
+      //     clientName: paymentIntent.metadata.clientName,
+      //     service: paymentIntent.metadata.service,
+      //     subservice: paymentIntent.metadata.subservice,
+      //     date: paymentIntent.metadata.date,
+      //     startTime: paymentIntent.metadata.startTime,
+      //     clientsNumber: paymentIntent.metadata.clientsNumber,
+      //     language: paymentIntent.metadata.language,
+      //   },
+      // });
+
+      // const loginLink2 = await stripe.accounts.createLoginLink(
+      //   "acct_1QXB9kH25M0VH3l6"
+      // );
+      // console.log("Login Link:", loginLink2.url);
+
+      logger.info("Transferencias realizadas con éxito:", {
+        provider: transferProvider,
+        // owner: transferOwner,
+      });
     }
-
-    const chargeId = paymentIntent.latest_charge;
-    console.log("Charge ID:", chargeId);
-    console.log("el precio", paymentIntent.amount);
-
-    const charge = await stripe.charges.retrieve(chargeId);
-    const balanceTransaction = await stripe.balanceTransactions.retrieve(
-      charge.balance_transaction
-    );
-
-    const priceBRL = balanceTransaction.net / 100;
-
-    // Calcular divisiones
-    const totalAmount = paymentIntent.amount;
-    const providerShare = Math.round(totalAmount * 0.4);
-    // const ownerShare = Math.round(totalAmount * 0.4);
-
-    // Realizar transferencias
-    const transferProvider = await stripe.transfers.create({
-      amount: providerShare,
-      currency: paymentIntent.currency,
-      destination: "acct_1Qvico027lHvILlU",
-      source_transaction: chargeId,
-      description: "W-" + paymentIntent.description,
-      metadata: {
-        paymentIntentId: paymentIntentId,
-        clientName: paymentIntent.metadata.clientName,
-        service: paymentIntent.metadata.service,
-        subservice: paymentIntent.metadata.subservice,
-        date: paymentIntent.metadata.date,
-        startTime: paymentIntent.metadata.startTime,
-        clientsNumber: paymentIntent.metadata.clientsNumber,
-        language: paymentIntent.metadata.language,
-      },
-    });
-
-    const loginLink1 = await stripe.accounts.createLoginLink(
-      "acct_1Qvico027lHvILlU"
-    );
-
-    console.log("Login Link:", loginLink1.url);
-
-    // const transferOwner = await stripe.transfers.create({
-    //   amount: ownerShare,
-    //   currency: paymentIntent.currency,
-    //   destination: "acct_1QXB9kH25M0VH3l6",
-    //   source_transaction: chargeId,
-    //   description: "B-" + paymentIntent.description,
-    //   metadata: {
-    //     paymentIntentId: paymentIntentId,
-    //     clientName: paymentIntent.metadata.clientName,
-    //     service: paymentIntent.metadata.service,
-    //     subservice: paymentIntent.metadata.subservice,
-    //     date: paymentIntent.metadata.date,
-    //     startTime: paymentIntent.metadata.startTime,
-    //     clientsNumber: paymentIntent.metadata.clientsNumber,
-    //     language: paymentIntent.metadata.language,
-    //   },
-    // });
-
-    // const loginLink2 = await stripe.accounts.createLoginLink(
-    //   "acct_1QXB9kH25M0VH3l6"
-    // );
-    // console.log("Login Link:", loginLink2.url);
-
-    logger.info("Transferencias realizadas con éxito:", {
-      provider: transferProvider,
-      // owner: transferOwner,
-    });
-
     return { priceBRL };
   } catch (error) {
     logger.error("Error realizando transferencias:", error.message);

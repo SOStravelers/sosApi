@@ -6,6 +6,7 @@ import User from "../models/user.js";
 export const newBookingNotification = async (booking, multiple) => {
   try {
     global.logger.info("---NEW BOOKING NOTIFICATION---");
+    console.log("boookingsss", booking);
     const bodyClient = multiple
       ? `New reservation with : ${booking.workerUser.personalData.name.first}`
       : `New reservation at : ${booking.businessUser.businessData.name}`;

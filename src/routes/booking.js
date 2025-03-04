@@ -68,11 +68,11 @@ router.post(
         required: true,
         type: "string",
       },
-      {
-        param_key: "businessUser",
-        required: true,
-        type: "string",
-      },
+      // {
+      //   param_key: "businessUser",
+      //   required: true,
+      //   type: "string",
+      // },
       {
         param_key: "workerUser",
         required: true,
@@ -93,11 +93,11 @@ router.post(
         required: true,
         type: "object",
       },
-      {
-        param_key: "endTime",
-        required: true,
-        type: "object",
-      },
+      // {
+      //   param_key: "endTime",
+      //   required: true,
+      //   type: "object",
+      // },
       {
         param_key: "date",
         required: true,

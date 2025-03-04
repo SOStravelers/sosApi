@@ -423,9 +423,7 @@ export const getWorkerId = async (req, res, next) => {
   console.log("--- GET USER Worker BY ID ---", req.params);
   try {
     const user = await User.findOne({ _id: req.params.id, type: "worker" })
-      .select(
-        "about email img language personalData username workerData _id _id "
-      )
+      .select("about email img language personalData username workerData  _id ")
       .populate({
         path: "workerData.services.id",
         select: "name _id",
@@ -1220,7 +1218,7 @@ export const getRandomUsers = async (req, res, next) => {
                 isActive: true,
                 "schedules.isActive": true,
               }).select("subService");
-
+              console.log("encontro", activeSubServices);
               const activeSubServiceIds = activeSubServices.map(
                 (schedule) => schedule.subService
               );
