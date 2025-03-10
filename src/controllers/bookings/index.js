@@ -114,6 +114,12 @@ export const create = async (req, res, next) => {
       };
     }
     let exists = await Booking.findOne(query, {}).exec();
+    console.log(
+      "wena wena wena",
+      exists,
+      subService.multiple,
+      exists && !subService.multiple
+    );
     if (exists && !subService.multiple) {
       throw createError(409, "booking already exists");
     } else {

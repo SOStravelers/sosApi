@@ -168,7 +168,7 @@ const userSchema = new Schema(
     paymentData: {
       isActive: { type: Boolean, default: false },
       stripeCustomerId: { type: String },
-      stripeAccountId: { type: String },
+      stripeAccountId: { type: String, default: null },
       paypalAccountId: { type: String },
       paypalClientId: { type: String },
       paypalClientSecret: { type: String },

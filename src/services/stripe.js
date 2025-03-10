@@ -214,7 +214,7 @@ export const createPaymentIntentAutomatic = async (data, user) => {
   }
 };
 
-export const transferPaymentsStripe = async (data) => {
+export const transferPaymentsStripe = async (data, user) => {
   logger.info("--- CREATE TRANSFERS STRIPE ---");
   console.log("dataStripe", data);
   try {
@@ -241,9 +241,10 @@ export const transferPaymentsStripe = async (data) => {
     }
     console.log("paso1");
 
-    const cargos = false;
     let priceBRL = 0;
-    if (cargos == true) {
+    const stripeSeller = user.paymentData.stripeAccountId || null;
+
+    if (stripeSeller) {
       // Verificar cargos
       if (!paymentIntent.latest_charge) {
         throw new Error("No se encontraron cargos para este PaymentIntent.");
@@ -262,14 +263,14 @@ export const transferPaymentsStripe = async (data) => {
 
       // Calcular divisiones
       const totalAmount = paymentIntent.amount;
-      const providerShare = Math.round(totalAmount * 0.4);
+      const providerShare = Math.round(totalAmount * 0.9);
       // const ownerShare = Math.round(totalAmount * 0.4);
 
       // Realizar transferencias
       const transferProvider = await stripe.transfers.create({
         amount: providerShare,
         currency: paymentIntent.currency,
-        destination: "acct_1Qvico027lHvILlU",
+        destination: stripeSeller,
         source_transaction: chargeId,
         description: "W-" + paymentIntent.description,
         metadata: {
@@ -284,9 +285,7 @@ export const transferPaymentsStripe = async (data) => {
         },
       });
 
-      const loginLink1 = await stripe.accounts.createLoginLink(
-        "acct_1Qvico027lHvILlU"
-      );
+      const loginLink1 = await stripe.accounts.createLoginLink(stripeSeller);
 
       console.log("Login Link:", loginLink1.url);
 
