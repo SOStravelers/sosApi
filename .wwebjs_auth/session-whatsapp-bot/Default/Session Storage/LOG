@@ -1,3 +1,2 @@
-2025/03/10-19:13:59.373 f503 Reusing MANIFEST /Users/unabase/Desktop/SOS/sosBack/.wwebjs_auth/session-whatsapp-bot/Default/Session Storage/MANIFEST-000001
-2025/03/10-19:13:59.373 f503 Recovering log #3
-2025/03/10-19:13:59.374 f503 Reusing old log /Users/unabase/Desktop/SOS/sosBack/.wwebjs_auth/session-whatsapp-bot/Default/Session Storage/000003.log 
+2025/03/10-19:35:33.748 12203 Creating DB /Users/unabase/Desktop/SOS/sosBack/.wwebjs_auth/session-whatsapp-bot/Default/Session Storage since it was missing.
+2025/03/10-19:35:33.767 12203 Reusing MANIFEST /Users/unabase/Desktop/SOS/sosBack/.wwebjs_auth/session-whatsapp-bot/Default/Session Storage/MANIFEST-000001

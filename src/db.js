@@ -85,13 +85,24 @@ mongoose
       // Convertir el mensaje a minúsculas y eliminar espacios innecesarios
       const text = message.body.trim();
 
-      // Expresión regular para extraer valores clave
+      // Verificar si el mensaje empieza con "Generate Service:"
+      if (!text.startsWith("Generate Service:")) {
+        await message.reply(
+          "Thank you for reaching out! Our team will assist you shortly. ⏳"
+        );
+        return;
+      }
+
+      // Eliminar "Generate Service:" del texto
+      const content = text.replace("Generate Service:", "").trim();
+
+      // Expresión regular para extraer los valores obligatorios
       const regex =
         /date\s*=\s*(\S+)\s*subServiceId\s*=\s*(\S+)\s*time\s*=\s*(\S+)\s*nameSubservice\s*=\s*([\w\s]+)\s*price\s*=\s*(\S+)/;
-      const match = text.match(regex);
+      const match = content.match(regex);
 
       if (match) {
-        // Extraer valores del mensaje
+        // Extraer valores obligatorios
         const date = match[1];
         const subServiceId = match[2];
         const time = match[3];
@@ -109,8 +120,27 @@ mongoose
         // Reemplazar espacios en nameSubservice por %20 para la URL
         const encodedSubservice = encodeURIComponent(nameSubservice);
 
-        // Construir la URL
-        const url = `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameSubservice=${encodedSubservice}&price=${price}`;
+        // Construcción base de la URL
+        let url = `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&isoTime=${isoTime}&stringData=${time}&nameSubservice=${encodedSubservice}&price=${price}`;
+
+        // Buscar parámetros opcionales y agregarlos a la URL
+        const optionalParams = content.match(/\b(\w+)\s*=\s*([\w\s]+)/g);
+        if (optionalParams) {
+          optionalParams.forEach((param) => {
+            const [key, value] = param.split("=").map((x) => x.trim());
+            if (
+              ![
+                "date",
+                "subServiceId",
+                "time",
+                "nameSubservice",
+                "price",
+              ].includes(key)
+            ) {
+              url += `&${key}=${encodeURIComponent(value)}`;
+            }
+          });
+        }
 
         // Responder con la URL generada
         await message.reply(url);
