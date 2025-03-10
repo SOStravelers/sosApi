@@ -63,6 +63,10 @@ const byPassPolMauro = (body) => {
         //id Pohl
         body.workerUser = "67c71578fb4fe0941fe494f0";
         return body;
+      } else if ((body.service = "65a7d4d50fec5717b282a352")) {
+        //id Barbara
+        body.workerUser = "65a7ddc6c14f7a217471b12d";
+        return body;
       } else {
         console.log("qwe3");
         //id Mauro
