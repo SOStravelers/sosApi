@@ -3,6 +3,7 @@ import envar from "../config/envar.js";
 import Stripe from "stripe";
 import Booking from "../models/booking.js";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
+import { byPassPolMauro } from "../utils/changeId.js";
 
 const populate = [
   {
@@ -218,7 +219,8 @@ export const transferPaymentsStripe = async (data, user) => {
   logger.info("--- CREATE TRANSFERS STRIPE ---");
   console.log("dataStripe", data);
   try {
-    const { paymentIntentId } = data;
+    let allData = byPassPolMauro(data);
+    const { paymentIntentId, partner, workerUser, service } = allData;
 
     if (!paymentIntentId) {
       throw new Error("PaymentIntent ID is required.");
@@ -226,7 +228,7 @@ export const transferPaymentsStripe = async (data, user) => {
     console.log("la id", paymentIntentId);
     // Recuperar el PaymentIntent
     let paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    console.log("el payment", paymentIntent);
+    // console.log("el payment", paymentIntent);
     // Verificar estado
     if (paymentIntent.status !== "succeeded") {
       if (paymentIntent.status === "requires_capture") {
@@ -242,9 +244,14 @@ export const transferPaymentsStripe = async (data, user) => {
     console.log("paso1");
 
     let priceBRL = 0;
-    const stripeSeller = user.paymentData.stripeAccountId || null;
+    console.log("la gran id", workerUser);
+    const worker = await User.findOne({ _id: workerUser }).select(
+      "paymentData"
+    );
+    console.log("workerData", worker);
+    const workerStripeId = worker?.paymentData?.stripeAccountId || null;
 
-    if (stripeSeller) {
+    if (workerStripeId) {
       // Verificar cargos
       if (!paymentIntent.latest_charge) {
         throw new Error("No se encontraron cargos para este PaymentIntent.");
@@ -261,16 +268,23 @@ export const transferPaymentsStripe = async (data, user) => {
 
       priceBRL = balanceTransaction.net / 100;
 
+      const partnerUser = await User.findOne({ username: partner }).select(
+        "paymentData"
+      );
+
+      const partnerStripeId = partnerUser?.paymentData?.stripeAccountId || null;
+
       // Calcular divisiones
       const totalAmount = paymentIntent.amount;
-      const providerShare = Math.round(totalAmount * 0.9);
-      // const ownerShare = Math.round(totalAmount * 0.4);
+      const providerShare = partnerStripeId
+        ? Math.round(totalAmount * 0.8)
+        : Math.round(totalAmount * 0.9);
 
       // Realizar transferencias
       const transferProvider = await stripe.transfers.create({
         amount: providerShare,
         currency: paymentIntent.currency,
-        destination: stripeSeller,
+        destination: workerStripeId,
         source_transaction: chargeId,
         description: "W-" + paymentIntent.description,
         metadata: {
@@ -285,36 +299,42 @@ export const transferPaymentsStripe = async (data, user) => {
         },
       });
 
-      const loginLink1 = await stripe.accounts.createLoginLink(stripeSeller);
+      const loginLink1 = await stripe.accounts.createLoginLink(workerStripeId);
 
       console.log("Login Link:", loginLink1.url);
+      let transferPartner = null;
+      if (partnerStripeId) {
+        const totalAmount = paymentIntent.amount;
+        const partnerShare = Math.round(totalAmount * 0.1);
 
-      // const transferOwner = await stripe.transfers.create({
-      //   amount: ownerShare,
-      //   currency: paymentIntent.currency,
-      //   destination: "acct_1QXB9kH25M0VH3l6",
-      //   source_transaction: chargeId,
-      //   description: "B-" + paymentIntent.description,
-      //   metadata: {
-      //     paymentIntentId: paymentIntentId,
-      //     clientName: paymentIntent.metadata.clientName,
-      //     service: paymentIntent.metadata.service,
-      //     subservice: paymentIntent.metadata.subservice,
-      //     date: paymentIntent.metadata.date,
-      //     startTime: paymentIntent.metadata.startTime,
-      //     clientsNumber: paymentIntent.metadata.clientsNumber,
-      //     language: paymentIntent.metadata.language,
-      //   },
-      // });
+        // Realizar transferencias
+        const transferPartner = await stripe.transfers.create({
+          amount: partnerShare,
+          currency: paymentIntent.currency,
+          destination: partnerStripeId,
+          source_transaction: chargeId,
+          description: "W-" + paymentIntent.description,
+          metadata: {
+            paymentIntentId: paymentIntentId,
+            clientName: paymentIntent.metadata.clientName,
+            service: paymentIntent.metadata.service,
+            subservice: paymentIntent.metadata.subservice,
+            date: paymentIntent.metadata.date,
+            startTime: paymentIntent.metadata.startTime,
+            clientsNumber: paymentIntent.metadata.clientsNumber,
+            language: paymentIntent.metadata.language,
+          },
+        });
 
-      // const loginLink2 = await stripe.accounts.createLoginLink(
-      //   "acct_1QXB9kH25M0VH3l6"
-      // );
-      // console.log("Login Link:", loginLink2.url);
+        const loginLink2 = await stripe.accounts.createLoginLink(
+          partnerStripeId
+        );
+        console.log("Login Link:", loginLink2.url);
+      }
 
       logger.info("Transferencias realizadas con éxito:", {
         provider: transferProvider,
-        // owner: transferOwner,
+        partner: transferPartner || null,
       });
     }
     return { priceBRL };

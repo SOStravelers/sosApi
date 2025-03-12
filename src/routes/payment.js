@@ -63,6 +63,21 @@ router.post(
         required: true,
         type: "string",
       },
+      {
+        param_key: "workerUser",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "partner",
+        required: false,
+        type: "string",
+      },
     ],
     "body"
   ),
