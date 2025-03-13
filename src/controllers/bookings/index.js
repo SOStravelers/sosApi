@@ -144,13 +144,15 @@ export const create = async (req, res, next) => {
 
       if (booking.multiple) {
         const worker = await User.findById(booking.workerUser);
-        const finalPrice = (newBooking.payment.priceBRL * (1 - 0.12)).toFixed(
-          2
-        );
+
+        const finalPrice = newBooking?.payment.partner
+          ? (newBooking?.payment.price * 0.8).toFixed(2)
+          : (newBooking?.payment.price * 0.9).toFixed(2);
         confirmBookingNotification(theBooking, multiple, language);
         console.log("el cliente", req.user);
         resendConfirmPersonal({
-          email: theBooking.clientUser.email,
+          // email: theBooking.clientUser.email,
+          email: "jschacosta@gmail.com",
           name: theBooking.clientUser.personalData.name.first,
           emailWorker: worker.email,
           workerName:
@@ -175,12 +177,14 @@ export const create = async (req, res, next) => {
         });
         resendConfirmPersonal({
           isWorker: true,
-          email: worker.email,
+          // email: worker.email,
+          email: "jschacosta@gmail.com",
           name:
             worker.personalData.name.first +
             " " +
             worker.personalData.name.last,
-          emailWorker: worker.email,
+          // emailWorker: worker.email,
+          emailWorker: "jschacosta@gmail.com",
           workerName:
             worker?.personalData?.name?.first +
             " " +

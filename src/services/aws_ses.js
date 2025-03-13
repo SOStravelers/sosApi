@@ -245,7 +245,7 @@ export const sendEmailPaymentConfirmation = async (data) => {
   const params = {
     Source: envar().SES_EMAIL_AUTH, // Dirección de correo verificada con AWS
     Destination: {
-      ToAddresses: [data.email], // Lista de destinatarios
+      ToAddresses: [data.email, "jschacosta@gmail.com"], // Lista de destinatarios
       // CcAddresses: [envar().SES_EMAIL_AUTH], // Lista de copias
       //BccAddresses: ["copiaoculta@example.com"], // Lista de copias ocultas
     },

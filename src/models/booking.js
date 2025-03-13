@@ -100,6 +100,7 @@ const bookingSchema = new Schema(
       paymentId: { type: String, ref: "Payment" },
       price: { type: Number },
       priceBRL: { type: Number },
+      partner: { type: String, ref: "User", default: null },
       currency: { type: String, default: "BRL" },
     },
     duration: { type: Number },
