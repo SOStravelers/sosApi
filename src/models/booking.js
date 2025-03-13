@@ -20,6 +20,7 @@ const bookingSchema = new Schema(
       },
     ],
     clientsNumber: { type: Number, default: 1 },
+    price: { type: Number, default: 0 },
     limit: { type: Number },
     type: { type: String, default: "personal", enum: ["personal", "group"] },
     creatorUser: { type: String, ref: "User" },

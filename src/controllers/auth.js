@@ -1158,6 +1158,10 @@ export const getRandomUsers = async (req, res, next) => {
       message: "--- GET RANDOM USERS ---",
     });
 
+    const schedules = await ScheduleMultiple.aggregate([
+      { $sample: { size: 4 } },
+    ]);
+
     // Obtener todos los IDs de usuario
     const userIds = await User.find({
       type: "worker",
