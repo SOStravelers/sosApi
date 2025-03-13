@@ -156,7 +156,7 @@ Depois, escreva sua consulta. Responderemos em breve! 😊`;
 
       // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
       const workerId = "65312a63c0b1e1658a5a712c";
-
+      //
       // Formatear el isoTime
       const isoTime = `${date}T${time}:00.000Z`;
 
