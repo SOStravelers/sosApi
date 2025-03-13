@@ -246,7 +246,7 @@ export const transferPaymentsStripe = async (data, user) => {
     let priceBRL = 0;
     console.log("la gran id", workerUser);
     const worker = await User.findOne({ _id: workerUser }).select(
-      "paymentData"
+      "paymentData email"
     );
     console.log("workerData", worker);
     const workerStripeId = worker?.paymentData?.stripeAccountId || null;
@@ -269,7 +269,7 @@ export const transferPaymentsStripe = async (data, user) => {
       priceBRL = balanceTransaction.net / 100;
 
       const partnerUser = await User.findOne({ username: partner }).select(
-        "paymentData"
+        "paymentData email"
       );
 
       const partnerStripeId = partnerUser?.paymentData?.stripeAccountId || null;
@@ -286,7 +286,7 @@ export const transferPaymentsStripe = async (data, user) => {
         currency: paymentIntent.currency,
         destination: workerStripeId,
         source_transaction: chargeId,
-        description: "W-" + paymentIntent.description,
+        description: "W - " + paymentIntent.description + " - " + worker.email,
         metadata: {
           paymentIntentId: paymentIntentId,
           clientName: paymentIntent.metadata.clientName,
@@ -313,7 +313,8 @@ export const transferPaymentsStripe = async (data, user) => {
           currency: paymentIntent.currency,
           destination: partnerStripeId,
           source_transaction: chargeId,
-          description: "W-" + paymentIntent.description,
+          description:
+            "P - " + paymentIntent.description + " - " + partnerUser.email,
           metadata: {
             paymentIntentId: paymentIntentId,
             clientName: paymentIntent.metadata.clientName,
