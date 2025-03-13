@@ -136,15 +136,15 @@ Depois, escreva sua consulta. Responderemos em breve! 😊`;
       }
       return;
     }
-
+    console.log("vamos");
     // Eliminar "Generate Service:" del texto
     const content = text.replace("Generate Service:", "").trim();
 
     // Expresión regular para extraer los valores obligatorios
     const regex =
-      /date\s*=\s*(\S+)\s*subServiceId\s*=\s*(\S+)\s*time\s*=\s*(\S+)\s*price\s*=\s*(\S+)/;
+      /date\s*=\s*(\S+)[\s\S]*?subServiceId\s*=\s*(\S+)[\s\S]*?time\s*=\s*(\S+)[\s\S]*?price\s*=\s*(\S+)/;
     const match = content.match(regex);
-
+    console.log(match);
     if (match) {
       // Extraer valores obligatorios
       const date = match[1];
@@ -161,7 +161,7 @@ Depois, escreva sua consulta. Responderemos em breve! 😊`;
       const isoTime = `${date}T${time}:00.000Z`;
 
       const subService = await Subservice.findOne({
-        _id: req.params.id,
+        _id: subServiceId,
       })
         .populate("service")
         .exec();
