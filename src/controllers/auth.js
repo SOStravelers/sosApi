@@ -1158,6 +1158,41 @@ export const getRandomUsers = async (req, res, next) => {
       message: "--- GET RANDOM USERS ---",
     });
 
+    const user = await User.findOne({ _id: "65312a63c0b1e1658a5a712c" })
+      .select("_id personalData workerData.services img.imgUrl")
+      .populate([
+        {
+          path: "workerData.services.id",
+          select: "name isActive",
+          match: { isActive: true },
+          model: "Service",
+        },
+        {
+          path: "workerData.services.subServices",
+          select: "name imgUrl duration price isActive multiple goChat",
+          model: "Subservice",
+          match: { isActive: true },
+        },
+      ]);
+    console.log("el usuario", user.workerData.services);
+    const finalArray = [];
+
+    for (let i = 0; i < user.workerData.services.length; i++) {
+      const usernew = {
+        ...user,
+        workerData: {
+          ...user.workerData,
+          services: [...user.workerData.services],
+        },
+      };
+      usernew.workerData.services.splice(i, 1);
+      finalArray.push(usernew);
+      console.log("usuario", usernew.workerData.services);
+    }
+    res.send(finalArray);
+
+    return;
+
     const schedules = await ScheduleMultiple.aggregate([
       { $sample: { size: 4 } },
     ]);
@@ -1192,7 +1227,7 @@ export const getRandomUsers = async (req, res, next) => {
 
       // Seleccionar un mayor número de IDs al azar para aumentar las probabilidades
       const randomIds = selectRandomIds(userIds, 10);
-
+      console.log("casa", randomIds);
       // Buscar usuarios y poblar campos
       const randomUsers = await User.find({ _id: { $in: randomIds } })
         .select("_id personalData workerData.services img.imgUrl")
