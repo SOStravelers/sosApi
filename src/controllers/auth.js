@@ -1174,9 +1174,9 @@ export const getRandomUsers = async (req, res, next) => {
           match: { isActive: true },
         },
       ]);
-    console.log("el usuario", user.workerData.services);
+    console.log("el usuario", user._id, user.workerData.services);
     const finalArray = [];
-
+    console.log("length", user.workerData.services.length);
     for (let i = 0; i < user.workerData.services.length; i++) {
       const usernew = {
         ...user,
@@ -1185,7 +1185,9 @@ export const getRandomUsers = async (req, res, next) => {
           services: [...user.workerData.services],
         },
       };
-      usernew.workerData.services.splice(i, 1);
+      usernew.workerData.services = usernew.workerData.services.filter(
+        (_, index) => index === i
+      );
       finalArray.push(usernew);
       console.log("usuario", usernew.workerData.services);
     }
