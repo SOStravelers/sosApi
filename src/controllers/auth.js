@@ -1188,8 +1188,10 @@ export const getRandomUsers = async (req, res, next) => {
       usernew.workerData.services = usernew.workerData.services.filter(
         (_, index) => index === i
       );
-      finalArray.push(usernew);
-      console.log("usuario", usernew.workerData.services);
+      console.log("usuario2", usernew.workerData.services[0].id);
+      if (usernew.workerData.services[0].id) {
+        finalArray.push(usernew);
+      }
     }
     res.send(finalArray);
 
