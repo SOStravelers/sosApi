@@ -113,6 +113,14 @@ export const create = async (req, res, next) => {
       booking.multiple ? (booking.status = "confirmed") : "";
       booking.clientNumber = phoneNumber;
       const newBooking = await booking.save();
+      await User.findByIdAndUpdate(
+        req.user._id.toString(),
+        {
+          phone: phoneNumber,
+        },
+        { new: true }
+      );
+
       const theBooking = await Booking.findOne({ _id: newBooking._id })
         .populate(populate)
         .exec();
