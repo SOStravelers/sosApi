@@ -56,6 +56,7 @@ export const create = async (req, res, next) => {
   try {
     const emailData = req.body.emailData;
     const language = req.body.language;
+    const phoneNumber = req.body.phoneNumber;
     let bookingData = req.body;
     bookingData.emailData = null;
 
@@ -110,6 +111,7 @@ export const create = async (req, res, next) => {
       // Asignar el nuevo idKey al booking
       booking.idKey = newIdKey;
       booking.multiple ? (booking.status = "confirmed") : "";
+      booking.clientNumber = phoneNumber;
       const newBooking = await booking.save();
       const theBooking = await Booking.findOne({ _id: newBooking._id })
         .populate(populate)
@@ -151,8 +153,8 @@ export const create = async (req, res, next) => {
         confirmBookingNotification(theBooking, multiple, language);
         console.log("el cliente", req.user);
         resendConfirmPersonal({
-          // email: theBooking.clientUser.email,
-          email: "jschacosta@gmail.com",
+          email: theBooking.clientUser.email,
+          // email: "jschacosta@gmail.com",
           name: theBooking.clientUser.personalData.name.first,
           emailWorker: worker.email,
           workerName:
@@ -177,8 +179,8 @@ export const create = async (req, res, next) => {
         });
         resendConfirmPersonal({
           isWorker: true,
-          // email: worker.email,
-          email: "jschacosta@gmail.com",
+          email: worker.email,
+          // email: "jschacosta@gmail.com",
           name:
             worker.personalData.name.first +
             " " +
@@ -194,6 +196,7 @@ export const create = async (req, res, next) => {
             " " +
             req.user?.personalData?.name?.last,
           workerPhone: worker?.workerData?.phone,
+          clientPhone: theBooking.clientPhone,
           service: theBooking.service.name[language],
           subservice: theBooking.subservice.name[language],
           clientsNumber: theBooking.clientsNumber,

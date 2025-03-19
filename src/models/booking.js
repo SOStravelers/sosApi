@@ -9,6 +9,7 @@ const bookingSchema = new Schema(
     workerUser: { type: String, ref: "User" },
     firstWorker: { type: String, ref: "User" },
     clientUser: { type: String, ref: "User" },
+    clientNumber: { type: String },
     multiple: { type: Boolean, default: false },
     clients: [
       {
