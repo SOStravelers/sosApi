@@ -31,6 +31,7 @@ export const resendConfirmPersonal = async (info) => {
       ? templateHtml("confirmBookingWorkerMultiple")
       : templateHtml("confirmBooking");
     const template = Handlebars.compile(htmlString);
+    console.log("a enviar", clientPhone);
     const htmlToSend = template({
       name: name,
       service: service,

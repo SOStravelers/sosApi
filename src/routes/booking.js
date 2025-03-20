@@ -5,6 +5,7 @@ import {
   getBookings,
   updateOne,
   cancelBooking,
+  updatePhoneNumber,
 } from "../controllers/bookings/index.js";
 
 import {
@@ -822,6 +823,26 @@ router.get(
     "query"
   ),
   getLastMonthBusiness
+);
+
+router.put(
+  "/set/phoneBooking",
+  validateParams(
+    [
+      {
+        param_key: "clientPhone",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "bookingId",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  updatePhoneNumber
 );
 
 router.put(

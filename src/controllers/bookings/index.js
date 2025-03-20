@@ -56,10 +56,9 @@ export const create = async (req, res, next) => {
   try {
     const emailData = req.body.emailData;
     const language = req.body.language;
-    const phoneNumber = req.body.phoneNumber;
     let bookingData = req.body;
     bookingData.emailData = null;
-
+    console.log("telefono 1", req.body.clientPhone);
     console.log("el booking1", bookingData);
     bookingData = byPassPolMauro(bookingData);
     console.log("el booking3", bookingData);
@@ -111,12 +110,11 @@ export const create = async (req, res, next) => {
       // Asignar el nuevo idKey al booking
       booking.idKey = newIdKey;
       booking.multiple ? (booking.status = "confirmed") : "";
-      booking.clientNumber = phoneNumber;
       const newBooking = await booking.save();
       await User.findByIdAndUpdate(
         req.user._id.toString(),
         {
-          phone: phoneNumber,
+          phone: newBooking.clientNumber,
         },
         { new: true }
       );
@@ -151,7 +149,10 @@ export const create = async (req, res, next) => {
         //   completedData // completedData
         // );
       }
-
+      console.log("telefono 2", req.body.clientPhone);
+      console.log("telefono 3", booking.clientPhone);
+      console.log("telefono 4", newBooking.clientPhone);
+      console.log("telefono 5", theBooking.clientPhone);
       if (booking.multiple) {
         const worker = await User.findById(booking.workerUser);
 
@@ -257,6 +258,24 @@ export const getById = async (req, res, next) => {
       .exec();
     if (!booking) throw createError(404, "Booking not found");
     res.send(booking);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Obtener reserva por ID
+export const updatePhoneNumber = async (req, res, next) => {
+  global.logger.info("---UPDATE PHONE NUMBER---");
+  const { bookingId, clientPhone } = req.body;
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      bookingId,
+      {
+        clientPhone: clientPhone,
+      },
+      { new: true }
+    );
+    res.send({ status: "success" });
   } catch (err) {
     next(err);
   }
