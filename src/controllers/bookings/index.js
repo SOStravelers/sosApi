@@ -65,6 +65,11 @@ export const create = async (req, res, next) => {
     const subService = await Subservice.findById(req.body.subservice);
     const multiple = subService.multiple;
     let booking = new Booking(bookingData);
+
+    if (subService.partner) {
+      booking.workerUser = subService.partner;
+    }
+
     console.log("el booking2", booking);
     booking.firstWorker = booking.workerUser;
     let query = {};
