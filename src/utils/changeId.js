@@ -21,7 +21,6 @@ export const byPassPolMauro = (body) => {
         console.log("mauro");
         //id Mauro
         body.workerUser = "67c721b3fb4fe0941fe4959b";
-        //cambio
         return body;
       }
     } else {
