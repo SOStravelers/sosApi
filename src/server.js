@@ -7,6 +7,7 @@ import staticDir from "./config/staticPath.js";
 import bodyParser from "body-parser";
 import localeMiddleware from "express-locale";
 import db from "./db.js";
+//cambio
 import routes from "./routes/index.js";
 import schedule from "node-schedule";
 import moment from "moment-timezone";
