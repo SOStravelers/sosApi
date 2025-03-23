@@ -8,7 +8,7 @@ import { createError } from "../config/error.js";
 import Subservice from "../models/subservice.js";
 import { convertirHoraAMinutos, convertirMinutosAHora } from "../utils/time.js";
 import moment from "moment-timezone";
-
+//cambio
 const arrayExeptions = ["663039e1dbd84508c88f9074"];
 
 //Crear horario
