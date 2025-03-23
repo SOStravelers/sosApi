@@ -8,8 +8,10 @@ export const setIdClient = async (req, res) => {
     let { clientId, partner } = req.body;
 
     // Validaciones
-    if (!clientId) {
-      return res.status(400).json({ error: "clientId is required" });
+    if (!clientId || typeof clientId !== "string" || clientId.trim() === "") {
+      return res
+        .status(400)
+        .json({ error: "clientId is required and must be a non-empty string" });
     }
 
     if (!partner) partner = "external";

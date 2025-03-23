@@ -5,6 +5,7 @@ import qrcode from "qrcode";
 import { AwsUploadFile } from "./aws_s3.js";
 import Subservice from "../models/subservice.js";
 import Wmessage from "../models/wmessages.js";
+import { sendTextSubservices } from "../controllers/subservice.js";
 
 export const initializeWhatsApp = (mongoose) => {
   // 🔹 Solo después de conectar a MongoDB, inicializar WhatsApp
@@ -68,8 +69,84 @@ export const initializeWhatsApp = (mongoose) => {
     const text = message.body.trim();
     console.log("mensaje", message);
 
+    if (text.startsWith("Generate Service")) {
+      console.log("vamos");
+      // Eliminar "Generate Service:" del texto
+      const content = text.replace("Generate Service:", "").trim();
+
+      // Expresión regular para extraer los valores obligatorios
+      const regex =
+        /date\s*=\s*(\S+)[\s\S]*?subServiceId\s*=\s*(\S+)[\s\S]*?time\s*=\s*(\S+)[\s\S]*?price\s*=\s*(\S+)/;
+      const match = content.match(regex);
+      console.log(match);
+      if (match) {
+        // Extraer valores obligatorios
+        const date = match[1];
+        const subServiceId = match[2];
+        const time = match[3];
+        const price = match[4];
+
+        console.log("Precio extraído:", price);
+
+        // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
+        const workerId = "65312a63c0b1e1658a5a712c";
+        //
+        // Formatear el isoTime
+        const isoTime = `${date}T${time}:00.000Z`;
+
+        const subService = await Subservice.findOne({
+          _id: subServiceId,
+        })
+          .populate("service")
+          .exec();
+
+        if (!subService) {
+          await message.reply(
+            "La id de subService no existe.Revisa y corrige ese campo"
+          );
+          return;
+        }
+
+        // Reemplazar espacios en nameSubservice por %20 para la URL
+        const encodedSubservice = encodeURIComponent(subService.name["en"]);
+        const encodedService = encodeURIComponent(
+          subService.service.name["en"]
+        );
+
+        // Construcción base de la URL
+        let url = `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&service=${subService.service._id}&isoTime=${isoTime}&stringData=${time}&nameSubservice=${encodedSubservice}&nameService=${encodedService}&price=${price}`;
+
+        // Buscar parámetros opcionales y agregarlos a la URL
+        const optionalParams = content.match(/\b(\w+)\s*=\s*([\w\s]+)/g);
+        if (optionalParams) {
+          optionalParams.forEach((param) => {
+            const [key, value] = param.split("=").map((x) => x.trim());
+            if (
+              ![
+                "date",
+                "subServiceId",
+                "time",
+                "nameSubservice",
+                "price",
+              ].includes(key)
+            ) {
+              url += `&${key}=${encodeURIComponent(value)}`;
+            }
+          });
+        }
+
+        // Responder con la URL generada
+        await message.reply(url);
+      }
+    } else if (text.startsWith("Mis servicios")) {
+      const content = text.replace("Mis servicios:", "").trim();
+      const email = content.toLowerCase();
+      const messageFinal = await sendTextSubservices({ email, isActive: true });
+      await message.reply(messageFinal);
+    }
+
     // Verificar si el mensaje empieza con "Generate Service:"
-    if (!text.startsWith("Generate Service:")) {
+    else {
       console.log("no es servicio");
       const senderPhone = message.from.split("@")[0]; // Número del usuario
 
@@ -119,88 +196,22 @@ export const initializeWhatsApp = (mongoose) => {
         let newMessage = new Wmessage(body);
         await newMessage.save();
         const messageText = `Thank you for contacting SOS Travel.
-Gracias por contactar a SOS Travel.
-Obrigado por entrar em contato com o SOS Travel.
+        Gracias por contactar a SOS Travel.
+        Obrigado por entrar em contato com o SOS Travel.
 
-Please tell us which language you prefer to speak:
-Por favor, dinos en qué idioma prefieres hablar:
-Por favor, diga-nos em que idioma prefere falar:
+        Please tell us which language you prefer to speak:
+        Por favor, dinos en qué idioma prefieres hablar:
+        Por favor, diga-nos em que idioma prefere falar:
 
-🇪🇸 Español | 🇵🇹 Português | 🇫🇷 Français | 🌍 Inglés
+        🇪🇸 Español | 🇵🇹 Português | 🇫🇷 Français | 🌍 Inglés
 
-Then, please write your inquiry. We will reply soon! 😊
-Luego, escríbenos tu consulta. ¡Te responderemos pronto! 😊
-Depois, escreva sua consulta. Responderemos em breve! 😊`;
+        Then, please write your inquiry. We will reply soon! 😊
+        Luego, escríbenos tu consulta. ¡Te responderemos pronto! 😊
+        Depois, escreva sua consulta. Responderemos em breve! 😊`;
 
         await message.reply(messageText);
       }
       return;
-    }
-    console.log("vamos");
-    // Eliminar "Generate Service:" del texto
-    const content = text.replace("Generate Service:", "").trim();
-
-    // Expresión regular para extraer los valores obligatorios
-    const regex =
-      /date\s*=\s*(\S+)[\s\S]*?subServiceId\s*=\s*(\S+)[\s\S]*?time\s*=\s*(\S+)[\s\S]*?price\s*=\s*(\S+)/;
-    const match = content.match(regex);
-    console.log(match);
-    if (match) {
-      // Extraer valores obligatorios
-      const date = match[1];
-      const subServiceId = match[2];
-      const time = match[3];
-      const price = match[4];
-
-      console.log("Precio extraído:", price);
-
-      // Simular un workerId (podrías obtenerlo dinámicamente si es necesario)
-      const workerId = "65312a63c0b1e1658a5a712c";
-      //
-      // Formatear el isoTime
-      const isoTime = `${date}T${time}:00.000Z`;
-
-      const subService = await Subservice.findOne({
-        _id: subServiceId,
-      })
-        .populate("service")
-        .exec();
-
-      if (!subService) {
-        await message.reply(
-          "La id de subService no existe.Revisa y corrige ese campo"
-        );
-        return;
-      }
-
-      // Reemplazar espacios en nameSubservice por %20 para la URL
-      const encodedSubservice = encodeURIComponent(subService.name["en"]);
-      const encodedService = encodeURIComponent(subService.service.name["en"]);
-
-      // Construcción base de la URL
-      let url = `https://sostvl.com/summary-custom?date=${date}&workerId=${workerId}&subServiceId=${subServiceId}&service=${subService.service._id}&isoTime=${isoTime}&stringData=${time}&nameSubservice=${encodedSubservice}&nameService=${encodedService}&price=${price}`;
-
-      // Buscar parámetros opcionales y agregarlos a la URL
-      const optionalParams = content.match(/\b(\w+)\s*=\s*([\w\s]+)/g);
-      if (optionalParams) {
-        optionalParams.forEach((param) => {
-          const [key, value] = param.split("=").map((x) => x.trim());
-          if (
-            ![
-              "date",
-              "subServiceId",
-              "time",
-              "nameSubservice",
-              "price",
-            ].includes(key)
-          ) {
-            url += `&${key}=${encodeURIComponent(value)}`;
-          }
-        });
-      }
-
-      // Responder con la URL generada
-      await message.reply(url);
     }
   });
 

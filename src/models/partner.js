@@ -3,9 +3,10 @@ const Schema = mongoose.Schema;
 import uniqueValidator from "mongoose-unique-validator";
 import mongoosePaginate from "mongoose-paginate-v2";
 import paginateConfig from "../config/paginate.js";
+//
 const partnerSchema = new Schema(
   {
-    clientId: { type: String, unique: true },
+    clientId: { type: String },
     firstPartner: { type: String },
     lastPartner: { type: String },
   },

@@ -11,6 +11,7 @@ import {
   getAll,
   getPrice,
   infoSubserviceByWorker,
+  getByEmail,
 } from "../controllers/subservice.js";
 
 //Create subService
@@ -167,6 +168,22 @@ router.get(
     "query"
   ),
   infoSubserviceByWorker
+);
+
+//Obtener los services y subservices  por email
+router.get(
+  "/all/byemail/:email",
+  validateParams(
+    [
+      {
+        param_key: "email",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  getByEmail
 );
 
 export default router;

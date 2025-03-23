@@ -161,3 +161,87 @@ export const infoSubserviceByWorker = async (req, res, next) => {
 
   return res.status(200).json(info);
 };
+
+export const getByEmail = async (req, res, next) => {
+  try {
+    const { email } = req.params;
+    if (!email) {
+      return res.status(400).json({ error: "Email es requerido" });
+    }
+
+    const message = await sendTextSubservices({ email, isActive: true });
+
+    res.status(200).send(message);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Activar o desactivar multiples usuarios
+export const sendTextSubservices = async (body) => {
+  const { email, isActive } = body;
+  global.logger.info(
+    "---GET SERVICES AND SUBSERVICES BY EMAIL (TEXT OUTPUT)---"
+  );
+  console.log("el body", body);
+
+  try {
+    const arrayServices = [
+      {
+        name: "Experience",
+        _id: "67d39901d2112e5164f10902",
+      },
+      {
+        name: "Trips-Transfers",
+        _id: "6757137ad2b2668720116ec9",
+      },
+      {
+        name: "Tour",
+        _id: "67c11cc117c3a7a2c353cb1c",
+      },
+    ];
+
+    if (!email || !Array.isArray(arrayServices)) {
+      throw createError(400, "Email y arrayServices son requeridos.");
+    }
+
+    // Obtener el usuario por email
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw createError(404, "Usuario no encontrado");
+    }
+
+    const serviceIds = arrayServices.map((s) => s._id);
+
+    // Buscar subservicios activos
+    const subServices = await Subservice.find({
+      partner: user._id,
+      service: { $in: serviceIds },
+      isActive: isActive !== undefined ? isActive : true,
+    }).select("_id name service");
+
+    // Construir respuesta en texto
+    let message = "";
+
+    arrayServices.forEach((service) => {
+      const subservicesForThisService = subServices.filter(
+        (sub) => sub.service.toString() === service._id
+      );
+
+      if (subservicesForThisService.length > 0) {
+        message += `\n*${service.name}:*\n\n`; // Título del servicio
+
+        subservicesForThisService.forEach((sub) => {
+          const subName = sub.name?.es || "Sin nombre";
+          message += `  ${subName}\n  id: ${sub._id}\n\n`;
+        });
+      }
+    });
+    if (!message) {
+      message = "No se encontraron subservicios para este usuario.";
+    }
+    return message;
+  } catch (err) {
+    throw err;
+  }
+};
