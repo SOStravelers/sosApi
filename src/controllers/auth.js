@@ -218,11 +218,9 @@ export const loginGoogle = async (req, res, next) => {
   });
   try {
     let { email, name, image } = req.body;
-    console.log(req.body);
     email = email.toLowerCase().trim();
     var user = await User.findOne({ email: email }).exec();
     let newValue = false;
-    console.log(user);
     if (!user) {
       console.log("nuevo");
       newValue = true;

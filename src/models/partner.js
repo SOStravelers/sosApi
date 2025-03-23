@@ -6,10 +6,8 @@ import paginateConfig from "../config/paginate.js";
 const partnerSchema = new Schema(
   {
     clientId: { type: String, unique: true },
-    partner: { type: String },
+    firstPartner: { type: String },
     lastPartner: { type: String },
-    lastConection: { type: Date },
-    firstConection: { type: Date },
   },
   { timestamps: true }
 );

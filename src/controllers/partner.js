@@ -4,30 +4,40 @@ export const setIdClient = async (req, res) => {
   try {
     global.logger.info("=== SET ID CLIENT ===");
     console.log("body", req.body);
+
     let { clientId, partner } = req.body;
 
-    !partner ? (partner = "external") : "";
+    // Validaciones
+    if (!clientId) {
+      return res.status(400).json({ error: "clientId is required" });
+    }
 
-    const client = await Partner.findOne({
-      clientId: clientId,
-    }).exec();
+    if (!partner) partner = "external";
+
+    const client = await Partner.findOne({ clientId }).exec();
+
     if (client) {
-      await Partner.findOneAndUpdate({
-        lastConection: new Date(),
-        lastPartner: partner,
-      }).exec();
+      await Partner.findOneAndUpdate(
+        { clientId },
+        {
+          $set: {
+            lastConection: new Date(),
+            lastPartner: partner,
+          },
+        }
+      ).exec();
     } else {
       await Partner.create({
-        clientId: clientId,
+        clientId,
         firstPartner: partner,
         lastPartner: partner,
-        lastConection: new Date(),
-        firstConection: new Date(),
       });
     }
+
     return res.send("saved");
   } catch (err) {
-    throw err;
+    global.logger.error("Error in setIdClient:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -35,8 +45,8 @@ export const getClientStats = async (req, res) => {
   try {
     global.logger.info("=== GET CLIENT STATS ===");
 
+    console.log("query", req.query);
     let { range, partner } = req.query;
-
     // Si no viene range, usamos 'day' por defecto
     if (!range) range = "day";
 
@@ -66,13 +76,13 @@ export const getClientStats = async (req, res) => {
 
     // Construimos el filtro de búsqueda
     const filter = {
-      lastConection: { $gte: fromDate },
+      updatedAt: { $gte: fromDate },
     };
 
     if (partner) {
       filter.lastPartner = partner;
     }
-
+    console.log("filter", filter);
     const count = await Partner.countDocuments(filter);
 
     return res.json({ count });
