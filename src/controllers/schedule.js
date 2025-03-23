@@ -215,14 +215,12 @@ export const activateMany = async (req, res, next) => {
 
 export const businessSchedule = async (req, res, next) => {
   console.log("Fetching schedules...");
-  // const subService = "6547f61545d6ccde7ac65fd0"; // SubService ID
   const { businessId, serviceId, subserviceId, workerId } = req.query;
   const subService = subserviceId;
-  const startDate = new Date();
-  startDate.setUTCHours(0, 0, 0, 0); // Start of the day
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 15); // Add 15 days
-  endDate.setUTCHours(23, 59, 59, 999); // End of the day
+
+  // Fechas en UTC
+  const startDate = moment.utc().startOf("day").toDate();
+  const endDate = moment.utc().add(15, "days").endOf("day").toDate();
 
   console.log(
     "SubService:",
@@ -234,29 +232,27 @@ export const businessSchedule = async (req, res, next) => {
   );
 
   try {
-    // Fetch schedules for the subService
     const schedules = await ScheduleMultiple.find({
       subService,
-      isActive: true, // Main schedule active
-      "schedules.isActive": true, // Active schedules
+      isActive: true,
+      "schedules.isActive": true,
     });
 
     console.log("Schedules fetched:", schedules.length);
 
-    // Generate an array of days in the range
     const daysInRange = [];
-    let currentDate = new Date(startDate);
-    while (currentDate <= endDate) {
+    let currentDate = moment.utc(startDate);
+
+    while (currentDate.toDate() <= endDate) {
       daysInRange.push({
-        day: currentDate.getUTCDay(), // Get day of the week (0-6)
-        date: new Date(currentDate),
+        day: currentDate.day(),
+        date: currentDate.clone().toDate(),
       });
-      currentDate.setDate(currentDate.getDate() + 1);
+      currentDate.add(1, "day");
     }
 
     console.log("Days in Range:", daysInRange);
 
-    // Filter schedules and group by date
     const responseMap = {};
 
     schedules.forEach((schedule) => {
@@ -266,38 +262,43 @@ export const businessSchedule = async (req, res, next) => {
         );
 
         if (matchedSchedules.length > 0) {
-          const dateString =
-            date.toISOString().split("T")[0] + "T00:00:00.000Z";
+          const dateString = moment.utc(date).startOf("day").toISOString();
           if (!responseMap[dateString]) {
             responseMap[dateString] = [];
           }
 
           matchedSchedules.forEach((entry) => {
-            const currentDateString = date.toISOString().split("T")[0]; // "2024-12-07"
-            const isoTime = entry.iso.slice(1); // "13:55:00.000Z"
+            const currentDateString = moment.utc(date).format("YYYY-MM-DD");
+            const isoTime = entry.iso.slice(1); // "10:00:00.000Z"
 
-            const startTimeBase = new Date(`${currentDateString}T${isoTime}`);
-            if (isNaN(startTimeBase.getTime())) {
-              console.error("Invalid startTimeBase:", {
-                currentDateString,
-                isoTime,
-              });
-              throw new Error("Invalid date value");
+            const intervalStart = moment
+              .utc(`${currentDateString}T${isoTime}`)
+              .toDate();
+
+            // Validar si ya pasó (según hora local Brasil)
+            const nowInBrazil = moment.tz("America/Sao_Paulo");
+            const intervalStartInBrazil = moment
+              .utc(intervalStart)
+              .tz("America/Sao_Paulo");
+
+            const isTodayInBrazil =
+              nowInBrazil.format("YYYY-MM-DD") ===
+              intervalStartInBrazil.format("YYYY-MM-DD");
+
+            if (
+              isTodayInBrazil &&
+              intervalStartInBrazil.isBefore(nowInBrazil)
+            ) {
+              return; // Saltar este horario porque ya pasó en Brasil
             }
 
-            let intervalStart = new Date(startTimeBase);
-
-            // Validar duración y calcular `endTime`
             const duration =
               typeof entry.duration === "number" ? entry.duration : 0;
-            let intervalEnd = new Date(intervalStart);
-            if (duration === 0) {
-              intervalEnd = new Date(intervalStart); // `endTime` será igual a `startTime`
-            } else {
-              intervalEnd.setMinutes(intervalStart.getMinutes() + duration);
-            }
 
-            // Validar `intervalEnd`
+            const intervalEnd = moment(intervalStart)
+              .add(duration, "minutes")
+              .toDate();
+
             if (isNaN(intervalEnd.getTime())) {
               console.error("Invalid intervalEnd:", {
                 intervalStart,
@@ -317,12 +318,9 @@ export const businessSchedule = async (req, res, next) => {
       });
     });
 
-    // Unificar el mapa `responseMap` en una lista única por día y eliminar días vacíos
     const response = [];
-    daysInRange.forEach(({ day, date }) => {
-      const dateString = date.toISOString().split("T")[0] + "T00:00:00.000Z";
-
-      // Si no hay intervals para este día, no lo incluimos
+    daysInRange.forEach(({ date }) => {
+      const dateString = moment.utc(date).startOf("day").toISOString();
       const intervals = responseMap[dateString] || [];
       if (intervals.length > 0) {
         response.push({
