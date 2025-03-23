@@ -36,8 +36,7 @@ export const setIdClient = async (req, res) => {
 
     return res.send("saved");
   } catch (err) {
-    global.logger.error("Error in setIdClient:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+    throw err;
   }
 };
 
@@ -87,7 +86,6 @@ export const getClientStats = async (req, res) => {
 
     return res.json({ count });
   } catch (err) {
-    global.logger.error("Error in getClientStats:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+    throw err;
   }
 };
