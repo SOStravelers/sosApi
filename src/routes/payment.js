@@ -74,6 +74,11 @@ router.post(
         type: "string",
       },
       {
+        param_key: "subService",
+        required: false,
+        type: "string",
+      },
+      {
         param_key: "partner",
         required: false,
         type: "string",

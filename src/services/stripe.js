@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import Booking from "../models/booking.js";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 import { byPassPolMauro } from "../utils/changeId.js";
-
+import Subservice from "../models/subservice.js";
 const populate = [
   {
     path: "businessUser",
@@ -220,8 +220,8 @@ export const transferPaymentsStripe = async (data, user) => {
   console.log("dataStripe", data);
   try {
     let allData = byPassPolMauro(data);
-    const { paymentIntentId, partner, workerUser, service } = allData;
-
+    let { paymentIntentId, partner, workerUser, service, subService } = allData;
+    console.log("la data", allData);
     if (!paymentIntentId) {
       throw new Error("PaymentIntent ID is required.");
     }
@@ -241,41 +241,57 @@ export const transferPaymentsStripe = async (data, user) => {
         );
       }
     }
-    console.log("paso1");
 
-    let priceBRL = 0;
-    console.log("la gran id", workerUser);
+    //cambiar el workerUser si es un subservicio especifico
+    const subServiceNow = await Subservice.findById(subService);
+    if (subServiceNow.partner) {
+      workerUser = subServiceNow.partner;
+    }
+
+    console.log("bl3", workerUser, partner);
+
     const worker = await User.findOne({ _id: workerUser }).select(
       "paymentData email"
     );
-    console.log("workerData", worker);
     const workerStripeId = worker?.paymentData?.stripeAccountId || null;
 
+    const partnerUser = await User.findOne({ username: partner }).select(
+      "paymentData email"
+    );
+
+    const partnerStripeId = partnerUser?.paymentData?.stripeAccountId || null;
+
+    console.log(
+      "bla",
+      worker._id,
+      workerStripeId,
+      partnerUser._id,
+      partnerStripeId
+    );
+
+    let priceBRL = 0;
+
+    // Verificar cargos
+    if (!paymentIntent.latest_charge) {
+      throw new Error("No se encontraron cargos para este PaymentIntent.");
+    }
+
+    const chargeId = paymentIntent.latest_charge;
+    console.log("Charge ID:", chargeId);
+    console.log("el precio", paymentIntent.amount);
+
+    const charge = await stripe.charges.retrieve(chargeId);
+    const balanceTransaction = await stripe.balanceTransactions.retrieve(
+      charge.balance_transaction
+    );
+
+    priceBRL = balanceTransaction.net / 100;
+
+    // Calcular divisiones
+    const totalAmount = paymentIntent.amount;
+
+    //se hace transferencia al proveedor
     if (workerStripeId) {
-      // Verificar cargos
-      if (!paymentIntent.latest_charge) {
-        throw new Error("No se encontraron cargos para este PaymentIntent.");
-      }
-
-      const chargeId = paymentIntent.latest_charge;
-      console.log("Charge ID:", chargeId);
-      console.log("el precio", paymentIntent.amount);
-
-      const charge = await stripe.charges.retrieve(chargeId);
-      const balanceTransaction = await stripe.balanceTransactions.retrieve(
-        charge.balance_transaction
-      );
-
-      priceBRL = balanceTransaction.net / 100;
-
-      const partnerUser = await User.findOne({ username: partner }).select(
-        "paymentData email"
-      );
-
-      const partnerStripeId = partnerUser?.paymentData?.stripeAccountId || null;
-
-      // Calcular divisiones
-      const totalAmount = paymentIntent.amount;
       const providerShare = partnerStripeId
         ? Math.round(totalAmount * 0.8)
         : Math.round(totalAmount * 0.9);
@@ -301,41 +317,40 @@ export const transferPaymentsStripe = async (data, user) => {
 
       const loginLink1 = await stripe.accounts.createLoginLink(workerStripeId);
 
-      console.log("Login Link:", loginLink1.url);
-      let transferPartner = null;
-      if (partnerStripeId) {
-        const totalAmount = paymentIntent.amount;
-        const partnerShare = Math.round(totalAmount * 0.1);
+      logger.info(
+        "Transferencias worker realizada",
+        transferProvider,
+        loginLink1
+      );
+    }
+    //se hace transferencia al partner
+    if (partnerStripeId) {
+      const partnerShare = Math.round(totalAmount * 0.1);
 
-        // Realizar transferencias
-        const transferPartner = await stripe.transfers.create({
-          amount: partnerShare,
-          currency: paymentIntent.currency,
-          destination: partnerStripeId,
-          source_transaction: chargeId,
-          description:
-            "P - " + paymentIntent.description + " - " + partnerUser.email,
-          metadata: {
-            paymentIntentId: paymentIntentId,
-            clientName: paymentIntent.metadata.clientName,
-            service: paymentIntent.metadata.service,
-            subservice: paymentIntent.metadata.subservice,
-            date: paymentIntent.metadata.date,
-            startTime: paymentIntent.metadata.startTime,
-            clientsNumber: paymentIntent.metadata.clientsNumber,
-            language: paymentIntent.metadata.language,
-          },
-        });
+      // Realizar transferencias
+      const transferPartner = await stripe.transfers.create({
+        amount: partnerShare,
+        currency: paymentIntent.currency,
+        destination: partnerStripeId,
+        source_transaction: chargeId,
+        description:
+          "P - " + paymentIntent.description + " - " + partnerUser.email,
+        metadata: {
+          paymentIntentId: paymentIntentId,
+          clientName: paymentIntent.metadata.clientName,
+          service: paymentIntent.metadata.service,
+          subservice: paymentIntent.metadata.subservice,
+          date: paymentIntent.metadata.date,
+          startTime: paymentIntent.metadata.startTime,
+          clientsNumber: paymentIntent.metadata.clientsNumber,
+          language: paymentIntent.metadata.language,
+        },
+      });
 
-        const loginLink2 = await stripe.accounts.createLoginLink(
-          partnerStripeId
-        );
-        console.log("Login Link:", loginLink2.url);
-      }
-
-      logger.info("Transferencias realizadas con éxito:", {
-        provider: transferProvider,
-        partner: transferPartner || null,
+      const loginLink2 = await stripe.accounts.createLoginLink(partnerStripeId);
+      logger.info("Transferencias partner realizada", {
+        provider: transferPartner,
+        link: loginLink2,
       });
     }
     return { priceBRL };
