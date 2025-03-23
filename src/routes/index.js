@@ -13,6 +13,7 @@ import admin from "./admin.js";
 import schedule from "./schedule.js";
 import holliday from "./holliday.js";
 import support from "./support.js";
+import partner from "./partner.js";
 import {
   isAuth,
   isAdmin,
@@ -52,6 +53,9 @@ routes.use("/schedules2", schedule);
 routes.use("/hollidays", isAuth, holliday);
 
 routes.use("/favorites", isAuth, favorite);
+
+routes.use("/partners", partner);
+routes.use("/partnersAuth", isAuth, partner);
 
 routes.use("/tests", test);
 
