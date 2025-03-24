@@ -52,7 +52,7 @@ export const resendConfirmPersonal = async (info) => {
     const toSend = isWorker ? emailWorker : email;
     const data = await resend.emails.send({
       from: "SOS Travelers <booking@sostvl.com>",
-      to: [toSend, "jschacosta@gmail.com", "sostravellers@gmail.com"], // va dirigido al usuario
+      to: [toSend, "sostravellers@gmail.com"], // va dirigido al usuario
       subject: "SOS Travelers - Confirm booking",
       html: htmlToSend,
     });

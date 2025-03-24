@@ -154,10 +154,7 @@ export const create = async (req, res, next) => {
         //   completedData // completedData
         // );
       }
-      console.log("telefono 2", req.body.clientPhone);
-      console.log("telefono 3", booking.clientPhone);
-      console.log("telefono 4", newBooking.clientPhone);
-      console.log("telefono 5", theBooking.clientPhone);
+      console.log("telefono", theBooking.clientPhone);
       if (booking.multiple) {
         const worker = await User.findById(booking.workerUser);
 
@@ -199,8 +196,8 @@ export const create = async (req, res, next) => {
             worker.personalData.name.first +
             " " +
             worker.personalData.name.last,
-          // emailWorker: worker.email,
-          emailWorker: "jschacosta@gmail.com",
+          emailWorker: worker.email,
+          // emailWorker: "jschacosta@gmail.com",
           workerName:
             worker?.personalData?.name?.first +
             " " +
