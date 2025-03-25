@@ -96,6 +96,7 @@ const subserviceSchema = new Schema(
     hasLimit: { type: Boolean, default: false },
     goChat: { type: Boolean, default: false },
     partner: { type: String, ref: "User" },
+    isoDate: { type: String },
     //hloa
   },
   { timestamps: true }

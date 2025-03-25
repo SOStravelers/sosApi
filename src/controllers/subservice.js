@@ -24,7 +24,7 @@ export const getByService = async (req, res, next) => {
     let options = {
       // populate,
       select:
-        "name price duration imgUrl details multiple shortDescription goChat",
+        "name price duration imgUrl details multiple shortDescription goChat isoTime",
       page: Number(req.query.page) || 1,
       limit: Number(req.query.limit) || 50,
       sort: { updatedAt: -1 },
