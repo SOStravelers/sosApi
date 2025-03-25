@@ -97,7 +97,6 @@ const subserviceSchema = new Schema(
     goChat: { type: Boolean, default: false },
     partner: { type: String, ref: "User" },
     isoDate: { type: String },
-    stringData: { type: String },
     //hloa
   },
   { timestamps: true }

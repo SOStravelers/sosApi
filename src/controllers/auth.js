@@ -1167,7 +1167,7 @@ export const getRandomUsers = async (req, res, next) => {
         },
         {
           path: "workerData.services.subServices",
-          select: "name imgUrl duration price isActive multiple goChat",
+          select: "name imgUrl duration price isActive multiple goChat isoTime",
           model: "Subservice",
           match: { isActive: true },
         },
