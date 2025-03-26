@@ -359,7 +359,7 @@ export const transferPaymentsStripe = async (data, user) => {
     throw error;
   }
 };
-
+//minicambio
 //UPDATE PAYMENT INTENT WITH METADATA
 export const updatedPaymentIntent = async (data) => {
   logger.info("---UPDATE PAYMENT INTENT STRIPE ---");
