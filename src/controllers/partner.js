@@ -17,7 +17,7 @@ export const setIdClient = async (req, res) => {
     if (!partner) partner = "external";
 
     const client = await Partner.findOne({ clientId }).exec();
-
+    console.log("hay cliente", client);
     if (client) {
       await Partner.findOneAndUpdate(
         { clientId },

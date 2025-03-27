@@ -10,6 +10,7 @@ import { procesarNombre } from "../utils/data.js";
 import { createCustomerId } from "../services/stripe.js";
 import { resendEmail } from "../services/resend.js";
 import Booking from "../models/booking.js";
+import mongoose from "mongoose";
 
 import {
   generarNumero4Digitos,
@@ -365,14 +366,12 @@ export const createPassToken = async (req, res, next) => {
 };
 //Obtener usuario por ID
 export const getById = async (req, res, next) => {
-  global.logger.info({
-    message: "--- GET USER BY ID ---",
-  });
+  logger.info("--- GET USER BY id ---");
   console.log(req.params.id);
   try {
     const user = await User.findOne({ _id: req.params.id })
       .select(
-        "about email img language personalData username workerData _id security.hasPassword"
+        "about newAbout reviewScore numberBookings email img language personalData username workerData _id security.hasPassword"
       )
       .populate({
         path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
@@ -389,6 +388,7 @@ export const getById = async (req, res, next) => {
     if (!user) {
       throw createError(404, "User not found");
     } else {
+      console.log("el user", user);
       res.status(200).json(user);
     }
   } catch (err) {
@@ -1302,6 +1302,45 @@ export const getRandomUsers = async (req, res, next) => {
   }
 };
 
+export const getWorkerUsers = async (req, res, next) => {
+  try {
+    global.logger.info({
+      message: "--- GET WORKER USERS ---",
+    });
+
+    const users = await User.aggregate([
+      {
+        $match: {
+          type: "worker",
+          isActive: true,
+          _id: { $ne: new mongoose.Types.ObjectId("65312a63c0b1e1658a5a712c") },
+        },
+      },
+      { $sample: { size: 50 } }, // Cambiá 50 por el máximo de usuarios que querís
+    ]);
+
+    // Hacemos populate manual porque aggregate no permite populate directamente
+    const populatedUsers = await User.populate(users, [
+      {
+        path: "workerData.services.id",
+        select: "name isActive",
+        match: { isActive: true },
+        model: "Service",
+      },
+      {
+        path: "workerData.services.subServices",
+        select: "name imgUrl duration price isActive multiple goChat isoTime",
+        match: { isActive: true },
+        model: "Subservice",
+      },
+    ]);
+
+    return res.send(populatedUsers);
+  } catch (err) {
+    next(err);
+  }
+};
+
 function stripDate(date) {
   return new Date(
     1970,
@@ -1312,3 +1351,31 @@ function stripDate(date) {
     date.getSeconds()
   );
 }
+
+///para testing
+
+export const gettokenUser = async (req, res, next) => {
+  logger.info("--- GET TOKEN USER ---");
+  console.log("email", req.params.email);
+  try {
+    const user = await User.findOne({ email: req.params.email }).select(
+      " email img _id  username type"
+    );
+    if (!user) {
+      throw createError(404, "User not found");
+    }
+    const userToCreateToken = {
+      _id: user._id,
+      username: user.username,
+      type: user.type,
+    };
+    res.status(200).json({
+      msg: "login success",
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userToCreateToken),
+      user: user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

@@ -61,6 +61,30 @@ const userSchema = new Schema(
       enum: ["email", "google", "other"],
     },
     about: { type: String, default: "" },
+    newAbout: {
+      en: {
+        type: String,
+        default: "",
+      },
+      es: {
+        type: String,
+        default: "",
+      },
+      pt: {
+        type: String,
+        default: "",
+      },
+      fr: {
+        type: String,
+        default: "",
+      },
+      de: {
+        type: String,
+        default: "",
+      },
+    },
+    reviewScore: { type: Number, default: 0 },
+    numberBookings: { type: Number, default: 0 },
     language: {
       type: String,
       default: "EN",

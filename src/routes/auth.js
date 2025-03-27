@@ -21,6 +21,8 @@ import {
   loginEmailBusiness,
   getWorkerForBook,
   getRandomUsers,
+  getWorkerUsers,
+  gettokenUser,
 } from "../controllers/auth.js";
 
 //Create user/worker/business
@@ -410,4 +412,23 @@ router.get(
 );
 //get business by service
 router.get("/random/users", getRandomUsers);
+//worker users
+router.get("/worker/users", getWorkerUsers);
+
+//para test
+
+router.get(
+  "/email/:email",
+  validateParams(
+    [
+      {
+        param_key: "email",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  gettokenUser
+);
 export default router;
