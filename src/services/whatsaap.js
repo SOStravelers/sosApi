@@ -16,7 +16,7 @@ export const initializeWhatsApp = (mongoose) => {
     authStrategy: new LocalAuth({
       store,
       clientId: "whatsapp-bot",
-      backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
+      // backupSyncIntervalMs: 60000, // Configura el intervalo a 1 minuto (60000 ms)
     }),
     puppeteer: {
       args: ["--no-sandbox", "--disable-setuid-sandbox"], // Añadir estos argumentos
