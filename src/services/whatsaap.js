@@ -185,7 +185,7 @@ export const initializeWhatsApp = (mongoose) => {
             Escreva sua consulta e responderemos em breve. ⏳
             Écrivez votre demande et nous répondrons rapidement. ⏳
             `;
-          await message.reply(replyMessage);
+          // await message.reply(replyMessage);
         }
       } else {
         console.log("no hay mensaje");
