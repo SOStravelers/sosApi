@@ -18,6 +18,7 @@ export const setIdClient = async (req, res) => {
 
     const client = await Partner.findOne({ clientId }).exec();
     console.log("hay cliente", client);
+
     if (client) {
       await Partner.findOneAndUpdate(
         { clientId },
@@ -29,16 +30,38 @@ export const setIdClient = async (req, res) => {
         }
       ).exec();
     } else {
-      await Partner.create({
-        clientId,
-        firstPartner: partner,
-        lastPartner: partner,
-      });
+      try {
+        await Partner.create({
+          clientId,
+          firstPartner: partner,
+          lastPartner: partner,
+        });
+      } catch (err) {
+        // Si el error es por clave duplicada, no se cae
+        if (err.code === 11000) {
+          global.logger.warn(
+            "Cliente ya existe (duplicate key), actualizando..."
+          );
+          await Partner.findOneAndUpdate(
+            { clientId },
+            {
+              $set: {
+                lastConection: new Date(),
+                lastPartner: partner,
+              },
+            }
+          ).exec();
+        } else {
+          throw err;
+        }
+      }
     }
 
     return res.send("saved");
   } catch (err) {
-    throw err;
+    console.error("Error en setIdClient:", err);
+    global.logger.error("Error en setIdClient", err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

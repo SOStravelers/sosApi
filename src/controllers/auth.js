@@ -1152,9 +1152,7 @@ export const businessByService = async (req, res, next) => {
 
 export const getRandomUsers = async (req, res, next) => {
   try {
-    global.logger.info({
-      message: "--- GET RANDOM USERS ---",
-    });
+    global.logger.info("--- GET RANDOM USERS ---");
 
     const user = await User.findOne({ _id: "65312a63c0b1e1658a5a712c" })
       .select("_id personalData workerData.services img.imgUrl")
@@ -1162,142 +1160,64 @@ export const getRandomUsers = async (req, res, next) => {
         {
           path: "workerData.services.id",
           select: "name isActive",
-          match: { isActive: true },
           model: "Service",
         },
         {
           path: "workerData.services.subServices",
           select: "name imgUrl duration price isActive multiple goChat isoTime",
           model: "Subservice",
-          match: { isActive: true },
         },
-      ]);
-    console.log("el usuario", user._id, user.workerData.services);
+      ])
+      .lean();
+
+    if (!user || !user.workerData || !Array.isArray(user.workerData.services)) {
+      return res.send([]);
+    }
+
     const finalArray = [];
-    console.log("length", user.workerData.services.length);
-    for (let i = 0; i < user.workerData.services.length; i++) {
-      const usernew = {
-        ...user,
+
+    for (const service of user.workerData.services) {
+      if (!service || !service.id) {
+        console.warn("Servicio sin ID:", service);
+        continue;
+      }
+
+      const activeSubServices = (service.subServices || []).filter(
+        (sub) => sub?.isActive
+      );
+
+      console.log(
+        "Servicio:",
+        service.id.name?.en,
+        "| Activos:",
+        activeSubServices.length
+      );
+
+      if (activeSubServices.length === 0) {
+        continue;
+      }
+
+      const userClone = {
+        _id: user._id,
+        personalData: user.personalData,
+        img: user.img,
         workerData: {
           ...user.workerData,
-          services: [...user.workerData.services],
+          services: [
+            {
+              ...service,
+              subServices: activeSubServices,
+            },
+          ],
         },
       };
-      usernew.workerData.services = usernew.workerData.services.filter(
-        (_, index) => index === i
-      );
-      console.log("usuario2", usernew.workerData.services[0].id);
-      if (usernew.workerData.services[0].id) {
-        finalArray.push(usernew);
-      }
-    }
-    res.send(finalArray);
 
-    return;
-
-    const schedules = await ScheduleMultiple.aggregate([
-      { $sample: { size: 4 } },
-    ]);
-
-    // Obtener todos los IDs de usuario
-    const userIds = await User.find({
-      type: "worker",
-      isActive: true,
-      "workerData.isActive": true,
-    }).select("_id");
-
-    console.log(userIds.length);
-
-    // Función para seleccionar aleatoriamente IDs sin duplicados
-    const selectRandomIds = (ids, count) => {
-      const randomIds = [];
-      const availableIds = [...ids];
-      for (let i = 0; i < count && availableIds.length > 0; i++) {
-        const randomIndex = Math.floor(Math.random() * availableIds.length);
-        randomIds.push(availableIds[randomIndex]);
-        availableIds.splice(randomIndex, 1); // Eliminar el ID seleccionado
-      }
-      return randomIds;
-    };
-
-    let filteredUsers = [];
-    let attempts = 0;
-
-    // Intentar garantizar que se obtengan al menos 4 usuarios válidos
-    while (filteredUsers.length < 4 && attempts < 5) {
-      attempts++;
-
-      // Seleccionar un mayor número de IDs al azar para aumentar las probabilidades
-      const randomIds = selectRandomIds(userIds, 10);
-      console.log("casa", randomIds);
-      // Buscar usuarios y poblar campos
-      const randomUsers = await User.find({ _id: { $in: randomIds } })
-        .select("_id personalData workerData.services img.imgUrl")
-        .populate([
-          {
-            path: "workerData.services.id",
-            select: "name isActive",
-            match: { isActive: true },
-            model: "Service",
-          },
-          {
-            path: "workerData.services.subServices",
-            select: "name imgUrl duration price isActive multiple",
-            model: "Subservice",
-            match: { isActive: true },
-          },
-        ]);
-
-      // Filtrar subservicios activos y mantener solo los relevantes
-      const validUsers = await Promise.all(
-        randomUsers.map(async (user) => {
-          const updatedServices = await Promise.all(
-            user.workerData.services.map(async (service) => {
-              const activeSubServices = await ScheduleMultiple.find({
-                user: user._id,
-                subService: { $in: service.subServices.map((sub) => sub._id) },
-                isActive: true,
-                "schedules.isActive": true,
-              }).select("subService");
-              console.log("encontro", activeSubServices);
-              const activeSubServiceIds = activeSubServices.map(
-                (schedule) => schedule.subService
-              );
-
-              // Filtrar los subservices activos
-              const filteredSubServices = service.subServices.filter((sub) =>
-                activeSubServiceIds.includes(sub._id.toString())
-              );
-
-              // Retornar solo si hay subservices activos
-              return filteredSubServices.length > 0
-                ? {
-                    ...service.toObject(),
-                    subServices: filteredSubServices,
-                  }
-                : null;
-            })
-          );
-
-          // Filtrar servicios sin subservices activos
-          user.workerData.services = updatedServices.filter(
-            (service) => service
-          );
-
-          return user.workerData.services.length > 0 ? user : null;
-        })
-      );
-
-      // Filtrar usuarios no válidos
-      filteredUsers = validUsers.filter((user) => user);
-
-      // Si hay al menos 4 usuarios válidos, detener el bucle
-      if (filteredUsers.length >= 4) break;
+      finalArray.push(userClone);
     }
 
-    // Limitar a un máximo de 6 usuarios antes de enviar
-    res.send(filteredUsers.slice(0, 6));
+    return res.send(finalArray);
   } catch (err) {
+    console.error("Error en getRandomUsers:", err);
     next(err);
   }
 };
