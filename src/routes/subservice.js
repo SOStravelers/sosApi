@@ -12,6 +12,8 @@ import {
   getPrice,
   infoSubserviceByWorker,
   getByEmail,
+  getWithVideos,
+  getRecommendedSubservice,
 } from "../controllers/subservice.js";
 
 //Create subService
@@ -61,7 +63,7 @@ router.get(
 );
 //Get subservice by ID
 router.get(
-  "/:id",
+  "/byId/:id",
   validateParams(
     [
       {
@@ -76,7 +78,7 @@ router.get(
 );
 //Get all services
 router.get(
-  "/get/all",
+  "/getAll/paginate",
   validateParams(
     [
       {
@@ -99,9 +101,14 @@ router.get(
   ),
   getAll
 );
+
+//Get sugerencias con videos
+router.get("/get/withVideos", getWithVideos);
+//Get recomendados
+router.get("/get/recommended", getRecommendedSubservice);
 //update subservice
 router.put(
-  "/:id",
+  "/allData/:id",
   validateParams(
     [
       {

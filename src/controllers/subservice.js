@@ -41,9 +41,15 @@ export const getByService = async (req, res, next) => {
 };
 //Obtener subService por id
 export const getById = async (req, res, next) => {
-  global.logger.info("---GET SUBSERVICE BY ID---");
+  global.logger.info("---GET SUBSERVICE BY IDs---");
+  console.log(req.params);
   try {
-    const subService = await Subservice.findOne({ _id: req.params.id }).exec();
+    const subService = await Subservice.findOne({ _id: req.params.id })
+      .populate({
+        path: "service",
+        select: "name",
+      })
+      .exec();
     if (!subService) throw createError(404, "subService not found");
     res.status(200).json(subService);
   } catch (err) {
@@ -63,7 +69,37 @@ export const getAll = async (req, res, next) => {
       limit: query.limit || 50,
       sort: { updatedAt: -1 },
     };
-    const subservices = await Subservice.paginate(query, options);
+    console.log("options", options);
+    console.log("la query", query);
+
+    const subservices = await Subservice.paginate({ isActive: true }, options);
+    res.status(200).json(subservices);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Obtener all services con paginate segun varias metricas
+export const getWithVideos = async (req, res, next) => {
+  global.logger.info("---GET SUBSERVICES WITH VIDEOS---");
+  try {
+    const subservices = await Subservice.find({
+      videoUrl: { $exists: true, $ne: null },
+    });
+    res.status(200).json(subservices);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Obtener all services con paginate segun varias metricas
+export const getRecommendedSubservice = async (req, res, next) => {
+  global.logger.info("---GET SUBSERVICES RECOMENDED---");
+  try {
+    const subservices = await Subservice.aggregate([
+      { $match: { recommended: true } },
+      { $sample: { size: 7 } },
+    ]);
     res.status(200).json(subservices);
   } catch (err) {
     next(err);

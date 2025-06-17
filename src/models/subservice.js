@@ -76,6 +76,12 @@ const subserviceSchema = new Schema(
       },
     },
     imgUrl: { type: String },
+    videoUrl: { type: String },
+    gallery: {
+      _id: false,
+      images: [{ type: String }],
+      videos: [{ type: String }],
+    },
     creator: { type: String, ref: "User" },
     updated: {
       updatedAt: {
@@ -90,14 +96,99 @@ const subserviceSchema = new Schema(
       category2: { type: Number, default: 0 },
       category3: { type: Number, default: 0 },
     },
+    route: [
+      {
+        _id: false,
+        name: {
+          en: {
+            type: String,
+            default: "",
+          },
+          es: {
+            type: String,
+            default: "",
+          },
+          fr: {
+            type: String,
+            default: "",
+          },
+          pt: {
+            type: String,
+            default: "",
+          },
+          de: {
+            type: String,
+            default: "",
+          },
+        },
+        mapLocation: { type: String },
+      },
+    ],
+    includedList: [
+      {
+        _id: false,
+        name: {
+          en: {
+            type: String,
+            default: "",
+          },
+          es: {
+            type: String,
+            default: "",
+          },
+          fr: {
+            type: String,
+            default: "",
+          },
+          pt: {
+            type: String,
+            default: "",
+          },
+          de: {
+            type: String,
+            default: "",
+          },
+        },
+      },
+    ],
+    restrictions: [
+      {
+        _id: false,
+        name: {
+          en: {
+            type: String,
+            default: "",
+          },
+          es: {
+            type: String,
+            default: "",
+          },
+          fr: {
+            type: String,
+            default: "",
+          },
+          pt: {
+            type: String,
+            default: "",
+          },
+          de: {
+            type: String,
+            default: "",
+          },
+        },
+      },
+    ],
+    rate: { type: Number, default: 5 },
+    rateCount: { type: Number, default: 10 },
+    commentsCount: { type: Number, default: 3 },
     type: { type: String, default: "personal", enum: ["personal", "group"] },
     limit: { type: Number, default: 1 },
+    recommended: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
     hasLimit: { type: Boolean, default: false },
     goChat: { type: Boolean, default: false },
     partner: { type: String, ref: "User" },
     isoDate: { type: String },
-    //hloa
   },
   { timestamps: true }
 );

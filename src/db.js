@@ -22,7 +22,7 @@ mongoose
 
     // Inicializar WhatsApp después de conectar a MongoDB
     if (env == "production") {
-      initializeWhatsApp(mongoose);
+      // initializeWhatsApp(mongoose);
     }
   })
   .catch((err) => console.error("❌ Error al conectar a MongoDB:", err));
