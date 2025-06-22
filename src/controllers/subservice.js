@@ -10,6 +10,7 @@ import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 import Jimp from "jimp";
 import envar from "../config/envar.js";
+//hola
 
 async function awsDelete(key) {
   await s3.send(
