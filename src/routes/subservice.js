@@ -18,13 +18,33 @@ import {
   getAllByService,
   changeStatus,
 } from "../controllers/subservice.js";
-
+import { isValidImage, isValidVideo } from "../config/uploadTypes.js";
 // multer en memoria, límite general 50MB por archivo
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+  fileFilter(req, file, cb) {
+    const { fieldname, mimetype } = file;
+
+    // 1️⃣ campos de imagen
+    if (["imgUrl", "galleryImages"].includes(fieldname)) {
+      if (!isValidImage(mimetype)) {
+        return cb(createError(415, `Unsupported image type: ${mimetype}`));
+      }
+    }
+
+    // 2️⃣ campos de vídeo
+    if (["videoUrl", "galleryVideos"].includes(fieldname)) {
+      if (!isValidVideo(mimetype)) {
+        return cb(createError(415, `Unsupported video type: ${mimetype}`));
+      }
+    }
+
+    cb(null, true); // aceptar archivo
+  },
 });
 
+//para subir galeria de fotos y videos
 router.post(
   "/assets/:id",
   validateParams(
@@ -215,7 +235,7 @@ router.get(
 //obtener todos los subservicios agrupados por servicios
 router.get("/all/byService", getAllByService);
 
-//actualizar isActive en un servicio:
+//actualizar isActive en un sub-servicio:
 router.put(
   "/changeStatus/one/:id",
   validateParams(

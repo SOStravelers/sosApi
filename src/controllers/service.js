@@ -68,6 +68,29 @@ export const updateOne = async (req, res, next) => {
     next(err);
   }
 };
+
+// Actualizar status isActive de un servicio
+export const changeStatus = async (req, res, next) => {
+  global.logger.info("---UPDATE STATUS SUBSERVICE---");
+  try {
+    let data = req.body;
+    const subservice = await Service.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        isActive: data.isActive,
+      },
+      {
+        new: true,
+      }
+    ).exec();
+    if (!subservice) throw createError(404, "service not found");
+    res.status(200).json(subservice);
+  } catch (err) {
+    next(err);
+  }
+};
 //Activar o desactivar multiples usuarios
 export const activateMany = async (req, res, next) => {
   global.logger.info("---ACTIVATE/DESACTIVATE MANY SERVICES---");

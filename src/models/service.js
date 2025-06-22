@@ -29,6 +29,7 @@ const serviceSchema = new Schema(
       },
     },
     isActive: { type: Boolean, default: true },
+    archived: { type: Boolean, default: false },
     details: { type: String },
     imgUrl: { type: String },
     icon: { type: String },

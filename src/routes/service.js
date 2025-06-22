@@ -12,6 +12,7 @@ import {
   activateMany,
   uploadIconService,
   serviceAndSubservice,
+  changeStatus,
 } from "../controllers/service.js";
 import { getServicesBusiness } from "../controllers/user.js";
 
@@ -157,6 +158,32 @@ router.post(
   ),
   upload.single("file"),
   uploadIconService
+);
+
+//actualizar isActive en un servicio:
+router.put(
+  "/changeStatus/one/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "isActive",
+        required: true,
+        type: "boolean",
+      },
+    ],
+    "body"
+  ),
+  changeStatus
 );
 
 export default router;

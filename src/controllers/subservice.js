@@ -3,7 +3,7 @@ import User from "../models/user.js";
 import ScheduleMultiple from "../models/scheduleMultiple.js";
 import { createError } from "../config/error.js";
 import { botcurrency } from "../services/botcurrency.js";
-
+import { isValidImage, isValidVideo } from "../config/uploadTypes.js";
 import { AwsUploadFile } from "../services/aws_s3.js";
 import { s3 } from "../services/awsClient.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -26,36 +26,30 @@ function extractKeyFromUrl(url) {
 }
 
 export const uploadAssets = async (req, res, next) => {
-  console.log("ha entrado");
+  const uploadedKeys = []; // para rollback si algo falla
+
   try {
     const { id } = req.params;
     const files = req.files || {};
     const body = req.body;
 
-    // Obtener subservice actual
+    /* 1. Obtener subservicio */
     const sub = await Subservice.findById(id);
     if (!sub) throw createError(404, "Subservice no encontrado");
 
     const updates = {};
     const deletes = [];
 
-    // 1) Borrar imagen principal si se solicitó
+    /* 2. Borrados solicitados ---------------------------------- */
     if (body.removeImg === "true" && sub.imgUrl) {
-      console.log("caso1", body.removeImg, sub.imgUrl);
       deletes.push(extractKeyFromUrl(sub.imgUrl));
       updates.imgUrl = null;
     }
-
-    // 2) Borrar vídeo principal
     if (body.removeVideo === "true" && sub.videoUrl) {
-      console.log("caso2", body.removeVideo, sub.videoUrl);
       deletes.push(extractKeyFromUrl(sub.videoUrl));
       updates.videoUrl = null;
     }
-
-    // 3) Borrar gallery images
     if (body.removeGalleryImages) {
-      console.log("caso3", body.removeGalleryImages);
       const idxs = JSON.parse(body.removeGalleryImages);
       sub.gallery.images.forEach((url, i) => {
         if (idxs.includes(i)) deletes.push(extractKeyFromUrl(url));
@@ -64,10 +58,7 @@ export const uploadAssets = async (req, res, next) => {
         (_, i) => !idxs.includes(i)
       );
     }
-
-    // 4) Borrar gallery videos
     if (body.removeGalleryVideos) {
-      console.log("caso4", body.removeGalleryVideos);
       const idxs = JSON.parse(body.removeGalleryVideos);
       sub.gallery.videos.forEach((url, i) => {
         if (idxs.includes(i)) deletes.push(extractKeyFromUrl(url));
@@ -77,68 +68,96 @@ export const uploadAssets = async (req, res, next) => {
       );
     }
 
-    // 5) Subir nueva imagen principal
+    /* 3. Imagen principal -------------------------------------- */
     if (files.imgUrl) {
       const img = files.imgUrl[0];
-      const image = await Jimp.read(img.buffer);
-      image.resize(800, Jimp.AUTO).quality(80);
-      const buf = await image.getBufferAsync(Jimp.MIME_JPEG);
-      const resp = await AwsUploadFile({
-        fileName: `subservices/${id}/img.${img.mimetype.split("/")[1]}`,
-        buffer: buf,
-      });
-      updates.imgUrl = resp.url;
+
+      if (!isValidImage(img.mimetype)) {
+        throw createError(415, `Unsupported image type: ${img.mimetype}`);
+      }
+
+      const jimp = await Jimp.read(img.buffer);
+      jimp.resize(800, Jimp.AUTO).quality(80);
+      const buf = await jimp.getBufferAsync(Jimp.MIME_JPEG);
+
+      const key = `subservices/${id}/img.jpg`;
+      const { url } = await AwsUploadFile({ fileName: key, buffer: buf });
+      uploadedKeys.push(key);
+
+      updates.imgUrl = url;
     }
 
-    // 6) Subir nuevo vídeo principal
+    /* 4. Vídeo principal --------------------------------------- */
     if (files.videoUrl) {
       const vid = files.videoUrl[0];
+
+      if (!isValidVideo(vid.mimetype)) {
+        throw createError(415, `Unsupported video type: ${vid.mimetype}`);
+      }
+
       const ext = vid.originalname.split(".").pop();
-      const resp = await AwsUploadFile({
-        fileName: `subservices/${id}/video.${ext}`,
+      const key = `subservices/${id}/video.${ext}`;
+      const { url } = await AwsUploadFile({
+        fileName: key,
         buffer: vid.buffer,
       });
-      updates.videoUrl = resp.url;
+      uploadedKeys.push(key);
+
+      updates.videoUrl = url;
     }
 
-    // 7) Subir nuevas gallery images
+    /* 5. Galería de imágenes ----------------------------------- */
     if (files.galleryImages) {
       const oldImgs = updates["gallery.images"] || sub.gallery.images;
       const newUrls = [];
+
       for (let i = 0; i < files.galleryImages.length; i++) {
         const file = files.galleryImages[i];
-        const image = await Jimp.read(file.buffer);
-        image.resize(800, Jimp.AUTO).quality(70);
-        const buf = await image.getBufferAsync(Jimp.MIME_JPEG);
-        const resp = await AwsUploadFile({
-          fileName: `subservices/${id}/gallery/img_${Date.now()}_${i}.jpg`,
-          buffer: buf,
-        });
-        newUrls.push(resp.url);
+
+        if (!isValidImage(file.mimetype)) {
+          throw createError(415, `Unsupported image type: ${file.mimetype}`);
+        }
+
+        const jimp = await Jimp.read(file.buffer);
+        jimp.resize(800, Jimp.AUTO).quality(70);
+        const buf = await jimp.getBufferAsync(Jimp.MIME_JPEG);
+
+        const key = `subservices/${id}/gallery/img_${Date.now()}_${i}.jpg`;
+        const { url } = await AwsUploadFile({ fileName: key, buffer: buf });
+        uploadedKeys.push(key);
+        newUrls.push(url);
       }
       updates["gallery.images"] = [...oldImgs, ...newUrls];
     }
 
-    // 8) Subir nuevos gallery videos
+    /* 6. Galería de vídeos ------------------------------------- */
     if (files.galleryVideos) {
       const oldVids = updates["gallery.videos"] || sub.gallery.videos;
       const newUrls = [];
+
       for (let i = 0; i < files.galleryVideos.length; i++) {
         const file = files.galleryVideos[i];
+
+        if (!isValidVideo(file.mimetype)) {
+          throw createError(415, `Unsupported video type: ${file.mimetype}`);
+        }
+
         const ext = file.originalname.split(".").pop();
-        const resp = await AwsUploadFile({
-          fileName: `subservices/${id}/gallery/vid_${Date.now()}_${i}.${ext}`,
+        const key = `subservices/${id}/gallery/vid_${Date.now()}_${i}.${ext}`;
+        const { url } = await AwsUploadFile({
+          fileName: key,
           buffer: file.buffer,
         });
-        newUrls.push(resp.url);
+        uploadedKeys.push(key);
+        newUrls.push(url);
       }
       updates["gallery.videos"] = [...oldVids, ...newUrls];
     }
 
-    // Ejecutar borrados en S3
-    await Promise.all(deletes.map((key) => awsDelete(key)));
+    /* 7. Ejecutar borrados solicitados -------------------------- */
+    await Promise.all(deletes.map((k) => awsDelete(k)));
 
-    // Actualizar MongoDB
+    /* 8. Guardar en MongoDB ------------------------------------- */
     const updated = await Subservice.findByIdAndUpdate(
       id,
       { $set: updates },
@@ -147,6 +166,12 @@ export const uploadAssets = async (req, res, next) => {
 
     res.json(updated);
   } catch (err) {
+    /* 🔄 rollback: borrar lo que se subió en esta request */
+    if (Array.isArray(uploadedKeys) && uploadedKeys.length) {
+      await Promise.all(uploadedKeys.map((k) => awsDelete(k))).catch(
+        console.error
+      );
+    }
     next(err);
   }
 };

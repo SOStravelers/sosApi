@@ -52,6 +52,7 @@ const subserviceSchema = new Schema(
     },
     service: { type: String, ref: "Service" },
     isActive: { type: Boolean, default: true },
+    archived: { type: Boolean, default: false },
     duration: { type: Number },
     details: {
       en: {
