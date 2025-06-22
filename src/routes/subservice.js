@@ -1,7 +1,7 @@
 import Router from "express";
 const router = Router();
+import multer from "multer";
 import validateParams from "../middleware/validate.js";
-
 import {
   create,
   getById,
@@ -14,8 +14,31 @@ import {
   getByEmail,
   getWithVideos,
   getRecommendedSubservice,
+  uploadAssets,
+  getAllByService,
+  changeStatus,
 } from "../controllers/subservice.js";
 
+// multer en memoria, límite general 50MB por archivo
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
+
+router.post(
+  "/assets/:id",
+  validateParams(
+    [{ param_key: "id", required: true, type: "string" }],
+    "params"
+  ),
+  upload.fields([
+    { name: "imgUrl", maxCount: 1 },
+    { name: "videoUrl", maxCount: 1 },
+    { name: "galleryImages", maxCount: 8 },
+    { name: "galleryVideos", maxCount: 3 },
+  ]),
+  uploadAssets
+);
 //Create subService
 router.post(
   "/",
@@ -101,7 +124,6 @@ router.get(
   ),
   getAll
 );
-
 //Get sugerencias con videos
 router.get("/get/withVideos", getWithVideos);
 //Get recomendados
@@ -155,7 +177,6 @@ router.get(
   ),
   getPrice
 );
-
 //Obtener los precios actuaales
 router.get(
   "/data/byWorker/",
@@ -176,7 +197,6 @@ router.get(
   ),
   infoSubserviceByWorker
 );
-
 //Obtener los services y subservices  por email
 router.get(
   "/all/byemail/:email",
@@ -192,5 +212,32 @@ router.get(
   ),
   getByEmail
 );
+//obtener todos los subservicios agrupados por servicios
+router.get("/all/byService", getAllByService);
 
+//actualizar isActive en un servicio:
+router.put(
+  "/changeStatus/one/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "isActive",
+        required: true,
+        type: "boolean",
+      },
+    ],
+    "body"
+  ),
+  changeStatus
+);
 export default router;

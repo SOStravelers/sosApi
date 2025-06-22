@@ -31,6 +31,7 @@ const serviceSchema = new Schema(
     isActive: { type: Boolean, default: true },
     details: { type: String },
     imgUrl: { type: String },
+    icon: { type: String },
     creator: { type: String, ref: "User" },
     updated: {
       updatedAt: {

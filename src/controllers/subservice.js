@@ -4,6 +4,153 @@ import ScheduleMultiple from "../models/scheduleMultiple.js";
 import { createError } from "../config/error.js";
 import { botcurrency } from "../services/botcurrency.js";
 
+import { AwsUploadFile } from "../services/aws_s3.js";
+import { s3 } from "../services/awsClient.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import Jimp from "jimp";
+import envar from "../config/envar.js";
+
+async function awsDelete(key) {
+  await s3.send(
+    new DeleteObjectCommand({ Bucket: envar().BUCKET_NAME_FILES, Key: key })
+  );
+}
+
+function extractKeyFromUrl(url) {
+  try {
+    const { pathname } = new URL(url);
+    return pathname.startsWith("/") ? pathname.slice(1) : pathname;
+  } catch {
+    return url;
+  }
+}
+
+export const uploadAssets = async (req, res, next) => {
+  console.log("ha entrado");
+  try {
+    const { id } = req.params;
+    const files = req.files || {};
+    const body = req.body;
+
+    // Obtener subservice actual
+    const sub = await Subservice.findById(id);
+    if (!sub) throw createError(404, "Subservice no encontrado");
+
+    const updates = {};
+    const deletes = [];
+
+    // 1) Borrar imagen principal si se solicitó
+    if (body.removeImg === "true" && sub.imgUrl) {
+      console.log("caso1", body.removeImg, sub.imgUrl);
+      deletes.push(extractKeyFromUrl(sub.imgUrl));
+      updates.imgUrl = null;
+    }
+
+    // 2) Borrar vídeo principal
+    if (body.removeVideo === "true" && sub.videoUrl) {
+      console.log("caso2", body.removeVideo, sub.videoUrl);
+      deletes.push(extractKeyFromUrl(sub.videoUrl));
+      updates.videoUrl = null;
+    }
+
+    // 3) Borrar gallery images
+    if (body.removeGalleryImages) {
+      console.log("caso3", body.removeGalleryImages);
+      const idxs = JSON.parse(body.removeGalleryImages);
+      sub.gallery.images.forEach((url, i) => {
+        if (idxs.includes(i)) deletes.push(extractKeyFromUrl(url));
+      });
+      updates["gallery.images"] = sub.gallery.images.filter(
+        (_, i) => !idxs.includes(i)
+      );
+    }
+
+    // 4) Borrar gallery videos
+    if (body.removeGalleryVideos) {
+      console.log("caso4", body.removeGalleryVideos);
+      const idxs = JSON.parse(body.removeGalleryVideos);
+      sub.gallery.videos.forEach((url, i) => {
+        if (idxs.includes(i)) deletes.push(extractKeyFromUrl(url));
+      });
+      updates["gallery.videos"] = sub.gallery.videos.filter(
+        (_, i) => !idxs.includes(i)
+      );
+    }
+
+    // 5) Subir nueva imagen principal
+    if (files.imgUrl) {
+      const img = files.imgUrl[0];
+      const image = await Jimp.read(img.buffer);
+      image.resize(800, Jimp.AUTO).quality(80);
+      const buf = await image.getBufferAsync(Jimp.MIME_JPEG);
+      const resp = await AwsUploadFile({
+        fileName: `subservices/${id}/img.${img.mimetype.split("/")[1]}`,
+        buffer: buf,
+      });
+      updates.imgUrl = resp.url;
+    }
+
+    // 6) Subir nuevo vídeo principal
+    if (files.videoUrl) {
+      const vid = files.videoUrl[0];
+      const ext = vid.originalname.split(".").pop();
+      const resp = await AwsUploadFile({
+        fileName: `subservices/${id}/video.${ext}`,
+        buffer: vid.buffer,
+      });
+      updates.videoUrl = resp.url;
+    }
+
+    // 7) Subir nuevas gallery images
+    if (files.galleryImages) {
+      const oldImgs = updates["gallery.images"] || sub.gallery.images;
+      const newUrls = [];
+      for (let i = 0; i < files.galleryImages.length; i++) {
+        const file = files.galleryImages[i];
+        const image = await Jimp.read(file.buffer);
+        image.resize(800, Jimp.AUTO).quality(70);
+        const buf = await image.getBufferAsync(Jimp.MIME_JPEG);
+        const resp = await AwsUploadFile({
+          fileName: `subservices/${id}/gallery/img_${Date.now()}_${i}.jpg`,
+          buffer: buf,
+        });
+        newUrls.push(resp.url);
+      }
+      updates["gallery.images"] = [...oldImgs, ...newUrls];
+    }
+
+    // 8) Subir nuevos gallery videos
+    if (files.galleryVideos) {
+      const oldVids = updates["gallery.videos"] || sub.gallery.videos;
+      const newUrls = [];
+      for (let i = 0; i < files.galleryVideos.length; i++) {
+        const file = files.galleryVideos[i];
+        const ext = file.originalname.split(".").pop();
+        const resp = await AwsUploadFile({
+          fileName: `subservices/${id}/gallery/vid_${Date.now()}_${i}.${ext}`,
+          buffer: file.buffer,
+        });
+        newUrls.push(resp.url);
+      }
+      updates["gallery.videos"] = [...oldVids, ...newUrls];
+    }
+
+    // Ejecutar borrados en S3
+    await Promise.all(deletes.map((key) => awsDelete(key)));
+
+    // Actualizar MongoDB
+    const updated = await Subservice.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true }
+    );
+
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+};
+
 //Crear subServicio
 export const create = async (req, res, next) => {
   global.logger.info("---CREATE NEW SUBSERVICE---", req.body);
@@ -79,11 +226,67 @@ export const getAll = async (req, res, next) => {
   }
 };
 
+//Obtener todos los subservicios agrupados por servicios:
+// controllers/subservice.js
+export const getAllByService = async (req, res, next) => {
+  global.logger.info("--- GET ALL SUBSERVICES (small) BY SERVICE ---");
+  try {
+    const data = await Subservice.aggregate([
+      /* 1) convertir el id-texto al tipo ObjectId para el $lookup */
+      { $addFields: { serviceObjId: { $toObjectId: "$service" } } },
+
+      /* 2) unir con la colección services */
+      {
+        $lookup: {
+          from: "services",
+          localField: "serviceObjId",
+          foreignField: "_id",
+          as: "service",
+        },
+      },
+      { $unwind: "$service" },
+
+      /* 3) proyectar SOLO los campos que nos interesan */
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          isActive: 1,
+          service: {
+            _id: "$service._id",
+            name: "$service.name",
+            isActive: "$service.isActive",
+          },
+        },
+      },
+
+      /* 4) agrupar subservicios bajo cada servicio */
+      {
+        $group: {
+          _id: "$service._id",
+          service: { $first: "$service" },
+          subservices: {
+            $push: { _id: "$_id", name: "$name", isActive: "$isActive" },
+          },
+        },
+      },
+
+      /* 5) ordenar por nombre en español (opcional) */
+      { $sort: { "service.name.es": 1 } },
+    ]);
+
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
 //Obtener all services con paginate segun varias metricas
 export const getWithVideos = async (req, res, next) => {
   global.logger.info("---GET SUBSERVICES WITH VIDEOS---");
   try {
     const subservices = await Subservice.find({
+      isActive: true,
       videoUrl: { $exists: true, $ne: null },
     });
     res.status(200).json(subservices);
@@ -115,6 +318,28 @@ export const updateOne = async (req, res, next) => {
         _id: req.params.id,
       },
       data,
+      {
+        new: true,
+      }
+    ).exec();
+    if (!subservice) throw createError(404, "subService not found");
+    res.status(200).json(subservice);
+  } catch (err) {
+    next(err);
+  }
+};
+// Actualizar status isActive de un subservicio
+export const changeStatus = async (req, res, next) => {
+  global.logger.info("---UPDATE STATUS SUBSERVICE---");
+  try {
+    let data = req.body;
+    const subservice = await Subservice.findOneAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      {
+        isActive: data.isActive,
+      },
       {
         new: true,
       }

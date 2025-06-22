@@ -110,7 +110,7 @@ router.get(
 );
 router.get("/all/andsubservices", serviceAndSubservice);
 router.put(
-  "/:id",
+  "/allData/:id",
   validateParams(
     [
       {
