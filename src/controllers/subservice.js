@@ -7,6 +7,7 @@ import { isValidImage, isValidVideo } from "../config/uploadTypes.js";
 import { AwsUploadFile } from "../services/aws_s3.js";
 import { s3 } from "../services/awsClient.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 import Jimp from "jimp";
 import envar from "../config/envar.js";
 
@@ -25,6 +26,7 @@ function extractKeyFromUrl(url) {
   }
 }
 
+//subir y eliminar galeria de fotos, imgurl, videoUrl
 export const uploadAssets = async (req, res, next) => {
   const uploadedKeys = []; // para rollback si algo falla
 
@@ -228,25 +230,75 @@ export const getById = async (req, res, next) => {
     next(err);
   }
 };
-//Obtener all services con paginate segun varias metricas
+
+const NAME_FIELDS = ["name.en", "name.es", "name.pt", "name.fr", "name.de"];
+
+const buildKeywordSegments = (text = "") => {
+  const words = text.trim().split(/\s+/);
+  const out = [];
+  for (let len = words.length; len >= 1; len--) {
+    const seg = words.slice(0, len).join(" ");
+    if (len === 1 && seg.length < 4) continue; // descarta 1-palabra <4
+    out.push(seg);
+  }
+  return out;
+};
+
 export const getAll = async (req, res, next) => {
-  global.logger.info("---GET ALL SUBSERVICES---");
   try {
-    let query = {};
-    Object.assign(query, req.query);
-    let options = {
-      // populate,
-      // select,
-      page: query.page || 1,
-      limit: query.limit || 50,
+    /* ------------ paginación ------------ */
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 50;
+    if (page < 1 || limit < 1)
+      throw createError(400, "page y limit deben ser enteros positivos");
+
+    /* ------------ filtros ------------ */
+    const filter = { isActive: true };
+
+    /* service */
+    if (req.query.service) {
+      filter.service = req.query.service; // espera ObjectId string
+    }
+
+    /* minPrice / maxPrice */
+    const priceCond = {};
+    if (req.query.minPrice !== undefined) {
+      const min = Number(req.query.minPrice);
+      if (!Number.isNaN(min)) priceCond.$gte = min;
+    }
+    if (req.query.maxPrice !== undefined) {
+      const max = Number(req.query.maxPrice);
+      if (!Number.isNaN(max)) priceCond.$lte = max;
+    }
+    if (Object.keys(priceCond).length) {
+      filter["price.category1"] = priceCond;
+    }
+
+    /* keyword progresivo */
+    if (req.query.keyword) {
+      const segments = buildKeywordSegments(req.query.keyword);
+      if (segments.length) {
+        filter.$or = [];
+        segments.forEach((seg) => {
+          const regex = new RegExp(seg, "i");
+          NAME_FIELDS.forEach((f) => filter.$or.push({ [f]: regex }));
+        });
+      }
+    }
+
+    /* ------------ consulta paginada ------------ */
+    const options = {
+      page,
+      limit,
       sort: { updatedAt: -1 },
     };
-    console.log("options", options);
-    console.log("la query", query);
 
-    const subservices = await Subservice.paginate({ isActive: true }, options);
-    res.status(200).json(subservices);
+    const result = await Subservice.paginate(filter, options);
+    res.status(200).json(result);
   } catch (err) {
+    if (!(err instanceof Error) || !err.statusCode) {
+      err = createError(500, "Error interno del servidor");
+    }
     next(err);
   }
 };
