@@ -191,7 +191,7 @@ router.post(
 );
 //Actualizar un usuario por id
 router.put(
-  "/:id",
+  "/byId/:id",
   validateParams(
     [
       {

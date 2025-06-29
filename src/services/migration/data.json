@@ -1,0 +1,6250 @@
+[
+  {
+    "_id": {
+      "$oid": "65a7475dc14f7a217471b086"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-26T21:46:04.890Z"
+      },
+      "hasPassword": true
+    },
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.us-east-1.amazonaws.com/users/65a7475dc14f7a217471b086/profile/65a7475dc14f7a217471b086.png",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/65a7475dc14f7a217471b086/gallery/photo0.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7475dc14f7a217471b086/gallery/photo1.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7475dc14f7a217471b086/gallery/photo2.jpg",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "personalData": {
+      "name": {
+        "first": "Johann",
+        "last": "Schwarze"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": true,
+      "isAboutmeOk": true,
+      "isMySchedulesOk": true,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": [
+        {
+          "id": {
+            "$oid": "67d39901d2112e5164f10902"
+          },
+          "subServices": [
+            {
+              "$oid": "67db8a03cde11359e225611a"
+            },
+            {
+              "$oid": "67d11ee7674e49ca9d4389d2"
+            }
+          ],
+          "gallery": []
+        }
+      ]
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "category": "category1",
+      "isActive": false,
+      "services": []
+    },
+    "paymentData": {
+      "stripeAccountId": null,
+      "isActive": false,
+      "stripeCustomerId": "cus_POQkMYmJ8nu09j"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "worker",
+    "updatedAt": {
+      "$date": "2025-06-28T23:21:03.730Z"
+    },
+    "lastLogin": {
+      "$date": "2025-06-23T06:47:35.299Z"
+    },
+    "about": "Hola hOla",
+    "newAbout": {
+      "en": "<h3><strong>Hiking & Nature Guide in Rio – Trails & Viewpoints Expert</strong></h3><br><br>Discover Rio's wild side with a <strong>multilingual guide</strong> who specializes in trails like <strong>Pedra da Gávea, Pedra Bonita, Dois Irmãos, and Morro da Urca</strong>.<br><br>With over <strong>3 years living in Rio</strong> and experience as a traveler across <strong>South America and Europe</strong>, I offer guided hikes that are <strong>safe, dynamic, and deeply connected to nature</strong>.<br><br>Each hike is adapted to your pace and interest, whether you seek adventure, breathtaking views, or moments of calm and reflection in the Atlantic Forest.<br><br>I'm fluent in <strong>English, Portuguese, and Spanish</strong>, and will guide you with <strong>clarity, patience, and good energy</strong> through some of the most incredible natural spots in the city.<br><br>Also available for <strong>private transfers, custom city tours, and cultural experiences</strong> throughout Rio and nearby destinations.<br><br>Let’s make your connection with nature a <strong>memorable and inspiring experience</strong>.",
+      "es": "<h3><strong>Guía de Senderismo y Naturaleza en Río – Experto en Trillas y Miradores</strong></h3><br><br>Descubre el lado natural de Río con un <strong>guía multilingüe</strong> especializado en senderos como <strong>Pedra da Gávea, Pedra Bonita, Dois Irmãos y Morro da Urca</strong>.<br><br>Con más de <strong>3 años viviendo en Río</strong> y experiencia como viajero por <strong>Sudamérica y Europa</strong>, ofrezco caminatas guiadas <strong>seguras, dinámicas y conectadas con la naturaleza</strong>.<br><br>Cada experiencia se adapta a tu ritmo e intereses, ya sea que busques aventura, vistas increíbles o momentos de paz en la Mata Atlántica.<br><br>Hablo <strong>español, portugués e inglés</strong>, y guío con <strong>claridad, paciencia y buena energía</strong> por algunos de los paisajes naturales más impresionantes de la ciudad.<br><br>También realizo <strong>traslados privados, tours personalizados por la ciudad y experiencias culturales</strong> en Río y alrededores.<br><br>Conectemos con la naturaleza de una forma <strong>memorable e inspiradora</strong>.",
+      "pt": "<h3><strong>Guia de Trilhas e Natureza no Rio – Especialista em Mirantes e Aventuras</strong></h3><br><br>Explore o lado natural do Rio com um <strong>guia multilíngue</strong> especializado em trilhas como <strong>Pedra da Gávea, Pedra Bonita, Dois Irmãos e Morro da Urca</strong>.<br><br>Com mais de <strong>3 anos vivendo no Rio</strong> e experiência como viajante por <strong>América do Sul e Europa</strong>, ofereço caminhadas <strong>seguras, dinâmicas e conectadas com a natureza</strong>.<br><br>Cada trilha é adaptada ao seu ritmo e interesse, seja para quem busca aventura, vistas incríveis ou momentos de paz na Floresta Atlântica.<br><br>Falo <strong>português, inglês e espanhol</strong>, e guio com <strong>clareza, paciência e boa energia</strong> pelos cenários naturais mais impressionantes da cidade.<br><br>Também realizo <strong>transfers privados, passeios personalizados e experiências culturais</strong> no Rio e região.<br><br>Vamos viver uma conexão com a natureza que seja <strong>marcante e inspiradora</strong>.",
+      "fr": "<h3><strong>Guide de Randonnée à Rio – Expert en Sentiers et Panoramas</strong></h3><br><br>Explorez le côté nature de Rio avec un <strong>guide multilingue</strong> spécialisé dans les sentiers tels que <strong>Pedra da Gávea, Pedra Bonita, Dois Irmãos et Morro da Urca</strong>.<br><br>Installé à Rio depuis <strong>plus de 3 ans</strong> et ayant voyagé à travers <strong>l’Amérique du Sud et l’Europe</strong>, je propose des randonnées <strong>dynamiques, sûres et en pleine connexion avec la nature</strong>.<br><br>Chaque sortie est adaptée à votre rythme et à vos envies, que vous recherchiez l’aventure, des vues à couper le souffle ou un moment de calme en pleine forêt atlantique.<br><br>Je parle <strong>français, anglais, portugais et espagnol</strong>, et vous guide avec <strong>clarté, sérénité et énergie positive</strong>.<br><br>Je propose aussi des <strong>transferts privés, visites personnalisées et expériences culturelles</strong> à Rio et dans les environs.<br><br>Partons ensemble pour une expérience <strong>inoubliable et inspirante</strong> au cœur de la nature.",
+      "de": "<h3><strong>Wander- und Naturführer in Rio – Spezialist für Aussichtspunkte & Trails</strong></h3><br><br>Erleben Sie das grüne Rio mit einem <strong>mehrsprachigen Guide</strong>, der sich auf Wanderungen wie <strong>Pedra da Gávea, Pedra Bonita, Dois Irmãos und Morro da Urca</strong> spezialisiert hat.<br><br>Seit über <strong>3 Jahren in Rio lebend</strong> und mit Reiseerfahrung in <strong>Südamerika und Europa</strong>, biete ich <strong>sichere, dynamische und naturnahe Erlebnisse</strong>.<br><br>Jede Tour wird an Ihr Tempo und Ihre Interessen angepasst – ob Sie Abenteuer, atemberaubende Aussichten oder ruhige Momente im Atlantischen Regenwald suchen.<br><br>Ich spreche <strong>Deutsch, Englisch, Portugiesisch und Spanisch</strong> und begleite Sie mit <strong>Geduld, Klarheit und positiver Energie</strong> durch die schönsten Naturorte Rios.<br><br>Ich biete auch <strong>private Transfers, individuelle Stadttouren und kulturelle Erlebnisse</strong> in Rio und Umgebung.<br><br>Erleben Sie mit mir eine <strong>unvergessliche und inspirierende Verbindung zur Natur</strong>."
+    },
+    "reviewScore": 4.1,
+    "numberBookings": 23,
+    "language": "EN",
+    "email": "jschacosta@gmail.com",
+    "username": "johann",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-01-17T03:19:57.562Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 9175,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-01-26T21:45:21.527Z"
+      },
+      "urlcode": "pqR3AFK3eeyznw25YEUt4Mirb6boDM"
+    },
+    "password": "$2a$10$RZEIaZOsrI1LdkLF3P9wD.lZQdrGWsw0XZvTtDGqtRm1PrjIyFmQy"
+  },
+  {
+    "_id": {
+      "$oid": "65bae98f12f6b49956ea3d64"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-31T21:22:06.135Z"
+      },
+      "hasPassword": false
+    },
+    "username": "o8ju4iwgat",
+    "rating": 5,
+    "email": "Naosei@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-02-01T00:45:03.537Z"
+    },
+    "lastLogin": {
+      "$date": "2024-01-31T21:22:06.135Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Jean"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "createdAt": {
+      "$date": "2024-02-01T00:45:03.537Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65c0fe5212f6b49956ea4ab1"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-31T21:22:06.135Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKXhi76QyaLEucR-elTv0QQO_SMNOc5OiMfAYRP-Kf3mms=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Jon",
+        "last": "Roberts"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PVV4twQrWA893t"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-05T15:27:15.489Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-05T15:27:15.124Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "jonathanroberts1988@gmail.com",
+    "username": "jgv3dwbtfr",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-05T15:27:14.848Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65ca3f69fe2c357861c4d3ac"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-08T00:54:31.239Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKGRngaPP5I0Y9_OVDz3ooIoz0qNCp0uYjt3v-lJj0j=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Paulina",
+        "last": "Simankowicz"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PY877B5dfIwYFm"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-14T18:05:18.708Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-14T18:05:18.707Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "p.simankowicz@gmail.com",
+    "username": "u8xg5jjdfo",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-12T15:55:21.520Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65cf68d8fe2c357861c4dd3c"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-08T00:54:31.239Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKeC9vKD8lxZ-bKlcvF1an_Uz0gRFlgP4lB1Gjufvh4vcto=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Fara",
+        "last": "Ahmed"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PZb35l7RhmyZe0"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-16T13:53:29.269Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-16T13:53:28.904Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "f.ahmed.27.05.94@gmail.com",
+    "username": "af3yo3z4d1",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-16T13:53:28.602Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65cf79c29f8c8a35ce4ef0ca"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-16T15:01:39.557Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKUGREiYeAGB8ifBBGuJ59vJq5ROf-A7yUm7zKzWxJuyg=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "César",
+        "last": "Jst"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PZcDmI6g2YQSKd"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-16T15:05:38.812Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-16T15:05:38.430Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "cesar.jestin@gmail.com",
+    "username": "1dgl2tf715",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-16T15:05:38.217Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65d49f058b72b85e419e0133"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-18T21:07:17.298Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJxhPyTpNNLbsuvQKgU-41obMYiX1KFVYJATbSGmHnA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Dewy",
+        "last": "van Dam"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Pb4r05otYkflI4"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-20T12:45:58.546Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-20T12:45:57.793Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "dewyvandam@gmail.com",
+    "username": "l72onjzm0z",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-20T12:45:57.677Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65e14f716f3a89c2f931da68"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "password": "$2a$10$eyXUn49gxAjho0KtF30DKeDgnhcQNqYbpAqVY31LjbndUK9PMojiK",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-01T03:45:53.220Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "user@sostvl.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-03-01T03:45:54.394Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-01T03:42:31.692Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "User",
+        "last": "Sos"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "xenaytlzuj",
+    "createdAt": {
+      "$date": "2024-03-01T03:45:53.294Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 1691,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-03-01T03:45:54.394Z"
+      },
+      "urlcode": "lNsUSHguGr15Ixfym6zNdkaQAvS76P"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65e900454d058d5d6f19a210"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-03T17:37:14.113Z"
+      },
+      "hasPassword": false
+    },
+    "username": "ggh3720w4g",
+    "rating": 5,
+    "email": "Adrian93@icloud.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-03-06T23:46:13.907Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-03T17:37:14.113Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Adrian",
+        "last": ""
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "createdAt": {
+      "$date": "2024-03-06T23:46:13.907Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65f5adaa4d058d5d6f19b0b3"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-03T17:37:14.113Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIwxiHSfacGVYJ3nAtX6Pw-jC6ZkOcE8RGsyCsp7Ysx=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Olivier",
+        "last": "van Tets"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PkTE7u9PmOE8ul"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-16T14:33:14.784Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-16T14:33:14.412Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "ocwvantets@gmail.com",
+    "username": "b3jebp9tae",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-16T14:33:14.207Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "660821726733fede0aebc684"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-28T17:58:05.923Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLjV58YS1Mslg2J2k8hR9bf4PcRfkZIoDyf3iuA0uje=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Carla",
+        "last": "Martí"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PpiJpswkicBkRV"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-30T14:28:02.543Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-30T14:28:02.011Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "mscarlamarti@gmail.com",
+    "username": "51l0ihqan1",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-30T14:28:02.081Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6615c68c50abfb5e83b221a0"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "security": {
+      "updatedAt": {
+        "$date": "2024-04-03T14:00:43.512Z"
+      },
+      "hasPassword": false
+    },
+    "username": "0jign2vf0e",
+    "rating": 5,
+    "email": "Loic_kr@hmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-04-09T22:51:56.482Z"
+    },
+    "lastLogin": {
+      "$date": "2024-04-03T14:00:43.512Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Loic",
+        "last": "kr"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "createdAt": {
+      "$date": "2024-04-09T22:51:56.482Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6630461ddbd84508c88f9094"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$gd9oDlsaBaZiMhzn1/xI2ekNym4ErzE5MJ9ZVFgxa1xrTOc8C54zO",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-04-30T01:50:33.457Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "chez.zanyrj@gmail.com",
+    "type": "business",
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.amazonaws.com/users/6630461ddbd84508c88f9094/profile/6630461ddbd84508c88f9094.png?hola=90739",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/6630461ddbd84508c88f9094/gallery/photo0.jpg",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "updatedAt": {
+      "$date": "2024-05-02T04:29:26.489Z"
+    },
+    "lastLogin": {
+      "$date": "2024-05-02T04:29:26.489Z"
+    },
+    "about": "Discover the heartbeat of Rio at Aquarela Hostel. Centrally located, our cozy rooms offer stunning views, and our rooftop terrace provides the perfect backdrop for your Rio adventures. Immerse yourself in the energy of the city, make new friends, and experience the best of Rio with us!🌊🌅\n\nDescubra o pulsar do Rio no Aquarela Hostel. Com localização central, nossos quartos aconchegantes oferecem vistas deslumbrantes, e nosso terraço no último andar proporciona o cenário perfeito para suas aventuras no Rio. Mergulhe na energia da cidade, faça novos amigos e viva o melhor do Rio conosco! 🌊🌅",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Chez",
+        "last": "Zany",
+        "nickName": "chezZany"
+      },
+      "isActive": true,
+      "nationality": "Brazilian",
+      "country": "Brazil",
+      "idNumber": "19292383"
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "location": {
+        "city": "Rio de Janeiro",
+        "country": "Brazil",
+        "url": "https://maps.app.goo.gl/KwRkezsXFP3jJEuVA"
+      },
+      "owner": {
+        "name": {
+          "last": "Tibou",
+          "first": "Tibo"
+        }
+      },
+      "isActive": true,
+      "services": [
+        {
+          "service": "65a7d3d80fec5717b282a33e",
+          "isActive": true
+        },
+        {
+          "service": "65a7d4d50fec5717b282a352",
+          "isActive": true
+        },
+        {
+          "service": "65ba9be19a1ce5c62a9be654",
+          "isActive": true
+        }
+      ],
+      "name": "Chez Zany",
+      "category": "category2"
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "ksnt7b85bse",
+    "createdAt": {
+      "$date": "2024-01-17T13:50:59.838Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 2448,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-01-17T13:51:00.867Z"
+      },
+      "urlcode": "li0BycuxrGjay3YkE9Obu7s96IMIVI"
+    },
+    "lastLoginType": "email",
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6633c84152920a8591a77ea9"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-02T04:56:06.250Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIOwoLHVh3v3DFlMhcaWcPtqV9kbMgLiIKNNi58Zt1uPvnyd52h=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Aim",
+        "last": "Major"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Q27KoW7ABKeITc"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-05-05T17:15:17.506Z"
+    },
+    "lastLogin": {
+      "$date": "2024-05-05T17:15:17.506Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "animeaim97@gmail.com",
+    "username": "pwvoudoqah",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-05-02T17:07:13.894Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66364fe452920a8591a781a2"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-02T04:56:06.250Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocK112mM1g6bLOl5pbTsGUylWmKFB_JbbdV7GBkxdg3t7ZqXrMM=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Sami",
+        "last": "Joop Djitli Schedler"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Q2puGUPFpmpQ7x"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-07-05T20:01:53.911Z"
+    },
+    "lastLogin": {
+      "$date": "2024-07-05T20:01:53.910Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "sami.joop.ds@gmail.com",
+    "username": "kywceug4od",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-05-04T15:10:28.789Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "663c105e483584ff7f90623f"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$tn5LGwalKKYrx82BFnLI7uBMMzQgXMZIi9nqinGZC4sZdCpozfQ66",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-08T23:53:02.991Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "matthewbomparola@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-05-08T23:53:19.254Z"
+    },
+    "lastLogin": {
+      "$date": "2024-05-08T13:27:19.549Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Matthew",
+        "last": "Bomparola"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "97mepm5lol",
+    "createdAt": {
+      "$date": "2024-05-08T23:53:03.070Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 2605,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-05-08T23:53:04.238Z"
+      },
+      "urlcode": "lO7dQIxM3x4JLxrivfOM4M8OYFkEbp"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6644cd1bd10a60489a583d0b"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-13T13:31:43.898Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIWYh8T5z5iAM0c_sedGWnjOqT72-4CucE7gV3CmHK6WePBoGk=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Luz",
+        "last": "RSjulson"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Q6xAovDRSPnZA3"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-05-15T14:56:28.342Z"
+    },
+    "lastLogin": {
+      "$date": "2024-05-15T14:56:27.491Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "luzluvtravel18@gmail.com",
+    "username": "qyz4orj736",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-05-15T14:56:27.564Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66c60101add432744f9015a8"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-08-21T14:30:09.348Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIO6NceCuMmBQ-qj23uVDHHvQOfYgLKdb1sWRNIBeCC5ghB2Gs6=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "severine",
+        "last": "navarro"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QhfLtzvKH7qWgL"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-08-21T18:53:47.449Z"
+    },
+    "lastLogin": {
+      "$date": "2024-08-21T18:53:47.449Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "sev.nav.bloc@gmail.com",
+    "username": "vguzn0jeg8",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-08-21T15:00:17.771Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66d21606f5db606c308aed2c"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-08-28T15:34:11.215Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKXp8PEZEds6saMXu8EkIOqpiOSj8-KY_rzOfOSEcAgQbZwh1Hj=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Annan",
+        "last": "Gan"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Ql6Cp4ahDyVVog"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-08-31T07:20:45.805Z"
+    },
+    "lastLogin": {
+      "$date": "2024-08-31T07:20:45.803Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "annangan2013@gmail.com",
+    "username": "8jccr93umv",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-08-30T18:57:11.069Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "672aa70377ef6dbe9f4e94ab"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-11-05T21:16:01.843Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKejc33fLFOEWKo1KTf4ZH96exOLpzgAAb5u8_7nlqKDmwWkA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Heloise",
+        "last": "Pellegrin"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_RAGUZGbd5LrYti"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-11-05T23:29:08.600Z"
+    },
+    "lastLogin": {
+      "$date": "2024-11-05T23:29:08.600Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "helopellegrin@gmail.com",
+    "username": "kilbu1aj25",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-11-05T23:15:15.249Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "673e37f76617bdd703d41287"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-11-05T23:45:32.782Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJG4LRJExmxbkIvW7AvzTCUPw7p36oOj5ys9cnD_CX8WF0GPbfj=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Arthur",
+        "last": "Massing"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_RFpCvtB5KitXfs"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-11-20T19:26:48.179Z"
+    },
+    "lastLogin": {
+      "$date": "2024-11-20T19:26:47.533Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "arthur.massing@gmail.com",
+    "username": "srfaxlbz2s",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-11-20T19:26:47.599Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65312a63c0b1e1658a5a712c"
+    },
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.amazonaws.com/users/65312a63c0b1e1658a5a712c/profile/65312a63c0b1e1658a5a712c.jpg",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/65312a63c0b1e1658a5a712c/gallery/photo0.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65312a63c0b1e1658a5a712c/gallery/photo1.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65312a63c0b1e1658a5a712c/gallery/photo2.jpg",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "personalData": {
+      "name": {
+        "first": "SOS",
+        "last": "Traveler"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "isMyServicesOk": true,
+      "isAboutmeOk": true,
+      "isMySchedulesOk": true,
+      "isMyWorkplacesOk": true,
+      "isActive": true,
+      "services": [
+        {
+          "id": "67c11cc117c3a7a2c353cb1c",
+          "subServices": [
+            "67c466b317c3a7a2c353cb47",
+            "67c47c7a17c3a7a2c353cb59",
+            "67dda93cdec9e620b1389b5a",
+            "67e0279a65fab94882bae20e",
+            "67fec6a3a33166efa9679f45"
+          ],
+          "gallery": []
+        },
+        {
+          "id": "6757137ad2b2668720116ec9",
+          "subServices": [
+            "67c1350417c3a7a2c353cb1f",
+            "67c3e35f17c3a7a2c353cb3f",
+            "67c3e48517c3a7a2c353cb41",
+            "67c3e4b017c3a7a2c353cb43",
+            "67c3e5a817c3a7a2c353cb45",
+            "67d11ee7674e49ca9d4389d2"
+          ],
+          "gallery": []
+        },
+        {
+          "id": "67d39901d2112e5164f10902",
+          "subServices": [
+            "67d399d2d2112e5164f10904",
+            "67db8a03cde11359e225611a",
+            "67d11ee7674e49ca9d4389d2"
+          ],
+          "gallery": []
+        }
+      ]
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "category": "category1",
+      "isActive": false,
+      "services": []
+    },
+    "isActive": true,
+    "isValidate": true,
+    "type": "worker",
+    "updatedAt": {
+      "$date": "2025-04-15T20:59:28.916Z"
+    },
+    "lastLogin": {
+      "$date": "2025-04-15T20:57:55.432Z"
+    },
+    "about": "Tours, football match tickets, transfers, and more.",
+    "language": "EN",
+    "email": "sostravellers@gmail.com",
+    "username": "sostravel",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2023-10-19T13:08:52.123Z"
+    },
+    "__v": 0,
+    "password": "$2a$10$ka1SkCxuq6PHh21kmz2Tauc0fm5l5bUptl7E4t07ix79QU7m6SxrC",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-08T07:28:56.952Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "validation": {
+      "code": 2640,
+      "expTime": 5,
+      "time": {
+        "$date": "2023-11-22T14:44:50.307Z"
+      },
+      "urlcode": "e5uni6GlRoAK2SiEYvEItTwSH1K1rg"
+    },
+    "paymentData": {
+      "stripeAccountId": null,
+      "isActive": false,
+      "stripeCustomerId": "cus_P4pHZ3YiydOB84"
+    },
+    "admin": true,
+    "newAbout": {
+      "en": "",
+      "es": "",
+      "pt": "",
+      "fr": "",
+      "de": ""
+    },
+    "numberBookings": 0,
+    "reviewScore": 0
+  },
+  {
+    "_id": {
+      "$oid": "67c71578fb4fe0941fe494f0"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-04T17:02:37.053Z"
+      },
+      "hasPassword": true
+    },
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.amazonaws.com/users/67c71578fb4fe0941fe494f0/profile/67c71578fb4fe0941fe494f0.jpg?hola=42698?hola=38946?hola=70389?hola=19093?hola=31293?hola=13338",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/67c71578fb4fe0941fe494f0/gallery/photo0.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/67c71578fb4fe0941fe494f0/gallery/photo1.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/67c71578fb4fe0941fe494f0/gallery/photo2.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/67c71578fb4fe0941fe494f0/gallery/photo3.jpg",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "personalData": {
+      "name": {
+        "first": "Pohl",
+        "last": "Mac-Conell"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "isMyServicesOk": true,
+      "isAboutmeOk": true,
+      "isMySchedulesOk": true,
+      "isMyWorkplacesOk": true,
+      "isActive": true,
+      "services": [
+        {
+          "id": "6757137ad2b2668720116ec9",
+          "subServices": [
+            "67c1350417c3a7a2c353cb1f",
+            "67c3e35f17c3a7a2c353cb3f",
+            "67c3e48517c3a7a2c353cb41",
+            "67c3e4b017c3a7a2c353cb43",
+            "67c3e5a817c3a7a2c353cb45"
+          ],
+          "gallery": []
+        },
+        {
+          "id": "67c11cc117c3a7a2c353cb1c",
+          "subServices": [
+            "67dda93cdec9e620b1389b5a",
+            "67e0279a65fab94882bae20e"
+          ],
+          "gallery": []
+        },
+        {
+          "id": "67d39901d2112e5164f10902",
+          "subServices": [
+            "67d11ee7674e49ca9d4389d2",
+            "67d399d2d2112e5164f10904"
+          ],
+          "gallery": []
+        }
+      ],
+      "text": {
+        "en": "<h3><strong>Multilingual Tour Guide in Rio</strong></h3><br><br>Explore the best of Brazil with a <strong>certified tour guide</strong> fluent in <strong>English, Portuguese, and Spanish</strong>, with over <strong>1 year of experience</strong> offering immersive and safe travel experiences in Rio de Janeiro and nearby destinations.<br><br>I organize <strong>personalized tours</strong> to the most iconic and cultural landmarks in the city, such as <strong>Christ the Redeemer, Sugarloaf Mountain, Lapa, Santa Teresa, Selarón Steps</strong>, and panoramic viewpoints like <strong>Mirante Dona Marta</strong> and <strong>Vista Chinesa</strong>.<br><br>You can also enjoy <strong>private transfers</strong> to stunning destinations such as <strong>Arraial do Cabo, Angra dos Reis, and Búzios</strong>.<br><br>I also offer <strong>exclusive experiences</strong> like attending a football match at <strong>Maracanã Stadium</strong>, visiting <strong>local markets and museums</strong>, or hiking in <strong>Tijuca National Park</strong>.<br><br>Every tour is tailored to your interests and needs, ensuring the <strong>highest quality service</strong> and making your journey through Brazil <strong>safe, enriching, and unforgettable</strong>.",
+        "es": "<h3><strong>Guía Turístico Multilingüe en Río</strong></h3><br><br>Descubre lo mejor de Brasil con un <strong>guía turístico certificado</strong> que habla <strong>inglés, portugués y español</strong>, y cuenta con más de <strong>1 año de experiencia</strong> ofreciendo experiencias seguras y memorables en Río de Janeiro y alrededores.<br><br>Realizo <strong>tours personalizados</strong> por los principales puntos históricos y culturales de la ciudad, como el <strong>Cristo Redentor, Pan de Azúcar, Lapa, Santa Teresa, Escalera de Selarón</strong> y miradores como <strong>Dona Marta</strong> y <strong>Vista Chinesa</strong>.<br><br>También ofrezco <strong>traslados privados</strong> a destinos como <strong>Arraial do Cabo, Angra dos Reis y Búzios</strong>.<br><br>Además, brindo <strong>experiencias exclusivas</strong> como asistir a un partido de fútbol en el <strong>Estadio Maracaná</strong>, recorrer <strong>ferias locales y museos</strong>, o hacer senderismo en el <strong>Parque Nacional de Tijuca</strong>.<br><br>Cada tour se adapta a tus intereses, garantizando el <strong>mejor servicio personalizado</strong> para que tu experiencia en Brasil sea <strong>segura, enriquecedora e inolvidable</strong>.",
+        "pt": "<h3><strong>Guia de Turismo Multilíngue no Rio</strong></h3><br><br>Explore o melhor do Brasil com um <strong>guia turístico certificado</strong>, fluente em <strong>inglês, português e espanhol</strong>, com mais de <strong>1 ano de experiência</strong> oferecendo experiências seguras e memoráveis no Rio de Janeiro e arredores.<br><br>Organizo <strong>tours personalizados</strong> pelos principais pontos históricos e culturais da cidade, como o <strong>Cristo Redentor, Pão de Açúcar, Lapa, Santa Teresa, Escadaria Selarón</strong> e mirantes como o <strong>Dona Marta</strong> e a <strong>Vista Chinesa</strong>.<br><br>Também ofereço <strong>transfers privados</strong> para destinos como <strong>Arraial do Cabo, Angra dos Reis e Búzios</strong>.<br><br>Além disso, proporciono <strong>experiências exclusivas</strong> como assistir a um jogo de futebol no <strong>Estádio do Maracanã</strong>, visitar <strong>feiras locais e museus</strong>, ou fazer trilhas no <strong>Parque Nacional da Tijuca</strong>.<br><br>Cada tour é adaptado aos seus interesses, garantindo o <strong>melhor atendimento personalizado</strong> para tornar sua experiência no Brasil <strong>segura, rica e inesquecível</strong>.",
+        "fr": "<h3><strong>Guide Touristique Multilingue à Rio</strong></h3><br><br>Découvrez le meilleur du Brésil avec un <strong>guide certifié</strong> parlant <strong>anglais, portugais et espagnol</strong>, avec plus de <strong>1 an d'expérience</strong> dans l'organisation de visites sécurisées et inoubliables à Rio de Janeiro et ses environs.<br><br>Je propose des <strong>visites personnalisées</strong> des principaux sites historiques et culturels de la ville, tels que le <strong>Christ Rédempteur, le Pain de Sucre, Lapa, Santa Teresa, l'escalier Selarón</strong>, ainsi que des points de vue comme le <strong>Mirante Dona Marta</strong> et la <strong>Vista Chinesa</strong>.<br><br>Je propose aussi des <strong>transferts privés</strong> vers des destinations comme <strong>Arraial do Cabo, Angra dos Reis et Búzios</strong>.<br><br>Je vous offre également des <strong>expériences exclusives</strong> comme assister à un match au <strong>stade Maracanã</strong>, visiter des <strong>marchés locaux et musées</strong>, ou faire de la randonnée dans le <strong>Parc National de Tijuca</strong>.<br><br>Chaque visite est adaptée à vos envies pour vous garantir un <strong>service personnalisé de qualité</strong> et faire de votre voyage au Brésil une expérience <strong>sûre, enrichissante et inoubliable</strong>.",
+        "de": "<h3><strong>Mehrsprachiger Reiseleiter in Rio</strong></h3><br><br>Entdecken Sie das Beste von Brasilien mit einem <strong>zertifizierten Reiseleiter</strong>, der <strong>Englisch, Portugiesisch und Spanisch</strong> spricht und über <strong>mehr als 1 Jahr Erfahrung</strong> in Rio de Janeiro und Umgebung verfügt.<br><br>Ich biete <strong>maßgeschneiderte Touren</strong> zu historischen und kulturellen Highlights der Stadt an, wie dem <strong>Christus-Erlöser, Zuckerhut, Lapa, Santa Teresa, Selarón-Treppe</strong> und Aussichtspunkten wie <strong>Mirante Dona Marta</strong> und der <strong>Vista Chinesa</strong>.<br><br>Genießen Sie <strong>private Transfers</strong> zu Zielen wie <strong>Arraial do Cabo, Angra dos Reis und Búzios</strong>.<br><br>Ich biete auch <strong>exklusive Erlebnisse</strong> wie <strong>Fußballspiele im Maracanã-Stadion</strong>, Besuche auf <strong>lokalen Märkten und in Museen</strong> oder Wanderungen im <strong>Tijuca-Nationalpark</strong>.<br><br>Jede Tour wird individuell an Ihre Wünsche angepasst und bietet den <strong>besten persönlichen Service</strong>, damit Ihre Brasilienreise <strong>sicher, bereichernd und unvergesslich</strong> wird."
+      }
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "acct_1R4Dgm01eEiRaXwy",
+      "stripeAccountId": "acct_1Qvico027lHvILlU"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "worker",
+    "updatedAt": {
+      "$date": "2025-03-26T23:14:07.735Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-26T16:30:20.754Z"
+    },
+    "about": "Tour guide who speaks English / Portuguese / Spanish, with over 1 year of experience in Rio de Janeiro. Discover Brazil in the safest, most comfortable, and personalized way.\n\nGuía turístico que habla en inglés / portugués / español, con más de 1 año de experiencia en Rio de Janeiro.\n\nGuia turístico que fala inglês / português / espanhol, com mais de 1 ano de experiência no Rio de Janeiro. Conheça o Brasil da forma mais segura, confortável e personalizada.",
+    "newAbout": {
+      "en": "<h3><strong>Multilingual Tour Guide in Rio</strong></h3><br><br>Explore the best of Brazil with a <strong>certified tour guide</strong> fluent in <strong>English, Portuguese, and Spanish</strong>, with over <strong>1 year of experience</strong> offering immersive and safe travel experiences in Rio de Janeiro and nearby destinations.<br><br>I organize <strong>personalized tours</strong> to the most iconic and cultural landmarks in the city, such as <strong>Christ the Redeemer, Sugarloaf Mountain, Lapa, Santa Teresa, Selarón Steps</strong>, and panoramic viewpoints like <strong>Mirante Dona Marta</strong> and <strong>Vista Chinesa</strong>.<br><br>You can also enjoy <strong>private transfers</strong> to stunning destinations such as <strong>Arraial do Cabo, Angra dos Reis, and Búzios</strong>.<br><br>I also offer <strong>exclusive experiences</strong> like attending a football match at <strong>Maracanã Stadium</strong>, visiting <strong>local markets and museums</strong>, or hiking in <strong>Tijuca National Park</strong>.<br><br>Every tour is tailored to your interests and needs, ensuring the <strong>highest quality service</strong> and making your journey through Brazil <strong>safe, enriching, and unforgettable</strong>.",
+      "es": "<h3><strong>Guía Turístico Multilingüe en Río</strong></h3><br><br>Descubre lo mejor de Brasil con un <strong>guía turístico certificado</strong> que habla <strong>inglés, portugués y español</strong>, y cuenta con más de <strong>1 año de experiencia</strong> ofreciendo experiencias seguras y memorables en Río de Janeiro y alrededores.<br><br>Realizo <strong>tours personalizados</strong> por los principales puntos históricos y culturales de la ciudad, como el <strong>Cristo Redentor, Pan de Azúcar, Lapa, Santa Teresa, Escalera de Selarón</strong> y miradores como <strong>Dona Marta</strong> y <strong>Vista Chinesa</strong>.<br><br>También ofrezco <strong>traslados privados</strong> a destinos como <strong>Arraial do Cabo, Angra dos Reis y Búzios</strong>.<br><br>Además, brindo <strong>experiencias exclusivas</strong> como asistir a un partido de fútbol en el <strong>Estadio Maracaná</strong>, recorrer <strong>ferias locales y museos</strong>, o hacer senderismo en el <strong>Parque Nacional de Tijuca</strong>.<br><br>Cada tour se adapta a tus intereses, garantizando el <strong>mejor servicio personalizado</strong> para que tu experiencia en Brasil sea <strong>segura, enriquecedora e inolvidable</strong>.",
+      "pt": "<h3><strong>Guia de Turismo Multilíngue no Rio</strong></h3><br><br>Explore o melhor do Brasil com um <strong>guia turístico certificado</strong>, fluente em <strong>inglês, português e espanhol</strong>, com mais de <strong>1 ano de experiência</strong> oferecendo experiências seguras e memoráveis no Rio de Janeiro e arredores.<br><br>Organizo <strong>tours personalizados</strong> pelos principais pontos históricos e culturais da cidade, como o <strong>Cristo Redentor, Pão de Açúcar, Lapa, Santa Teresa, Escadaria Selarón</strong> e mirantes como o <strong>Dona Marta</strong> e a <strong>Vista Chinesa</strong>.<br><br>Também ofereço <strong>transfers privados</strong> para destinos como <strong>Arraial do Cabo, Angra dos Reis e Búzios</strong>.<br><br>Além disso, proporciono <strong>experiências exclusivas</strong> como assistir a um jogo de futebol no <strong>Estádio do Maracanã</strong>, visitar <strong>feiras locais e museus</strong>, ou fazer trilhas no <strong>Parque Nacional da Tijuca</strong>.<br><br>Cada tour é adaptado aos seus interesses, garantindo o <strong>melhor atendimento personalizado</strong> para tornar sua experiência no Brasil <strong>segura, rica e inesquecível</strong>.",
+      "fr": "<h3><strong>Guide Touristique Multilingue à Rio</strong></h3><br><br>Découvrez le meilleur du Brésil avec un <strong>guide certifié</strong> parlant <strong>anglais, portugais et espagnol</strong>, avec plus de <strong>1 an d'expérience</strong> dans l'organisation de visites sécurisées et inoubliables à Rio de Janeiro et ses environs.<br><br>Je propose des <strong>visites personnalisées</strong> des principaux sites historiques et culturels de la ville, tels que le <strong>Christ Rédempteur, le Pain de Sucre, Lapa, Santa Teresa, l'escalier Selarón</strong>, ainsi que des points de vue comme le <strong>Mirante Dona Marta</strong> et la <strong>Vista Chinesa</strong>.<br><br>Je propose aussi des <strong>transferts privés</strong> vers des destinations comme <strong>Arraial do Cabo, Angra dos Reis et Búzios</strong>.<br><br>Je vous offre également des <strong>expériences exclusives</strong> comme assister à un match au <strong>stade Maracanã</strong>, visiter des <strong>marchés locaux et musées</strong>, ou faire de la randonnée dans le <strong>Parc National de Tijuca</strong>.<br><br>Chaque visite est adaptée à vos envies pour vous garantir un <strong>service personnalisé de qualité</strong> et faire de votre voyage au Brésil une expérience <strong>sûre, enrichissante et inoubliable</strong>.",
+      "de": "<h3><strong>Mehrsprachiger Reiseleiter in Rio</strong></h3><br><br>Entdecken Sie das Beste von Brasilien mit einem <strong>zertifizierten Reiseleiter</strong>, der <strong>Englisch, Portugiesisch und Spanisch</strong> spricht und über <strong>mehr als 1 Jahr Erfahrung</strong> in Rio de Janeiro und Umgebung verfügt.<br><br>Ich biete <strong>maßgeschneiderte Touren</strong> zu historischen und kulturellen Highlights der Stadt an, wie dem <strong>Christus-Erlöser, Zuckerhut, Lapa, Santa Teresa, Selarón-Treppe</strong> und Aussichtspunkten wie <strong>Mirante Dona Marta</strong> und der <strong>Vista Chinesa</strong>.<br><br>Genießen Sie <strong>private Transfers</strong> zu Zielen wie <strong>Arraial do Cabo, Angra dos Reis und Búzios</strong>.<br><br>Ich biete auch <strong>exklusive Erlebnisse</strong> wie <strong>Fußballspiele im Maracanã-Stadion</strong>, Besuche auf <strong>lokalen Märkten und in Museen</strong> oder Wanderungen im <strong>Tijuca-Nationalpark</strong>.<br><br>Jede Tour wird individuell an Ihre Wünsche angepasst und bietet den <strong>besten persönlichen Service</strong>, damit Ihre Brasilienreise <strong>sicher, bereichernd und unvergesslich</strong> wird."
+    },
+    "language": "EN",
+    "email": "pohlmlagos@gmail.com",
+    "username": "chilenoql",
+    "lastLoginType": "google",
+    "reviewScore": 4.7,
+    "numberBookings": 63,
+    "createdAt": {
+      "$date": "2025-03-04T15:00:08.659Z"
+    },
+    "__v": 0,
+    "password": "$2a$10$nCJc0CPYCRPjHxD8RkXcLuhPDgSer8i27uRGobJQ3z4gbE4SE9IEK"
+  },
+  {
+    "_id": {
+      "$oid": "65a7db43c14f7a217471b0f4"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$gd9oDlsaBaZiMhzn1/xI2ekNym4ErzE5MJ9ZVFgxa1xrTOc8C54zO",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-26T18:54:57.320Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "aquareladoleme@gmail.com",
+    "type": "business",
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.amazonaws.com/users/65a7db43c14f7a217471b0f4/profile/65a7db43c14f7a217471b0f4.jpg?hola=70349?hola=5274?hola=79985?hola=52039?hola=8294?hola=32670?hola=43290?hola=77290?hola=87048?hola=1220?hola=22288",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/65a7db43c14f7a217471b0f4/gallery/photo0.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7db43c14f7a217471b0f4/gallery/photo1.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7db43c14f7a217471b0f4/gallery/photo2.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7db43c14f7a217471b0f4/gallery/photo3.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7db43c14f7a217471b0f4/gallery/photo4.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7db43c14f7a217471b0f4/gallery/photo5.jpg",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "updatedAt": {
+      "$date": "2025-01-20T18:39:37.962Z"
+    },
+    "lastLogin": {
+      "$date": "2025-01-20T18:39:37.961Z"
+    },
+    "about": "Discover the heartbeat of Rio at Aquarela Hostel. Centrally located, our cozy rooms offer stunning views, and our rooftop terrace provides the perfect backdrop for your Rio adventures. Immerse yourself in the energy of the city, make new friends, and experience the best of Rio with us!🌊🌅\n\nDescubra o pulsar do Rio no Aquarela Hostel. Com localização central, nossos quartos aconchegantes oferecem vistas deslumbrantes, e nosso terraço no último andar proporciona o cenário perfeito para suas aventuras no Rio. Mergulhe na energia da cidade, faça novos amigos e viva o melhor do Rio conosco! 🌊🌅",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Aquarela",
+        "last": "Do Leme",
+        "nickName": "aquareladoleme"
+      },
+      "isActive": true,
+      "nationality": "Brazilian",
+      "country": "Brazil",
+      "idNumber": "19292383"
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "location": {
+        "city": "Rio de Janeiro",
+        "country": "Brazil",
+        "url": "https://maps.app.goo.gl/KwRkezsXFP3jJEuVA"
+      },
+      "owner": {
+        "name": {
+          "last": "Tibou",
+          "first": "Tibo"
+        }
+      },
+      "isActive": true,
+      "category": "category1",
+      "services": [
+        {
+          "service": "65a7d3d80fec5717b282a33e",
+          "isActive": true
+        },
+        {
+          "service": "65a7d4d50fec5717b282a352",
+          "isActive": true
+        },
+        {
+          "service": "663039e1dbd84508c88f9074",
+          "isActive": true
+        }
+      ],
+      "name": "Aquarela do Leme"
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "ksnt7b85be",
+    "createdAt": {
+      "$date": "2024-01-17T13:50:59.838Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 2448,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-01-17T13:51:00.867Z"
+      },
+      "urlcode": "li0BycuxrGjay3YkE9Obu7s96IMIVI"
+    },
+    "lastLoginType": "email",
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65a7ddc6c14f7a217471b12d"
+    },
+    "isActive": false,
+    "isValidate": true,
+    "password": "$2a$10$3ooc017hJIcD2WuY010hUeiWXfcxrL2lpHW5NUYjcFIn8KzFJoaGu",
+    "security": {
+      "updatedAt": {
+        "$date": "2025-02-06T21:35:31.770Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "barbara.angual@outlook.com",
+    "type": "worker",
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.amazonaws.com/users/65a7ddc6c14f7a217471b12d/profile/65a7ddc6c14f7a217471b12d.jpg",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/65a7ddc6c14f7a217471b12d/gallery/photo0.jpg?hola=64670?hola=17740",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7ddc6c14f7a217471b12d/gallery/photo1.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7ddc6c14f7a217471b12d/gallery/photo2.jpg?hola=24263",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7ddc6c14f7a217471b12d/gallery/photo3.jpg?hola=72874?hola=88882",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7ddc6c14f7a217471b12d/gallery/photo4.jpg?hola=64811?hola=7522",
+        "https://sosappfiles.s3.amazonaws.com/users/65a7ddc6c14f7a217471b12d/gallery/photo5.jpg?hola=33146?hola=62253",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "updatedAt": {
+      "$date": "2025-03-15T17:28:03.668Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-15T17:28:03.667Z"
+    },
+    "about": "Namaste! I'm Barbara, your Ayurvedic massage specialist for a unique journey of relaxation! 🌿💆‍♀️ Blending Ayurvedic traditions with the warmth of Brazil, I offer personalized massages to rejuvenate your mind and body. Book now and embark on this well-being journey!\n\nNamaste! Eu sou Barbara, sua massagista especializada em Ayurveda para uma jornada única de relaxamento! 🌿💆‍♀️ Com as tradições ayurvédicas e o toque brasileiro, ofereço massagens personalizadas para revitalizar sua mente e corpo. Agende agora e embarque nessa jornada de bem-estar!",
+    "newAbout": {
+      "en": "<h3><strong>Ayurvedic Massage Therapist – Wellness in Leme</strong></h3><br><br>Reconnect with your body and mind through <strong>authentic Ayurvedic massages</strong> delivered by a <strong>French therapist</strong> living in Rio de Janeiro for over <strong>4 years</strong>.<br><br>Specialized in ancient Indian techniques focused on energy flow, relaxation and inner balance, I offer sessions in a <strong>beautiful space with ocean and nature views</strong> inside <strong>Hostel Aquarela do Leme</strong>.<br><br>Each massage is a personalized and holistic ritual, combining natural oils, conscious touch and breathing to promote <strong>deep physical and emotional release</strong>.<br><br>I speak <strong>French, English and Portuguese</strong>, and sessions are available in a peaceful and safe environment designed for your full relaxation.<br><br>Treat yourself to a unique wellness experience in one of the most serene corners of Rio.",
+      "es": "<h3><strong>Terapeuta de Masajes Ayurvédicos – Bienestar en Leme</strong></h3><br><br>Reconecta con tu cuerpo y mente a través de <strong>masajes ayurvédicos auténticos</strong> realizados por una <strong>terapeuta francesa</strong> que vive en Río de Janeiro hace más de <strong>4 años</strong>.<br><br>Especializada en técnicas tradicionales de la India enfocadas en el flujo energético, la relajación y el equilibrio interior, las sesiones se realizan en un <strong>espacio hermoso con vistas al mar y la naturaleza</strong> dentro del <strong>Hostel Aquarela do Leme</strong>.<br><br>Cada masaje es un ritual personalizado y holístico, que utiliza aceites naturales, tacto consciente y respiración para generar una <strong>liberación física y emocional profunda</strong>.<br><br>Hablo <strong>francés, inglés y portugués</strong>, y las sesiones se realizan en un ambiente seguro y tranquilo, ideal para tu bienestar.<br><br>Regálate una experiencia única de sanación en uno de los rincones más tranquilos de Río.",
+      "pt": "<h3><strong>Terapeuta de Massagem Ayurvédica – Bem-estar no Leme</strong></h3><br><br>Reconecte-se com seu corpo e mente através de <strong>massagens ayurvédicas autênticas</strong> feitas por uma <strong>terapeuta francesa</strong> que vive no Rio de Janeiro há mais de <strong>4 anos</strong>.<br><br>Especializada em técnicas milenares da Índia, focadas no fluxo de energia, relaxamento e equilíbrio interior, atendo em um <strong>espaço encantador com vista para o mar e a natureza</strong> dentro do <strong>Hostel Aquarela do Leme</strong>.<br><br>Cada massagem é um ritual personalizado e holístico, com uso de óleos naturais, toque consciente e respiração para promover uma <strong>liberação física e emocional profunda</strong>.<br><br>Falo <strong>francês, inglês e português</strong>, e realizo as sessões em um ambiente calmo, seguro e acolhedor.<br><br>Permita-se viver uma experiência única de bem-estar em um dos cantinhos mais tranquilos do Rio.",
+      "fr": "<h3><strong>Thérapeute en Massage Ayurvédique – Sérénité à Leme</strong></h3><br><br>Reconnectez-vous avec votre corps et votre esprit grâce à des <strong>massages ayurvédiques authentiques</strong> réalisés par une <strong>thérapeute française</strong> vivant à Rio depuis plus de <strong>4 ans</strong>.<br><br>Spécialisée dans les techniques traditionnelles de l'Inde axées sur l'énergie, la détente et l'équilibre intérieur, je vous accueille dans un <strong>espace magnifique avec vue sur la mer et la nature</strong> au <strong>Hostel Aquarela do Leme</strong>.<br><br>Chaque séance est un rituel holistique et personnalisé, combinant huiles naturelles, toucher conscient et respiration pour une <strong>détente physique et émotionnelle profonde</strong>.<br><br>Je parle <strong>français, anglais et portugais</strong> et propose des séances dans un environnement paisible et sécurisé.<br><br>Offrez-vous un moment de bien-être dans l’un des lieux les plus calmes de Rio.",
+      "de": "<h3><strong>Ayurvedische Massagetherapeutin – Entspannung in Leme</strong></h3><br><br>Finden Sie zurück zu Körper und Geist mit <strong>authentischen ayurvedischen Massagen</strong>, angeboten von einer <strong>französischen Therapeutin</strong>, die seit über <strong>4 Jahren in Rio de Janeiro lebt</strong>.<br><br>Spezialisiert auf traditionelle indische Techniken zur Förderung von Energiefluss, innerem Gleichgewicht und tiefer Entspannung, finden die Sitzungen in einem <strong>wunderschönen Raum mit Meer- und Naturblick</strong> im <strong>Hostel Aquarela do Leme</strong> statt.<br><br>Jede Massage ist ein individuelles, ganzheitliches Ritual mit natürlichen Ölen, bewusstem Berühren und Atemarbeit zur <strong>tiefen körperlichen und emotionalen Entlastung</strong>.<br><br>Ich spreche <strong>Französisch, Englisch und Portugiesisch</strong> und arbeite in einer sicheren und ruhigen Umgebung.<br><br>Gönnen Sie sich ein einzigartiges Wohlfühlerlebnis an einem der friedlichsten Orte Rios."
+    },
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Barbara",
+        "last": "Angual"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "isMyServicesOk": true,
+      "isAboutmeOk": true,
+      "isMySchedulesOk": true,
+      "isMyWorkplacesOk": true,
+      "isActive": true,
+      "services": [
+        {
+          "id": "65a7d4d50fec5717b282a352",
+          "subServices": [
+            "65a7d5d09c90e2cef1493424",
+            "65a7d5d69c90e2cef1493428",
+            "65fe404604f07fe1a8ddbbaf"
+          ],
+          "gallery": []
+        }
+      ],
+      "phone": "+56951049892"
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "74kqjndeiu",
+    "createdAt": {
+      "$date": "2024-01-17T14:01:42.471Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 5323,
+      "expTime": 5,
+      "time": {
+        "$date": "2025-02-06T21:34:14.550Z"
+      },
+      "urlcode": "ZcIlYCFA9W285Ob1oXezMetpvN7kKH"
+    },
+    "lastLoginType": "email",
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65a8028df9bd05e897cc8d52"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-17T14:17:25.681Z"
+      },
+      "hasPassword": true
+    },
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.amazonaws.com/users/65a8028df9bd05e897cc8d52/profile/65a8028df9bd05e897cc8d52.jpg",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/65a8028df9bd05e897cc8d52/gallery/photo0.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a8028df9bd05e897cc8d52/gallery/photo1.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a8028df9bd05e897cc8d52/gallery/photo2.jpg",
+        "https://sosappfiles.s3.amazonaws.com/users/65a8028df9bd05e897cc8d52/gallery/photo3.jpg",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "personalData": {
+      "name": {
+        "first": "Emmanuel",
+        "last": "Baroski"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "isMyServicesOk": true,
+      "isAboutmeOk": true,
+      "isMySchedulesOk": true,
+      "isMyWorkplacesOk": true,
+      "isActive": true,
+      "services": [
+        {
+          "id": "65a7d3d80fec5717b282a33e",
+          "subServices": [
+            "65a7d6a39c90e2cef1493435",
+            "65a7d6899c90e2cef149342d",
+            "65a7d6909c90e2cef1493431",
+            "65a7d6b09c90e2cef1493439"
+          ],
+          "gallery": []
+        }
+      ]
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "isActive": false,
+    "isValidate": true,
+    "rating": 5,
+    "type": "worker",
+    "updatedAt": {
+      "$date": "2024-08-16T06:08:49.557Z"
+    },
+    "lastLogin": {
+      "$date": "2024-08-16T06:08:49.557Z"
+    },
+    "about": "Hello, I'm Emmanuel! With 14 years of experience 💇‍♂️, I've taken my barbering skills to hostels for the past decade. I provide quality haircuts directly at your accommodation, adding a touch of style and comfort to your experience. I look forward to the opportunity to serve you soon! ✂️✨",
+    "language": "EN",
+    "email": "emmabaroski@icloud.com",
+    "username": "ajqmgtl9qf",
+    "lastLoginType": "email",
+    "createdAt": {
+      "$date": "2024-01-17T16:38:37.628Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 6036,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-01-23T02:11:14.320Z"
+      },
+      "urlcode": "0wgYMckfEnwnhOzT7EvnhvgUCfQT6u"
+    },
+    "password": "$2a$10$dPQ4rECOcyrVSH3R5UF5CeT2GEFhzWbQy5qnMpVR4i2JfH/YfDoGa"
+  },
+  {
+    "_id": {
+      "$oid": "65c17037844fc6ed6bc80336"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-05T15:28:52.684Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKTw2kVvR0K6ir9YAkThoUTwfNrTNd-cSFpa49ohM6U=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Elliot",
+        "last": "Brady"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PVcu8cMc2m7joo"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-05T23:33:11.705Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-05T23:33:11.372Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "elliotpbrady@gmail.com",
+    "username": "z5d32q68na",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-05T23:33:11.161Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65d49fb78b72b85e419e0176"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-18T21:07:17.298Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIY7ac4F0b6VoMPHsWySRC0oyWZNMooCY9mjkshk8YOmkpZ=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Alessia",
+        "last": "Iobbi"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Pb4uhFq2joHhex"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-20T12:48:56.485Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-20T12:48:55.886Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "alessiaiobbiai@gmail.com",
+    "username": "9o0xyqce5b",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-20T12:48:55.966Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65dbb8cb34903ddfffd9bd3d"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$ccHT6PhEQPLaewua.WE8T.QD.K727k5DTthFHmwa4ve62JR.DsHj2",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-25T22:01:47.992Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "tinitounss@hotmail.fr",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-02-25T22:02:10.458Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-25T21:05:11.912Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Ben"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "b6w8ynse6b",
+    "createdAt": {
+      "$date": "2024-02-25T22:01:48.067Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 3357,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-02-25T22:01:49.175Z"
+      },
+      "urlcode": "NiDCIasiICmYlLQ3v7wfsuUF4JBqbj"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65e12eca3bc8e8f3379a3f2f"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-25T22:04:00.312Z"
+      },
+      "hasPassword": false
+    },
+    "username": "788qn5h5cd",
+    "rating": 5,
+    "email": "Emmabaroski@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-03-01T01:26:34.281Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-25T22:04:00.312Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Cliente",
+        "last": "Emma"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "createdAt": {
+      "$date": "2024-03-01T01:26:34.281Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65e1e7df6f3a89c2f931db8a"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$eyXUn49gxAjho0KtF30DKe.p1s0xshULJjwgqBJGJV5K4wysp4zFa",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-01T14:36:15.873Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "clodaghmkelly@outlook.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-03-01T14:37:25.945Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-01T03:42:31.692Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Clodagh",
+        "last": "Kelly"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "j5btakukiy",
+    "createdAt": {
+      "$date": "2024-03-01T14:36:15.959Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 8183,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-03-01T14:36:19.541Z"
+      },
+      "urlcode": "TjOfSPppkKxOVAa79DvgBIupFbl5Ob"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65e62ff34d058d5d6f199b0b"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-03T17:37:14.113Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIgaRdTlsgIiLQICIOtGIn-2yfX94HUTwl9pjmLb6AYndaN=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Karim",
+        "last": "BEOUCHE"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Pg4K2Tfs5Nv2J8"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-04T21:29:44.849Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-04T21:29:44.848Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "mrbeouche@gmail.com",
+    "username": "bvwyje4eez",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-04T20:32:51.133Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66521fbb30dde377ee69c667"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-25T13:12:54.152Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKaN54sEoFjivffY-mVxos-GGLNti5tI2NYJVbxJAROtwJjp9w=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Pauline",
+        "last": "réalisatrice"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QAjsBKirLqF1C8"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-05-25T17:28:28.193Z"
+    },
+    "lastLogin": {
+      "$date": "2024-05-25T17:28:27.760Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "pauline.realisatrice@gmail.com",
+    "username": "alzwcus0em",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-05-25T17:28:27.317Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "666d91413434c1d2a15282c9"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-06-08T03:11:23.009Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKmWmci6TtFDbPPveTim68KSfYGjJQa0TBDrP1cMKEKe_KhZA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Mickael",
+        "last": "Devoye"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QIXLZKF4R6queX"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-06-15T13:04:01.869Z"
+    },
+    "lastLogin": {
+      "$date": "2024-06-15T13:04:01.321Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "devoye29@gmail.com",
+    "username": "i9nec1epq5",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-06-15T13:04:01.392Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66db1311f5db606c308af137"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-08-28T15:34:11.215Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKh7tVBbJ70FQiClyLTtrkIe-xEWGYLykS91jLsZFaI0x5FYw=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Baloo",
+        "last": "Wisdom"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QneYBEFrzEW9J3"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-09-06T14:34:58.559Z"
+    },
+    "lastLogin": {
+      "$date": "2024-09-06T14:34:58.155Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "baloo.wisdom@gmail.com",
+    "username": "ps56zblw0r",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-09-06T14:34:57.931Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66dde1e7ff1c9e43420b480c"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-09-06T14:36:50.392Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKg1MI1qnf4Cowlz2ggkFOYlCumYTDqz328kTVXbdbI3m1hoQ=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "jesse",
+        "last": "anastase"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QoS19cJn6D5QXx"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-09-11T03:59:21.700Z"
+    },
+    "lastLogin": {
+      "$date": "2024-09-11T03:59:21.699Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "anastase.jesse@gmail.com",
+    "username": "mhoc15awln",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-09-08T17:41:59.181Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66f6c3426f282bb643610ecb"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-09-23T19:56:26.375Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLgB2dVOuiy7jVBb1raC5EzNELleiNVvJzt5gPbMPZmaAQ1mA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Cécile",
+        "last": "Thuret"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QvWLuluWiQbTfX"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-09-27T14:37:55.487Z"
+    },
+    "lastLogin": {
+      "$date": "2024-09-27T14:37:54.995Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "cecile.thuret@gmail.com",
+    "username": "137mbwlnzs",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-09-27T14:37:54.872Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "676820d31fcc4baba6561341"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$WJ.NlQTf//iZ0u5Pe/uCXO3eACvFiHH5HcJfYLtl9jbilS.gq2n3O",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-12-22T14:23:15.391Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "marion.achach@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-12-22T14:24:12.791Z"
+    },
+    "lastLogin": {
+      "$date": "2024-12-22T03:03:13.728Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Marion"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "58mtcm76jc",
+    "createdAt": {
+      "$date": "2024-12-22T14:23:15.475Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 6212,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-12-22T14:23:16.874Z"
+      },
+      "urlcode": "5KBKawOCjCnzfqSYFf7UMljEKRlbbn"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "67702658ff12b817cb159851"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-12-22T14:25:55.822Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKy13UEg6tElWddbt72_2X9UdhFWeJ_VFuHuDgENHAb6CehKeCF=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Rebecca",
+        "last": "Fernandez"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_RU0qB3XqkB6rIA"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-12-28T16:24:57.130Z"
+    },
+    "lastLogin": {
+      "$date": "2024-12-28T16:24:56.542Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "rebecca.marie42@gmail.com",
+    "username": "kwsq1r3bj9",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-12-28T16:24:56.236Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67d194de9df224d0efb71153"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$CzHFfvZWEkgvMC.p/HxN9u8uGj0bZS5D9.GUiimofbroxk1r2c2MO",
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-12T14:06:23.041Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "kostgeo99@yahoo.gr",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2025-03-12T14:07:05.999Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-12T06:03:22.733Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Kostas",
+        "last": "Georgas"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null
+    },
+    "username": "fydqb3aopm",
+    "createdAt": {
+      "$date": "2025-03-12T14:06:23.153Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 9216,
+      "expTime": 5,
+      "time": {
+        "$date": "2025-03-12T14:06:24.710Z"
+      },
+      "urlcode": "fj6qmkdHg7chLzy5gtqyggF0K88Ux4"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65b428a1b466642e9720f32a"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$RZEIaZOsrI1LdkLF3P9wD.lZQdrGWsw0XZvTtDGqtRm1PrjIyFmQy",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-26T21:48:17.498Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "johann@unabase.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocL8aZehcyUs3JSI3hRWikBdTQY8HYifj0ayYgzRn2NQ=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2025-03-15T21:37:43.774Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-15T21:37:43.771Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Johann",
+        "last": "Schwarze 2"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "stripeAccountId": null,
+      "isActive": false,
+      "stripeCustomerId": "cus_PTii2oleTHdjXu"
+    },
+    "username": "k94hq8ge05",
+    "createdAt": {
+      "$date": "2024-01-26T21:48:17.662Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 6710,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-01-26T21:48:18.329Z"
+      },
+      "urlcode": "NIdtB8FdGSaGZwXhHP7qQyZSjHLbw3"
+    },
+    "lastLoginType": "google"
+  },
+  {
+    "_id": {
+      "$oid": "65bb88b012f6b49956ea3fc4"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-31T21:22:06.135Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLDCybzj1KxkIPBt7ckHs8Ui6SsjRQBC1c1USPnjw_0=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Ricardo",
+        "last": "Rabanal Cid"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PTwt0Ncy3WUVwJ"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-01T12:04:01.142Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-01T12:04:00.639Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "methalcon@gmail.com",
+    "username": "8y79eom0ax",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-01T12:04:00.709Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65e202b93e427958aae2ce9b"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-01T15:54:04.632Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLGO1DHnhM83B3MCDzZh7hHxWg50TJQDDU7fxiNEcJA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Bastien",
+        "last": "v"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PeskxrdvlRrD1u"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-02T14:39:26.824Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-02T14:39:26.823Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "bastien.deboisrolin@gmail.com",
+    "username": "qdwqhzk0nn",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-01T16:30:49.117Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65ef95524d058d5d6f19aa12"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-03T17:37:14.113Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocI5we0b1s4D7CubUWRBDYyUk_LXWalBK-P6NlQbNu0NqA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Ezequiel",
+        "last": "Murad"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PijrRSaLnrL3H7"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-11T23:35:47.117Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-11T23:35:46.537Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "muradezequiel@gmail.com",
+    "username": "lf4hxejt8p",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-11T23:35:46.604Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65f0a5be4d058d5d6f19ab45"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$tScmwcQbAYxpjigFdDOwNeW1PwCWACTt9O/nCC/mgocn0Ustkywve",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-12T18:58:06.954Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "nefelipsy@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-03-27T15:13:15.961Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-27T15:13:15.959Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Nefeli",
+        "last": "Nasika"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "v82jdrjz3d",
+    "createdAt": {
+      "$date": "2024-03-12T18:58:07.025Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 8330,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-03-12T18:58:08.121Z"
+      },
+      "urlcode": "gHvxYYBk7uJuK7TiMGXenmQhe3ozUs"
+    },
+    "lastLoginType": "email"
+  },
+  {
+    "_id": {
+      "$oid": "65f24e704d058d5d6f19acff"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-03T17:37:14.113Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKQMFTQgI58-UKtkKEFYA1egLpJES1t8d_nr8_PT_U5hX0=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Tom",
+        "last": "Mutschmann"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PjVpKHcWU8hyK1"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-14T01:10:09.346Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-14T01:10:08.969Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "tmutschmann@gmail.com",
+    "username": "nqbyhed2gp",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-14T01:10:08.777Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66180f4550abfb5e83b2242e"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-04-03T14:00:43.512Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLyzz3Ys8obfHmqDXs36OpMHgQT8yonjn6xncmTK-S5ZrkgZdfx=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Nikita",
+        "last": "Ostrovsky"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PuEw6zCAsL0nks"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-04-11T16:26:46.573Z"
+    },
+    "lastLogin": {
+      "$date": "2024-04-11T16:26:46.202Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "nik.ostro@gmail.com",
+    "username": "hdag46j3ct",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-04-11T16:26:45.961Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "666b190a3434c1d2a152805a"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-06-08T03:11:23.009Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocL1y8Vsso_hnxKhGL2foJoSuBaOfTesNBPQW_1Pgy3QoSLorQ=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Maya",
+        "last": "J"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QHpq0wh3n7xHwv"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-06-14T14:42:53.944Z"
+    },
+    "lastLogin": {
+      "$date": "2024-06-14T14:42:53.944Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "nadia.mishmash@gmail.com",
+    "username": "70mbja0lfc",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-06-13T16:06:34.317Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "667dc8023434c1d2a1528ab7"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-06-08T03:11:23.009Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJxkXB1gRzpc2o_Dp1d36rEXIMq1o_RjRuFX2rxTUJUZQ82zOwe1g=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "anaelle",
+        "last": ""
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QN8z87brvgqcrZ"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-06-27T20:13:55.352Z"
+    },
+    "lastLogin": {
+      "$date": "2024-06-27T20:13:54.692Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "anaelle2176@gmail.com",
+    "username": "luvp4dvy1v",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-06-27T20:13:54.785Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "669520730611f632db9f45c5"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "password": "$2a$10$/JsgDAO6MZcgBNjzCfAZS.9PQAP3sgrGtWN4LznIcbPLLfGxW1P/S",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-07-15T13:13:23.651Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "diessicarebel@hotmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-07-17T14:19:14.718Z"
+    },
+    "lastLogin": {
+      "$date": "2024-07-17T14:19:13.516Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Diéssica",
+        "last": "Nunes sales"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "4m6cko8t7a",
+    "createdAt": {
+      "$date": "2024-07-15T13:13:23.728Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 5940,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-07-17T14:19:14.717Z"
+      },
+      "urlcode": "NisCufQlqXH8muG0vH8kHyYyU1TVBp"
+    },
+    "lastLoginType": "email"
+  },
+  {
+    "_id": {
+      "$oid": "66c5f91a3b69182f467dfcd7"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-08-09T16:27:21.071Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIRx5Qx-kklgsCKGbF2JGBBjuwTE7tPR846EkWuuNA-kzzG1Q=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Merel",
+        "last": "Zoet"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Qheo9G6XNFt5Qq"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-08-21T14:26:35.737Z"
+    },
+    "lastLogin": {
+      "$date": "2024-08-21T14:26:35.055Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "merelzoet@gmail.com",
+    "username": "ea81ac1c1s",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-08-21T14:26:34.930Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67a60d5b4203190f31359796"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-12-28T16:30:38.337Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLNzffTtr3KmfLHM_WBO90xs0RaoGxzVwn7ZXUw-nc0XOUZwSUl=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Aurélie",
+        "last": "Grangier"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_RjKShhfyYdOmHH"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-02-07T17:51:18.226Z"
+    },
+    "lastLogin": {
+      "$date": "2025-02-07T17:51:18.226Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "aurelie.grangier@gmail.com",
+    "username": "uaw8r6j5ex",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-02-07T13:40:43.139Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67cf9db62d41873bfc02144f"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-10T22:56:36.680Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKf7T0hmpgg0SOFOAXxWfEcJwvP9zj1D4ea5JZWtCLpODdILA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Johann",
+        "last": "Schwarze"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null,
+      "stripeCustomerId": "cus_Rv8hpyzmcjeYIP"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-06-21T19:33:53.679Z"
+    },
+    "lastLogin": {
+      "$date": "2025-06-21T19:33:53.668Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "johannbrasil10@gmail.com",
+    "username": "gfm3q9ibfz",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-11T02:19:35.084Z"
+    },
+    "__v": 0,
+    "newAbout": {
+      "en": "",
+      "es": "",
+      "pt": "",
+      "fr": "",
+      "de": ""
+    },
+    "numberBookings": 0,
+    "reviewScore": 0
+  },
+  {
+    "_id": {
+      "$oid": "65b427e8543cbbd3f613c6c5"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$GBxSyTaX3fwS7xdtTY5v0.nV9OzsOialIU6TqwptrhvdVQ3FYWA3O",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-10T13:14:10.891Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "kschwarzeg@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-02-10T13:15:28.216Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-10T13:15:28.216Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Konrad"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "x19jrqf62d",
+    "createdAt": {
+      "$date": "2024-01-26T21:45:12.805Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 9120,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-02-10T13:13:08.506Z"
+      },
+      "urlcode": "2fSbOQGvuDqxsab5DIEefTEfKKMzmU"
+    },
+    "lastLoginType": "email"
+  },
+  {
+    "_id": {
+      "$oid": "65b9bd869a1ce5c62a9be645"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$gd9oDlsaBaZiMhzn1/xI2ekNym4ErzE5MJ9ZVFgxa1xrTOc8C54zO",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-25T12:01:34.556Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "estrelasdebabilonia@gmail.com",
+    "type": "business",
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.amazonaws.com/users/65b9bd869a1ce5c62a9be645/gallery/photo4.jpg",
+      "coverImg": "",
+      "gallery": [
+        "https://sosappfiles.s3.amazonaws.com/users/65b9bd869a1ce5c62a9be645/gallery/photo0.jpg?hola=19434",
+        "https://sosappfiles.s3.amazonaws.com/users/65b9bd869a1ce5c62a9be645/gallery/photo1.jpg?hola=98862",
+        "https://sosappfiles.s3.amazonaws.com/users/65b9bd869a1ce5c62a9be645/gallery/photo2.jpg?hola=91788",
+        "https://sosappfiles.s3.amazonaws.com/users/65b9bd869a1ce5c62a9be645/gallery/photo3.jpg?hola=63779",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "updatedAt": {
+      "$date": "2024-02-08T18:06:05.058Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-08T15:00:47.712Z"
+    },
+    "about": "Discover the heartbeat of Estrela de Babilonia. Centrally located, our cozy rooms offer stunning views, and our rooftop terrace provides the perfect backdrop for your Rio adventures. Immerse yourself in the energy of the city, make new friends, and experience the best of Rio with us!🌊",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Estrelas",
+        "last": "De Babilonia",
+        "nickName": "estreladebabilonia"
+      },
+      "isActive": true,
+      "nationality": "Brazilian",
+      "country": "Brazil",
+      "idNumber": "19292383"
+    },
+    "businessData": {
+      "location": {
+        "city": "Rio de Janeiro",
+        "country": "Brazil",
+        "details": {
+          "en": "Your service will be provided at our partner hostel, Aquarela do Leme, with an amazing Rooftop ready to welcome you. 🏨 Just come in, head up to the terrace at the scheduled time, and enjoy to the fullest! 🌟",
+          "pt": "Seu serviço será realizado em nosso hostel parceiro, Aquarela do Leme, com um incrível Rooftop pronto para te receber. 🏨 Basta entrar, subir até o terraço no horário marcado e aproveitar ao máximo! 🌟"
+        },
+        "url": "https://maps.app.goo.gl/KwRkezsXFP3jJEuVA"
+      },
+      "owner": {
+        "name": {
+          "last": "Viviana",
+          "first": ""
+        }
+      },
+      "isActive": true,
+      "services": [
+        {
+          "service": "65a7d4d50fec5717b282a352",
+          "isActive": true
+        },
+        {
+          "service": "65a7d3d80fec5717b282a33e",
+          "isActive": true
+        }
+      ],
+      "name": "Estrelas de babilonia",
+      "category": "category2"
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "ksnt7b85ba",
+    "createdAt": {
+      "$date": "2024-01-17T13:50:59.838Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 2448,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-01-17T13:51:00.867Z"
+      },
+      "urlcode": "li0BycuxrGjay3YkE9Obu7s96IMIVI"
+    },
+    "lastLoginType": "email",
+    "workerData": {
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65ba62a6543cbbd3f613d144"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-01-24T20:50:38.247Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIfa1eb07wo8-gAMmeAku_6jyYYIU8N-DL-v_aK1K6wE8Y=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "vega",
+        "last": "KMS"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PTcfL6qPd85D5S"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-01-31T23:20:11.725Z"
+    },
+    "lastLogin": {
+      "$date": "2024-01-31T23:20:11.724Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "vegak.m.s@gmail.com",
+    "username": "75lhpnsaok",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-01-31T15:09:26.225Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65c1248b844fc6ed6bc7ff0e"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$rzWdoJOvjNgnOIK8zk9BxOlXofxHgC.0b6QJYOSt/lOfefOE1EjPu",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-05T18:10:19.590Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "floanwelt@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-02-05T18:11:37.547Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-05T15:28:52.684Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Florian",
+        "last": "Abel"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "cekyo1zc1g",
+    "createdAt": {
+      "$date": "2024-02-05T18:10:19.661Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 6060,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-02-05T18:10:21.292Z"
+      },
+      "urlcode": "QuMj1H2EGNKXfIFQ4BZvtcBC6lSI0X"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65c38a4887fadccf28f17644"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-05T23:34:16.173Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJJzWmwvUPTWVAGTU4Yj5oqDE9QPG6vvavro3Hj9G-AoGUX=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Diana",
+        "last": "Nitu"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PWDwXuasqV4IJi"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-07T15:38:17.356Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-07T15:38:17.355Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "diananitu1101@gmail.com",
+    "username": "808bdjka6j",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-07T13:48:56.797Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65dcbd3e3bc8e8f3379a2faf"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-25T22:04:00.312Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKrOYmh8Zy27vsEAW0EL5gnzCReA6bCVcy1dX6OTVf55ZA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Lucille",
+        "last": "Fch"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PdNsVqxqpJinkQ"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-02-26T16:33:03.024Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-26T16:33:02.661Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "lucillefch@gmail.com",
+    "username": "mxodf9jn1u",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-26T16:33:02.405Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "65dcbd653bc8e8f3379a2fcb"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$DMu7a8LP9Ey0hBSyvelfse/qRItrIRHurVwn.6unIsFu9LQwsUBbO",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-26T16:33:41.276Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "pietri.audrey@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-02-26T16:34:10.885Z"
+    },
+    "lastLogin": {
+      "$date": "2024-02-25T22:04:00.312Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Audrey"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "xmpxx5v4uk",
+    "createdAt": {
+      "$date": "2024-02-26T16:33:41.345Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 3564,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-02-26T16:33:42.409Z"
+      },
+      "urlcode": "Q4SejPLs0hFSYQaoD4vxGxXYJFJOqH"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65e0fc4d3bc8e8f3379a3ecc"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-02-25T22:04:00.312Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKerdwXhvkkyxTrL0U1nBhcjxQiXUEojoPFg-TcjZ6BLw=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Emmanuel",
+        "last": "Baroski"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PeagNfAzqruYVb"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-04-03T20:10:53.970Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-01T01:25:27.564Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "emmabaroski@gmail.com",
+    "username": "gxp28e7awa",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-02-29T21:51:09.196Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 6337,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-04-03T20:10:53.970Z"
+      },
+      "urlcode": "20jdpI5w8JIZkROfHEFTy22gJTtDWl"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65e4b4bbb2a4381539ecdd9e"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "password": "$2a$10$y0OKYWixSiY33bnbWwcqKOgrIV/aCIbhtcJHn6OlNiQeayHcpRFbG",
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-03T17:34:51.912Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "adrien.4506@hotmail.fr",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2024-03-03T17:36:17.678Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-03T17:36:17.678Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Adrien",
+        "last": "Carvalho"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "55rzkoo578",
+    "createdAt": {
+      "$date": "2024-03-03T17:34:51.983Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 8589,
+      "expTime": 5,
+      "time": {
+        "$date": "2024-03-03T17:34:54.071Z"
+      },
+      "urlcode": "vHRfPw9AzZgn67BJmi6P4e4NsrYEja"
+    },
+    "lastLoginType": "email"
+  },
+  {
+    "_id": {
+      "$oid": "65e9ccf44d058d5d6f19a3b7"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-03T17:37:14.113Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJwcgTWDLAmLq_zHxeOVqT6LBTQAClVmGSysngzIrwP=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Sam",
+        "last": "Browne-Swinburne"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Ph5zvjeAJXOrXm"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-07T14:19:33.064Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-07T14:19:32.667Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "samb-s@hotmail.com",
+    "username": "g4s3mq02aq",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-07T14:19:32.427Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6605850c8a17d47f2c20dc60"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-27T15:22:59.700Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJShwYSRwRTrhqgymvRbvdLDJcxOS2C1-Wl_fNExbgTdd4=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Valentine",
+        "last": "Troesch"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PoyJsS3a3jJt8p"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-28T14:56:13.521Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-28T14:56:12.958Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "troesch.valentine@gmail.com",
+    "username": "zmyirvxro6",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-28T14:56:13.031Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6605af1beeecb67c45e158cb"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-28T14:57:41.351Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJiPa3OIBFRO_leI8tXwIx1VquuCSWKHldSz2RBhHpC=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Khadija",
+        "last": "K"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Pp1DxUu7kCU5LO"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-03-28T17:55:40.137Z"
+    },
+    "lastLogin": {
+      "$date": "2024-03-28T17:55:39.757Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "wizkhadija8@gmail.com",
+    "username": "jvtajqhvcn",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-03-28T17:55:39.517Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "660d5db380244d8c94933d63"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-03-30T14:29:18.311Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLw3ptU7q4u4Q7Y61uKWTtL6kHSHoMyul5a6W6rQTIG8Vs=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Martin",
+        "last": "Ritz"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_PrCYy6cyDtramd"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-04-04T23:03:24.260Z"
+    },
+    "lastLogin": {
+      "$date": "2024-04-04T23:03:24.260Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "martinritz22@gmail.com",
+    "username": "mrein5ui22",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-04-03T13:46:27.340Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6637823852920a8591a782a7"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-02T04:56:06.250Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocL-wB0AMXLbmXQOsOYuW1OvzujZQZc3Ke2en5lFZueJQyozd_r3=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Umba",
+        "last": "Peggy Monga"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Q3AzKhbJomdJme"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-05-25T13:09:45.382Z"
+    },
+    "lastLogin": {
+      "$date": "2024-05-25T13:09:45.381Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "upmonga4@gmail.com",
+    "username": "9r9twgycaw",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-05-05T12:57:28.195Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6653850c30dde377ee69c8f2"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-05-25T13:12:54.152Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIEQGxmVypg5cdRvwy5o5RP8WUZ8qrpT2IZNQbIF6fAScpt5g=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Zoé",
+        "last": ""
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QB8STy7DEhNcl4"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-05-26T18:53:01.268Z"
+    },
+    "lastLogin": {
+      "$date": "2024-05-26T18:53:00.917Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "zoey.bnhm@gmail.com",
+    "username": "q2owrhvyj9",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-05-26T18:53:00.580Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "669506f40611f632db9f4559"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-07-05T20:58:59.168Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLJQ0BaKM_Ra3Twp125BzBFT0OYomYKM_g9XJcf-4wIAJf_vdU=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Leo",
+        "last": "Cheung"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QTkWWzj4cVb6hg"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-07-16T16:48:27.489Z"
+    },
+    "lastLogin": {
+      "$date": "2024-07-16T16:48:27.486Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "leopatrickcheung@gmail.com",
+    "username": "j7nit2150c",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-07-15T11:24:36.649Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66b6430a88a51b43f1453873"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-07-15T18:28:58.172Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLsgFLPWrZ-AJiJuU_S7i0TrtSRAqQaZjOSs5LQqiQgZLcPdqo=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Zen",
+        "last": "Yen"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QdC1wJ8hhfYYof"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-08-09T16:25:47.924Z"
+    },
+    "lastLogin": {
+      "$date": "2024-08-09T16:25:46.964Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "getzenwithyen@gmail.com",
+    "username": "1cxri8lkew",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-08-09T16:25:47.233Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66cf42ecd0603d7326c9118d"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-08-21T20:33:48.829Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKYruWZWLzYiegLGJcNo3SKp944k-3ntleOjpkMJPzM5shWzQ=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Silvia",
+        "last": "Argurio"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_QkIR34J31kmVwk"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-08-28T15:31:57.865Z"
+    },
+    "lastLogin": {
+      "$date": "2024-08-28T15:31:57.164Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "silvia.argurio@gmail.com",
+    "username": "czleofpadt",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-08-28T15:31:56.814Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "66f1c7b4ff1c9e43420b52fd"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-09-06T14:36:50.392Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJesDETFXVaHHf_6lUC1HpAqy1Q0t1ChATZKFWbdl8DWwAcMw=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "David",
+        "last": "Müller"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_Qu6Z799zGjRhIZ"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-09-23T19:55:32.983Z"
+    },
+    "lastLogin": {
+      "$date": "2024-09-23T19:55:32.470Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "damueller999@gmail.com",
+    "username": "81utmbv0m5",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-09-23T19:55:32.307Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "673cb89d6617bdd703d40fed"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2024-11-05T23:45:32.782Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLo6F1eLYJ_ak2DARVw2mClQZLxvdbc0JPuEMiyLJkKDtRUdQ=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Inês",
+        "last": "Martinho Ferreira"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_RFOo25QbLWGXmh"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2024-11-23T01:37:54.288Z"
+    },
+    "lastLogin": {
+      "$date": "2024-11-23T01:37:54.287Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "ines.mart.ferreira@gmail.com",
+    "username": "iub5gxej2c",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2024-11-19T16:11:09.550Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67c65f271df74d283dc9ed7c"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-04T01:29:25.430Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLP1HFFXRxi0W3_zXXzHSXCJDqNo3nwJYr_5KhBWPPngy0ErA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Johann",
+        "last": "Schwarze"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "stripeAccountId": null,
+      "isActive": false,
+      "stripeCustomerId": "cus_RsVpI0CGCY39YT"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-04-02T01:23:19.460Z"
+    },
+    "lastLogin": {
+      "$date": "2025-04-02T01:23:19.460Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "jeannoir19@gmail.com",
+    "username": "mkayvmnexk",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-04T02:02:15.801Z"
+    },
+    "__v": 0,
+    "newAbout": {
+      "en": "",
+      "es": "",
+      "pt": "",
+      "fr": "",
+      "de": ""
+    },
+    "numberBookings": 0,
+    "reviewScore": 0
+  },
+  {
+    "_id": {
+      "$oid": "67c721b3fb4fe0941fe4959b"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-02T16:04:46.285Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://sosappfiles.s3.us-east-1.amazonaws.com/users/67c71578fb4fe0941fe494f0/67c721b3fb4fe0941fe4959b/profile/67c721b3fb4fe0941fe4959b.png",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Mauro",
+        "last": "Roa"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": [],
+      "phone": "+56951049892"
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeCustomerId": "cus_RsjDAHGC7cm14m",
+      "stripeAccountId": "acct_1QmKoz02p3T0U7Hk"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "worker",
+    "updatedAt": {
+      "$date": "2025-04-17T15:09:15.089Z"
+    },
+    "lastLogin": {
+      "$date": "2025-04-17T15:09:15.089Z"
+    },
+    "about": "soy mauro",
+    "newAbout": {
+      "en": "<h3><strong>Favela Tour Guide in Rio – Local Resident</strong></h3><br><br>Explore Rio's most iconic favelas like <strong>Vidigal and Rocinha</strong> with an <strong>officially registered local guide</strong>, fluent in <strong>English, Portuguese, and Spanish</strong>, and with over <strong>5 years of experience living in Rio de Janeiro</strong>.<br><br>More than a tour, this is a deep and respectful immersion into the <strong>culture, history, daily life, and resilience</strong> of the communities that shape the real Rio.<br><br>Visit panoramic viewpoints, art-covered alleys, local businesses, and experience the true spirit of the favela with someone who lives and breathes it.<br><br>Also offering <strong>personalized city tours</strong> and <strong>private transfers</strong> to destinations like <strong>Arraial do Cabo, Angra dos Reis, and Búzios</strong>.<br><br>Each experience is designed to be <strong>authentic, safe, and informative</strong>, making your time in Brazil <strong>meaningful, enriching, and unforgettable</strong>.",
+      "es": "<h3><strong>Guía de Tours en Favelas – Residente Local</strong></h3><br><br>Descubre las favelas más emblemáticas de Río como <strong>Vidigal y Rocinha</strong> con un <strong>guía local oficialmente registrado</strong>, que habla <strong>inglés, portugués y español</strong>, y que lleva más de <strong>5 años viviendo en Río de Janeiro</strong>.<br><br>Más que un tour, es una inmersión profunda y respetuosa en la <strong>cultura, historia, vida cotidiana y fuerza</strong> de las comunidades que dan identidad al verdadero Río.<br><br>Visita miradores, callejones llenos de arte, negocios locales y siente el verdadero espíritu de la favela junto a quien la vive día a día.<br><br>También realiza <strong>tours personalizados por la ciudad</strong> y <strong>traslados privados</strong> a destinos como <strong>Arraial do Cabo, Angra dos Reis y Búzios</strong>.<br><br>Cada experiencia está diseñada para ser <strong>auténtica, segura e informativa</strong>, haciendo que tu paso por Brasil sea <strong>significativo, enriquecedor e inolvidable</strong>.",
+      "pt": "<h3><strong>Guia de Tours em Favelas – Morador Local</strong></h3><br><br>Explore as favelas mais icônicas do Rio como <strong>Vidigal e Rocinha</strong> com um <strong>guia local oficialmente registrado</strong>, fluente em <strong>inglês, português e espanhol</strong>, e com mais de <strong>5 anos de vivência no Rio de Janeiro</strong>.<br><br>Mais do que um tour, é uma imersão profunda e respeitosa na <strong>cultura, história, cotidiano e resistência</strong> das comunidades que formam o verdadeiro Rio.<br><br>Visite mirantes incríveis, becos cheios de arte, comércios locais e sinta o verdadeiro espírito da favela com quem vive ali.<br><br>Também ofereço <strong>tours personalizados pela cidade</strong> e <strong>transfers privados</strong> para destinos como <strong>Arraial do Cabo, Angra dos Reis e Búzios</strong>.<br><br>Cada experiência é pensada para ser <strong>autêntica, segura e informativa</strong>, tornando sua estadia no Brasil <strong>significativa, rica e inesquecível</strong>.",
+      "fr": "<h3><strong>Guide des Favelas à Rio – Résident Local</strong></h3><br><br>Découvrez les favelas les plus emblématiques de Rio comme <strong>Vidigal et Rocinha</strong> avec un <strong>guide local officiellement enregistré</strong>, parlant <strong>anglais, portugais et espagnol</strong>, et vivant à Rio de Janeiro depuis plus de <strong>5 ans</strong>.<br><br>Plus qu'une visite, c'est une immersion profonde et respectueuse dans la <strong>culture, l'histoire, la vie quotidienne et la résilience</strong> de ces communautés qui incarnent le vrai Rio.<br><br>Explorez des points de vue spectaculaires, des ruelles artistiques, des commerces locaux et vivez l'esprit authentique de la favela avec un habitant.<br><br>Propose aussi des <strong>tours personnalisés dans la ville</strong> et des <strong>transferts privés</strong> vers <strong>Arraial do Cabo, Angra dos Reis et Búzios</strong>.<br><br>Chaque expérience est conçue pour être <strong>authentique, sécurisée et enrichissante</strong>, rendant votre séjour au Brésil <strong>inoubliable et plein de sens</strong>.",
+      "de": "<h3><strong>Favela-Tourguide in Rio – Lokaler Bewohner</strong></h3><br><br>Entdecken Sie die berühmten Favelas von Rio wie <strong>Vidigal und Rocinha</strong> mit einem <strong>offiziell registrierten lokalen Guide</strong>, der <strong>Englisch, Portugiesisch und Spanisch</strong> spricht und seit über <strong>5 Jahren in Rio de Janeiro lebt</strong>.<br><br>Mehr als nur ein Rundgang – es ist eine respektvolle, tiefgehende Erfahrung der <strong>Kultur, Geschichte, des Alltags und der Stärke</strong> dieser einzigartigen Gemeinschaften.<br><br>Besuchen Sie atemberaubende Aussichtspunkte, kunstvolle Gassen, lokale Geschäfte und erleben Sie das wahre Leben in der Favela mit einem Bewohner.<br><br>Zusätzlich biete ich <strong>maßgeschneiderte Stadttouren</strong> und <strong>private Transfers</strong> zu Zielen wie <strong>Arraial do Cabo, Angra dos Reis und Búzios</strong>.<br><br>Jede Tour ist <strong>authentisch, sicher und lehrreich</strong>, und macht Ihren Aufenthalt in Brasilien <strong>bedeutungsvoll, bereichernd und unvergesslich</strong>."
+    },
+    "reviewScore": 4.74,
+    "numberBookings": 48,
+    "language": "EN",
+    "email": "carlosmroap@gmail.com",
+    "username": "mauroroa",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-04T15:52:19.363Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67c74742008e1b8ec687a7c4"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "password": "$2a$10$nbFMr.xldDYmLAuGLCg14OMaKTi7sQWtmtPt5zbFeNBr9zdENAQjW",
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-04T18:32:34.296Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "peasdsdadadadad@gmail.com",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2025-03-04T18:32:35.172Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-04T18:32:01.320Z"
+    },
+    "about": "",
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Pepito"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false
+    },
+    "username": "983h6yfocl",
+    "createdAt": {
+      "$date": "2025-03-04T18:32:34.459Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 4090,
+      "expTime": 5,
+      "time": {
+        "$date": "2025-03-04T18:32:35.171Z"
+      },
+      "urlcode": "Qs6v6bk2Z8sW4QBvtN66IGoS5dqBAB"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "67d194bc9df224d0efb71114"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-12T06:03:22.733Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJECTwYVWJQhDFe_2w5msruwr_mRQQmANAKxwx3hMWb3ZBcC0hM=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "ΣΠΥΡΟΣ",
+        "last": "ΚΑΡΤΕΡΑΣ"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null,
+      "stripeCustomerId": "cus_RvhJWjAF5ZqUOg"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-03-12T14:05:48.913Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-12T14:05:48.896Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "spyroskarteras@gmail.com",
+    "username": "859wmcdlgw",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-12T14:05:48.353Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67d45cd726cecb3f54ae6461"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-14T04:29:23.987Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKW2jBXrABDuX4Gb4_RNapb0e_p4GkcNzUvbg19FIoiCS_NZA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Lola",
+        "last": "Angual"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null,
+      "stripeCustomerId": "cus_RwUJageV8wlN7P"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-03-14T16:44:08.873Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-14T16:44:07.736Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "angual.lola@gmail.com",
+    "username": "73p8x2uda2",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-14T16:44:07.954Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67e05e2af5de59991c1dd29c"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-23T16:28:42.972Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocLuT4ZYPIxwBM1qG49ZvmCWlOUO5OrtYguGtzUtE-A2y08LJcA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "ana",
+        "last": "maria farinas villegas"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": "acct_1R4Dgm01eEiRaXwy",
+      "stripeCustomerId": "cus_RztozXlMq8VV9p"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-03-23T19:16:59.834Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-23T19:16:58.765Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "anafar08@gmail.com",
+    "username": "entrechilenos",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-23T19:16:58.954Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67e07f1ca0d3456922a141bd"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-23T21:37:06.118Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocK7Jb_R-r-G9jgBCwggLr_mlOKEaXVr_oXO0qBjomo6w3J4hG7HPA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Catalina",
+        "last": "Perez Segura"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null,
+      "stripeCustomerId": "cus_Rzw5rRZqh2WMIy"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-03-24T02:56:41.231Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-24T02:56:41.229Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "kattam.perez@gmail.com",
+    "username": "wtmsx0e9dq",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-23T21:37:32.974Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67e0b82165bd8be01a00e4a6"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-24T00:47:21.062Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocKSmo6JBYcmp48xN2DqdIQHuoWWuzHC9VMNYzekeFhrLntqvA=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "alondra",
+        "last": "hernandez"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null,
+      "stripeCustomerId": "cus_S000xOZrBlN4Vs"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-03-24T12:52:43.605Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-24T12:40:12.606Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "hernandealondra917@gmail.com",
+    "username": "rua5pjxf96",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-24T01:40:49.562Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67e16488fc71aa40644eff60"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-24T13:55:37.989Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocJS5oh8b--bPn7k5CnIHzS-JZAF3QpCzphPu4Jamo3qphlaIEAY=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "John",
+        "last": "Lamur"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null,
+      "stripeCustomerId": "cus_S0BspWcO645xPw"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-03-24T13:56:25.327Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-24T13:56:24.208Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "john.lamur.m@gmail.com",
+    "username": "vsajyde0u3",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-24T13:56:24.417Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67e172b0fc71aa40644efff4"
+    },
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-24T13:55:37.989Z"
+      },
+      "hasPassword": false
+    },
+    "img": {
+      "imgUrl": "https://lh3.googleusercontent.com/a/ACg8ocIvcoScK9iNC5dEQ8BjrR-YwlVQvv1Vhkt8KWMTvsVZtXDoL4A=s96-c",
+      "coverImg": "",
+      "gallery": []
+    },
+    "personalData": {
+      "name": {
+        "first": "Paradise",
+        "last": "Paradise"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": "acct_1R1t6s03ALEvcUJM",
+      "stripeCustomerId": "cus_S0Cqvunb2JT9GO"
+    },
+    "isActive": true,
+    "isValidate": true,
+    "rating": 5,
+    "type": "personal",
+    "updatedAt": {
+      "$date": "2025-03-25T21:09:24.208Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-25T21:09:24.207Z"
+    },
+    "about": "",
+    "language": "EN",
+    "email": "018paradise@gmail.com",
+    "username": "maslocomas",
+    "lastLoginType": "google",
+    "createdAt": {
+      "$date": "2025-03-24T14:56:48.712Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "67e693832704c632027d89a7"
+    },
+    "isActive": true,
+    "isValidate": false,
+    "password": "$2a$10$AyCPZdFdqoZcwcsVqJW.eO4Wv.1uMGiShsl9Wqx8q7XyRSAUpiZ.i",
+    "security": {
+      "updatedAt": {
+        "$date": "2025-03-28T12:18:12.012Z"
+      },
+      "hasPassword": true
+    },
+    "rating": 5,
+    "email": "marcialore1121@live.cl",
+    "type": "personal",
+    "img": {
+      "imgUrl": "",
+      "coverImg": "",
+      "gallery": []
+    },
+    "updatedAt": {
+      "$date": "2025-03-28T12:18:13.981Z"
+    },
+    "lastLogin": {
+      "$date": "2025-03-28T10:47:14.940Z"
+    },
+    "about": "",
+    "newAbout": {
+      "en": "",
+      "es": "",
+      "pt": "",
+      "fr": "",
+      "de": ""
+    },
+    "reviewScore": 0,
+    "numberBookings": 0,
+    "language": "EN",
+    "personalData": {
+      "name": {
+        "first": "Marcia",
+        "last": "Rodríguez"
+      },
+      "isActive": true
+    },
+    "workerData": {
+      "languages": {
+        "main": "EN",
+        "secondary": []
+      },
+      "isMyServicesOk": false,
+      "isAboutmeOk": false,
+      "isMySchedulesOk": false,
+      "isMyWorkplacesOk": true,
+      "isActive": false,
+      "services": []
+    },
+    "businessData": {
+      "details": {
+        "en": "",
+        "es": "",
+        "fr": "",
+        "pt": ""
+      },
+      "isActive": false,
+      "category": "category1",
+      "services": []
+    },
+    "paymentData": {
+      "isActive": false,
+      "stripeAccountId": null
+    },
+    "username": "c39ge3c8u9",
+    "createdAt": {
+      "$date": "2025-03-28T12:18:12.200Z"
+    },
+    "__v": 0,
+    "validation": {
+      "code": 5693,
+      "expTime": 5,
+      "time": {
+        "$date": "2025-03-28T12:18:13.980Z"
+      },
+      "urlcode": "UeoICQreCkqq8HERHmohAMGPgLho6i"
+    }
+  }
+]

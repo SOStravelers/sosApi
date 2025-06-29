@@ -3,7 +3,11 @@ import Holliday from "../models/holliday.js";
 import Booking from "../models/booking.js";
 import Jimp from "jimp";
 import Schedule from "../models/schedule.js";
-
+import extractReferencePaths from "../helpers/extractReferencePaths.js";
+import { normalizeObjectIdReferencesForController } from "../helpers/controllers/normalizeRefValueForController.js";
+import mongoJsonToPlain from "../helpers/mongoJsonToPlain.js";
+const USER_REF_PATHS = extractReferencePaths(User.schema);
+console.log("los paths", USER_REF_PATHS);
 import { n64tobuffer } from "../utils/externalFiles.js";
 import { AwsUploadFile } from "../services/aws_s3.js";
 import { procesarNombre } from "../utils/data.js";
@@ -230,13 +234,19 @@ export const setWorker = async (req, res, next) => {
 //Actualizar data de un usuario por ID
 export const updateOne = async (req, res, next) => {
   global.logger.info("---UPDATE USER---");
+  // Limpiar JSON con $oid/$date
+  let userObj = mongoJsonToPlain(req.body);
+  // Normaliza referencias (convierte strings a ObjectId)
+  userObj = normalizeObjectIdReferencesForController(userObj, USER_REF_PATHS);
+  console.log("user limpio", userObj.workerData.services, userObj._id);
+  // return res.send(userObj);
   try {
-    let { user } = req.body;
+    let { user } = userObj;
     let newUser = await User.findOneAndUpdate(
       {
         _id: req.params.id,
       },
-      user,
+      userObj,
       {
         new: true,
       }

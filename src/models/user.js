@@ -124,10 +124,10 @@ const userSchema = new Schema(
       },
       services: [
         {
-          id: { type: String, ref: "Service" },
+          id: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
           _id: false,
           subServices: Array({
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Subservice",
           }),
           gallery: { type: Array },
@@ -183,9 +183,9 @@ const userSchema = new Schema(
       services: [
         {
           _id: false,
-          service: { type: String, ref: "Service" },
+          service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
           isActive: { type: Boolean, default: true },
-          schedule: { type: String, ref: "Schedule" },
+          schedule: { type: mongoose.Schema.Types.ObjectId, ref: "Schedule" },
         },
       ],
     },
@@ -200,7 +200,7 @@ const userSchema = new Schema(
       paypalAccessToken: { type: String },
       paypalExpiresIn: { type: Number },
     },
-    currency: { type: String, ref: "Currency" },
+    currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
   },
   { timestamps: true }
 );

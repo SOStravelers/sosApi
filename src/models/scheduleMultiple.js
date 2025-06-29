@@ -15,6 +15,7 @@ const scheduleMultipleSchema = new Schema(
         day: Number, // 0-6 (representando los días de la semana)
         isActive: Boolean, // Habilitado/deshabilitado para ese día
         iso: String, // Fecha y hora exacta del horario
+        limitClients: { type: Number, default: 0 },
       },
     ],
     creator: { type: String, ref: "User" },
