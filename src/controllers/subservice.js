@@ -7,7 +7,10 @@ import { isValidImage, isValidVideo } from "../config/uploadTypes.js";
 import { AwsUploadFile } from "../services/aws_s3.js";
 import { s3 } from "../services/awsClient.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-
+const USER_REF_PATHS = extractReferencePaths(Subservice.schema);
+import extractReferencePaths from "../helpers/extractReferencePaths.js";
+import { normalizeObjectIdReferencesForController } from "../helpers/controllers/normalizeRefValueForController.js";
+import mongoJsonToPlain from "../helpers/mongoJsonToPlain.js";
 import Jimp from "jimp";
 import envar from "../config/envar.js";
 //hola
@@ -247,6 +250,13 @@ const buildKeywordSegments = (text = "") => {
 
 export const getAll = async (req, res, next) => {
   try {
+    req.query = mongoJsonToPlain(req.query);
+
+    req.query = normalizeObjectIdReferencesForController(
+      req.query,
+      USER_REF_PATHS
+    );
+
     /* ------------ paginación ------------ */
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 50;
