@@ -13,6 +13,7 @@ import { normalizeObjectIdReferencesForController } from "../helpers/controllers
 import mongoJsonToPlain from "../helpers/mongoJsonToPlain.js";
 import Jimp from "jimp";
 import envar from "../config/envar.js";
+import { populate } from "dotenv";
 //hola
 
 async function awsDelete(key) {
@@ -302,6 +303,7 @@ export const getAll = async (req, res, next) => {
       page,
       limit,
       sort: { updatedAt: -1 },
+      populate: { path: "currency" },
     };
 
     const result = await Subservice.paginate(filter, options);
@@ -376,6 +378,8 @@ export const getWithVideos = async (req, res, next) => {
     const subservices = await Subservice.find({
       isActive: true,
       videoUrl: { $exists: true, $ne: null },
+    }).populate({
+      path: "currency",
     });
     res.status(200).json(subservices);
   } catch (err) {

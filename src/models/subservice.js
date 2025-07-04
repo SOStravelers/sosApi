@@ -167,58 +167,79 @@ const subserviceSchema = new Schema(
       videos: [{ type: String }],
     },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    updated: {
-      updatedAt: {
-        type: Date,
-        default: new Date(),
-      },
-      updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    },
     rate: { type: Number, default: 5 },
     rateCount: { type: Number, default: 10 },
     commentsCount: { type: Number, default: 3 },
     recommended: { type: Boolean, default: false },
-    partner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    limit: { type: Number, default: 1 },
-
-    //variantes para tipos de subservicios
-
-    //price por eliminar
-    price: {
-      _id: false,
-      category1: { type: Number, default: 0 },
-      category2: { type: Number, default: 0 },
-      category3: { type: Number, default: 0 },
-    },
-
-    prices: [
-      {
-        _id: false,
-        currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
-        value: { type: Number, default: 0 },
-        valueFormated: { type: String, default: "" },
-      },
-    ],
-    //seria si el usuario quiere que suban con el tiempo
-    prices2: [
-      {
-        _id: false,
-        currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
-        value: { type: Number, default: 0 },
-        valueFormated: { type: String, default: "" },
-      },
-    ],
-    hasLimit: { type: Boolean, default: false },
-
-    hasProducts: { type: Boolean, default: false }, // sirve para tipo de eventos como gastronomia, fiestas,etc
-    type: {
-      type: String,
-      default: "group",
-      enum: ["personal", "group", "events", "food"],
-    },
+    worker: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     multiple: { type: Boolean, default: false }, // cambiar nombre como a limites por dias
-    goChat: { type: Boolean, default: false },
-    isoDate: { type: String },
+
+    //nuevas
+    currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
+    country: { type: mongoose.Schema.Types.ObjectId, ref: "Country" },
+    typeService: {
+      type: String,
+      enum: ["tour", "event", "food", "other"],
+    },
+    tourData: {
+      _id: false,
+      hasChildren: { type: Boolean, default: false },
+      adultPrice: { type: Number },
+      childrenPrice: { type: Number },
+      limit: { type: Number },
+      hasLimit: { type: Boolean },
+      price: {
+        brl: {
+          value: { type: Number },
+          format: { type: String },
+        },
+        usd: {
+          value: { type: Number },
+          formated: { type: String },
+        },
+        eur: {
+          value: { type: Number },
+          formated: { type: String },
+        },
+      },
+    },
+    eventData: {
+      _id: false,
+      hasWoman: { type: Boolean, default: false },
+      hasMan: { type: Boolean, default: false },
+      hasChildren: { type: Boolean, default: false },
+      tieredPricing: { type: Boolean, default: false },
+      prices: {
+        early_bird: {
+          _id: false,
+          womanPrice: { type: Number, default: 0 },
+          manPrice: { type: Number, default: 0 },
+          childrenPrice: { type: Number, default: 0 },
+          timeUntilEvent: { type: String, default: "" },
+          limit: { type: Number, default: 1 },
+          hasLimit: { type: Boolean, default: false },
+        },
+        general: {
+          _id: false,
+          womanPrice: { type: Number, default: 0 },
+          manPrice: { type: Number, default: 0 },
+          childrenPrice: { type: Number, default: 0 },
+          timeUntilEvent: { type: String, default: "" },
+        },
+        LastMinute: {
+          _id: false,
+          womanPrice: { type: Number, default: 0 },
+          manPrice: { type: Number, default: 0 },
+          childrenPrice: { type: Number, default: 0 },
+          timeUntilEvent: { type: String, default: "" },
+          limit: { type: Number, default: 1 },
+          hasLimit: { type: Boolean, default: false },
+        },
+      },
+    },
+    foodData: {
+      _id: false,
+    },
   },
   { timestamps: true }
 );

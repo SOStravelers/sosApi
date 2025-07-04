@@ -235,18 +235,19 @@ export const setWorker = async (req, res, next) => {
 export const updateOne = async (req, res, next) => {
   global.logger.info("---UPDATE USER---");
   // Limpiar JSON con $oid/$date
-  let userObj = mongoJsonToPlain(req.body);
+  // let userObj = mongoJsonToPlain(req.body);
   // Normaliza referencias (convierte strings a ObjectId)
-  userObj = normalizeObjectIdReferencesForController(userObj, USER_REF_PATHS);
-  console.log("user limpio", userObj.workerData.services, userObj._id);
+  // userObj = normalizeObjectIdReferencesForController(userObj, USER_REF_PATHS);
+  // console.log("user limpio", userObj.workerData.services);
   // return res.send(userObj);
   try {
-    let { user } = userObj;
+    // let { user } = userObj;
     let newUser = await User.findOneAndUpdate(
       {
         _id: req.params.id,
       },
-      userObj,
+      // userObj,
+      req.body,
       {
         new: true,
       }

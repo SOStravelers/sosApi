@@ -14,6 +14,7 @@ import schedule from "./schedule.js";
 import holliday from "./holliday.js";
 import support from "./support.js";
 import partner from "./partner.js";
+import currency from "./currency.js";
 import {
   isAuth,
   isAdmin,
@@ -61,6 +62,8 @@ routes.use("/tests", test);
 
 routes.use("/payments", isAuth, payment);
 routes.use("/paymentsAuth", payment);
+
+routes.use("/currencies", currency);
 
 //rutas metal
 routes.use("/support", support);
