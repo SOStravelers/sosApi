@@ -177,6 +177,8 @@ const subserviceSchema = new Schema(
     //nuevas
     currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
     country: { type: mongoose.Schema.Types.ObjectId, ref: "Country" },
+    canCancel: { type: Boolean },
+    timeUntilCancel: { type: Number },
     typeService: {
       type: String,
       enum: ["tour", "event", "food", "other"],
