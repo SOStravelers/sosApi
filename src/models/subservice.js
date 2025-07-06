@@ -184,11 +184,7 @@ const subserviceSchema = new Schema(
     tourData: {
       _id: false,
       hasChildren: { type: Boolean, default: false },
-      adultPrice: { type: Number },
-      childrenPrice: { type: Number },
-      limit: { type: Number },
-      hasLimit: { type: Boolean },
-      price: {
+      adultPrice: {
         brl: {
           value: { type: Number },
           format: { type: String },
@@ -202,6 +198,22 @@ const subserviceSchema = new Schema(
           formated: { type: String },
         },
       },
+      childrenPrice: {
+        brl: {
+          value: { type: Number },
+          format: { type: String },
+        },
+        usd: {
+          value: { type: Number },
+          formated: { type: String },
+        },
+        eur: {
+          value: { type: Number },
+          formated: { type: String },
+        },
+      },
+      limit: { type: Number },
+      hasLimit: { type: Boolean },
     },
     eventData: {
       _id: false,
