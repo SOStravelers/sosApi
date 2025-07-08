@@ -330,7 +330,7 @@ export const createPassToken = async (req, res, next) => {
     message: "--- CREATE PASSWORD TOKEN ---",
   });
   try {
-    const id = req.user._id.toString();
+    const id = req.user._id;
     const newPassword = req.body.password.trim();
     if (!newPassword) {
       throw createError(400, "a field is missing");

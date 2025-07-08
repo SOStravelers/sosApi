@@ -105,6 +105,9 @@ export const getFavorites = async (req, res, next) => {
             gallery: 1,
             videoUrl: 1,
             isActive: 1,
+            duration: 1,
+            tourData: 1,
+            typeService: 1,
             service: {
               _id: 1,
               name: 1,

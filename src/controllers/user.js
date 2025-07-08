@@ -413,7 +413,7 @@ export const galleryPhoto = async (req, res, next) => {
         });
         if (resp.results.$metadata.httpStatusCode == 200) {
           let user = await User.findOne({
-            _id: req.user._id.toString(),
+            _id: req.user._id,
           }).select("img");
           let gallery = user.img.gallery;
           console.log("la url", resp.url);
@@ -476,7 +476,7 @@ export const hasPassword = async (req, res, next) => {
   global.logger.info("---HAS PASSWORD---");
   try {
     let user = await User.findOne({
-      _id: req.user._id.toString(),
+      _id: req.user._id,
     }).select("security");
     if (user.security && user.security.hasPassword) {
       res.status(200).send({ hasPassword: true });
@@ -496,10 +496,7 @@ export const changePassword = async (req, res, next) => {
     if (!newPassword) {
       throw createError(400, "a field is missing");
     }
-    const validPass = await User.validPassword(
-      req.user._id.toString(),
-      currentPassword
-    );
+    const validPass = await User.validPassword(req.user._id, currentPassword);
     if (!validPass) {
       throw createError(400, "current password wrong");
     }
@@ -541,7 +538,7 @@ export const readyToWork = async (req, res, next) => {
       isMySchedulesOk,
       isMyWorkplacesOk,
     } = req.body;
-    const id = req.user._id.toString();
+    const id = req.user._id;
 
     const updateFields = {
       "workerData.isActive": isActive,
@@ -572,7 +569,7 @@ export const readyToWork = async (req, res, next) => {
 export const getServicesWorker = async (req, res, next) => {
   global.logger.info("---GET SERVICES BY WORKER---");
   try {
-    const id = req.user._id.toString();
+    const id = req.user._id;
     console.log(id);
     const user = await User.findOne({ _id: id })
       .select("workerData.services type")
@@ -605,7 +602,7 @@ export const getServicesWorker = async (req, res, next) => {
 export const getServicesBusiness = async (req, res, next) => {
   global.logger.info("---GET SERVICES BY Business---");
   try {
-    const id = req.user._id.toString();
+    const id = req.user._id;
     console.log(id);
     const user = await User.findById(id)
       .select("businessData type")

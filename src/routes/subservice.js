@@ -2,6 +2,7 @@ import Router from "express";
 const router = Router();
 import multer from "multer";
 import validateParams from "../middleware/validate.js";
+import { isAuth } from "../middleware/auth.js";
 import {
   create,
   getById,
@@ -122,6 +123,32 @@ router.get(
 //Get all services
 router.get(
   "/getAll/paginate",
+  validateParams(
+    [
+      {
+        param_key: "isActive",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "limit",
+        required: false,
+        type: "string", // Dependiendo de si limit es un número o no
+      },
+      {
+        param_key: "page",
+        required: false,
+        type: "string", // Dependiendo de si page es un número o no
+      },
+    ],
+    "query"
+  ),
+  getAll
+);
+//con auth para ademas obtener favoritos
+router.get(
+  "/getAll/user/paginate",
+  isAuth,
   validateParams(
     [
       {

@@ -50,7 +50,7 @@ export const addUpdateDefault = async (req, res, next) => {
 export const addOrUpdateWorker = async (req, res, next) => {
   global.logger.info("---ADD NEW SCHEDULE OR UPDATE WORKER---");
   try {
-    const id = req.user._id.toString();
+    const id = req.user._id;
     const schedules = req.body;
     const user = await User.findOne({ _id: id });
     if (!user) {
@@ -92,7 +92,7 @@ export const addOrUpdateBusiness = async (req, res, next) => {
   global.logger.info("---ADD NEW SCHEDULE OR UPDATE BUSINESS---");
   try {
     console.log("body", req.body);
-    const id = req.user._id.toString();
+    const id = req.user._id;
     const service = req.body.service;
     const schedules = req.body.schedules;
     const user = await User.findById(id);
@@ -106,7 +106,7 @@ export const addOrUpdateBusiness = async (req, res, next) => {
     if (existSchedule) {
       console.log("update", schedules);
       const update = {
-        creator: req.user._id.toString(),
+        creator: req.user._id,
         default: false,
         $set: { schedules: schedules },
       };
@@ -136,7 +136,7 @@ export const addOrUpdateBusiness = async (req, res, next) => {
 export const getByUser = async (req, res, next) => {
   global.logger.info("---GET SCHEDULE BY USER ID---");
   try {
-    const id = req.user._id.toString();
+    const id = req.user._id;
     let query = { user: id };
 
     // Si req.query.idService está presente, añadirlo a la consulta

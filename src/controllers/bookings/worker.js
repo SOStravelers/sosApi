@@ -538,8 +538,8 @@ export const createBookingWorker = async (req, res, next) => {
     const bookingData = req.body;
     let booking = new Booking(bookingData);
     booking.firstWorker = booking.workerUser;
-    booking.creatorUser = req.user._id.toString();
-    booking.workerUser = req.user._id.toString();
+    booking.creatorUser = req.user._id;
+    booking.workerUser = req.user._id;
 
     // Buscar el último booking ordenado por idKey en orden descendente
     let lastBooking = await Booking.findOne().sort({ idKey: -1 });

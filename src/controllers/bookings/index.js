@@ -134,7 +134,7 @@ export const create = async (req, res, next) => {
       const brazilTime = moment().tz("America/Sao_Paulo");
       if (booking.multiple) {
         const completedData = {
-          canceledBy: req.user._id.toString(),
+          canceledBy: req.user._id,
           canceledAtUTC: brazilTime,
           timeZone: "America/Sao_Paulo",
           previusStatus: booking.status,

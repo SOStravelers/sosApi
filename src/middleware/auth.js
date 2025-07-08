@@ -134,7 +134,7 @@ export const isAuth = async (req, res, next) => {
           "isActive type security isValidate name username email imgUrl personalData workerData paymentData"
         )
         .exec();
-      authUser.id = authUser._id.toString();
+      authUser.id = authUser._id;
       req.user = authUser;
       next();
     } catch (err) {

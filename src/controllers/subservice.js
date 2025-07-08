@@ -1,4 +1,6 @@
 import Subservice from "../models/subservice.js";
+import mongoose from "mongoose";
+
 import User from "../models/user.js";
 import ScheduleMultiple from "../models/scheduleMultiple.js";
 import { createError } from "../config/error.js";
@@ -251,29 +253,25 @@ const buildKeywordSegments = (text = "") => {
 };
 
 export const getAll = async (req, res, next) => {
+  console.log("---GET ALL SUBSERVICES---");
   try {
     req.query = mongoJsonToPlain(req.query);
-
     req.query = normalizeObjectIdReferencesForController(
       req.query,
       USER_REF_PATHS
     );
 
-    /* ------------ paginación ------------ */
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 50;
     if (page < 1 || limit < 1)
       throw createError(400, "page y limit deben ser enteros positivos");
 
-    /* ------------ filtros ------------ */
     const filter = { isActive: true };
 
-    /* service */
     if (req.query.service) {
-      filter.service = req.query.service; // espera ObjectId string
+      filter.service = req.query.service;
     }
 
-    /* minPrice / maxPrice */
     const priceCond = {};
     if (req.query.minPrice !== undefined) {
       const min = Number(req.query.minPrice);
@@ -287,7 +285,6 @@ export const getAll = async (req, res, next) => {
       filter["price.category1"] = priceCond;
     }
 
-    /* keyword progresivo */
     if (req.query.keyword) {
       const segments = buildKeywordSegments(req.query.keyword);
       if (segments.length) {
@@ -299,15 +296,47 @@ export const getAll = async (req, res, next) => {
       }
     }
 
-    /* ------------ consulta paginada ------------ */
     const options = {
       page,
       limit,
       sort: { updatedAt: -1 },
       populate: { path: "currency" },
+      lean: true, // necesario para modificar los docs directamente
     };
 
     const result = await Subservice.paginate(filter, options);
+
+    if (result.docs.length === 0) {
+      return res.status(200).json({ ...result, docs: [] });
+    }
+
+    if (req.user && mongoose.Types.ObjectId.isValid(req.user._id)) {
+      const subserviceIds = result.docs.map((doc) => doc._id.toString());
+
+      const favorites = await Favorite.find({
+        user: req.user._id,
+        subservice: { $in: subserviceIds },
+        isActive: true,
+      }).select("subservice");
+      console.log(" losfavorites", favorites.length);
+
+      const favoriteSet = new Set(
+        favorites.map((f) => f.subservice.toString())
+      );
+
+      result.docs = result.docs.map((doc) => {
+        return {
+          ...doc,
+          isFavorite: favoriteSet.has(doc._id.toString()),
+        };
+      });
+    } else {
+      result.docs = result.docs.map((doc) => ({
+        ...doc,
+        isFavorite: false,
+      }));
+    }
+
     res.status(200).json(result);
   } catch (err) {
     if (!(err instanceof Error) || !err.statusCode) {
