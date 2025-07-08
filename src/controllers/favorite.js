@@ -93,6 +93,11 @@ export const getFavorites = async (req, res, next) => {
         },
       },
       {
+        $addFields: {
+          "subservice.isFavorite": true, // ✅ aquí se marca como favorito
+        },
+      },
+      {
         $project: {
           user: 1,
           subservice: {
@@ -108,6 +113,7 @@ export const getFavorites = async (req, res, next) => {
             duration: 1,
             tourData: 1,
             typeService: 1,
+            isFavorite: 1, // 👈 asegúrate de incluirlo en el proyecto
             service: {
               _id: 1,
               name: 1,
@@ -123,6 +129,7 @@ export const getFavorites = async (req, res, next) => {
     next(err);
   }
 };
+
 //te dice si un subservicio por usuario es favorito
 export const isFavorite = async (req, res, next) => {
   try {
