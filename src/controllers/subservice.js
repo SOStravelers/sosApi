@@ -14,6 +14,7 @@ import mongoJsonToPlain from "../helpers/mongoJsonToPlain.js";
 import Jimp from "jimp";
 import envar from "../config/envar.js";
 import { populate } from "dotenv";
+import Favorite from "../models/favorite.js";
 //hola
 
 async function awsDelete(key) {

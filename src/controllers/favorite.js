@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import Subservice from "../models/subservice.js";
 import Favorite from "../models/favorite.js";
 import { createError } from "../config/error.js";
 
@@ -6,88 +7,132 @@ import { createError } from "../config/error.js";
 export const addFavorite = async (req, res, next) => {
   global.logger.info("--- ADD FAVORITE ---");
   try {
-    let receptor = await User.findById(req.params.id);
+    let subservice = await Subservice.findById(req.params.id);
+    if (!subservice) throw createError(404, "Subservice not found ");
     let favorite = await Favorite.findOne({
-      emisor: req.user._id.toString(),
-      receptor: req.params.id,
+      user: req.user._id,
+      subservice: req.params.id,
     });
-    if (!receptor) {
-      throw createError(404, "User not found or invalid credentials");
-    } else if (favorite) {
-      throw createError(409, "Already exists");
+    if (favorite && !favorite.isActive) {
+      await Favorite.findOneAndUpdate(
+        { _id: favorite._id },
+        { isActive: true }
+      );
+      res.status(201).json("saved");
     } else {
       let newFavorite = new Favorite({
-        emisor: req.user._id.toString(),
-        receptor: req.params.id,
+        user: req.user._id,
+        subservice: req.params.id,
+        isActive: true,
       });
       await newFavorite.save();
-      res.status(201).json(newFavorite);
+      res.status(201).json("saved");
     }
   } catch (err) {
     next(err);
   }
 };
 //Eliminar usuario a favorito
-export const deleteFavorite = async (req, res, next) => {
-  global.logger.info("--- DELETE FAVORITE ---");
+export const removeFavorite = async (req, res, next) => {
+  global.logger.info("--- REMOVE FAVORITE ---");
   try {
-    let receptor = await User.findById(req.params.id);
+    let subservice = await Subservice.findById(req.params.id);
+    if (!subservice) throw createError(404, "Subservice not found ");
     let favorite = await Favorite.findOne({
-      emisor: req.user._id.toString(),
-      receptor: req.params.id,
+      user: req.user._id,
+      subservice: req.params.id,
     });
-    if (!receptor) {
-      throw createError(404, "User not found or invalid credentials");
-    } else if (!favorite) {
-      throw createError(404, "relation doesnt exist");
-    } else {
-      await Favorite.findOneAndDelete({
-        emisor: req.user._id.toString(),
-        receptor: req.params.id,
-      });
-      res.status(200).json({ message: "deleted success" });
+    console.log(favorite);
+    if (favorite && favorite.isActive) {
+      await Favorite.findOneAndUpdate(
+        { _id: favorite._id },
+        { isActive: false }
+      );
     }
+    res.status(200).json("removed");
   } catch (err) {
     next(err);
   }
 };
 //Obtener todos los favoritos de un usuario
 export const getFavorites = async (req, res, next) => {
-  global.logger.info("--- GET FAVORITE ---");
+  global.logger.info("--- GET FAVORITE (via aggregate) ---");
   try {
-    let favorites = await Favorite.find({
-      emisor: req.user._id.toString(),
-    })
-      // .populate({
-      //   path: "receptor",
-      //   select: "_id img personalData workerData email",
+    const favorites = await Favorite.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "subservices",
+          localField: "subservice",
+          foreignField: "_id",
+          as: "subservice",
+        },
+      },
+      { $unwind: "$subservice" },
+      {
+        $match: {
+          "subservice.isActive": true,
+        },
+      },
+      {
+        $lookup: {
+          from: "services",
+          localField: "subservice.service",
+          foreignField: "_id",
+          as: "subservice.service",
+        },
+      },
+      { $unwind: "$subservice.service" },
+      {
+        $match: {
+          "subservice.service.isActive": true,
+        },
+      },
+      {
+        $project: {
+          user: 1,
+          subservice: {
+            _id: 1,
+            name: 1,
+            rate: 1,
+            rateCount: 1,
+            commentsCount: 1,
+            coverImg: 1,
+            gallery: 1,
+            videoUrl: 1,
+            isActive: 1,
+            service: {
+              _id: 1,
+              name: 1,
+              isActive: 1,
+            },
+          },
+        },
+      },
+    ]);
 
-      // })
-      .populate({
-        path: "receptor",
-        select:
-          "img.imgUrl type workerData.services businessData.name businessData.isActive businessData.services businessData.type personalData.name personalData.isActive",
-        populate: [
-          {
-            path: "workerData.services.subServices",
-            model: "Subservice",
-            // Puedes agregar opciones adicionales para el populate de subServicios si es necesario
-          },
-          {
-            path: "workerData.services.id",
-            select: "name isActive imgUrl",
-            model: "Service",
-            // Puedes agregar opciones adicionales para el populate de servicios si es necesario
-          },
-          {
-            path: "businessData.services.service",
-            select: "name isActive imgUrl",
-            model: "Service",
-            // Puedes agregar opciones adicionales para el populate de servicios en businessData si es necesario
-          },
-        ],
-      });
     res.status(200).json(favorites);
+  } catch (err) {
+    next(err);
+  }
+};
+//te dice si un subservicio por usuario es favorito
+export const isFavorite = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const favorite = await Favorite.findOne({
+      user: req.user._id,
+      subservice: id,
+    });
+    if (favorite.isActive) {
+      return res.status(200).json({ isFavorite: true });
+    } else {
+      return res.status(200).json({ isFavorite: false });
+    }
   } catch (err) {
     next(err);
   }

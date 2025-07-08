@@ -1,15 +1,13 @@
 import Router from "express";
 const router = Router();
 import validateParams from "../middleware/validate.js";
-import {
-  addFavorite,
-  deleteFavorite,
-  getFavorites,
-} from "../controllers/favorite.js";
+import { isAuth } from "../middleware/auth.js";
+import * as FavoriteController from "../controllers/favorite.js";
 
 //añadir a favorito
 router.get(
   "/add/:id",
+  isAuth,
   validateParams(
     [
       {
@@ -20,11 +18,12 @@ router.get(
     ],
     "params"
   ),
-  addFavorite
+  FavoriteController.addFavorite
 );
 //eliminar Favorito
 router.get(
-  "/delete/:id",
+  "/remove/:id",
+  isAuth,
   validateParams(
     [
       {
@@ -35,9 +34,26 @@ router.get(
     ],
     "params"
   ),
-  deleteFavorite
+  FavoriteController.removeFavorite
 );
 //obtener todos mis favoritos
-router.get("/getAll", getFavorites);
+router.get("/getAll", isAuth, FavoriteController.getFavorites);
+
+//saber si un subservicio es favorito
+router.get(
+  "/isFavorite/:id",
+  isAuth,
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  FavoriteController.isFavorite
+);
 
 export default router;

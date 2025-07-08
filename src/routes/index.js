@@ -53,7 +53,7 @@ routes.use("/schedules2", schedule);
 
 routes.use("/hollidays", isAuth, holliday);
 
-routes.use("/favorites", isAuth, favorite);
+routes.use("/favorites", favorite);
 
 routes.use("/partners", partner);
 routes.use("/partnersAuth", isAuth, partner);

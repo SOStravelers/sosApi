@@ -7,12 +7,8 @@ import paginateConfig from "../config/paginate.js";
 const favoriteSchema = new Schema(
   {
     isActive: { type: Boolean },
-    emisor: { type: String, ref: "User" },
-    receptor: { type: String, ref: "User" },
-    type: {
-      type: String,
-      enum: ["hostel", "worker", "hotel"],
-    },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    subservice: { type: mongoose.Schema.Types.ObjectId, ref: "Subservice" },
   },
   { timestamps: true }
 );
