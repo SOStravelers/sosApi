@@ -62,6 +62,7 @@ export const getFavorites = async (req, res, next) => {
       {
         $match: {
           user: req.user._id,
+          isActive: true,
         },
       },
       {
@@ -109,6 +110,7 @@ export const getFavorites = async (req, res, next) => {
             coverImg: 1,
             gallery: 1,
             videoUrl: 1,
+            imgUrl: 1,
             isActive: 1,
             duration: 1,
             tourData: 1,
