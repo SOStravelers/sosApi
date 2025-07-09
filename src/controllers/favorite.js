@@ -13,7 +13,7 @@ export const addFavorite = async (req, res, next) => {
       user: req.user._id,
       subservice: req.params.id,
     });
-    if (favorite && !favorite.isActive) {
+    if (favorite) {
       await Favorite.findOneAndUpdate(
         { _id: favorite._id },
         { isActive: true }
