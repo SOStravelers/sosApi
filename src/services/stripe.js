@@ -1,10 +1,11 @@
-import User from "../models/user.js";
+import User from "../apiServices/users/model.js";
 import envar from "../config/envar.js";
 import Stripe from "stripe";
-import Booking from "../models/booking.js";
+import Booking from "../apiServices/bookings/model.js";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 import { byPassPolMauro } from "../utils/changeId.js";
-import Subservice from "../models/subservice.js";
+import Subservice from "../apiServices/subservices/model.js";
+
 const populate = [
   {
     path: "businessUser",

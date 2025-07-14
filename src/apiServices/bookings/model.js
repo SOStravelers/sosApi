@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 import mongoosePaginate from "mongoose-paginate-v2";
-import paginateConfig from "../config/paginate.js";
+import paginateConfig from "../../config/paginate.js";
 
 const bookingSchema = new Schema(
   {

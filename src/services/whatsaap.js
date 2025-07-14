@@ -3,7 +3,7 @@ const { Client, RemoteAuth, LocalAuth, MessageMedia } = pkg;
 import { MongoStore } from "wwebjs-mongo";
 import qrcode from "qrcode";
 import { AwsUploadFile } from "./aws_s3.js";
-import Subservice from "../models/subservice.js";
+import Subservice from "../apiServices/subservices/model.js";
 import Wmessage from "../models/wmessages.js";
 import { sendTextSubservices } from "../controllers/subservice.js";
 

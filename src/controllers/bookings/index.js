@@ -20,7 +20,7 @@ import {
   addIdBookingtoPI,
 } from "../../services/stripe.js";
 import moment from "moment-timezone";
-import Subservice from "../../models/subservice.js";
+import Subservice from "../../apiServices/subservices/model.js";
 
 const populate = [
   {

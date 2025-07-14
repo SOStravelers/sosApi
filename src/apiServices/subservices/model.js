@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 import uniqueValidator from "mongoose-unique-validator";
 import mongoosePaginate from "mongoose-paginate-v2";
-import paginateConfig from "../config/paginate.js";
+import paginateConfig from "../../config/paginate.js";
 
 const subserviceSchema = new Schema(
   {
@@ -173,7 +173,7 @@ const subserviceSchema = new Schema(
     recommended: { type: Boolean, default: false },
     worker: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     multiple: { type: Boolean, default: false }, // cambiar nombre como a limites por dias
-
+    startTimeIso: { type: Date },
     //nuevas
     currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
     country: { type: mongoose.Schema.Types.ObjectId, ref: "Country" },
@@ -216,43 +216,6 @@ const subserviceSchema = new Schema(
       },
       limit: { type: Number },
       hasLimit: { type: Boolean },
-    },
-    eventData: {
-      _id: false,
-      hasWoman: { type: Boolean, default: false },
-      hasMan: { type: Boolean, default: false },
-      hasChildren: { type: Boolean, default: false },
-      tieredPricing: { type: Boolean, default: false },
-      prices: {
-        early_bird: {
-          _id: false,
-          womanPrice: { type: Number, default: 0 },
-          manPrice: { type: Number, default: 0 },
-          childrenPrice: { type: Number, default: 0 },
-          timeUntilEvent: { type: String, default: "" },
-          limit: { type: Number, default: 1 },
-          hasLimit: { type: Boolean, default: false },
-        },
-        general: {
-          _id: false,
-          womanPrice: { type: Number, default: 0 },
-          manPrice: { type: Number, default: 0 },
-          childrenPrice: { type: Number, default: 0 },
-          timeUntilEvent: { type: String, default: "" },
-        },
-        LastMinute: {
-          _id: false,
-          womanPrice: { type: Number, default: 0 },
-          manPrice: { type: Number, default: 0 },
-          childrenPrice: { type: Number, default: 0 },
-          timeUntilEvent: { type: String, default: "" },
-          limit: { type: Number, default: 1 },
-          hasLimit: { type: Boolean, default: false },
-        },
-      },
-    },
-    foodData: {
-      _id: false,
     },
   },
   { timestamps: true }

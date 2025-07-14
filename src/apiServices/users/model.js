@@ -4,7 +4,7 @@ import uniqueValidator from "mongoose-unique-validator";
 import bcrypt from "bcryptjs";
 const salt = bcrypt.genSaltSync(10);
 import mongoosePaginate from "mongoose-paginate-v2";
-import paginateConfig from "../config/paginate.js";
+import paginateConfig from "../../config/paginate.js";
 
 const userSchema = new Schema(
   {

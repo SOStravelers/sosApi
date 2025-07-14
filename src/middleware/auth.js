@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 // import mainConfig from '../main';
 
 import envar from "../config/envar.js";
-import User from "../models/user.js";
+import User from "../apiServices/users/model.js";
 import { createError } from "../config/error.js";
 
 // funcs to decoded, encoded and generate accessToken

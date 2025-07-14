@@ -105,76 +105,7 @@ router.get(
   ),
   getByService
 );
-//Get subservice by ID
-router.get(
-  "/byId/:id",
-  validateParams(
-    [
-      {
-        param_key: "id",
-        required: true,
-        type: "string",
-      },
-    ],
-    "params"
-  ),
-  getById
-);
-//Get all services
-router.get(
-  "/getAll/paginate",
-  validateParams(
-    [
-      {
-        param_key: "isActive",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
-        type: "string", // Dependiendo de si limit es un número o no
-      },
-      {
-        param_key: "page",
-        required: false,
-        type: "string", // Dependiendo de si page es un número o no
-      },
-    ],
-    "query"
-  ),
-  getAll
-);
-//con auth para ademas obtener favoritos
-router.get(
-  "/getAll/user/paginate",
-  isAuth,
-  validateParams(
-    [
-      {
-        param_key: "isActive",
-        required: false,
-        type: "string",
-      },
-      {
-        param_key: "limit",
-        required: false,
-        type: "string", // Dependiendo de si limit es un número o no
-      },
-      {
-        param_key: "page",
-        required: false,
-        type: "string", // Dependiendo de si page es un número o no
-      },
-    ],
-    "query"
-  ),
-  getAll
-);
-//Get sugerencias con videos
-router.get("/get/withVideos", getWithVideos);
-//Get recomendados
-router.get("/get/recommended", getRecommendedSubservice);
+
 //update subservice
 router.put(
   "/allData/:id",

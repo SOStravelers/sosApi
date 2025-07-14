@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 import uniqueValidator from "mongoose-unique-validator";
 import mongoosePaginate from "mongoose-paginate-v2";
-import paginateConfig from "../config/paginate.js";
+import paginateConfig from "../../config/paginate.js";
+
 const ProductSchema = new Schema(
   {
     item: { type: mongoose.Schema.Types.ObjectId, ref: "Item" },

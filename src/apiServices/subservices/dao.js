@@ -1,22 +1,21 @@
-import Subservice from "../apiServices/subservices/model.js";
+import Subservice from "./model.js";
 import mongoose from "mongoose";
-
-import User from "../apiServices/users/model.js";
-import ScheduleMultiple from "../models/scheduleMultiple.js";
-import { createError } from "../config/error.js";
-import { botcurrency } from "../services/botcurrency.js";
-import { isValidImage, isValidVideo } from "../config/uploadTypes.js";
-import { AwsUploadFile } from "../services/aws_s3.js";
-import { s3 } from "../services/awsClient.js";
+import User from "../users/model.js";
+import Schedule from "../schedules/model.js";
+import { createError } from "../../config/error.js";
+import { botcurrency } from "../../services/botcurrency.js";
+import { isValidImage, isValidVideo } from "../../config/uploadTypes.js";
+import { AwsUploadFile } from "../../services/aws_s3.js";
+import { s3 } from "../../services/awsClient.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import extractReferencePaths from "../../helpers/extractReferencePaths.js";
 const USER_REF_PATHS = extractReferencePaths(Subservice.schema);
-import extractReferencePaths from "../helpers/extractReferencePaths.js";
-import { normalizeObjectIdReferencesForController } from "../helpers/controllers/normalizeRefValueForController.js";
-import mongoJsonToPlain from "../helpers/mongoJsonToPlain.js";
+import { normalizeObjectIdReferencesForController } from "../../helpers/controllers/normalizeRefValueForController.js";
+import mongoJsonToPlain from "../../helpers/mongoJsonToPlain.js";
 import Jimp from "jimp";
-import envar from "../config/envar.js";
+import envar from "../../config/envar.js";
 import { populate } from "dotenv";
-import Favorite from "../apiServices/favorites/model.js";
+import Favorite from "../favorites/model.js";
 //hola
 
 async function awsDelete(key) {
@@ -186,59 +185,146 @@ export const uploadAssets = async (req, res, next) => {
   }
 };
 
-//Crear subServicio
-export const create = async (req, res, next) => {
-  global.logger.info("---CREATE NEW SUBSERVICE---", req.body);
+//Obtener all services con VIDEOS
+export const getWithVideos = async () => {
+  logger.info("*** GET WITH VIDEOS SUBSERVICE DAO ***");
   try {
-    let subservice = new Subservice(req.body);
-    subservice.name = req.body.name.toLowerCase();
-    subservice.creator = req.body.user;
-    const newsubService = await subservice.save();
-    res.json(newsubService);
+    const subservices = await Subservice.find({
+      isActive: true,
+      videoUrl: { $exists: true, $ne: null },
+    });
+    // .populate({
+    //   path: "currency",
+    // });
+    return subservices;
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
-//obtener los subservicios por servicio
-export const getByService = async (req, res, next) => {
-  global.logger.info("---GET SUBSERVICES BY SERVICE---");
+//Obtener all services con paginate
+export const getAll = async (data, user) => {
+  logger.info("*** GET ALL SUBSERVICES DAO ***");
   try {
-    let options = {
-      // populate,
-      select:
-        "name price duration imgUrl details multiple shortDescription goChat isoTime",
-      page: Number(req.query.page) || 1,
-      limit: Number(req.query.limit) || 50,
+    data = mongoJsonToPlain(data);
+    data = normalizeObjectIdReferencesForController(data, USER_REF_PATHS);
+
+    const page = parseInt(data.page, 10) || 1;
+    const limit = parseInt(data.limit, 10) || 50;
+    if (page < 1 || limit < 1)
+      throw createError(400, "page y limit deben ser enteros positivos");
+
+    const filter = { isActive: true };
+
+    if (data.service) {
+      filter.service = data.service;
+    }
+
+    const priceCond = {};
+    if (data.minPrice !== undefined) {
+      const min = Number(data.minPrice);
+      if (!Number.isNaN(min)) priceCond.$gte = min;
+    }
+    if (data.maxPrice !== undefined) {
+      const max = Number(data.maxPrice);
+      if (!Number.isNaN(max)) priceCond.$lte = max;
+    }
+    if (Object.keys(priceCond).length) {
+      filter["price.category1"] = priceCond;
+    }
+
+    if (data.keyword) {
+      const segments = buildKeywordSegments(data.keyword);
+      if (segments.length) {
+        filter.$or = [];
+        segments.forEach((seg) => {
+          const regex = new RegExp(seg, "i");
+          NAME_FIELDS.forEach((f) => filter.$or.push({ [f]: regex }));
+        });
+      }
+    }
+
+    const options = {
+      page,
+      limit,
       sort: { updatedAt: -1 },
+      populate: { path: "currency" },
+      lean: true, // necesario para modificar los docs directamente
     };
-    let query = {};
-    query.isActive = true;
-    query.service = req.query.id;
 
-    const subservices = await Subservice.paginate(query, options);
-    res.status(200).json(subservices);
+    const result = await Subservice.paginate(filter, options);
+
+    if (result.docs.length === 0) {
+      return res.status(200).json({ ...result, docs: [] });
+    }
+
+    if (user && mongoose.Types.ObjectId.isValid(user._id)) {
+      const subserviceIds = result.docs.map((doc) => doc._id.toString());
+
+      const favorites = await Favorite.find({
+        user: user._id,
+        subservice: { $in: subserviceIds },
+        isActive: true,
+      }).select("subservice");
+      console.log(" losfavorites", favorites.length);
+
+      const favoriteSet = new Set(
+        favorites.map((f) => f.subservice.toString())
+      );
+
+      result.docs = result.docs.map((doc) => {
+        return {
+          ...doc,
+          isFavorite: favoriteSet.has(doc._id.toString()),
+        };
+      });
+    } else {
+      result.docs = result.docs.map((doc) => ({
+        ...doc,
+        isFavorite: false,
+      }));
+    }
+
+    return result;
   } catch (err) {
-    next(err);
+    throw err;
+  }
+};
+//Obtener subService por id
+export const getById = async (id) => {
+  logger.info("*** GET BY ID SUBSERVICE DAO ***");
+  try {
+    const subService = await Subservice.findOne({ _id: id })
+      .populate({
+        path: "service",
+        select: "name",
+      })
+      .exec();
+    if (!subService) throw createError(404, "subService not found");
+    return subService;
+  } catch (err) {
+    throw err;
+  }
+};
+//Obtener all services con paginate segun varias metricas
+export const getRecommendedSubservice = async () => {
+  logger.info("*** GET RECOMENDED SUBSERVICES DAO ***");
+  try {
+    const subservices = await Subservice.aggregate([
+      { $match: { recommended: true } },
+      { $sample: { size: 7 } },
+    ]);
+    return subservices;
+  } catch (err) {
+    throw err;
   }
 };
 
-const NAME_FIELDS = ["name.en", "name.es", "name.pt", "name.fr", "name.de"];
+//
+///
 
-const buildKeywordSegments = (text = "") => {
-  const words = text.trim().split(/\s+/);
-  const out = [];
-  for (let len = words.length; len >= 1; len--) {
-    const seg = words.slice(0, len).join(" ");
-    if (len === 1 && seg.length < 4) continue; // descarta 1-palabra <4
-    out.push(seg);
-  }
-  return out;
-};
-
-//Obtener todos los subservicios agrupados por servicios:
 // controllers/subservice.js
 export const getAllByService = async (req, res, next) => {
-  global.logger.info("--- GET ALL SUBSERVICES (small) BY SERVICE ---");
+  logger.info("*** GET ALL SUBSERVICES (small) BY SERVICE ---");
   try {
     const data = await Subservice.aggregate([
       /* 1) convertir el id-texto al tipo ObjectId para el $lookup */
@@ -290,19 +376,57 @@ export const getAllByService = async (req, res, next) => {
   }
 };
 
-//Obtener all services con paginate segun varias metricas
-export const getRecommendedSubservice = async (req, res, next) => {
-  global.logger.info("---GET SUBSERVICES RECOMENDED---");
+//Crear subServicio
+export const create = async (req, res, next) => {
+  global.logger.info("---CREATE NEW SUBSERVICE---", req.body);
   try {
-    const subservices = await Subservice.aggregate([
-      { $match: { recommended: true } },
-      { $sample: { size: 7 } },
-    ]);
+    let subservice = new Subservice(req.body);
+    subservice.name = req.body.name.toLowerCase();
+    subservice.creator = req.body.user;
+    const newsubService = await subservice.save();
+    res.json(newsubService);
+  } catch (err) {
+    next(err);
+  }
+};
+//obtener los subservicios por servicio
+export const getByService = async (req, res, next) => {
+  global.logger.info("---GET SUBSERVICES BY SERVICE---");
+  try {
+    let options = {
+      // populate,
+      select:
+        "name price duration imgUrl details multiple shortDescription goChat isoTime",
+      page: Number(req.query.page) || 1,
+      limit: Number(req.query.limit) || 50,
+      sort: { updatedAt: -1 },
+    };
+    let query = {};
+    query.isActive = true;
+    query.service = req.query.id;
+
+    const subservices = await Subservice.paginate(query, options);
     res.status(200).json(subservices);
   } catch (err) {
     next(err);
   }
 };
+
+const NAME_FIELDS = ["name.en", "name.es", "name.pt", "name.fr", "name.de"];
+
+const buildKeywordSegments = (text = "") => {
+  const words = text.trim().split(/\s+/);
+  const out = [];
+  for (let len = words.length; len >= 1; len--) {
+    const seg = words.slice(0, len).join(" ");
+    if (len === 1 && seg.length < 4) continue; // descarta 1-palabra <4
+    out.push(seg);
+  }
+  return out;
+};
+
+//Obtener todos los subservicios agrupados por servicios:
+
 //Actualizar data de un subservicio
 export const updateOne = async (req, res, next) => {
   global.logger.info("---UPDATE SUBSERVICE---");
@@ -396,7 +520,7 @@ export const infoSubserviceByWorker = async (req, res, next) => {
     });
   } else {
     console.log("caso2");
-    info = await ScheduleMultiple.findOne({
+    info = await Schedule.findOne({
       subService: req.query.subservice,
       user: req.query.user,
     })
