@@ -4,64 +4,63 @@ import Subservice from "../subservices/model.js";
 import { createError } from "../../config/error.js";
 
 //Añadir usuario a favorito
-export const addFavorite = async (req, res, next) => {
-  global.logger.info("--- ADD FAVORITE ---");
+export const addFavorite = async (id, user) => {
+  logger.info("*** ADD FAVORITE DAO ***");
   try {
-    let subservice = await Subservice.findById(req.params.id);
+    let subservice = await Subservice.findById(id);
     if (!subservice) throw createError(404, "Subservice not found ");
     let favorite = await Favorite.findOne({
-      user: req.user._id,
-      subservice: req.params.id,
+      user: user._id,
+      subservice: id,
     });
     if (favorite) {
       await Favorite.findOneAndUpdate(
         { _id: favorite._id },
         { isActive: true }
       );
-      res.status(201).json("saved");
+      return "saved";
     } else {
       let newFavorite = new Favorite({
-        user: req.user._id,
-        subservice: req.params.id,
+        user: user._id,
+        subservice: id,
         isActive: true,
       });
       await newFavorite.save();
-      res.status(201).json("saved");
+      return "saved";
     }
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
 //Eliminar usuario a favorito
-export const removeFavorite = async (req, res, next) => {
-  global.logger.info("--- REMOVE FAVORITE ---");
+export const removeFavorite = async (id, user) => {
+  logger.info("*** REMOVE FAVORITE DAO ***");
   try {
-    let subservice = await Subservice.findById(req.params.id);
+    let subservice = await Subservice.findById(id);
     if (!subservice) throw createError(404, "Subservice not found ");
     let favorite = await Favorite.findOne({
-      user: req.user._id,
-      subservice: req.params.id,
+      user: user._id,
+      subservice: id,
     });
-    console.log(favorite);
     if (favorite && favorite.isActive) {
       await Favorite.findOneAndUpdate(
         { _id: favorite._id },
         { isActive: false }
       );
     }
-    res.status(200).json("removed");
+    return "removed";
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
 //Obtener todos los favoritos de un usuario
-export const getFavorites = async (req, res, next) => {
-  global.logger.info("--- GET FAVORITE (via aggregate) ---");
+export const getFavorites = async (user) => {
+  logger.info("*** GET FAVORITE DAO (via aggregate) ***");
   try {
     const favorites = await Favorite.aggregate([
       {
         $match: {
-          user: req.user._id,
+          user: user._id,
           isActive: true,
         },
       },
@@ -130,27 +129,25 @@ export const getFavorites = async (req, res, next) => {
         },
       },
     ]);
-
-    res.status(200).json(favorites);
+    return favorites;
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
 
 //te dice si un subservicio por usuario es favorito
-export const isFavorite = async (req, res, next) => {
+export const isFavorite = async (id, user) => {
   try {
-    const { id } = req.params;
     const favorite = await Favorite.findOne({
-      user: req.user._id,
+      user: user._id,
       subservice: id,
     });
     if (favorite.isActive) {
-      return res.status(200).json({ isFavorite: true });
+      return { isFavorite: true };
     } else {
-      return res.status(200).json({ isFavorite: false });
+      return { isFavorite: false };
     }
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
