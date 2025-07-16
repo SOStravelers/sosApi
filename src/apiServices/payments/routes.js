@@ -1,23 +1,7 @@
 import Router from "express";
-import validateParams from "../middleware/validate.js";
-import {
-  aprovedOrder,
-  createOrder,
-  paymentIntentStripe,
-  capturePaymentStripe,
-  updatedPaymentIntentStripe,
-  cancelPaymentIntentStripe,
-  refundStripe,
-  transferPayments,
-  getStripeLink,
-  getPaymentIntentById,
-} from "../controllers/payment.js";
-
+import validateParams from "../../middleware/validate.js";
+import * as PAYMENT_CONTROLLERS from "./controllers.js";
 const router = Router();
-
-//------PAYPAL------
-router.post("/newOrder", createOrder);
-router.post("/approvedOrder", aprovedOrder);
 
 //------STRIPE------
 router.post(
@@ -37,8 +21,10 @@ router.post(
     ],
     "body"
   ),
-  paymentIntentStripe
+  PAYMENT_CONTROLLERS.paymentIntentStripe
 );
+
+export default router;
 router.get(
   "/stripe/capture/:id",
   validateParams(
@@ -51,7 +37,7 @@ router.get(
     ],
     "params"
   ),
-  capturePaymentStripe
+  PAYMENT_CONTROLLERS.capturePaymentStripe
 );
 
 router.post(
@@ -86,7 +72,7 @@ router.post(
     ],
     "body"
   ),
-  transferPayments
+  PAYMENT_CONTROLLERS.transferPayments
 );
 router.put(
   "/stripe/update",
@@ -105,7 +91,7 @@ router.put(
     ],
     "body"
   ),
-  updatedPaymentIntentStripe
+  PAYMENT_CONTROLLERS.updatedPaymentIntentStripe
 );
 router.get(
   "/stripe/cancel/:id",
@@ -119,7 +105,7 @@ router.get(
     ],
     "params"
   ),
-  cancelPaymentIntentStripe
+  PAYMENT_CONTROLLERS.cancelPaymentIntentStripe
 );
 router.put(
   "/stripe/refund",
@@ -138,7 +124,7 @@ router.put(
     ],
     "body"
   ),
-  refundStripe
+  PAYMENT_CONTROLLERS.refundStripe
 );
 
 router.get(
@@ -153,7 +139,7 @@ router.get(
     ],
     "params"
   ),
-  getStripeLink
+  PAYMENT_CONTROLLERS.getStripeLink
 );
 
 router.get(
@@ -168,7 +154,9 @@ router.get(
     ],
     "params"
   ),
-  getPaymentIntentById
+  PAYMENT_CONTROLLERS.getPaymentIntentById
 );
 
-export default router;
+// //------PAYPAL------
+router.post("/newOrder", PAYMENT_CONTROLLERS.createOrderPaypal);
+router.post("/approvedOrder", PAYMENT_CONTROLLERS.aproveOrderPaypal);

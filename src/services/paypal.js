@@ -75,7 +75,7 @@ export const createOrderPaypal = async (data) => {
   }
 };
 
-export const captureOrder = async (data) => {
+export const captureOrderPaypal = async (data) => {
   console.log("-capture order paypal--", data);
   const accessToken = await generateAccessToken();
   console.log("access token", accessToken);

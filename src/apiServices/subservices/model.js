@@ -181,7 +181,7 @@ const subserviceSchema = new Schema(
     timeUntilCancel: { type: Number },
     typeService: {
       type: String,
-      enum: ["tour", "event", "food", "other"],
+      enum: ["tour", "event", "product"],
     },
     tourData: {
       _id: false,
