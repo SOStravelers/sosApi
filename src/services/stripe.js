@@ -69,33 +69,38 @@ export const createPaymentIntent = async (data, user) => {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
+    let userDB = null;
+    if (user) {
+      userDB = await User.findById(user._id);
 
-    const userDB = await User.findById(user._id.toString());
+      // Crear customer si no existe
+      if (!userDB.paymentData?.stripeCustomerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.name,
+        });
 
-    // Crear customer si no existe
-    if (!userDB.paymentData?.stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.name,
-      });
-
-      userDB.paymentData.stripeCustomerId = customer.id;
-      await userDB.save();
+        userDB.paymentData.stripeCustomerId = customer.id;
+        await userDB.save();
+      }
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const dataToSent = {
       amount: data.amount,
       currency: data.currency || "usd",
       capture_method: "manual",
       description: "Service booking SOS app",
       automatic_payment_methods: { enabled: true },
       setup_future_usage: "off_session",
-      customer: userDB.paymentData.stripeCustomerId,
-    });
+    };
+    userDB ? (dataToSent.customer = userDB.paymentData.stripeCustomerId) : null;
+
+    const paymentIntent = await stripe.paymentIntents.create(dataToSent);
+
     console.log("el payment Intent", paymentIntent);
 
     // 🔐 Si ya vino con método de pago (caso off_session), lo guardamos
-    if (paymentIntent.payment_method) {
+    if (paymentIntent.payment_method && userDB) {
       userDB.paymentData.paymentMethodId = paymentIntent.payment_method;
       console.log("payment Method", paymentIntent.payment_method);
       await userDB.save();

@@ -26,6 +26,26 @@ router.post(
   PAYMENT_CONTROLLERS.paymentIntentStripe
 );
 
+router.post(
+  "/stripe/noAuth/payment-intents",
+  validateParams(
+    [
+      {
+        param_key: "amount",
+        required: false,
+        type: "number",
+      },
+      {
+        param_key: "currency",
+        required: false,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  PAYMENT_CONTROLLERS.paymentIntentStripe
+);
+
 router.get(
   "/stripe/capture/:id",
   validateParams(
