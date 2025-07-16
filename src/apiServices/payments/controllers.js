@@ -81,6 +81,16 @@ export const getPaymentIntentById = async (req, res, next) => {
     next(err);
   }
 };
+
+export const creteDirectPaymentStripe = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const response = await PAYMENT_DAO.creteDirectPaymentStripe(data);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
 //-----------------
 //------PAYPAL-----
 //-----------------

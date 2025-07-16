@@ -8,10 +8,7 @@ import Booking from "../bookings/model.js";
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
   try {
-    const paymentIntent = await STRIPE_SERVICE.createPaymentIntentAutomatic(
-      data,
-      user
-    );
+    const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(data, user);
     return { clientSecret: paymentIntent.client_secret };
   } catch (err) {
     throw err;
@@ -86,6 +83,18 @@ export const getPaymentIntentById = async (id) => {
   logger.info("*** GET PAYMENT INTENT BY ID STRIPE PAYMENT DAO ***");
   try {
     const link = await STRIPE_SERVICE.getPaymentIntent(id);
+    return link;
+  } catch (err) {
+    throw err;
+  }
+};
+
+//-----------------
+
+export const creteDirectPaymentStripe = async (data) => {
+  logger.info("*** GET PAYMENT INTENT BY ID STRIPE PAYMENT DAO ***");
+  try {
+    const link = await STRIPE_SERVICE.createDirectPaymentIntent(data);
     return link;
   } catch (err) {
     throw err;

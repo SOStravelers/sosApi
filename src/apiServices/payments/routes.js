@@ -1,6 +1,7 @@
 import Router from "express";
 import validateParams from "../../middleware/validate.js";
 import * as PAYMENT_CONTROLLERS from "./controllers.js";
+import { isAuth } from "../../middleware/auth.js";
 const router = Router();
 
 //------STRIPE------
@@ -21,10 +22,10 @@ router.post(
     ],
     "body"
   ),
+  isAuth,
   PAYMENT_CONTROLLERS.paymentIntentStripe
 );
 
-export default router;
 router.get(
   "/stripe/capture/:id",
   validateParams(
@@ -157,6 +158,32 @@ router.get(
   PAYMENT_CONTROLLERS.getPaymentIntentById
 );
 
+router.post(
+  "/stripe/direct-payment-intent",
+  validateParams(
+    [
+      {
+        param_key: "customer",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "currency",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "price",
+        required: true,
+        type: "number",
+      },
+    ],
+    "body"
+  ),
+  PAYMENT_CONTROLLERS.creteDirectPaymentStripe
+);
+
 // //------PAYPAL------
 router.post("/newOrder", PAYMENT_CONTROLLERS.createOrderPaypal);
 router.post("/approvedOrder", PAYMENT_CONTROLLERS.aproveOrderPaypal);
+export default router;

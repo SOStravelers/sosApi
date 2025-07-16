@@ -65,28 +65,42 @@ export const createCustomerId = async (id) => {
 //CREATE PAYMENT INTENT
 export const createPaymentIntent = async (data, user) => {
   logger.info("---CREATE PAYMENT INTENT STRIPE ---");
-  console.log("data", data);
-  console.log("user", user);
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
+
     const userDB = await User.findById(user._id.toString());
-    const objeto = {
+
+    // Crear customer si no existe
+    if (!userDB.paymentData?.stripeCustomerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.name,
+      });
+
+      userDB.paymentData.stripeCustomerId = customer.id;
+      await userDB.save();
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
       amount: data.amount,
-      currency: data.currency ? data.currency : "usd",
-      // currency: "usd",
-      capture_method: "manual", // esto es para que no se capture automaticamente. se hace con el capturePaymentIntent hasta 7 dias despues
+      currency: data.currency || "usd",
+      capture_method: "manual",
       description: "Service booking SOS app",
       automatic_payment_methods: { enabled: true },
-      // setup_future_usage: "off_session",
-      //customer: user.paymentData.stripeCustomerId,
-    };
-    if (userDB.paymentData && userDB.paymentData.stripeCustomerId) {
-      data.customer = userDB.paymentData.stripeCustomerId;
+      setup_future_usage: "off_session",
+      customer: userDB.paymentData.stripeCustomerId,
+    });
+    console.log("el payment Intent", paymentIntent);
+
+    // 🔐 Si ya vino con método de pago (caso off_session), lo guardamos
+    if (paymentIntent.payment_method) {
+      userDB.paymentData.paymentMethodId = paymentIntent.payment_method;
+      console.log("payment Method", paymentIntent.payment_method);
+      await userDB.save();
     }
-    const paymentIntent = await stripe.paymentIntents.create(objeto);
-    console.log(paymentIntent);
+
     return paymentIntent;
   } catch (error) {
     throw error;
@@ -450,5 +464,46 @@ export const addIdBookingtoPI = async (PI, id, bookingNumber) => {
     });
   } catch (err) {
     throw err;
+  }
+};
+
+export const createDirectPaymentIntent = async (data) => {
+  logger.info("---CREATE DIRECT PAYMENT INTENT STRIPE ---");
+
+  try {
+    let paymentMethodId;
+
+    // 1. Intentar usar el default_payment_method
+    const customer = await stripe.customers.retrieve(data.customer);
+    if (customer.invoice_settings?.default_payment_method) {
+      paymentMethodId = customer.invoice_settings.default_payment_method;
+    } else {
+      // 2. Si no hay, buscar uno manualmente
+      const methods = await stripe.paymentMethods.list({
+        customer: data.customer,
+        type: "card",
+      });
+
+      if (!methods.data.length) {
+        throw new Error("No se encontró ningún método de pago guardado.");
+      }
+
+      paymentMethodId = methods.data[0].id;
+    }
+
+    // 3. Crear nuevo PaymentIntent con ese método
+    const intent = await stripe.paymentIntents.create({
+      amount: data.price * 100,
+      currency: data.currency || "usd",
+      customer: data.customer,
+      payment_method: paymentMethodId,
+      off_session: true,
+      confirm: true,
+    });
+
+    return intent;
+  } catch (error) {
+    logger.error("Fallo en cobro directo:", error.message);
+    throw error;
   }
 };
