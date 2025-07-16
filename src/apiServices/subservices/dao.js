@@ -254,7 +254,7 @@ export const getAll = async (data, user) => {
     const result = await Subservice.paginate(filter, options);
 
     if (result.docs.length === 0) {
-      return res.status(200).json({ ...result, docs: [] });
+      return { ...result, docs: [] };
     }
 
     if (user && mongoose.Types.ObjectId.isValid(user._id)) {
