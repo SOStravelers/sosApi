@@ -187,36 +187,37 @@ const subserviceSchema = new Schema(
       _id: false,
       hasChildren: { type: Boolean, default: false },
       adultPrice: {
-        brl: {
-          value: { type: Number },
-          format: { type: String },
-        },
-        usd: {
-          value: { type: Number },
-          formated: { type: String },
-        },
-        eur: {
-          value: { type: Number },
-          formated: { type: String },
-        },
+        usd: { type: Number },
+        eur: { type: Number },
+        brl: { type: Number },
       },
       childrenPrice: {
-        brl: {
-          value: { type: Number },
-          format: { type: String },
-        },
-        usd: {
-          value: { type: Number },
-          formated: { type: String },
-        },
-        eur: {
-          value: { type: Number },
-          formated: { type: String },
-        },
+        usd: { type: Number },
+        eur: { type: Number },
+        brl: { type: Number },
       },
       limit: { type: Number },
       hasLimit: { type: Boolean },
     },
+    categories: [
+      {
+        category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+        default: { type: Boolean, default: false },
+        type: { type: String, required: true, enum: ["select", "free"] },
+        products: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
+            price: {
+              usd: { type: Number },
+              eur: { type: Number },
+              brl: { type: Number },
+            },
+            default: { type: Boolean, default: false },
+          },
+        ],
+      },
+    ],
   },
   { timestamps: true }
 );

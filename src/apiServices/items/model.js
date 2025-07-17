@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 import uniqueValidator from "mongoose-unique-validator";
 
-const itemSchema = new Schema(
+const categorySchema = new Schema(
   {
     subservice: { type: mongoose.Schema.Types.ObjectId, ref: "Subservice" },
     order: { type: Number },
@@ -75,10 +75,22 @@ const itemSchema = new Schema(
     type: { type: String, required: true, enum: ["select", "free"] },
     isActive: { type: Boolean, default: true },
     archived: { type: Boolean, default: false },
+    products: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        price: {
+          usd: { type: Number },
+          eur: { type: Number },
+          brl: { type: Number },
+        },
+        default: { type: Boolean, default: false },
+      },
+    ],
   },
   { timestamps: true }
 );
 
-const Item = mongoose.model("Item", itemSchema);
+const Category = mongoose.model("Category", categorySchema);
 
-export default Item;
+export default Category;

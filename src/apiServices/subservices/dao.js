@@ -1,4 +1,5 @@
 import Subservice from "./model.js";
+import Product from "../products/model.js";
 import mongoose from "mongoose";
 import User from "../users/model.js";
 import Schedule from "../schedules/model.js";
@@ -202,93 +203,140 @@ export const getWithVideos = async () => {
   }
 };
 //Obtener all services con paginate
-export const getAll = async (data, user) => {
-  logger.info("*** GET ALL SUBSERVICES DAO ***");
+
+export const getAll = async (data) => {
   try {
-    data = mongoJsonToPlain(data);
-    data = normalizeObjectIdReferencesForController(data, USER_REF_PATHS);
+    let {
+      keyword,
+      minPrice,
+      maxPrice,
+      currency,
+      service,
+      page = 1,
+      limit = 12,
+    } = data;
 
-    const page = parseInt(data.page, 10) || 1;
-    const limit = parseInt(data.limit, 10) || 50;
-    if (page < 1 || limit < 1)
-      throw createError(400, "page y limit deben ser enteros positivos");
+    page = parseInt(page);
+    limit = parseInt(limit);
 
-    const filter = { isActive: true };
+    const query = { isActive: true }; // ← no filtramos por archived
+    if (keyword) query["name.en"] = { $regex: keyword, $options: "i" };
+    if (service) query.service = service;
 
-    if (data.service) {
-      filter.service = data.service;
-    }
+    const options = {
+      populate: [{ path: "service", select: "name" }],
+      page,
+      limit,
+      lean: true,
+      sort: { createdAt: -1 },
+    };
 
-    const priceCond = {};
-    if (data.minPrice !== undefined) {
-      const min = Number(data.minPrice);
-      if (!Number.isNaN(min)) priceCond.$gte = min;
-    }
-    if (data.maxPrice !== undefined) {
-      const max = Number(data.maxPrice);
-      if (!Number.isNaN(max)) priceCond.$lte = max;
-    }
-    if (Object.keys(priceCond).length) {
-      filter["price.category1"] = priceCond;
-    }
+    const result = await Subservice.paginate(query, options);
+    const docs = result.docs;
 
-    if (data.keyword) {
-      const segments = buildKeywordSegments(data.keyword);
-      if (segments.length) {
-        filter.$or = [];
-        segments.forEach((seg) => {
-          const regex = new RegExp(seg, "i");
-          NAME_FIELDS.forEach((f) => filter.$or.push({ [f]: regex }));
-        });
+    const filteredResults = [];
+
+    const applyPriceFilter = currency || minPrice || maxPrice;
+    if (currency) currency = currency.toLowerCase();
+    if (minPrice) minPrice = parseFloat(minPrice);
+    if (maxPrice) maxPrice = parseFloat(maxPrice);
+
+    for (const doc of docs) {
+      let match = false;
+      let refPrice = null;
+
+      const reducedDoc = {
+        _id: doc._id,
+        name: doc.name,
+        imgUrl: doc.imgUrl,
+        duration: doc.duration,
+        videoUrl: doc.videoUrl,
+        rate: doc.rate,
+        rateCount: doc.rateCount,
+        gallery: doc.gallery,
+        service: { name: doc.service?.name },
+      };
+
+      // ---- TOUR ----
+      if (doc.typeService === "tour") {
+        const price = doc.tourData?.adultPrice?.[currency];
+
+        const priceMatch =
+          !applyPriceFilter ||
+          (price !== undefined &&
+            (minPrice === undefined || price >= minPrice) &&
+            (maxPrice === undefined || price <= maxPrice));
+
+        if (priceMatch) {
+          match = true;
+          refPrice = doc.tourData.adultPrice;
+          reducedDoc.tourData = {
+            adultPrice: doc.tourData.adultPrice,
+          };
+        }
+      }
+
+      // ---- PRODUCT ----
+      if (doc.typeService === "product") {
+        const defaultCategory = doc.categories?.find(
+          (c) =>
+            c.category?.default &&
+            Array.isArray(c.products) &&
+            c.products.length
+        );
+
+        const defaultProduct = defaultCategory?.products?.find(
+          (p) => p.default && p.price
+        );
+
+        if (defaultCategory && defaultProduct) {
+          const price = defaultProduct.price?.[currency];
+
+          const priceMatch =
+            !applyPriceFilter ||
+            (price !== undefined &&
+              (minPrice === undefined || price >= minPrice) &&
+              (maxPrice === undefined || price <= maxPrice));
+
+          if (priceMatch) {
+            match = true;
+            refPrice = defaultProduct.price;
+            reducedDoc.category = {
+              _id: defaultCategory.category?._id,
+              default: true,
+              products: [
+                {
+                  price: defaultProduct.price,
+                  default: true,
+                },
+              ],
+            };
+          }
+        }
+      }
+
+      if (match || !applyPriceFilter) {
+        reducedDoc.refPrice = refPrice;
+        filteredResults.push(reducedDoc);
       }
     }
 
-    const options = {
-      page,
+    const totalFiltered = filteredResults.length;
+    const startIndex = (page - 1) * limit;
+    const paginatedDocs = filteredResults.slice(startIndex, startIndex + limit);
+
+    return {
+      docs: paginatedDocs,
+      totalDocs: totalFiltered,
       limit,
-      sort: { updatedAt: -1 },
-      populate: { path: "currency" },
-      lean: true, // necesario para modificar los docs directamente
+      page,
+      totalPages: Math.ceil(totalFiltered / limit),
     };
-
-    const result = await Subservice.paginate(filter, options);
-
-    if (result.docs.length === 0) {
-      return { ...result, docs: [] };
-    }
-
-    if (user && mongoose.Types.ObjectId.isValid(user._id)) {
-      const subserviceIds = result.docs.map((doc) => doc._id.toString());
-
-      const favorites = await Favorite.find({
-        user: user._id,
-        subservice: { $in: subserviceIds },
-        isActive: true,
-      }).select("subservice");
-      console.log(" losfavorites", favorites.length);
-
-      const favoriteSet = new Set(
-        favorites.map((f) => f.subservice.toString())
-      );
-
-      result.docs = result.docs.map((doc) => {
-        return {
-          ...doc,
-          isFavorite: favoriteSet.has(doc._id.toString()),
-        };
-      });
-    } else {
-      result.docs = result.docs.map((doc) => ({
-        ...doc,
-        isFavorite: false,
-      }));
-    }
-
-    return result;
   } catch (err) {
     throw err;
   }
 };
+
 //Obtener subService por id
 export const getById = async (id) => {
   logger.info("*** GET BY ID SUBSERVICE DAO ***");
