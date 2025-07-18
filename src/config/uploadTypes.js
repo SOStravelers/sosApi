@@ -4,6 +4,7 @@ export const SUPPORTED_IMG_TYPES = [
   "image/jpg",
   "image/png",
   "image/gif",
+  "image/webp",
 ];
 
 export const isValidImage = (mime) => SUPPORTED_IMG_TYPES.includes(mime);

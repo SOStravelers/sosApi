@@ -155,6 +155,34 @@ const subserviceSchema = new Schema(
         },
       },
     ],
+
+    hasEvent: { type: Boolean, default: false },
+    eventData: {
+      _id: false,
+      name: {
+        en: {
+          type: String,
+          default: "",
+        },
+        es: {
+          type: String,
+          default: "",
+        },
+        fr: {
+          type: String,
+          default: "",
+        },
+        pt: {
+          type: String,
+          default: "",
+        },
+        de: {
+          type: String,
+          default: "",
+        },
+      },
+      date: { type: Date },
+    },
     service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
     isActive: { type: Boolean, default: true },
     archived: { type: Boolean, default: false },

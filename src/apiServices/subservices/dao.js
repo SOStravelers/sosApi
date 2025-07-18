@@ -1,7 +1,9 @@
 import Subservice from "./model.js";
 import Product from "../products/model.js";
+import Category from "../items/model.js";
 import mongoose from "mongoose";
 import User from "../users/model.js";
+import sharp from "sharp";
 import Schedule from "../schedules/model.js";
 import { createError } from "../../config/error.js";
 import { botcurrency } from "../../services/botcurrency.js";
@@ -17,6 +19,9 @@ import Jimp from "jimp";
 import envar from "../../config/envar.js";
 import { populate } from "dotenv";
 import Favorite from "../favorites/model.js";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
+dayjs.extend(utc);
 //hola
 
 async function awsDelete(key) {
@@ -35,22 +40,17 @@ function extractKeyFromUrl(url) {
 }
 
 //subir y eliminar galeria de fotos, imgurl, videoUrl
-export const uploadAssets = async (req, res, next) => {
-  const uploadedKeys = []; // para rollback si algo falla
 
+export const uploadAssets = async (id, files, body) => {
+  const uploadedKeys = [];
   try {
-    const { id } = req.params;
-    const files = req.files || {};
-    const body = req.body;
-
-    /* 1. Obtener subservicio */
     const sub = await Subservice.findById(id);
     if (!sub) throw createError(404, "Subservice no encontrado");
 
     const updates = {};
     const deletes = [];
 
-    /* 2. Borrados solicitados ---------------------------------- */
+    // 1. Borrados solicitados
     if (body.removeImg === "true" && sub.imgUrl) {
       deletes.push(extractKeyFromUrl(sub.imgUrl));
       updates.imgUrl = null;
@@ -78,29 +78,27 @@ export const uploadAssets = async (req, res, next) => {
       );
     }
 
-    /* 3. Imagen principal -------------------------------------- */
+    // 2. Imagen principal
     if (files.imgUrl) {
       const img = files.imgUrl[0];
-
       if (!isValidImage(img.mimetype)) {
         throw createError(415, `Unsupported image type: ${img.mimetype}`);
       }
 
-      const jimp = await Jimp.read(img.buffer);
-      jimp.resize(800, Jimp.AUTO).quality(80);
-      const buf = await jimp.getBufferAsync(Jimp.MIME_JPEG);
+      const buf = await sharp(img.buffer)
+        .resize({ width: 800 })
+        .jpeg({ quality: 80 })
+        .toBuffer();
 
       const key = `subservices/${id}/img.jpg`;
       const { url } = await AwsUploadFile({ fileName: key, buffer: buf });
       uploadedKeys.push(key);
-
       updates.imgUrl = url;
     }
 
-    /* 4. Vídeo principal --------------------------------------- */
+    // 3. Vídeo principal
     if (files.videoUrl) {
       const vid = files.videoUrl[0];
-
       if (!isValidVideo(vid.mimetype)) {
         throw createError(415, `Unsupported video type: ${vid.mimetype}`);
       }
@@ -112,42 +110,41 @@ export const uploadAssets = async (req, res, next) => {
         buffer: vid.buffer,
       });
       uploadedKeys.push(key);
-
       updates.videoUrl = url;
     }
 
-    /* 5. Galería de imágenes ----------------------------------- */
+    // 4. Galería de imágenes
     if (files.galleryImages) {
       const oldImgs = updates["gallery.images"] || sub.gallery.images;
       const newUrls = [];
 
       for (let i = 0; i < files.galleryImages.length; i++) {
         const file = files.galleryImages[i];
-
         if (!isValidImage(file.mimetype)) {
           throw createError(415, `Unsupported image type: ${file.mimetype}`);
         }
 
-        const jimp = await Jimp.read(file.buffer);
-        jimp.resize(800, Jimp.AUTO).quality(70);
-        const buf = await jimp.getBufferAsync(Jimp.MIME_JPEG);
+        const buf = await sharp(file.buffer)
+          .resize({ width: 800 })
+          .jpeg({ quality: 70 })
+          .toBuffer();
 
         const key = `subservices/${id}/gallery/img_${Date.now()}_${i}.jpg`;
         const { url } = await AwsUploadFile({ fileName: key, buffer: buf });
         uploadedKeys.push(key);
         newUrls.push(url);
       }
+
       updates["gallery.images"] = [...oldImgs, ...newUrls];
     }
 
-    /* 6. Galería de vídeos ------------------------------------- */
+    // 5. Galería de vídeos
     if (files.galleryVideos) {
       const oldVids = updates["gallery.videos"] || sub.gallery.videos;
       const newUrls = [];
 
       for (let i = 0; i < files.galleryVideos.length; i++) {
         const file = files.galleryVideos[i];
-
         if (!isValidVideo(file.mimetype)) {
           throw createError(415, `Unsupported video type: ${file.mimetype}`);
         }
@@ -161,28 +158,29 @@ export const uploadAssets = async (req, res, next) => {
         uploadedKeys.push(key);
         newUrls.push(url);
       }
+
       updates["gallery.videos"] = [...oldVids, ...newUrls];
     }
 
-    /* 7. Ejecutar borrados solicitados -------------------------- */
+    // 6. Borrar antiguos
     await Promise.all(deletes.map((k) => awsDelete(k)));
 
-    /* 8. Guardar en MongoDB ------------------------------------- */
+    // 7. Guardar en MongoDB
     const updated = await Subservice.findByIdAndUpdate(
       id,
       { $set: updates },
       { new: true }
     );
 
-    res.json(updated);
+    return updated;
   } catch (err) {
-    /* 🔄 rollback: borrar lo que se subió en esta request */
+    // rollback
     if (Array.isArray(uploadedKeys) && uploadedKeys.length) {
       await Promise.all(uploadedKeys.map((k) => awsDelete(k))).catch(
         console.error
       );
     }
-    next(err);
+    throw err;
   }
 };
 
@@ -220,7 +218,16 @@ export const getAll = async (data) => {
     limit = parseInt(limit);
 
     const query = { isActive: true }; // ← no filtramos por archived
-    if (keyword) query["name.en"] = { $regex: keyword, $options: "i" };
+    if (keyword && typeof keyword === "string" && keyword.trim() !== "") {
+      const segments = buildKeywordSegments(keyword);
+      query["$or"] = [];
+
+      for (const field of NAME_FIELDS) {
+        for (const seg of segments) {
+          query["$or"].push({ [field]: { $regex: seg, $options: "i" } });
+        }
+      }
+    }
     if (service) query.service = service;
 
     const options = {
@@ -255,6 +262,7 @@ export const getAll = async (data) => {
         rateCount: doc.rateCount,
         gallery: doc.gallery,
         service: { name: doc.service?.name },
+        chipData: doc.chipData,
       };
 
       // ---- TOUR ----
@@ -346,13 +354,40 @@ export const getById = async (id) => {
         path: "service",
         select: "name",
       })
+      .lean()
       .exec();
+
     if (!subService) throw createError(404, "subService not found");
-    return subService;
+
+    const response = { ...subService, refPrice: null };
+
+    if (subService.typeService === "tour") {
+      if (subService.tourData?.adultPrice) {
+        response.refPrice = subService.tourData.adultPrice;
+      }
+    }
+
+    if (subService.typeService === "product") {
+      const defaultCategory = subService.categories?.find(
+        (c) =>
+          c.category?.default && Array.isArray(c.products) && c.products.length
+      );
+
+      const defaultProduct = defaultCategory?.products?.find(
+        (p) => p.default && p.price
+      );
+
+      if (defaultProduct?.price) {
+        response.refPrice = defaultProduct.price;
+      }
+    }
+
+    return response;
   } catch (err) {
     throw err;
   }
 };
+
 //Obtener all services con paginate segun varias metricas
 export const getRecommendedSubservice = async () => {
   logger.info("*** GET RECOMENDED SUBSERVICES DAO ***");
@@ -367,8 +402,102 @@ export const getRecommendedSubservice = async () => {
   }
 };
 
-//
+export const getProductCategoriesAndProducts = async (subserviceId, date) => {
+  try {
+    // 1. Cargar subservicio y verificar tipo
+    const subservice = await Subservice.findOne({
+      _id: subserviceId,
+      typeService: "product",
+      isActive: true,
+      // archived: false,
+    }).lean();
+
+    if (!subservice) {
+      throw new Error("Subservicio no encontrado o no es del tipo 'product'");
+    }
+
+    // 2. Determinar fecha base para expiración
+    let baseDate;
+    if (subservice.multiple) {
+      if (!date) throw new Error("date param is required for multiple=true");
+      baseDate = dayjs.utc(date);
+    } else {
+      baseDate = dayjs.utc(subservice.startTime);
+    }
+
+    // 3. Obtener IDs de categorías y productos referenciados
+    const allCategoryIds = subservice.categories
+      .map((c) => c?.category?._id || c?.category)
+      .filter(Boolean);
+    const allProductIds = subservice.categories.flatMap((cat) =>
+      (cat.products || []).map((p) => p?.product)
+    );
+
+    // 4. Cargar categorías válidas
+    const validCategories = await Category.find({
+      _id: { $in: allCategoryIds },
+      isActive: true,
+      archived: false,
+    })
+      .select("title subtitle shortDescription type")
+      .lean();
+
+    const categoryMap = {};
+    validCategories.forEach((cat) => {
+      categoryMap[cat._id.toString()] = cat;
+    });
+
+    // 5. Cargar productos válidos (activos, no expirados)
+    const rawProducts = await Product.find({
+      _id: { $in: allProductIds },
+      isActive: true,
+    }).lean();
+
+    const validProductsMap = {};
+    rawProducts.forEach((prod) => {
+      const limitHours = prod.limitTime || 0;
+      const limitDate = baseDate.subtract(limitHours, "hour");
+      const isValid = !prod.hasLimitTime || dayjs().isBefore(limitDate); // Aún no expira
+      if (isValid) {
+        validProductsMap[prod._id.toString()] = prod;
+      }
+    });
+
+    // 6. Reconstruir categorías con productos válidos
+    const cleanCategories = subservice.categories
+      .map((cat) => {
+        const catId = cat.category?._id?.toString() || cat.category?.toString();
+        const realCat = categoryMap[catId];
+        if (!realCat) return null;
+
+        const cleanProducts = (cat.products || [])
+          .map((p) => {
+            const prod = validProductsMap[p?.product?.toString()];
+            if (!prod) return null;
+            return {
+              ...prod,
+              price: p?.price || prod.price,
+              default: p?.default || false,
+            };
+          })
+          .filter(Boolean);
+
+        return {
+          category: realCat,
+          products: cleanProducts,
+        };
+      })
+      .filter(Boolean);
+
+    return cleanCategories;
+  } catch (error) {
+    console.error("Error al obtener categorías y productos:", error);
+    throw error;
+  }
+};
+
 ///
+////
 
 // controllers/subservice.js
 export const getAllByService = async (req, res, next) => {

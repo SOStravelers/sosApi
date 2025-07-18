@@ -28,7 +28,7 @@
     "express-locale": "^2.0.1",
     "fs": "^0.0.1-security",
     "handlebars": "^4.7.8",
-    "jimp": "^0.22.10",
+    "jimp": "^0.22.12",
     "jsonwebtoken": "^9.0.2",
     "moment-timezone": "^0.5.43",
     "mongoose": "^6.3.4",

@@ -5,6 +5,7 @@ import validateParams from "../../middleware/validate.js";
 import { isAuth } from "../../middleware/auth.js";
 import * as SERVICE_CONTROLLERS from "./controllers.js";
 import { isValidImage, isValidVideo } from "../../config/uploadTypes.js";
+import { createError } from "../../config/error.js";
 // multer en memoria, límite general 50MB por archivo
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -55,6 +56,26 @@ router.get(
   ),
   SERVICE_CONTROLLERS.getAll
 );
+
+router.get(
+  "/getproducts",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "date",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  SERVICE_CONTROLLERS.getProductCategoriesAndProducts
+);
 //con auth para ademas obtener favoritos
 router.get(
   "/getAll/user/paginate",
@@ -102,5 +123,21 @@ router.get(
 );
 //Get recomendados
 router.get("/get/recommended", SERVICE_CONTROLLERS.getRecommendedSubservice);
+
+//para subir galeria de fotos y videos
+router.post(
+  "/assets/:id",
+  validateParams(
+    [{ param_key: "id", required: true, type: "string" }],
+    "params"
+  ),
+  upload.fields([
+    { name: "imgUrl", maxCount: 1 },
+    { name: "videoUrl", maxCount: 1 },
+    { name: "galleryImages", maxCount: 8 },
+    { name: "galleryVideos", maxCount: 3 },
+  ]),
+  SERVICE_CONTROLLERS.uploadAssets
+);
 
 export default router;
