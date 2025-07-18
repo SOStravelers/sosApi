@@ -17,26 +17,76 @@ const validatePriceTour = async (price, tourData, selectedData, currency) => {
       selectedData?.amountChildren * tourData?.childrenPrice[currency] || 0;
     console.log("totals", totalAdult, totalChildren);
     const totalSelected = totalAdult + totalChildren;
-    if (price / 100 == totalSelected) {
-      return true;
-    } else {
-      return false;
-    }
+
+    return price / 100 == totalSelected;
   } catch (err) {
     throw err;
+  }
+};
+
+const validatePriceProduct = async (
+  price,
+  categories,
+  selectedData,
+  currency
+) => {
+  try {
+    let totalCalculated = 0;
+
+    // Recorremos cada sección seleccionada por el usuario
+    for (const section of selectedData) {
+      const categoryId = section.sectionId;
+
+      // Buscamos la categoría correspondiente
+      const category = categories.find(
+        (c) => c.category._id.toString() === categoryId
+      );
+      if (!category) continue;
+
+      for (const userProduct of section.products) {
+        const productId = userProduct.productId;
+
+        // Buscamos el producto dentro de la categoría
+        const product = category.products.find(
+          (p) => p.product._id.toString() === productId
+        );
+        if (!product) continue;
+
+        const unitPrice = product.price?.[currency] || 0;
+        const qty = userProduct.qty || 0;
+
+        totalCalculated += unitPrice * qty;
+      }
+    }
+
+    const totalStripe = price / 100;
+
+    console.log(
+      "🧮 TOTAL en base de datos:",
+      totalCalculated,
+      "| Solicitado a enviar a stripe:",
+      totalStripe
+    );
+
+    return totalStripe === totalCalculated;
+  } catch (error) {
+    throw error;
   }
 };
 
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
   try {
-    console.log("la data", data);
+    console.log("subservice", data.subservice);
     if (!data.subservice) throw createError(400, "Missing id subservice");
-    const subservice = await Subservice.findById(data.subservice).populate({
-      path: "service",
-      select: "name",
-    });
-    console.log(subservice.service);
+    const subservice = await Subservice.findById(data.subservice)
+      .populate({
+        path: "service",
+        select: "name",
+      })
+      .populate("categories.category", "title")
+      .populate("categories.products.product", "name")
+      .lean();
     if (!subservice) throw createError(404, "Subservice not found");
     const opciones = ["usd", "brl", "eur"];
     if (!opciones.includes(data.currency))
@@ -49,6 +99,19 @@ export const paymentIntentStripe = async (data, user) => {
         data.currency
       );
       if (!validate) throw createError(400, "Invalid price");
+    } else if (subservice.typeService == "product") {
+      if (data.selectedData.length == 0)
+        throw createError(400, "Invalid price");
+
+      const validate = await validatePriceProduct(
+        data.amount,
+        subservice.categories,
+        data.selectedData,
+        data.currency
+      );
+      if (!validate) throw createError(400, "Invalid price");
+    } else {
+      throw createError(400, "Invalid type service");
     }
     const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(
       data,

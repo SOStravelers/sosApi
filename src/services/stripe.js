@@ -92,8 +92,7 @@ export const createPaymentIntent = async (data, user, subservice) => {
       amount: data.amount,
       currency: data.currency,
       capture_method: "manual",
-      description:
-        subservice.name[language] + " - " + subservice.service.name[language],
+      description: subservice.name.en + " - " + subservice.service.name.en,
       automatic_payment_methods: { enabled: true },
       setup_future_usage: "off_session",
       metadata: {

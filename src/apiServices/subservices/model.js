@@ -229,13 +229,14 @@ const subserviceSchema = new Schema(
     },
     categories: [
       {
+        _id: false,
         category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
         default: { type: Boolean, default: false },
         type: { type: String, required: true, enum: ["select", "free"] },
         products: [
           {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Product",
+            _id: false,
+            product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
             price: {
               usd: { type: Number },
               eur: { type: Number },
