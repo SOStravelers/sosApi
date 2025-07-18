@@ -1,14 +1,60 @@
 import * as PAYPAL_SERVICE from "../../services/paypal.js";
 import * as STRIPE_SERVICE from "../../services/stripe.js";
 import Booking from "../bookings/model.js";
+import { createError } from "../../config/error.js";
+import Subservice from "../subservices/model.js";
 
 //-----------------
 //------STRIPE-----
 //-----------------
+
+const validatePriceTour = async (price, tourData, selectedData, currency) => {
+  logger.info("*** VALIDATE PRICE TOUR STRIPE PAYMENT DAO ***");
+  try {
+    const totalAdult =
+      selectedData?.amountAdults * tourData?.adultPrice[currency] || 0;
+    const totalChildren =
+      selectedData?.amountChildren * tourData?.childrenPrice[currency] || 0;
+    console.log("totals", totalAdult, totalChildren);
+    const totalSelected = totalAdult + totalChildren;
+    if (price / 100 == totalSelected) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
   try {
-    const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(data, user);
+    console.log("la data", data);
+    if (!data.subservice) throw createError(400, "Missing id subservice");
+    const subservice = await Subservice.findById(data.subservice).populate({
+      path: "service",
+      select: "name",
+    });
+    console.log(subservice.service);
+    if (!subservice) throw createError(404, "Subservice not found");
+    const opciones = ["usd", "brl", "eur"];
+    if (!opciones.includes(data.currency))
+      throw createError(400, "Invalid currency");
+    if (subservice.typeService == "tour") {
+      const validate = await validatePriceTour(
+        data.amount,
+        subservice.tourData,
+        data.selectedData,
+        data.currency
+      );
+      if (!validate) throw createError(400, "Invalid price");
+    }
+    const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(
+      data,
+      user,
+      subservice
+    );
     return { clientSecret: paymentIntent.client_secret };
   } catch (err) {
     throw err;

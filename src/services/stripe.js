@@ -31,7 +31,7 @@ const populate = [
 
 //CREATE CUSTOMER ID
 export const createCustomerId = async (id) => {
-  logger.info("---CREATE CUSTOMER ID STRIPE ---");
+  logger.info(">>>CREATE CUSTOMER ID STRIPE <<<");
   try {
     const user = await User.findById(id);
     if (user) {
@@ -63,8 +63,8 @@ export const createCustomerId = async (id) => {
   }
 };
 //CREATE PAYMENT INTENT
-export const createPaymentIntent = async (data, user) => {
-  logger.info("---CREATE PAYMENT INTENT STRIPE ---");
+export const createPaymentIntent = async (data, user, subservice) => {
+  logger.info(">>> CREATE PAYMENT INTENT STRIPE <<<");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
@@ -84,15 +84,30 @@ export const createPaymentIntent = async (data, user) => {
         await userDB.save();
       }
     }
+    const language = data.language || "en";
+
+    console.log(subservice.name, subservice.service);
 
     const dataToSent = {
       amount: data.amount,
-      currency: data.currency || "usd",
+      currency: data.currency,
       capture_method: "manual",
-      description: "Service booking SOS app",
+      description:
+        subservice.name[language] + " - " + subservice.service.name[language],
       automatic_payment_methods: { enabled: true },
       setup_future_usage: "off_session",
+      metadata: {
+        clientName: data?.clientData?.name.trim(),
+        clientEmail: data?.clientData?.email.trim(),
+        clientPhone:
+          data?.clientData?.phoneCode + "-" + data?.clientData?.phone,
+        subservice: subservice._id.toString(),
+        service: subservice.service._id.toString(),
+        startTime: data?.startTime?.isoTime,
+        language: language,
+      },
     };
+
     userDB ? (dataToSent.customer = userDB.paymentData.stripeCustomerId) : null;
 
     const paymentIntent = await stripe.paymentIntents.create(dataToSent);
