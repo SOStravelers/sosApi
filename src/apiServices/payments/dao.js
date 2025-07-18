@@ -87,10 +87,12 @@ export const paymentIntentStripe = async (data, user) => {
       .populate("categories.category", "title")
       .populate("categories.products.product", "name")
       .lean();
+    //--------------
     if (!subservice) throw createError(404, "Subservice not found");
     const opciones = ["usd", "brl", "eur"];
     if (!opciones.includes(data.currency))
       throw createError(400, "Invalid currency");
+    //Analiza si los montos no fueron adulterados
     if (subservice.typeService == "tour") {
       const validate = await validatePriceTour(
         data.amount,
@@ -113,6 +115,7 @@ export const paymentIntentStripe = async (data, user) => {
     } else {
       throw createError(400, "Invalid type service");
     }
+    //--------------------------------------
     const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(
       data,
       user,

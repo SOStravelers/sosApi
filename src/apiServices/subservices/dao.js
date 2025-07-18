@@ -288,13 +288,13 @@ export const getAll = async (data) => {
       if (doc.typeService === "product") {
         const defaultCategory = doc.categories?.find(
           (c) =>
-            c.category?.default &&
+            c.default === true &&
             Array.isArray(c.products) &&
-            c.products.length
+            c.products.length > 0
         );
 
         const defaultProduct = defaultCategory?.products?.find(
-          (p) => p.default && p.price
+          (p) => p.default === true && p.price
         );
 
         if (defaultCategory && defaultProduct) {
@@ -310,7 +310,7 @@ export const getAll = async (data) => {
             match = true;
             refPrice = defaultProduct.price;
             reducedDoc.category = {
-              _id: defaultCategory.category?._id,
+              type: defaultCategory.type,
               default: true,
               products: [
                 {
@@ -370,11 +370,13 @@ export const getById = async (id) => {
     if (subService.typeService === "product") {
       const defaultCategory = subService.categories?.find(
         (c) =>
-          c.category?.default && Array.isArray(c.products) && c.products.length
+          c.default === true &&
+          Array.isArray(c.products) &&
+          c.products.length > 0
       );
 
       const defaultProduct = defaultCategory?.products?.find(
-        (p) => p.default && p.price
+        (p) => p.default === true && p.price
       );
 
       if (defaultProduct?.price) {
@@ -404,19 +406,17 @@ export const getRecommendedSubservice = async () => {
 
 export const getProductCategoriesAndProducts = async (subserviceId, date) => {
   try {
-    // 1. Cargar subservicio y verificar tipo
     const subservice = await Subservice.findOne({
       _id: subserviceId,
       typeService: "product",
       isActive: true,
-      // archived: false,
     }).lean();
 
     if (!subservice) {
       throw new Error("Subservicio no encontrado o no es del tipo 'product'");
     }
 
-    // 2. Determinar fecha base para expiración
+    // Fecha base
     let baseDate;
     if (subservice.multiple) {
       if (!date) throw new Error("date param is required for multiple=true");
@@ -425,15 +425,16 @@ export const getProductCategoriesAndProducts = async (subserviceId, date) => {
       baseDate = dayjs.utc(subservice.startTime);
     }
 
-    // 3. Obtener IDs de categorías y productos referenciados
+    // IDs
     const allCategoryIds = subservice.categories
-      .map((c) => c?.category?._id || c?.category)
+      .map((c) => c?.category?.toString())
       .filter(Boolean);
+
     const allProductIds = subservice.categories.flatMap((cat) =>
-      (cat.products || []).map((p) => p?.product)
+      (cat.products || []).map((p) => p?.product?.toString())
     );
 
-    // 4. Cargar categorías válidas
+    // Categorías válidas
     const validCategories = await Category.find({
       _id: { $in: allCategoryIds },
       isActive: true,
@@ -447,7 +448,7 @@ export const getProductCategoriesAndProducts = async (subserviceId, date) => {
       categoryMap[cat._id.toString()] = cat;
     });
 
-    // 5. Cargar productos válidos (activos, no expirados)
+    // Productos válidos
     const rawProducts = await Product.find({
       _id: { $in: allProductIds },
       isActive: true,
@@ -457,27 +458,29 @@ export const getProductCategoriesAndProducts = async (subserviceId, date) => {
     rawProducts.forEach((prod) => {
       const limitHours = prod.limitTime || 0;
       const limitDate = baseDate.subtract(limitHours, "hour");
-      const isValid = !prod.hasLimitTime || dayjs().isBefore(limitDate); // Aún no expira
+      const isValid = !prod.hasLimitTime || dayjs().isBefore(limitDate);
       if (isValid) {
         validProductsMap[prod._id.toString()] = prod;
       }
     });
 
-    // 6. Reconstruir categorías con productos válidos
+    // Construcción
     const cleanCategories = subservice.categories
       .map((cat) => {
-        const catId = cat.category?._id?.toString() || cat.category?.toString();
+        const catId = cat.category?.toString();
         const realCat = categoryMap[catId];
         if (!realCat) return null;
 
         const cleanProducts = (cat.products || [])
           .map((p) => {
-            const prod = validProductsMap[p?.product?.toString()];
-            if (!prod) return null;
+            const prodId = p?.product?.toString();
+            const baseProduct = validProductsMap[prodId];
+            if (!baseProduct) return null;
+
             return {
-              ...prod,
-              price: p?.price || prod.price,
-              default: p?.default || false,
+              ...baseProduct,
+              price: p.price || baseProduct.price,
+              default: p.default || false,
             };
           })
           .filter(Boolean);
