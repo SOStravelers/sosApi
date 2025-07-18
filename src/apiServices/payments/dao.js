@@ -77,8 +77,15 @@ const validatePriceProduct = async (
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
   try {
-    console.log("subservice", data.subservice);
+    //---------------Validaciones------------------------
     if (!data.subservice) throw createError(400, "Missing id subservice");
+    const isoTime = data.isoTime;
+    const isPast = new Date(isoTime) < new Date();
+    if (isPast) throw createError(400, "Invalid isoTime");
+    const opciones = ["usd", "brl", "eur"];
+    if (!opciones.includes(data.currency))
+      throw createError(400, "Invalid currency");
+    //---------------A buscar data-----------------------
     const subservice = await Subservice.findById(data.subservice)
       .populate({
         path: "service",
@@ -87,12 +94,9 @@ export const paymentIntentStripe = async (data, user) => {
       .populate("categories.category", "title")
       .populate("categories.products.product", "name")
       .lean();
-    //--------------
     if (!subservice) throw createError(404, "Subservice not found");
-    const opciones = ["usd", "brl", "eur"];
-    if (!opciones.includes(data.currency))
-      throw createError(400, "Invalid currency");
-    //Analiza si los montos no fueron adulterados
+    //---------------------------------------------------
+    //--------Analizar si data no fue adulterada---------
     if (subservice.typeService == "tour") {
       const validate = await validatePriceTour(
         data.amount,
@@ -115,7 +119,7 @@ export const paymentIntentStripe = async (data, user) => {
     } else {
       throw createError(400, "Invalid type service");
     }
-    //--------------------------------------
+    //----------------Envio a Stripe--------------------
     const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(
       data,
       user,

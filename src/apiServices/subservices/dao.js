@@ -277,9 +277,9 @@ export const getAll = async (data) => {
 
         if (priceMatch) {
           match = true;
-          refPrice = doc.tourData.adultPrice;
+          refPrice = doc?.tourData?.adultPrice || null;
           reducedDoc.tourData = {
-            adultPrice: doc.tourData.adultPrice,
+            adultPrice: doc?.tourData?.adultPrice || null,
           };
         }
       }
