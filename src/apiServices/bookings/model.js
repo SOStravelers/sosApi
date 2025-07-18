@@ -5,9 +5,7 @@ import paginateConfig from "../../config/paginate.js";
 
 const bookingSchema = new Schema(
   {
-    businessUser: { type: String, ref: "User" },
     workerUser: { type: String, ref: "User" },
-    firstWorker: { type: String, ref: "User" },
     clientUser: { type: String, ref: "User" },
     clientPhone: { type: String },
     multiple: { type: Boolean, default: false },
@@ -22,9 +20,6 @@ const bookingSchema = new Schema(
     ],
     clientsNumber: { type: Number, default: 1 },
     price: { type: Number, default: 0 },
-    limit: { type: Number },
-    type: { type: String, default: "personal", enum: ["personal", "group"] },
-    creatorUser: { type: String, ref: "User" },
     service: { type: String, ref: "Service" },
     subservice: { type: String, ref: "Subservice" },
     idKey: { type: String },
@@ -36,57 +31,7 @@ const bookingSchema = new Schema(
       stringData: { type: String },
       isoTime: { type: Date },
     },
-    date: {
-      stringData: { type: String },
-      isoDate: { type: Date },
-    },
     title: { type: String, default: "new Event" },
-    details: {
-      en: {
-        type: String,
-        default: "",
-      },
-      es: {
-        type: String,
-        default: "",
-      },
-      fr: {
-        type: String,
-        default: "",
-      },
-      pt: {
-        type: String,
-        default: "",
-      },
-      de: {
-        type: String,
-        default: "",
-      },
-    },
-    locationInfo: {
-      en: {
-        type: String,
-        default: "",
-      },
-      es: {
-        type: String,
-        default: "",
-      },
-      fr: {
-        type: String,
-        default: "",
-      },
-      pt: {
-        type: String,
-        default: "",
-      },
-      de: {
-        type: String,
-        default: "",
-      },
-    },
-    mapUrl: { type: String },
-    priceUnitService: { type: Number },
     payment: {
       method: {
         type: String,
@@ -105,7 +50,6 @@ const bookingSchema = new Schema(
       currency: { type: String, default: "BRL" },
     },
     duration: { type: Number },
-    coverImg: { type: String, default: "" },
     canceledData: {
       canceledBy: { type: String, ref: "User" },
       canceledAtUTC: { type: Date },
