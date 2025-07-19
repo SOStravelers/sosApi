@@ -31,7 +31,7 @@ const populate = [
 
 //CREATE CUSTOMER ID
 export const createCustomerId = async (id) => {
-  logger.info(">>>CREATE CUSTOMER ID STRIPE <<<");
+  logger.verbose(">>>CREATE CUSTOMER ID STRIPE <<<");
   try {
     const user = await User.findById(id);
     if (user) {
@@ -64,7 +64,7 @@ export const createCustomerId = async (id) => {
 };
 //CREATE PAYMENT INTENT
 export const createPaymentIntent = async (data, user, subservice) => {
-  logger.info(">>> CREATE PAYMENT INTENT STRIPE <<<");
+  logger.verbose(">>> CREATE PAYMENT INTENT STRIPE <<<");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
@@ -192,7 +192,7 @@ export const capturePaymentIntent = async (
 };
 
 export const askWasCapturedPayment = async (paymentIntentId) => {
-  logger.info(">>> ASK CAPTURED PAYMENT INTENT STRIPE <<<");
+  logger.verbose(">>> ASK CAPTURED PAYMENT INTENT STRIPE <<<");
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
     const status = paymentIntent.status;
@@ -229,7 +229,7 @@ export const askWasCapturedPayment = async (paymentIntentId) => {
 //CREATE PAYMENT INTENT AUTOMATIC FOR DIFERENTS USERS
 // CREATE PAYMENT INTENT WITH IMMEDIATE CHARGE AND PAYMENT SPLIT
 export const createPaymentIntentAutomatic = async (data, user) => {
-  logger.info("--- CREATE PAYMENT INTENT AUTOMATIC STRIPE ---");
+  logger.verbose("--- CREATE PAYMENT INTENT AUTOMATIC STRIPE ---");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
@@ -281,7 +281,7 @@ export const createPaymentIntentAutomatic = async (data, user) => {
 };
 
 export const transferPaymentsStripe = async (data, user) => {
-  logger.info("--- CREATE TRANSFERS STRIPE ---");
+  logger.verbose("--- CREATE TRANSFERS STRIPE ---");
   console.log("dataStripe", data);
   try {
     let allData = byPassPolMauro(data);
@@ -505,7 +505,7 @@ export const getPaymentIntent = async (paymentIntentId) => {
 };
 
 export const addIdBookingtoPI = async (PI, idBooking, bookingNumber) => {
-  logger.info(">>> ADD METADATA PAYMENT INTENT STRIPE <<<");
+  logger.verbose(">>> ADD METADATA PAYMENT INTENT STRIPE <<<");
   console.log("data", PI, idBooking, bookingNumber);
   try {
     await stripe.paymentIntents.update(PI, {

@@ -102,7 +102,6 @@ export const createBooking = async (data) => {
     const currency = await Currency.findOne({ code: statusPayment.currency });
     payment.currency = currency._id;
     await payment.save();
-    console.log("antes de guardar");
     let booking = new Booking(newData);
     // Buscar el último booking ordenado por idKey en orden descendente
     let lastBooking = await Booking.findOne().sort({ idKey: -1 });

@@ -35,7 +35,7 @@ import routes from "./routes/index.js";
 
 // check connection
 db.once("open", () => {
-  global.logger.info(`Connnected to mongodb`);
+  global.logger.debug(`Connnected to mongodb`);
 });
 db.on("error", (err) => {
   global.logger.error(err);
