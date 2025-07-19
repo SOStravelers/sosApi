@@ -1,7 +1,7 @@
-import Notification from "../models/notification.js";
+import Notification from "../apiServices/notifications/model.js";
 import { createError } from "../config/error.js";
-import Booking from "../models/booking.js";
-import User from "../models/user.js";
+import Booking from "../apiServices/bookings/model.js";
+import User from "../apiServices/users/model.js";
 
 export const newBookingNotification = async (booking, multiple) => {
   try {

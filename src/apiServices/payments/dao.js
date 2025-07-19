@@ -1,6 +1,8 @@
 import * as PAYPAL_SERVICE from "../../services/paypal.js";
 import * as STRIPE_SERVICE from "../../services/stripe.js";
 import Booking from "../bookings/model.js";
+import Currency from "../currencies/model.js";
+import Payment from "../payments/model.js";
 import { createError } from "../../config/error.js";
 import Subservice from "../subservices/model.js";
 
@@ -125,6 +127,22 @@ export const paymentIntentStripe = async (data, user) => {
       user,
       subservice
     );
+
+    const dataPayment = {
+      paymentMethod: "stripe",
+      status: "pending",
+      amount: paymentIntent.amount / 100,
+      amountPaid: paymentIntent.amount / 100,
+      pricePaid: 0,
+      transactionId: paymentIntent.id,
+    };
+    const currency = await Currency.findOne({ code: data.currency });
+    dataPayment.currency = currency._id;
+
+    const newPayment = new Payment(dataPayment);
+    await newPayment.save();
+    //---------------------------------------------------
+
     return { clientSecret: paymentIntent.client_secret };
   } catch (err) {
     throw err;

@@ -6,16 +6,15 @@ const paymentSchema = new Schema(
     bookingId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
-      required: true,
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    status: {
+      type: String,
+      default: "pending",
+      enum: ["pending", "paid", "failed", "canceled", "refunded"],
     },
     paymentMethod: {
       type: String,
-      enum: ["credit_card", "paypal"],
+      enum: ["credit_card", "paypal", "stripe"],
       required: true,
     },
     transactionId: {
@@ -26,13 +25,14 @@ const paymentSchema = new Schema(
       type: Number,
       required: true,
     },
-    currency: {
-      type: String,
-      default: "USD",
+    amountPaid: {
+      type: Number,
+      required: true,
     },
-    paymentDate: {
-      type: Date,
-      default: Date.now,
+    currency: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Currency",
+      required: true,
     },
   },
   { timestamps: true }

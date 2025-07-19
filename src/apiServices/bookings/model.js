@@ -5,11 +5,18 @@ import paginateConfig from "../../config/paginate.js";
 
 const bookingSchema = new Schema(
   {
-    workerUser: { type: String, ref: "User" },
-    clientUser: { type: String, ref: "User" },
+    workerUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    clientUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    clientEmail: { type: String },
     clientPhone: { type: String },
-    multiple: { type: Boolean, default: false },
-    clients: [
+    imgUrl: { type: String },
+    videoUrl: { type: String },
+    country: { type: String },
+    eventData: { type: Object },
+    tourData: { type: Object },
+    categories: { type: Array },
+    typeService: { type: String, enum: ["tour", "product"] },
+    othersClients: [
       {
         name: { type: String },
         email: { type: String },
@@ -18,10 +25,11 @@ const bookingSchema = new Schema(
         phone: { type: String },
       },
     ],
-    clientsNumber: { type: Number, default: 1 },
-    price: { type: Number, default: 0 },
-    service: { type: String, ref: "Service" },
-    subservice: { type: String, ref: "Subservice" },
+    serviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
+    serviceData: { type: Object },
+    subserviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Subservice" },
+    subServiceData: { type: Object },
+
     idKey: { type: String },
     startTime: {
       stringData: { type: String },
@@ -31,25 +39,9 @@ const bookingSchema = new Schema(
       stringData: { type: String },
       isoTime: { type: Date },
     },
-    title: { type: String, default: "new Event" },
-    payment: {
-      method: {
-        type: String,
-        default: "stripe",
-        enum: ["cash", "paypal", "stripe"],
-      },
-      status: {
-        type: String,
-        default: "pending",
-        enum: ["pending", "paid", "failed", "canceled", "refunded"],
-      },
-      paymentId: { type: String, ref: "Payment" },
-      price: { type: Number },
-      priceBRL: { type: Number },
-      partner: { type: String, ref: "User", default: null },
-      currency: { type: String, default: "BRL" },
-    },
     duration: { type: Number },
+    title: { type: String, default: "new Event" },
+    paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },
     canceledData: {
       canceledBy: { type: String, ref: "User" },
       canceledAtUTC: { type: Date },

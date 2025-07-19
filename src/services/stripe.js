@@ -86,8 +86,6 @@ export const createPaymentIntent = async (data, user, subservice) => {
     }
     const language = data.language || "en";
 
-    console.log(subservice.name, subservice.service);
-
     const dataToSent = {
       amount: data.amount,
       currency: data.currency,
@@ -110,8 +108,6 @@ export const createPaymentIntent = async (data, user, subservice) => {
     userDB ? (dataToSent.customer = userDB.paymentData.stripeCustomerId) : null;
 
     const paymentIntent = await stripe.paymentIntents.create(dataToSent);
-
-    console.log("el payment Intent", paymentIntent);
 
     // 🔐 Si ya vino con método de pago (caso off_session), lo guardamos
     if (paymentIntent.payment_method && userDB) {
@@ -190,6 +186,41 @@ export const capturePaymentIntent = async (
     // await stripe.invoices.finalizeInvoice(invoice.id);
 
     // console.log("invoice", invoice);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const askWasCapturedPayment = async (paymentIntentId) => {
+  logger.info(">>> ASK CAPTURED PAYMENT INTENT STRIPE <<<");
+  try {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const status = paymentIntent.status;
+    console.log("status", paymentIntent.status);
+    const captureMethod = paymentIntent.capture_method;
+
+    if (status === "succeeded" && paymentIntent?.amount_received) {
+      return {
+        status: "capturado",
+        amount: paymentIntent.amount,
+        amount_received: paymentIntent.amount_received,
+        currency: paymentIntent.currency,
+      };
+    }
+
+    if (
+      (status === "requires_capture" || status === "processing") &&
+      captureMethod === "manual"
+    ) {
+      return {
+        status: "autorizado",
+        amount: paymentIntent.amount,
+        amount_received: paymentIntent.amount_received,
+        currency: paymentIntent.currency,
+      };
+    }
+
+    return "fallido"; // incluye casos cancelados, rechazados, o sin charge aún
   } catch (error) {
     throw error;
   }
@@ -473,11 +504,13 @@ export const getPaymentIntent = async (paymentIntentId) => {
   }
 };
 
-export const addIdBookingtoPI = async (PI, id, bookingNumber) => {
+export const addIdBookingtoPI = async (PI, idBooking, bookingNumber) => {
+  logger.info(">>> ADD METADATA PAYMENT INTENT STRIPE <<<");
+  console.log("data", PI, idBooking, bookingNumber);
   try {
     await stripe.paymentIntents.update(PI, {
       metadata: {
-        bookingId: id, // ID del booking
+        bookingId: idBooking, // ID del booking
         bookingNumber: bookingNumber, // Número del booking
       },
     });
