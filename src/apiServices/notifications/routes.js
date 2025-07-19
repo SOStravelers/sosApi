@@ -39,7 +39,11 @@ router.put(
   ),
   NOTIFICATION_CONTROLLERS.setIsRead
 );
-// router.get("/checkNotifications", NOTIFICATION_CONTROLLERS.checkNotification);
+router.get(
+  "/checkNotifications",
+  isAuth,
+  NOTIFICATION_CONTROLLERS.checkNotification
+);
 // router.get("/getkey", NOTIFICATION_CONTROLLERS.getPublicKey);
 // router.post("/createSub", NOTIFICATION_CONTROLLERS.sendExampleNotification);
 

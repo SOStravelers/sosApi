@@ -8,11 +8,7 @@ export const newBookingNotification = async (req, res, next) => {
       booking,
       userId
     );
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -23,11 +19,7 @@ export const getByUser = async (req, res, next) => {
     const userId = req.user._id.toString();
     const data = req.query;
     const response = await NOTIFICATION_DAO.getByUser(data, userId);
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -37,10 +29,18 @@ export const setIsRead = async (req, res, next) => {
   try {
     const id = req.params.id;
     const response = await NOTIFICATION_DAO.setIsRead(id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const checkNotification = async (req, res, next) => {
+  try {
+    const idUser = req.user._id.toString();
+    const response = await NOTIFICATION_DAO.checkNotification(idUser);
+    res.status(200).json(response);
     if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
     }
   } catch (err) {
     next(err);
