@@ -5,13 +5,10 @@ import Currency from "../currencies/model.js";
 import Payment from "../payments/model.js";
 import { createError } from "../../config/error.js";
 import * as STRIPE_SERVICE from "../../services/stripe.js";
+import * as NOTIFICATION_DAO from "../notifications/dao.js";
 
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
-import moment from "moment-timezone";
-import {
-  newBookingNotification,
-  confirmBookingNotification,
-} from "../../services/notification.js";
+
 const populate = [
   {
     path: "workerUser",
@@ -42,6 +39,7 @@ export const createBooking = async (data) => {
     const subservice = await Subservice.findById(data.subservice).populate(
       "service"
     );
+    console.log;
     if (!subservice) throw createError(404, "Subservice not found");
     console.log("idUser", data.clientId);
     const clientUser = await User.findById(data.clientId);
@@ -65,14 +63,16 @@ export const createBooking = async (data) => {
       currency: subservice.currency,
       typeService: subservice.typeService,
     };
-
     if (subservice.typeService == "tour") {
+      console.log("caso 1");
       newData.tourData = data.selectedData;
     } else {
+      console.log("caso 1");
       newData.categories = data.selectedData;
     }
     if (subservice.eventData) {
-      newData.eventData;
+      console.log("caso 3");
+      newData.eventData = data.eventData;
     }
     console.log("la ID payment Intent", data.payment.paymentId);
 
@@ -148,8 +148,9 @@ export const createBooking = async (data) => {
       theBooking?._id.toString(),
       theBooking?.idKey
     );
-
-    // newBookingNotification(theBooking, multiple);
+    if (clientUser) {
+      NOTIFICATION_DAO.newBookingNotification(theBooking, clientUser._id);
+    }
     // resendCompletedPersonal({
     //   email: theBooking.clientUser.email,
     //   name: theBooking.clientUser.personalData.name.first,

@@ -5,16 +5,16 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import paginateConfig from "../../config/paginate.js";
 const notificationSchema = new Schema(
   {
-    title: { type: String, required: true },
-    subtitle: { type: String, ref: "Subtitle" },
-    booking: { type: String, ref: "Booking" },
+    title: { type: Object, required: true },
+    subtitle: { type: Object },
+    booking: { type: mongoose.Schema.Types.ObjectId, ref: "Booking" },
     type: { type: String, required: true },
-    body: { type: String },
+    body: { type: Object, required: true },
     isRead: { type: Boolean, default: false },
     toWorkers: { type: Boolean, default: false },
     toBusiness: { type: Boolean, default: false },
     toUsers: { type: Boolean, default: false },
-    to: [{ type: String, ref: "User", _id: false }],
+    to: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", _id: false }],
     link: { type: String },
     imgUrl: { type: String },
   },

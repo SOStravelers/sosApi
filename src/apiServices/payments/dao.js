@@ -142,7 +142,6 @@ export const paymentIntentStripe = async (data, user) => {
     const newPayment = new Payment(dataPayment);
     await newPayment.save();
     //---------------------------------------------------
-
     return { clientSecret: paymentIntent.client_secret };
   } catch (err) {
     throw err;

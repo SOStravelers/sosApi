@@ -28,7 +28,7 @@ const bookingSchema = new Schema(
     serviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
     serviceData: { type: Object },
     subserviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Subservice" },
-    subServiceData: { type: Object },
+    subserviceData: { type: Object },
 
     idKey: { type: String },
     startTime: {
