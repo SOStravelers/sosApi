@@ -5,6 +5,7 @@ import Booking from "../apiServices/bookings/model.js";
 const stripe = new Stripe(envar().STRIPE_SECRET_KEY);
 import { byPassPolMauro } from "../utils/changeId.js";
 import Subservice from "../apiServices/subservices/model.js";
+import { createError } from "../config/error.js";
 
 const populate = [
   {
@@ -121,6 +122,110 @@ export const createPaymentIntent = async (data, user, subservice) => {
     throw error;
   }
 };
+//Test payment Intent
+export const paymentIntentClient = async ({
+  customerId,
+  savedPaymentMethodId,
+  currency,
+  amount,
+  automatic = false,
+}) => {
+  logger.verbose(">>> CREATE PAYMENT INTENT CLIENT STRIPE <<<");
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100,
+      currency: currency,
+      customer: customerId,
+      confirm: true,
+      off_session: true,
+      payment_method: savedPaymentMethodId,
+      capture_method: automatic ? "automatic" : "manual",
+      // application_fee_amount: 400,
+      // transfer_data: {
+      //   destination: connectAccountId,
+      // },
+    });
+    return { msg: "Pago exitoso", id: paymentIntent.id };
+  } catch (error) {
+    if (error.code === "authentication_required") {
+      throw createError(400, "El banco requiere autenticación");
+      // Aquí puedes guardar el paymentIntent.id para intentar re-confirmarlo con el cliente presente más tarde
+    } else {
+      console.log("error", error.message);
+      throw createError(400, "Error al procesar el pago");
+    }
+  }
+};
+
+export const createCheckoutLinkStripe = async ({
+  name,
+  description,
+  amount,
+  defaultQty,
+  maxQty,
+  minQty,
+  email,
+  connectAccountId,
+}) => {
+  logger.verbose(">>> CREATE CHECKOUT LINK STRIPE <<<");
+
+  try {
+    const paymentIntentData = {
+      description: "LinkPayment - " + name,
+    };
+
+    if (connectAccountId) {
+      paymentIntentData.application_fee_amount = Math.floor(amount * 0.1);
+      paymentIntentData.transfer_data = {
+        destination: connectAccountId,
+      };
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            currency: "brl",
+            product_data: description ? { name, description } : { name },
+            unit_amount: amount,
+          },
+          quantity: defaultQty || 1,
+          ...(minQty &&
+            maxQty && {
+              adjustable_quantity: {
+                enabled: true,
+                minimum: minQty,
+                maximum: maxQty,
+              },
+            }),
+        },
+      ],
+      mode: "payment",
+      ...(email && { customer_email: email }),
+      success_url: process.env.URL_FRONTEND + "?success=success",
+      cancel_url: process.env.URL_FRONTEND + "/error",
+      payment_intent_data: paymentIntentData, // <-- siempre incluido
+    });
+
+    return session;
+  } catch (error) {
+    logger.error("Stripe error", error);
+    throw error;
+  }
+};
+
+//Buscar metodos de pagos de un cliente
+export const MethodsPaymentClient = async (customerId) => {
+  try {
+    const methods = await stripe.paymentMethods.list({
+      customer: customerId,
+      type: "card",
+    });
+    return methods.data;
+  } catch (err) {
+    throw err;
+  }
+};
 
 //CAPTURE PAYMENT INTENT
 export const capturePaymentIntent = async (
@@ -222,60 +327,6 @@ export const askWasCapturedPayment = async (paymentIntentId) => {
 
     return "fallido"; // incluye casos cancelados, rechazados, o sin charge aún
   } catch (error) {
-    throw error;
-  }
-};
-
-//CREATE PAYMENT INTENT AUTOMATIC FOR DIFERENTS USERS
-// CREATE PAYMENT INTENT WITH IMMEDIATE CHARGE AND PAYMENT SPLIT
-export const createPaymentIntentAutomatic = async (data, user) => {
-  logger.verbose("--- CREATE PAYMENT INTENT AUTOMATIC STRIPE ---");
-  try {
-    if (!envar().STRIPE_SECRET_KEY) {
-      throw new Error("MISSING_API_CREDENTIALS");
-    }
-    let userDB = null;
-    if (user && user._id) {
-      userDB = await User.findById(user._id.toString());
-    }
-    const customerId = userDB?.paymentData?.stripeCustomerId || null;
-    console.log("la ides", customerId);
-    // Lógica de cálculo
-    const totalAmount = data.amount; // Monto total en centavos
-    console.log("Monto total:", totalAmount);
-    console.log("la data", data);
-    // Crear el PaymentIntent
-    const dataPayment = {
-      amount: totalAmount,
-      currency: data.currency || "usd",
-      description: data.service + "-" + data.subservice,
-      metadata: {
-        clientName:
-          user?.personalData?.name?.first +
-          " " +
-          user?.personalData?.name?.last,
-        service: data?.service,
-        subservice: data?.subservice,
-        date: data?.date,
-        startTime: data?.startTime?.isoTime,
-        clientsNumber: data?.clientsNumber,
-        language: data?.language,
-      },
-      payment_method_types: ["card"], // Solo tarjetas de crédito
-      automatic_payment_methods: { enabled: false }, // Desactiva métodos automáticos con redirecciones
-    };
-
-    // Agregar customer solo si no es null
-    if (customerId) {
-      dataPayment.customer = customerId;
-    }
-
-    const paymentIntent = await stripe.paymentIntents.create(dataPayment);
-
-    console.log("PaymentIntent creado:", paymentIntent.id);
-    return paymentIntent;
-  } catch (error) {
-    console.error("Error creando PaymentIntent:", error);
     throw error;
   }
 };

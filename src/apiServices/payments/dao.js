@@ -76,6 +76,13 @@ const validatePriceProduct = async (
   }
 };
 
+const opciones = ["usd", "brl", "eur"];
+
+//---------------
+//-----FUNCIONES
+//---------------
+
+//Crear payment Intent tradicional
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
   try {
@@ -83,8 +90,9 @@ export const paymentIntentStripe = async (data, user) => {
     if (!data.subservice) throw createError(400, "Missing id subservice");
     const isoTime = data.isoTime;
     const isPast = new Date(isoTime) < new Date();
+
     if (isPast) throw createError(400, "Invalid isoTime");
-    const opciones = ["usd", "brl", "eur"];
+
     if (!opciones.includes(data.currency))
       throw createError(400, "Invalid currency");
     //---------------A buscar data-----------------------
@@ -147,7 +155,56 @@ export const paymentIntentStripe = async (data, user) => {
     throw err;
   }
 };
+// Obtener metodos de pago de un customer Id de stripe
+export const listMethodsPaymentClient = async (customerId) => {
+  logger.info("*** LIST METHODS PAYMENT CLIENT STRIPE PAYMENT DAO ***");
+  try {
+    const methods = await STRIPE_SERVICE.MethodsPaymentClient(customerId);
+    return methods;
+  } catch (err) {
+    throw err;
+  }
+};
+//Crear Payment Intent con el uso de un customer Id de stripe
+export const paymentIntentClient = async (data) => {
+  logger.info("*** PAYMENT INTENT CLIENT STRIPE PAYMENT DAO ***");
+  try {
+    const { customerId, savedPaymentMethodId, currency, amount, automatic } =
+      data;
+    if (!opciones.includes(currency))
+      throw createError(400, "Invalid currency");
+    const paymentIntent = await STRIPE_SERVICE.paymentIntentClient({
+      customerId,
+      savedPaymentMethodId,
+      currency,
+      amount,
+      automatic,
+    });
+    return paymentIntent;
+  } catch (err) {
+    throw err;
+  }
+};
+//Crear link de pago custom
+export const createCheckoutLink = async (data) => {
+  logger.info("*** CREATE CHECKOUT LINK STRIPE PAYMENT DAO ***");
+  try {
+    const { name, description, amount, defaultQty, maxQty, minQty } = data;
+    const link = await STRIPE_SERVICE.createCheckoutLinkStripe({
+      name,
+      description,
+      amount,
+      defaultQty,
+      maxQty,
+      minQty,
+    });
+    return link;
+  } catch (err) {
+    throw err;
+  }
+};
 //---------------
+
 export const transferPayments = async (data, user) => {
   logger.info("*** TRANSFER PAYMENTS STRIPE PAYMENT DAO ***");
   try {

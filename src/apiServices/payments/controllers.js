@@ -1,10 +1,41 @@
 import * as PAYMENT_DAO from "./dao.js";
-
+//------STRIPE------
+//Crear payment Intent tradicional
 export const paymentIntentStripe = async (req, res, next) => {
   try {
     const user = req.user;
     const data = req.body;
     const response = await PAYMENT_DAO.paymentIntentStripe(data, user);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+// Obtener metodos de pago de un customer Id de stripe
+export const listMethodsPaymentClient = async (req, res, next) => {
+  try {
+    const customerId = req.params.customerId;
+    const response = await PAYMENT_DAO.listMethodsPaymentClient(customerId);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+//Crear Payment Intent con el uso de un customer Id de stripe
+export const paymentIntentClient = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const response = await PAYMENT_DAO.paymentIntentClient(data);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+//Crear link de pago custom
+export const createCheckoutLink = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const response = await PAYMENT_DAO.createCheckoutLink(data);
     res.status(200).json(response);
   } catch (err) {
     next(err);
