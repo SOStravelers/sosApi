@@ -172,13 +172,13 @@ export const paymentIntentStripe = async (data, user) => {
     }
 
     //----------------Envio a Stripe--------------------
-    const paymentIntents = await STRIPE_SERVICE.createPaymentIntent(
+    const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(
       data,
       user,
       subservice,
       chargeValidate
     );
-    console.log("los payments", paymentIntents);
+    console.log("los payments", paymentIntent);
     // const dataPayment = {
     //   paymentMethod: "stripe",
     //   status: "pending",
@@ -193,7 +193,12 @@ export const paymentIntentStripe = async (data, user) => {
     // const newPayment = new Payment(dataPayment);
     // await newPayment.save();
     //---------------------------------------------------
-    return { clientSecret: paymentIntents[0].paymentIntent.client_secret };
+
+    return {
+      clientSecret: paymentIntent.intent.client_secret,
+      intentType: paymentIntent.typeIntent,
+      customer: paymentIntent.customer,
+    };
     // return { clientSecret: paymentIntents[0] };
   } catch (err) {
     throw err;
@@ -217,12 +222,24 @@ export const paymentIntentClient = async (data) => {
       data;
     if (!opciones.includes(currency))
       throw createError(400, "Invalid currency");
+
+    const subservice = await Subservice.findById(data.subservice)
+      .populate({
+        path: "service",
+        select: "name",
+      })
+      .populate("categories.category", "title")
+      .populate("categories.products.product", "name")
+      .lean();
+    if (!subservice) throw createError(404, "Subservice not found");
     const paymentIntent = await STRIPE_SERVICE.paymentIntentClient({
       customerId,
       savedPaymentMethodId,
       currency,
       amount,
       automatic,
+      data,
+      subservice,
     });
     return paymentIntent;
   } catch (err) {

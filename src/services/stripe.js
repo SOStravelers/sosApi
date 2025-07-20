@@ -76,6 +76,7 @@ export const createPaymentIntent = async (
       throw new Error("MISSING_API_CREDENTIALS");
     }
     let userDB = null;
+    let customerId = null;
     if (user) {
       userDB = await User.findById(user._id);
 
@@ -87,9 +88,18 @@ export const createPaymentIntent = async (
         });
 
         userDB.paymentData.stripeCustomerId = customer.id;
+        customerId = customer.id;
         await userDB.save();
       }
+      customerId = userDB.paymentData.stripeCustomerId;
+    } else {
+      const customer = await stripe.customers.create({
+        email: data?.clientData?.name.trim(),
+        name: data?.clientData?.email.trim(),
+      });
+      customerId = customer.id;
     }
+
     const language = data.language || "en";
 
     const dataToSent = {
@@ -110,71 +120,32 @@ export const createPaymentIntent = async (
         language: language,
       },
     };
-    userDB ? (dataToSent.customer = userDB.paymentData.stripeCustomerId) : null;
+    customerId ? (dataToSent.customer = customerId) : "";
 
-    const dataValidateCharge = {
-      ...dataToSent,
-      amount: 50,
-      capture_method: "automatic",
-      currency: "brl",
-      description: "Validate Card",
-      setup_future_usage: "off_session",
-    };
-
-    let payments = [];
-    let methodId = null;
     if (!chargeValidate) {
+      let methodId = null;
       const paymentIntent = await stripe.paymentIntents.create(dataToSent);
-      payments.push({
-        paymentIntent: paymentIntent,
-        id: paymentIntent.id,
-        amount: paymentIntent.amount / 100,
-        currency: paymentIntent.currency,
-        status: paymentIntent.status,
-      });
+
       const methods = await stripe.paymentMethods.list({
         customer: paymentIntent.customer,
         type: "card",
       });
       methodId = methods.data[0].id;
+      if (userDB) {
+        userDB.paymentData.paymentMethodId = methodId;
+        await userDB.save();
+      }
+      return {
+        intent: paymentIntent,
+        customer: paymentIntent.customer,
+        typeIntent: "payment",
+      };
     } else {
-      console.log("dataValidateCharge", dataValidateCharge);
-      const paymentIntent = await stripe.paymentIntents.create(
-        dataValidateCharge
-      );
-      // 🔐 Si ya vino con método de pago (caso off_session), lo guardamos
-      payments.push({
-        paymentIntent: paymentIntent,
-        id: paymentIntent.id,
-        amount: paymentIntent.amount / 100,
-        currency: paymentIntent.currency,
-        status: paymentIntent.status,
+      const setupIntent = await stripe.setupIntents.create({
+        customer: customerId,
       });
-
-      const methods = await stripe.paymentMethods.list({
-        customer: paymentIntent.customer,
-        type: "card",
-      });
-      methodId = methods.data[0].id;
-
-      dataToSent.payment_method = methodId;
-      console.log("dataToSent", dataToSent);
-      const paymentIntent2 = await stripe.paymentIntents.create(dataToSent);
-      payments.push({
-        paymentIntent: paymentIntent2,
-        id: paymentIntent2.id,
-        amount: paymentIntent2.amount / 100,
-        currency: paymentIntent2.currency,
-        status: paymentIntent2.status,
-      });
+      return { intent: setupIntent, customer: customerId, typeIntent: "setup" };
     }
-
-    if (userDB) {
-      userDB.paymentData.paymentMethodId = methodId;
-      await userDB.save();
-    }
-
-    return payments;
   } catch (error) {
     throw error;
   }
@@ -186,30 +157,59 @@ export const paymentIntentClient = async ({
   currency,
   amount,
   automatic = false,
+  data,
+  subservice,
 }) => {
   logger.verbose(">>> CREATE PAYMENT INTENT CLIENT STRIPE <<<");
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
+    let method = savedPaymentMethodId;
+    if (!method) {
+      const methods = await stripe.paymentMethods.list({
+        customer: customerId,
+        type: "card",
+      });
+      method = methods.data[0].id;
+    }
+    if (!method) throw createError(400, "No se encontró ningún método de pago");
+
+    let toSet = {
       amount: amount * 100,
       currency: currency,
       customer: customerId,
       confirm: true,
       off_session: true,
-      payment_method: savedPaymentMethodId,
+      payment_method: method,
       capture_method: automatic ? "automatic" : "manual",
       // application_fee_amount: 400,
       // transfer_data: {
       //   destination: connectAccountId,
       // },
-    });
+    };
+    if (data) {
+      toSet.metadata = {
+        clientName: data?.clientData?.name.trim(),
+        clientEmail: data?.clientData?.email.trim(),
+        clientPhone:
+          data?.clientData?.phoneCode + "-" + data?.clientData?.phone,
+
+        startTime: data?.startTime?.isoTime,
+        language: data.language,
+      };
+      if (subservice) {
+        toSet.metadata.subservice = subservice._id.toString();
+        toSet.metadata.service = subservice.service._id.toString();
+        toSet.description =
+          subservice.name.en + " - " + subservice.service.name.en;
+      }
+    }
+    const paymentIntent = await stripe.paymentIntents.create(toSet);
     return { msg: "Pago exitoso", id: paymentIntent.id };
   } catch (error) {
     if (error.code === "authentication_required") {
       throw createError(400, "El banco requiere autenticación");
       // Aquí puedes guardar el paymentIntent.id para intentar re-confirmarlo con el cliente presente más tarde
     } else {
-      console.log("error", error.message);
-      throw createError(400, "Error al procesar el pago");
+      throw error;
     }
   }
 };

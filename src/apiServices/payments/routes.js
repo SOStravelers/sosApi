@@ -76,7 +76,7 @@ router.get(
 );
 //Crear Payment Intent con el uso de un customer Id de stripe
 router.post(
-  "/stripe/client",
+  "/stripe/paymentIntent/client",
   validateParams(
     [
       {
@@ -86,7 +86,7 @@ router.post(
       },
       {
         param_key: "savedPaymentMethodId",
-        required: true,
+        required: false,
         type: "string",
       },
       {
