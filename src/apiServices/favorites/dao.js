@@ -142,6 +142,7 @@ export const isFavorite = async (id, user) => {
       user: user._id,
       subservice: id,
     });
+    if (!favorite) return null;
     if (favorite.isActive) {
       return { isFavorite: true };
     } else {

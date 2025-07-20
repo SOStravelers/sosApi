@@ -23,7 +23,6 @@ export const getServices = async (data) => {
   try {
     let body = {};
     Object.assign(body, data);
-    console.log("query", body);
     let options = {
       // select,
       page: body.page || 1,

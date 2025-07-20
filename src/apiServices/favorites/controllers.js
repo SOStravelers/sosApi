@@ -49,11 +49,7 @@ export const isFavorite = async (req, res, next) => {
     const id = req.params.id;
     const user = req.user;
     const response = await FAVORITE_DAO.isFavorite(id, user);
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }

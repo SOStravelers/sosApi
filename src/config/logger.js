@@ -1,6 +1,7 @@
 import winston, { createLogger, format, transports } from "winston";
-
-const { combine, timestamp, printf, colorize } = format;
+import envar from "../config/envar.js";
+const { combine, timestamp, printf, colorize, uncolorize, errors, json } =
+  format;
 
 winston.addColors({
   error: "red",
@@ -12,24 +13,40 @@ winston.addColors({
   silly: "gray",
 });
 
-const myFormat = printf(({ level, message, timestamp, stack }) => {
-  return stack
-    ? `${timestamp} ${level}: ${message}\n${stack}`
-    : `${timestamp} ${level}: ${message}`;
+const myFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
+  const base = `${timestamp} [${level}]: ${message}`;
+  const metaString = Object.keys(meta).length
+    ? `\n${JSON.stringify(meta, null, 2)}`
+    : "";
+  return stack ? `${base}\n${stack}${metaString}` : `${base}${metaString}`;
 });
+console.log("wena", process.env.COLOR_LOGS);
+const isLocal = process.env.COLOR_LOGS === "false";
 
 const logger = createLogger({
-  level: "silly", // Para ver todos los niveles
-  format: combine(colorize({ all: true }), timestamp(), myFormat),
-  defaultMeta: { service: "user-service" },
+  level: "silly",
+  format: combine(
+    errors({ stack: true }),
+    timestamp(),
+    isLocal ? colorize({ all: true }) : uncolorize(),
+    myFormat
+  ),
+  // defaultMeta: { service: "user-service" }, // ← quítalo
   transports: [
     new transports.File({ filename: "error.log", level: "error" }),
     new transports.File({ filename: "combined.log" }),
   ],
 });
 
-if (process.env.NODE_ENV !== "production") {
-  logger.add(new transports.Console());
-}
+// Agregar consola
+logger.add(
+  new transports.Console({
+    format: combine(
+      timestamp(),
+      isLocal ? colorize({ all: true }) : uncolorize(),
+      myFormat
+    ),
+  })
+);
 
 export default logger;

@@ -349,6 +349,8 @@ export const getAll = async (data) => {
 export const getById = async (id) => {
   logger.info("*** GET BY ID SUBSERVICE DAO ***");
   try {
+    logger.info("*** GET BY ID SUBSERVICE DAO ***");
+    console.log("wea", id);
     const subService = await Subservice.findOne({ _id: id })
       .populate({
         path: "service",
