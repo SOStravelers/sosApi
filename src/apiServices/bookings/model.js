@@ -7,6 +7,7 @@ const bookingSchema = new Schema(
   {
     workerUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     clientUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
     clientEmail: { type: String },
     clientPhone: { type: String },
     imgUrl: { type: String },
@@ -29,7 +30,11 @@ const bookingSchema = new Schema(
     serviceData: { type: Object },
     subserviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Subservice" },
     subserviceData: { type: Object },
-
+    price: {
+      netAmount: { type: Number },
+      taxes: { type: Number },
+      grossAmount: { type: Number },
+    },
     idKey: { type: String },
     startTime: {
       stringData: { type: String },
@@ -41,7 +46,7 @@ const bookingSchema = new Schema(
     },
     duration: { type: Number },
     title: { type: String, default: "new Event" },
-    paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },
+    payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
     canceledData: {
       canceledBy: { type: String, ref: "User" },
       canceledAtUTC: { type: Date },

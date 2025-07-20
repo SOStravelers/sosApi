@@ -32,6 +32,7 @@ const populate = [
     select: "personalData img, email",
   },
 ];
+const opciones = ["usd", "brl", "eur"];
 //Crear booking
 export const createBooking = async (data, user) => {
   global.logger.info("*** CREATE NEW BOOKING DAO ***");
@@ -71,9 +72,21 @@ export const createBooking = async (data, user) => {
       videoUrl: subservice.videoUrl,
       duration: subservice.duration,
       country: subservice.country,
-      currency: subservice.currency,
       typeService: subservice.typeService,
     };
+
+    if (!opciones.includes(data.currency))
+      throw createError(400, "Invalid currency");
+    const currency = await Currency.findOne({ code: data.currency });
+    newData.currency = currency._id;
+
+    const percentage = 10;
+    newData.price = {
+      netAmount: (data.amount * percentage) / 100,
+      taxes: percentage / 100,
+      grossAmount: data.amount,
+    };
+
     if (subservice.typeService == "tour") {
       console.log("caso 1");
       newData.tourData = data.selectedData;
