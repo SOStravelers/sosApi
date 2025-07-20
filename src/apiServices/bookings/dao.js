@@ -33,7 +33,7 @@ const populate = [
   },
 ];
 //Crear booking
-export const createBooking = async (data) => {
+export const createBooking = async (data, user) => {
   global.logger.info("*** CREATE NEW BOOKING DAO ***");
   try {
     const subservice = await Subservice.findById(data.subservice).populate(
@@ -42,7 +42,18 @@ export const createBooking = async (data) => {
     console.log;
     if (!subservice) throw createError(404, "Subservice not found");
     console.log("idUser", data.clientId);
-    const clientUser = await User.findById(data.clientId);
+
+    let clientUser = null;
+    if (user) {
+      clientUser = user;
+    } else {
+      const newUser = await User.findOne({
+        email: data.clientData.email,
+      });
+      if (newUser) {
+        clientUser = newUser;
+      }
+    }
 
     const newData = {
       clientUserId: clientUser?._id ? clientUser._id : null,
@@ -74,35 +85,25 @@ export const createBooking = async (data) => {
       console.log("caso 3");
       newData.eventData = data.eventData;
     }
-    console.log("la ID payment Intent", data.payment.paymentId);
 
-    const payment = await Payment.findOne({
-      transactionId: data.payment.paymentId,
-    });
-    if (!payment) {
-      throw createError(400, "Payment not found");
+    if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
+      //partidos de futbol
+      newData.status = "confirmed";
     }
-    newData.paymentId = payment._id;
 
-    const statusPayment = await STRIPE_SERVICE.askWasCapturedPayment(
-      data.payment.paymentId
-    );
-    if (statusPayment.status == "fallido")
-      throw createError(400, "Payment failed");
-    else if (statusPayment.status == "autorizado") {
-      newData.status = "requested";
-      payment.amount = statusPayment.amount / 100;
-      payment.amountPaid = statusPayment.amount_received / 100;
-    } else if (statusPayment.status == "capturado") {
-      newData.status = "completed";
-      payment.amount = statusPayment.amount / 100;
-      payment.amountPaid = statusPayment.amount_received / 100;
-      payment.status = "paid";
-    }
-    const currency = await Currency.findOne({ code: statusPayment.currency });
-    payment.currency = currency._id;
-    await payment.save();
     let booking = new Booking(newData);
+
+    console.log("la ID payment Intent", data.paymentIntent);
+
+    await Payment.findOneAndUpdate(
+      { transactionId: data.paymentIntent },
+      {
+        $set: {
+          bookingId: booking._id,
+        },
+      },
+      { new: true } // opcional: devuelve el documento actualizado
+    );
     // Buscar el último booking ordenado por idKey en orden descendente
     let lastBooking = await Booking.findOne().sort({ idKey: -1 });
     let newIdKey;
@@ -119,20 +120,6 @@ export const createBooking = async (data) => {
 
     const newBooking = await booking.save();
 
-    const updateDataUser = {
-      lastBooking: newBooking._id,
-    };
-    clientUser && clientUser.phone !== data.clientPhone
-      ? (updateDataUser.phone = clientUser.phone)
-      : null;
-    clientUser && clientUser.phone !== data.clientPhone
-      ? (updateDataUser.phoneCode = clientUser.phoneCode)
-      : null;
-
-    if (clientUser && clientUser.phone !== data.clientPhone) {
-      await User.findOneAndUpdate(id, updateDataUser, { new: true });
-    }
-
     const theBooking = await Booking.findOne({ _id: newBooking._id })
       .populate(populate)
       .exec();
@@ -142,11 +129,13 @@ export const createBooking = async (data) => {
     const emailData = clientUser?.email || data.clientData.email;
     // sendEmailPaymentConfirmation(emailData);
 
-    STRIPE_SERVICE.addIdBookingtoPI(
-      payment?.transactionId,
-      theBooking?._id.toString(),
-      theBooking?.idKey
-    );
+    if (data.intentType == "payment") {
+      STRIPE_SERVICE.addIdBookingtoPI(
+        data?.paymentIntent,
+        theBooking?._id.toString(),
+        theBooking?.idKey
+      );
+    }
     if (clientUser) {
       NOTIFICATION_DAO.newBookingNotification(theBooking, clientUser._id);
     }

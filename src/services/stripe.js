@@ -30,6 +30,69 @@ const populate = [
   },
 ];
 
+export const createStripeCustomer = async (data, shouldUpdate = true) => {
+  logger.verbose(">>> CREATE OR GET STRIPE CUSTOMER <<<");
+  if (!data.email) throw createError(400, "Email is required");
+  try {
+    const { customer, email, name, phone, description, userId, language } =
+      data;
+
+    const dataToSave = {};
+
+    // Solo agregar si existen
+    if (name) dataToSave.name = name;
+    if (email) dataToSave.email = email;
+    if (phone) dataToSave.phone = phone;
+    if (description) dataToSave.description = description;
+
+    // Metadata segura y filtrada
+    const metadata = {};
+    if (userId) metadata.userId = userId;
+    if (language) metadata.language = language;
+
+    if (Object.keys(metadata).length > 0) {
+      dataToSave.metadata = metadata;
+    }
+
+    let customerId = customer;
+
+    // 1. Si recibimos un customerId, validamos que exista
+    if (customerId) {
+      try {
+        const existingCustomer = await stripe.customers.retrieve(customerId);
+        if (shouldUpdate) {
+          const updated = await stripe.customers.update(customerId, dataToSave);
+          return updated.id;
+        }
+        return existingCustomer.id;
+      } catch (err) {
+        if (err.statusCode !== 404) throw err;
+        customerId = null;
+      }
+    }
+
+    // 2. Buscar por email
+    const existing = await stripe.customers.list({ email, limit: 1 });
+    if (existing.data.length > 0) {
+      if (shouldUpdate) {
+        const updated = await stripe.customers.update(
+          existing.data[0].id,
+          dataToSave
+        );
+        return updated.id;
+      }
+      return existing.data[0].id;
+    }
+
+    // 3. Crear nuevo si no existe
+    const created = await stripe.customers.create(dataToSave);
+    return created.id;
+  } catch (error) {
+    logger.error("Error creando o recuperando cliente:", error.message);
+    throw error;
+  }
+};
+
 //CREATE CUSTOMER ID
 export const createCustomerId = async (id) => {
   logger.verbose(">>>CREATE CUSTOMER ID STRIPE <<<");
@@ -75,33 +138,7 @@ export const createPaymentIntent = async (
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
-    let userDB = null;
-    let customerId = null;
-    if (user) {
-      userDB = await User.findById(user._id);
-
-      // Crear customer si no existe
-      if (!userDB.paymentData?.stripeCustomerId) {
-        const customer = await stripe.customers.create({
-          email: user.email,
-          name: user.name,
-        });
-
-        userDB.paymentData.stripeCustomerId = customer.id;
-        customerId = customer.id;
-        await userDB.save();
-      }
-      customerId = userDB.paymentData.stripeCustomerId;
-    } else {
-      const customer = await stripe.customers.create({
-        email: data?.clientData?.name.trim(),
-        name: data?.clientData?.email.trim(),
-      });
-      customerId = customer.id;
-    }
-
-    const language = data.language || "en";
-
+    //Organiza la data
     const dataToSent = {
       amount: data.amount * 100,
       currency: data.currency,
@@ -117,35 +154,53 @@ export const createPaymentIntent = async (
         subservice: subservice._id.toString(),
         service: subservice.service._id.toString(),
         startTime: data?.startTime?.isoTime,
-        language: language,
       },
     };
-    customerId ? (dataToSent.customer = customerId) : "";
-
-    if (!chargeValidate) {
-      let methodId = null;
-      const paymentIntent = await stripe.paymentIntents.create(dataToSent);
-
-      const methods = await stripe.paymentMethods.list({
-        customer: paymentIntent.customer,
-        type: "card",
+    //Se obtiene o crear customer en stripe
+    const customerData = {
+      email: user?.email || dataToSent.metadata.clientEmail,
+      name: user?.name || dataToSent.metadata.clientName,
+      phone: dataToSent.metadata.clientPhone,
+    };
+    if (user && user.paymentData?.stripe?.customer) {
+      customerData.customer = user.paymentData.stripeCustomerId;
+    }
+    const savedCustomerId = await createStripeCustomer(customerData, true);
+    console.log("id encontrada", savedCustomerId);
+    const customer = savedCustomerId;
+    dataToSent.customer = customer;
+    dataToSent.language = data.language || "en";
+    //Se analiza si hacer cargo a la tarjeta o solo validar
+    let response = null;
+    if (chargeValidate) {
+      const setupIntent = await stripe.setupIntents.create({
+        customer: customer,
       });
-      methodId = methods.data[0].id;
-      if (userDB) {
-        userDB.paymentData.paymentMethodId = methodId;
-        await userDB.save();
-      }
-      return {
-        intent: paymentIntent,
-        customer: paymentIntent.customer,
-        typeIntent: "payment",
+      response = {
+        intent: setupIntent,
+        customer: customer,
+        typeIntent: "setup",
       };
     } else {
-      const setupIntent = await stripe.setupIntents.create({
-        customer: customerId,
-      });
-      return { intent: setupIntent, customer: customerId, typeIntent: "setup" };
+      const paymentIntent = await stripe.paymentIntents.create(dataToSent);
+      response = {
+        intent: paymentIntent,
+        customer: customer,
+        typeIntent: "payment",
+      };
     }
+    //Se guarda la info de tarjetas en el usuario
+    const methods = await stripe.paymentMethods.list({
+      customer: customer,
+      type: "card",
+    });
+    if (methods && methods.data && user) {
+      user.paymentData.stripe.methodIdDefault = methods?.data[0]?.id || null;
+      user.paymentData.stripe.methods = methods.data;
+      await user.save();
+    }
+    //Se manda respuesta
+    return response;
   } catch (error) {
     throw error;
   }

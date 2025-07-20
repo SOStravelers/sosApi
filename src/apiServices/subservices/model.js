@@ -207,6 +207,9 @@ const subserviceSchema = new Schema(
     country: { type: mongoose.Schema.Types.ObjectId, ref: "Country" },
     canCancel: { type: Boolean },
     timeUntilCancel: { type: Number },
+    haveLimitTime: { type: Boolean, default: false },
+    timeLimitBook: { type: Number },
+    withTicket: { type: Boolean, default: false },
     typeService: {
       type: String,
       enum: ["tour", "event", "product"],

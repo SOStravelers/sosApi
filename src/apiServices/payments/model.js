@@ -10,11 +10,12 @@ const paymentSchema = new Schema(
     status: {
       type: String,
       default: "pending",
-      enum: ["pending", "paid", "failed", "canceled", "refunded"],
+      enum: ["unpaid", "paid", "canceled", "refunded"],
     },
+    clientEmail: { type: String },
     paymentMethod: {
       type: String,
-      enum: ["credit_card", "paypal", "stripe"],
+      enum: ["card", "paypal", "stripe"],
       required: true,
     },
     transactionId: {

@@ -5,6 +5,8 @@ import Currency from "../currencies/model.js";
 import Payment from "../payments/model.js";
 import { createError } from "../../config/error.js";
 import Subservice from "../subservices/model.js";
+import NoUser from "../nousers/model.js";
+import User from "../users/model.js";
 
 //-----------------
 //------STRIPE-----
@@ -110,17 +112,42 @@ export function isBeforeHoursThreshold(
   return now < thresholdDate;
 }
 
-//Crear payment Intent tradicional
-export const paymentIntentStripe = async (data, user) => {
-  logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
+const validateCreateBooking = async (subservice, data) => {
+  logger.info("*** VALIDATE CREATE BOOKING STRIPE PAYMENT DAO ***");
   try {
-    //---------------Validaciones------------------------
+    //Valida que no sea un fecha del pasado
     const isoTime = data.isoTime;
     const isPast = new Date(isoTime) < new Date();
     if (isPast) throw createError(400, "Invalid isoTime");
+    //Existe limite maximo para hacer el booking
+    if (subservice.haveLimitTime) {
+      const canBook = isBeforeHoursThreshold(
+        data.isoTime,
+        subservice.timeUntilCancel
+      );
+      if (!canBook) throw createError(400, "Invalid isoTime");
+    }
+  } catch (err) {
+    err;
+  }
+};
 
+//Crear payment Intent tradicional
+export const paymentIntentStripe = async (data, user) => {
+  logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
+
+  try {
     if (!opciones.includes(data.currency))
       throw createError(400, "Invalid currency");
+
+    if (!user) {
+      const savedUser = await User.findOne({ email: data.clientData.email });
+      if (savedUser) {
+        user = savedUser;
+      }
+    }
+    console.log("hay user", user ? user._id : "no hay user");
+
     //---------------A buscar data-----------------------
     const subservice = await Subservice.findById(data.subservice)
       .populate({
@@ -131,8 +158,11 @@ export const paymentIntentStripe = async (data, user) => {
       .populate("categories.products.product", "name")
       .lean();
     if (!subservice) throw createError(404, "Subservice not found");
+    //---------------Validaciones------------------------
+    validateCreateBooking(subservice, data);
     //---------------------------------------------------
-    //--------Analizar si data no fue adulterada---------
+    //---Analizar si data del precio no fue adulterada---
+    //---------------------------------------------------
     console.log("el precio", data.amount);
     console.log("el tipo de servicio", subservice.typeService);
     if (subservice.typeService == "tour") {
@@ -157,8 +187,10 @@ export const paymentIntentStripe = async (data, user) => {
     } else {
       throw createError(400, "Invalid type service");
     }
+    //---------------------------------------------------
+    //--Analiza si hay que solo hacer validacion de tarjeta o cobro---------
+    //---------------------------------------------------
     let chargeValidate = false;
-
     if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
       chargeValidate = true;
     } else if (subservice.withTicket) {
@@ -170,36 +202,70 @@ export const paymentIntentStripe = async (data, user) => {
       );
       hasCancel ? (chargeValidate = true) : (chargeValidate = false);
     }
-
-    //----------------Envio a Stripe--------------------
+    //---------------------------------------------------
+    //----------------ENVIO A STRIPE---------------------
+    //---------------------------------------------------
     const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(
       data,
       user,
       subservice,
       chargeValidate
     );
-    console.log("los payments", paymentIntent);
-    // const dataPayment = {
-    //   paymentMethod: "stripe",
-    //   status: "pending",
-    //   amount: paymentIntents[0].amount,
-    //   amountPaid: paymentIntent.amount,
-    //   pricePaid: 0,
-    //   transactionId: paymentIntent.id,
-    // };
-    // const currency = await Currency.findOne({ code: data.currency });
-    // dataPayment.currency = currency._id;
-
-    // const newPayment = new Payment(dataPayment);
-    // await newPayment.save();
     //---------------------------------------------------
-
+    //-----SI HUBO PAGO SE GUARDA EL PAGO EN LA BD--------
+    //---------------------------------------------------
+    if (paymentIntent.typeIntent == "payment") {
+      const status = amountPaid == amount ? "paid" : "unpaid";
+      const dataPayment = {
+        paymentMethod: "stripe",
+        status: status,
+        clientEmail: data.clientData.email,
+        amount: paymentIntent.amount,
+        amountPaid: paymentIntent.amount,
+        transactionId: paymentIntent.id,
+        paymentId: paymentIntent.id,
+      };
+      const currency = await Currency.findOne({ code: data.currency });
+      dataPayment.currency = currency._id;
+      const newPayment = new Payment(dataPayment);
+      await newPayment.save();
+      //---------------------------------------------------
+    }
+    //---------------------------------------------------
+    //-----SI NO HUBO USUARIO PREVIO SE CREA NO USER -----
+    //---------------------------------------------------
+    if (!user) {
+      const existNoUser = await NoUser.findOne({
+        email: data.clientData.email,
+      });
+      if (!existNoUser) {
+        const fullName = data.clientData.name;
+        const [firstName, ...rest] = fullName.trim().split(" ");
+        const lastName = rest.join(" ");
+        const noUserData = {
+          email: data.clientData.email,
+          phone: data.clientData.phone,
+          name: {
+            first: firstName,
+            last: lastName,
+          },
+          payment: {
+            stripe: {
+              customer: paymentIntent.customer,
+            },
+          },
+        };
+        await NoUser.create(noUserData);
+      }
+    }
+    //---------------------------------------------------
+    logger.warn("*** FIN CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
     return {
       clientSecret: paymentIntent.intent.client_secret,
+      paymentIntent: paymentIntent.intent.id,
       intentType: paymentIntent.typeIntent,
       customer: paymentIntent.customer,
     };
-    // return { clientSecret: paymentIntents[0] };
   } catch (err) {
     throw err;
   }

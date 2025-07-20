@@ -11,7 +11,7 @@ import { refreshTokenGen, accessTokenGen } from "../../middleware/auth.js";
 import { procesarNombre } from "../../utils/data.js";
 import { createCustomerId } from "../../services/stripe.js";
 import { resendEmail } from "../../services/resend.js";
-
+import { createStripeCustomer } from "../../services/stripe.js";
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
@@ -51,6 +51,16 @@ export const registerEmail = async (data) => {
     }
     user.email = theEmail;
     user.username = Math.random().toString(36).substring(2, 12);
+
+    const dataStripe = {
+      email: theEmail,
+      userId: user._id,
+      name: user.personalData.name + " " + user.personalData.name.last,
+    };
+    user.language ? (dataStripe.language = user.language) : "";
+    const customerId = await createStripeCustomer(dataStripe, true);
+    user.stripe.customerId = customerId;
+
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
       "about email type img language personalData type username workerData _id security.hasPassword"
@@ -98,9 +108,23 @@ export const loginEmail = async (data) => {
     }
     user.lastLogin = Date.now();
     user.lastLoginType = "email";
+
+    const dataStripe = {
+      email: email,
+      userId: user._id,
+      name: user.personalData.name + " " + user.personalData.name.last,
+    };
+    user.phone ? (dataStripe.phone = user.phone) : "";
+    user.language ? dataStripe.language : "";
+    const customerId = await createStripeCustomer(dataStripe, true);
+
     const updatedUser = await User.findOneAndUpdate(
       { email },
-      { lastLogin: Date.now(), lastLoginType: "email" },
+      {
+        lastLogin: Date.now(),
+        lastLoginType: "email",
+        "paymentData.stripe.customer": customerId, // 👈 anidado
+      },
       { new: true }
     ).select(
       "about email img type language  personalData username workerData _id security.hasPassword"
@@ -149,6 +173,18 @@ export const loginGoogle = async (data) => {
     user.lastLoginType = "google";
     user.isActive = true;
     user.isValidate = true;
+
+    //stripe customer
+    const dataStripe = {
+      email: user.email,
+      userId: user._id,
+      name: user.personalData.name + " " + user.personalData.name.last,
+    };
+    user.phone ? (dataStripe.phone = user.phone) : "";
+    user.language ? dataStripe.language : "";
+    const customerId = await createStripeCustomer(dataStripe, true);
+    user.paymentData.stripe.customer = customerId;
+
     if (newValue) {
       await user.save();
       const newUser = await User.findOne({ email: user.email }).select(
