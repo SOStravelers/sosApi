@@ -12,12 +12,19 @@ router.post(
     [
       {
         param_key: "amount",
-        required: false,
+        required: true,
         type: "number",
       },
+
+      {
+        param_key: "subservice",
+        required: true,
+        type: "string",
+      },
+
       {
         param_key: "currency",
-        required: false,
+        required: true,
         type: "string",
       },
     ],
@@ -33,12 +40,18 @@ router.post(
     [
       {
         param_key: "amount",
-        required: false,
+        required: true,
         type: "number",
+      },
+
+      {
+        param_key: "subservice",
+        required: true,
+        type: "string",
       },
       {
         param_key: "currency",
-        required: false,
+        required: true,
         type: "string",
       },
     ],
@@ -112,6 +125,11 @@ router.post(
         type: "string",
       },
       {
+        param_key: "amountService",
+        required: true,
+        type: "number",
+      },
+      {
         param_key: "amount",
         required: true,
         type: "number",
@@ -138,7 +156,7 @@ router.post(
   ),
   PAYMENT_CONTROLLERS.createCheckoutLink
 );
-
+//--------
 router.get(
   "/stripe/capture/:id",
   validateParams(

@@ -20,7 +20,7 @@ const validatePriceTour = async (price, tourData, selectedData, currency) => {
     console.log("totals", totalAdult, totalChildren);
     const totalSelected = totalAdult + totalChildren;
 
-    return price / 100 == totalSelected;
+    return price == totalSelected;
   } catch (err) {
     throw err;
   }
@@ -61,7 +61,7 @@ const validatePriceProduct = async (
       }
     }
 
-    const totalStripe = price / 100;
+    const totalStripe = price;
 
     console.log(
       "🧮 TOTAL en base de datos:",
@@ -82,15 +82,41 @@ const opciones = ["usd", "brl", "eur"];
 //-----FUNCIONES
 //---------------
 
+export function isBeforeHoursThreshold(
+  dateString,
+  hoursBefore,
+  language = "pt"
+) {
+  const targetDate = new Date(dateString);
+
+  if (isNaN(targetDate.getTime())) {
+    console.error("❌ Fecha inválida:", dateString);
+    return {
+      isBefore: false,
+      cancelTime: {
+        isoTime: null,
+        stringData: "",
+      },
+    };
+  }
+
+  // Calcular la fecha límite
+  const thresholdDate = new Date(
+    targetDate.getTime() - hoursBefore * 60 * 60 * 1000
+  );
+
+  const now = new Date(); // ya es en UTC
+
+  return now < thresholdDate;
+}
+
 //Crear payment Intent tradicional
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
   try {
     //---------------Validaciones------------------------
-    if (!data.subservice) throw createError(400, "Missing id subservice");
     const isoTime = data.isoTime;
     const isPast = new Date(isoTime) < new Date();
-
     if (isPast) throw createError(400, "Invalid isoTime");
 
     if (!opciones.includes(data.currency))
@@ -107,9 +133,11 @@ export const paymentIntentStripe = async (data, user) => {
     if (!subservice) throw createError(404, "Subservice not found");
     //---------------------------------------------------
     //--------Analizar si data no fue adulterada---------
+    console.log("el precio", data.amount);
+    console.log("el tipo de servicio", subservice.typeService);
     if (subservice.typeService == "tour") {
       const validate = await validatePriceTour(
-        data.amount,
+        data.amountService,
         subservice.tourData,
         data.selectedData,
         data.currency
@@ -129,28 +157,44 @@ export const paymentIntentStripe = async (data, user) => {
     } else {
       throw createError(400, "Invalid type service");
     }
+    let chargeValidate = false;
+
+    if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
+      chargeValidate = true;
+    } else if (subservice.withTicket) {
+      throw createError(400, "Invalid type service");
+    } else {
+      const hasCancel = isBeforeHoursThreshold(
+        service.startTime.isoTime,
+        service.timeUntilCancel
+      );
+      hasCancel ? (chargeValidate = true) : (chargeValidate = false);
+    }
+
     //----------------Envio a Stripe--------------------
-    const paymentIntent = await STRIPE_SERVICE.createPaymentIntent(
+    const paymentIntents = await STRIPE_SERVICE.createPaymentIntent(
       data,
       user,
-      subservice
+      subservice,
+      chargeValidate
     );
+    console.log("los payments", paymentIntents);
+    // const dataPayment = {
+    //   paymentMethod: "stripe",
+    //   status: "pending",
+    //   amount: paymentIntents[0].amount,
+    //   amountPaid: paymentIntent.amount,
+    //   pricePaid: 0,
+    //   transactionId: paymentIntent.id,
+    // };
+    // const currency = await Currency.findOne({ code: data.currency });
+    // dataPayment.currency = currency._id;
 
-    const dataPayment = {
-      paymentMethod: "stripe",
-      status: "pending",
-      amount: paymentIntent.amount / 100,
-      amountPaid: paymentIntent.amount / 100,
-      pricePaid: 0,
-      transactionId: paymentIntent.id,
-    };
-    const currency = await Currency.findOne({ code: data.currency });
-    dataPayment.currency = currency._id;
-
-    const newPayment = new Payment(dataPayment);
-    await newPayment.save();
+    // const newPayment = new Payment(dataPayment);
+    // await newPayment.save();
     //---------------------------------------------------
-    return { clientSecret: paymentIntent.client_secret };
+    return { clientSecret: paymentIntents[0].paymentIntent.client_secret };
+    // return { clientSecret: paymentIntents[0] };
   } catch (err) {
     throw err;
   }

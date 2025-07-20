@@ -64,7 +64,12 @@ export const createCustomerId = async (id) => {
   }
 };
 //CREATE PAYMENT INTENT
-export const createPaymentIntent = async (data, user, subservice) => {
+export const createPaymentIntent = async (
+  data,
+  user,
+  subservice,
+  chargeValidate
+) => {
   logger.verbose(">>> CREATE PAYMENT INTENT STRIPE <<<");
   try {
     if (!envar().STRIPE_SECRET_KEY) {
@@ -88,7 +93,7 @@ export const createPaymentIntent = async (data, user, subservice) => {
     const language = data.language || "en";
 
     const dataToSent = {
-      amount: data.amount,
+      amount: data.amount * 100,
       currency: data.currency,
       capture_method: "manual",
       description: subservice.name.en + " - " + subservice.service.name.en,
@@ -105,19 +110,71 @@ export const createPaymentIntent = async (data, user, subservice) => {
         language: language,
       },
     };
-
     userDB ? (dataToSent.customer = userDB.paymentData.stripeCustomerId) : null;
 
-    const paymentIntent = await stripe.paymentIntents.create(dataToSent);
+    const dataValidateCharge = {
+      ...dataToSent,
+      amount: 50,
+      capture_method: "automatic",
+      currency: "brl",
+      description: "Validate Card",
+      setup_future_usage: "off_session",
+    };
 
-    // 🔐 Si ya vino con método de pago (caso off_session), lo guardamos
-    if (paymentIntent.payment_method && userDB) {
-      userDB.paymentData.paymentMethodId = paymentIntent.payment_method;
-      console.log("payment Method", paymentIntent.payment_method);
+    let payments = [];
+    let methodId = null;
+    if (!chargeValidate) {
+      const paymentIntent = await stripe.paymentIntents.create(dataToSent);
+      payments.push({
+        paymentIntent: paymentIntent,
+        id: paymentIntent.id,
+        amount: paymentIntent.amount / 100,
+        currency: paymentIntent.currency,
+        status: paymentIntent.status,
+      });
+      const methods = await stripe.paymentMethods.list({
+        customer: paymentIntent.customer,
+        type: "card",
+      });
+      methodId = methods.data[0].id;
+    } else {
+      console.log("dataValidateCharge", dataValidateCharge);
+      const paymentIntent = await stripe.paymentIntents.create(
+        dataValidateCharge
+      );
+      // 🔐 Si ya vino con método de pago (caso off_session), lo guardamos
+      payments.push({
+        paymentIntent: paymentIntent,
+        id: paymentIntent.id,
+        amount: paymentIntent.amount / 100,
+        currency: paymentIntent.currency,
+        status: paymentIntent.status,
+      });
+
+      const methods = await stripe.paymentMethods.list({
+        customer: paymentIntent.customer,
+        type: "card",
+      });
+      methodId = methods.data[0].id;
+
+      dataToSent.payment_method = methodId;
+      console.log("dataToSent", dataToSent);
+      const paymentIntent2 = await stripe.paymentIntents.create(dataToSent);
+      payments.push({
+        paymentIntent: paymentIntent2,
+        id: paymentIntent2.id,
+        amount: paymentIntent2.amount / 100,
+        currency: paymentIntent2.currency,
+        status: paymentIntent2.status,
+      });
+    }
+
+    if (userDB) {
+      userDB.paymentData.paymentMethodId = methodId;
       await userDB.save();
     }
 
-    return paymentIntent;
+    return payments;
   } catch (error) {
     throw error;
   }
@@ -213,7 +270,6 @@ export const createCheckoutLinkStripe = async ({
     throw error;
   }
 };
-
 //Buscar metodos de pagos de un cliente
 export const MethodsPaymentClient = async (customerId) => {
   try {
