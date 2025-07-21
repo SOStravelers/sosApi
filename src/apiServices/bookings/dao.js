@@ -7,6 +7,7 @@ import Payment from "../payments/model.js";
 import { createError } from "../../config/error.js";
 import * as STRIPE_SERVICE from "../../services/stripe.js";
 import * as NOTIFICATION_DAO from "../notifications/dao.js";
+import * as SENDEMAIL_SERVICE from "../../services/emails/personal.js";
 
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 
@@ -153,13 +154,16 @@ export const createBooking = async (data, user) => {
     if (clientUser) {
       NOTIFICATION_DAO.newBookingNotification(theBooking, clientUser._id);
     }
-    // resendCompletedPersonal({
-    //   email: theBooking.clientUser.email,
-    //   name: theBooking.clientUser.personalData.name.first,
-    //   service: theBooking.service.name,
-    //   subservice: theBooking.subservice.name,
-    //   language: language,
-    // });
+
+    if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
+      SENDEMAIL_SERVICE.resendConfirmPersonal({
+        imgUrl: subservice.imgUrl,
+        email: data.clientData.email,
+        nameClient: data.clientData.name,
+        subserviceName: subservice.name.en,
+        serviceName: subservice.service.name.en,
+      });
+    }
 
     // confirmBookingNotification(theBooking, multiple, language);
 

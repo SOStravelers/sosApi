@@ -4,58 +4,20 @@ import Handlebars from "handlebars";
 import { templateHtml } from "../../utils/externalFiles.js";
 
 export const resendConfirmPersonal = async (info) => {
+  console.log("--> data email", info);
   try {
-    const {
-      email,
-      emailWorker,
-      name,
-      subservice,
-      service,
-      language,
-      workerPhone,
-      clientPhone,
-      workerName,
-      clientName,
-      date,
-      startTime,
-      priceUnitService,
-      clientsNumber,
-      price,
-      priceBRL,
-      finalPrice,
-      isWorker,
-    } = info;
-    console.log("*** resend confirmed ***", isWorker ? emailWorker : email);
-    console.log("subservice", subservice);
-    const htmlString = isWorker
-      ? templateHtml("confirmBookingWorkerMultiple")
-      : templateHtml("confirmBooking");
+    const { email } = info;
+    const htmlString = templateHtml("newConfirm");
     const template = Handlebars.compile(htmlString);
-    console.log("a enviar", clientPhone);
-    const htmlToSend = template({
-      name: name,
-      service: service,
-      workerPhone: workerPhone,
-      clientPhone: clientPhone,
-      workerName: workerName,
-      subservice: subservice,
-      language: language,
-      clientName: clientName,
-      date: date,
-      startTime: startTime,
-      priceUnitService: priceUnitService,
-      clientsNumber: clientsNumber,
-      price: price,
-      priceBRL: priceBRL,
-      finalPrice: finalPrice,
-    });
-    const toSend = isWorker ? emailWorker : email;
+    const htmlToSend = template(info);
+    const toSend = "jschacosta@gmail.com";
     const data = await resend.emails.send({
       from: "SOS Travelers <booking@sostvl.com>",
-      to: [toSend, "sostravellers@gmail.com"], // va dirigido al usuario
+      to: [email, "sostravellers@gmail.com"], // va dirigido al usuario
       subject: "SOS Travelers - Confirm booking",
       html: htmlToSend,
     });
+    return true;
   } catch (error) {
     console.error(error);
   }
