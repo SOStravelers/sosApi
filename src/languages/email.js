@@ -1,0 +1,100 @@
+const languageData = {
+  global: {
+    orderNumber: {
+      es: "Número de pedido",
+      en: "Order number",
+      pt: "Número do pedido",
+      fr: "Numéro de commande",
+      de: "Bestellnummer",
+    },
+    footer: {
+      rights: {
+        es: "Todos los derechos reservados",
+        en: "All rights reserved",
+        pt: "Todos os direitos reservados",
+        fr: "Tous droits réservés",
+        de: "Alle Rechte vorbehalten",
+      },
+      automatic: {
+        es: "Este es un email automático",
+        en: "This is an automatic email",
+        pt: "Este é um email automático",
+        fr: "Ceci est un email automatique",
+        de: "Dies ist ein automatisches Email",
+      },
+      privacy: {
+        es: "Politica de privacidad",
+        en: "Privacy policy",
+        pt: "Política de Privacidade",
+        fr: "Politique de confidentialité",
+        de: "Datenschutzrichtlinie",
+      },
+    },
+  },
+  newConfirm: {
+    title: {
+      es: "tu reserva ha sido confirmada!",
+      en: "your booking has been confirmed!",
+      pt: "seu reserva foi confirmada!",
+      fr: "votre réservation a été confirmée!",
+      de: "Ihre Reservierung wurde bestätigt!",
+    },
+    subtitle: {
+      es: "Ingresa a la página con tu cuenta para ver más detalles, o haz click en el botón a continuación",
+      en: "Log in to the page with your account to see more details, or click the button below",
+      pt: "Acesse a página com sua conta para ver mais detalhes ou clique no botão abaixo",
+      fr: "Connectez-vous à la page avec votre compte pour voir plus de détails ou cliquez sur le bouton ci-dessous",
+      de: "Melden Sie sich mit Ihrem Konto an, um mehr Details zu sehen, oder klicken Sie auf den Button unten",
+    },
+    mainButton: {
+      es: "Ver mi reserva",
+      en: "View my booking",
+      pt: "Ver minha reserva",
+      fr: "Voir ma réservation",
+      de: "Meine Buchung ansehen",
+    },
+    calendarButton: {
+      es: "Añadir al calendario",
+      en: "Add to calendar",
+      pt: "Adicionar ao calendário",
+      fr: "Ajouter au calendrier",
+      de: "Zum Kalender hinzufügen",
+    },
+    mapButton: {
+      es: "Ver mapa",
+      en: "View map",
+      pt: "Ver mapa",
+      fr: "Voir la carte",
+      de: "Karte ansehen",
+    },
+    dateLabel: {
+      es: "Fecha",
+      en: "Date",
+      pt: "Data",
+      fr: "Date",
+      de: "Datum",
+    },
+    locationLabel: {
+      es: "Lugar",
+      en: "Location",
+      pt: "Local",
+      fr: "Lieu",
+      de: "Ort",
+    },
+    startLabel: {
+      es: "Comienza:",
+      en: "Starts:",
+      pt: "Começa:",
+      fr: "Commence :",
+      de: "Beginnt:",
+    },
+    endLabel: {
+      es: "Termina:",
+      en: "Ends:",
+      pt: "Termina:",
+      fr: "Se termine :",
+      de: "Endet:",
+    },
+  },
+};
+export default languageData;

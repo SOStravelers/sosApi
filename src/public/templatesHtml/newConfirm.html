@@ -28,6 +28,7 @@
         .divImg {
             background-color: #102c36;
             max-width: 500px;
+            height: 80px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -192,13 +193,10 @@
         <h1>SOS Travelers</h1>
     </div>
     <div class="container">
-        <p class="pedido">Número do pedido: 2S30S98V4DH</p>
-        <h2> {{nameClient}}, seus ingressos estão disponíveis!</h2>
-        <p>
-            Baixe ou abra o app <b>Sympla</b>, faça login com este email e
-            <b>acesse seu QR code na aba "Ingressos"</b>
-        </p>
-        <button class="btn">Acessar meu ingresso</button>
+        <p class="pedido">{{orderNumber}}: 2S30S98V4DH</p>
+        <h2> {{nameClient}}, {{title}}</h2>
+        <p>{{subtitle}}</p>
+        <button class="btn">{{mainButton}}</button>
 
         <div class="card">
 
@@ -210,31 +208,31 @@
                 <div class="section">
                     <div class="section-title">
                         <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/email/calendar.png" alt="Data">
-                        <span>Data</span>
+                        <span>{{dataLabel}}</span>
                     </div>
-                    <p>Começa: Julho 17, 2025, 22h</p>
-                    <p>Termina: Julho 18, 2025, 05h</p>
+                    <p>{{startLabel}} Julho 17, 2025, 22h</p>
+                    <p>{{endLabel}} Julho 18, 2025, 05h</p>
                 </div>
                 <div class="section">
                     <div class="section-title">
                         <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/email/pin.png" alt="Local">
-                        <span>Local</span>
+                        <span>{{locationLabel}}</span>
                     </div>
                     <p>Tau, Rio de Janeiro, RJ</p>
                 </div>
                 <div class="links">
-                    <a href="#">Adicionar ao calendário</a>
-                    <a href="#">Ver mapa</a>
+                    <a href="#">{{calendarButton}}</a>
+                    <a href="#">{{mapButton}}</a>
                 </div>
             </div>
         </div>
 
         <div class="footer">
             <p>
-                © 2025 <b>Sympla</b> -Todos os direitos reservados.<br />
-                Este é um e-mail automático.
+                © 2025 <b>Sos Travellers</b> - {{footer.rights}}<br />
+                {{footer.automatic}}.
             </p>
-            <a href="#">Política de Privacidade</a>
+            <a href="#">{{footer.Privacy}}</a>
         </div>
     </div>
 </body>

@@ -2,19 +2,32 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 import Handlebars from "handlebars";
 import { templateHtml } from "../../utils/externalFiles.js";
+import { getLocalizedTexts } from "../../utils/language.js";
 
-export const resendConfirmPersonal = async (info) => {
+const subjects = {
+  newConfirm: {
+    es: "Tu reserva ha sido confirmada!",
+    en: "Your booking has been confirmed",
+  },
+};
+
+export const resendConfirmPersonal = async (info, language = "en") => {
   console.log("--> data email", info);
   try {
-    const { email } = info;
+    const { email, subserviceName, serviceName } = info;
     const htmlString = templateHtml("newConfirm");
     const template = Handlebars.compile(htmlString);
-    const htmlToSend = template(info);
-    const toSend = "jschacosta@gmail.com";
-    const data = await resend.emails.send({
+    const textsCustomLanguage = getLocalizedTexts("newConfirm", language);
+    const allData = {
+      ...info,
+      ...textsCustomLanguage,
+    };
+    console.log("la data", allData);
+    const htmlToSend = template(allData);
+    await resend.emails.send({
       from: "SOS Travelers <booking@sostvl.com>",
-      to: [email, "sostravellers@gmail.com"], // va dirigido al usuario
-      subject: "SOS Travelers - Confirm booking",
+      to: [email, "jschacosta@gmail.com"], // va dirigido al usuario
+      subject: subjects.newConfirm[language] + "- " + subserviceName,
       html: htmlToSend,
     });
     return true;
