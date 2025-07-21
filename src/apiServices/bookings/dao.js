@@ -34,7 +34,8 @@ const populate = [
     select: "personalData img, email",
   },
 ];
-const opciones = ["usd", "brl", "eur"];
+const optionsCurrency = ["usd", "brl", "eur"];
+const optionsLanguage = ["es", "en", "pt", "fr", "de"];
 //Crear booking
 export const createBooking = async (data, user) => {
   logger.info("*** CREATE NEW BOOKING DAO ***");
@@ -77,7 +78,7 @@ export const createBooking = async (data, user) => {
       typeService: subservice.typeService,
     };
 
-    if (!opciones.includes(data.currency))
+    if (!optionsCurrency.includes(data.currency))
       throw createError(400, "Invalid currency");
     const currency = await Currency.findOne({ code: data.currency });
     newData.currency = currency._id;
@@ -153,16 +154,22 @@ export const createBooking = async (data, user) => {
     }
     if (clientUser) {
       NOTIFICATION_DAO.newBookingNotification(theBooking, clientUser._id);
+
+      if (!optionsLanguage.includes(data.language))
+        throw createError(400, "Invalid language");
     }
 
     if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
-      SENDEMAIL_SERVICE.resendConfirmPersonal({
-        imgUrl: subservice.imgUrl,
-        email: data.clientData.email,
-        nameClient: data.clientData.name,
-        subserviceName: subservice.name.en,
-        serviceName: subservice.service.name.en,
-      });
+      SENDEMAIL_SERVICE.resendConfirmPersonal(
+        {
+          imgUrl: subservice.imgUrl,
+          email: data.clientData.email,
+          nameClient: data.clientData.name,
+          subserviceName: subservice.name[data.language],
+          serviceName: subservice.service.name[data.language],
+        },
+        data.language
+      );
     }
 
     return createTokenSimple({ id: theBooking._id.toString() });
