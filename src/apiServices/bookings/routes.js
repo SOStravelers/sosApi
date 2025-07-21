@@ -54,4 +54,19 @@ router.post(
   isAuth,
   BOOKING_CONTROLLERS.createBooking
 );
+
+router.get(
+  "/getdata/",
+  validateParams(
+    [
+      {
+        param_key: "token",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  BOOKING_CONTROLLERS.getByToken
+);
 export default router;

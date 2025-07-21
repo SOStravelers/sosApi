@@ -16,6 +16,7 @@ const decodeFunc = (token) => {
 const encodeFunc = (toSing, expiresIn) => {
   return jwt.sign(toSing, envar().SECRET, { expiresIn });
 };
+
 const accessToken = (user, tokenFresh = false, time) => {
   let tiempo = time ? time : "3d";
   return encodeFunc({ ...user, tokenFresh }, tiempo);
@@ -196,4 +197,11 @@ export const isAdmin = async (req, res, next) => {
       msg: "Not authorized, client must send an access token.",
     });
   }
+};
+
+export const createTokenSimple = (data) => {
+  return jwt.sign(data, envar().SECRET_EMAIL);
+};
+export const decodeTokenSimple = (data) => {
+  return jwt.verify(data, envar().SECRET_EMAIL);
 };

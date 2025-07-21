@@ -8,7 +8,7 @@ import { createError } from "../../config/error.js";
 import * as STRIPE_SERVICE from "../../services/stripe.js";
 import * as NOTIFICATION_DAO from "../notifications/dao.js";
 import * as SENDEMAIL_SERVICE from "../../services/emails/personal.js";
-
+import { createTokenSimple } from "../../middleware/auth.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 
 const populate = [
@@ -165,43 +165,7 @@ export const createBooking = async (data, user) => {
       });
     }
 
-    // confirmBookingNotification(theBooking, multiple, language);
-
-    // resendConfirmPersonal({
-    //   email: theBooking.clientUser.email,
-    //   // email: "jschacosta@gmail.com",
-    //   name: theBooking.clientUser.personalData.name.first,
-    //   emailWorker: worker.email,
-    //   workerName:
-    //     worker?.personalData?.name?.first +
-    //     " " +
-    //     worker?.personalData?.name?.last,
-    //   clientName:
-    //     req.user?.personalData?.name?.first +
-    //     " " +
-    //     req.user?.personalData?.name?.last,
-    //   workerPhone: worker?.workerData?.phone,
-    //   service: theBooking.service.name[language],
-    //   clientNumber: theBooking.clientNumber,
-    //   priceUnitService: theBooking.priceUnitService,
-    //   subservice: theBooking.subservice.name[language],
-    //   language: language,
-    //   date: theBooking.date.stringData,
-    //   startTime: theBooking.startTime.stringData,
-    //   price: theBooking.payment.price,
-    //   priceBRL: newBooking.payment.priceBRL,
-    //   finalPrice: finalPrice,
-    // });
-
-    // awsCompletedWorker({
-    //   email: theBooking.workerUser.email,
-    //   name: theBooking.workerUser.personalData.name.first,
-    //   service: theBooking.service.name,
-    //   subservice: theBooking.subservice.name,
-    //   language: language,
-    // });
-
-    return { booking: theBooking, msg: "new Document" };
+    return createTokenSimple({ id: theBooking._id.toString() });
   } catch (err) {
     throw err;
   }
@@ -221,6 +185,19 @@ export const setAllBookings = async (user) => {
     );
     const noUser = await NoUser.findOneAndDelete({ email: user.email });
     return "success";
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getByToken = async (id) => {
+  logger.info("*** SET ALL BOOKING DAO ***");
+  try {
+    const booking = await Booking.findOne({ _id: id })
+      .populate(populate)
+      .exec();
+
+    return booking;
   } catch (err) {
     throw err;
   }
