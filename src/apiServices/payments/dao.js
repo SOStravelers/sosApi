@@ -249,7 +249,7 @@ export const paymentIntentStripe = async (data, user) => {
             first: firstName,
             last: lastName,
           },
-          payment: {
+          paymentData: {
             stripe: {
               customer: paymentIntent.customer,
             },

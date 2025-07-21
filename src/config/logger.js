@@ -20,7 +20,6 @@ const myFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
     : "";
   return stack ? `${base}\n${stack}${metaString}` : `${base}${metaString}`;
 });
-console.log("wena", process.env.COLOR_LOGS);
 const isLocal = process.env.COLOR_LOGS === "true";
 
 const logger = createLogger({

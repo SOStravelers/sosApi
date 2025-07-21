@@ -12,23 +12,10 @@ import moment from "moment-timezone";
 import Booking from "./apiServices/bookings/model.js";
 import { capturePaymentIntent } from "./services/stripe.js";
 
-// 🆕 Autoimportar modelos
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const baseDir = path.join(__dirname, "apiServices");
-
-const folders = fs.readdirSync(baseDir);
-for (const folder of folders) {
-  const modelPath = path.join(baseDir, folder, "model.js");
-  if (fs.existsSync(modelPath)) {
-    await import(modelPath);
-    console.log(`✅ Modelo cargado: ${folder}/model.js`);
-  }
-}
+//Modelo
+import loadModels from "./helpers/loadModels.js";
+await loadModels();
+// await loadModels({ excludeFolders: ["demo", "test"] });
 
 // Rutas (después de modelos)
 import routes from "./routes/index.js";
@@ -73,7 +60,7 @@ schedule.scheduleJob(rule, async function () {
       },
       { status: "available" }
     );
-    console.log(result);
+    console.log("terminado");
   } catch (err) {
     console.error(err);
   }
@@ -130,7 +117,7 @@ schedule.scheduleJob(rule3, async function () {
       },
       { status: "canceled" }
     );
-    console.log(result);
+    console.log("terminado");
   } catch (err) {
     console.error(err);
   }

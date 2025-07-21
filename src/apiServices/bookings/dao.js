@@ -1,5 +1,6 @@
 import Booking from "./model.js";
 import User from "../../apiServices/users/model.js";
+import NoUser from "../../apiServices/nousers/model.js";
 import Subservice from "../../apiServices/subservices/model.js";
 import Currency from "../currencies/model.js";
 import Payment from "../payments/model.js";
@@ -35,7 +36,7 @@ const populate = [
 const opciones = ["usd", "brl", "eur"];
 //Crear booking
 export const createBooking = async (data, user) => {
-  global.logger.info("*** CREATE NEW BOOKING DAO ***");
+  logger.info("*** CREATE NEW BOOKING DAO ***");
   try {
     const subservice = await Subservice.findById(data.subservice).populate(
       "service"
@@ -197,6 +198,25 @@ export const createBooking = async (data, user) => {
     // });
 
     return { booking: theBooking, msg: "new Document" };
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const setAllBookings = async (user) => {
+  logger.info("*** SET ALL BOOKING DAO ***");
+  try {
+    const bookings = await Booking.updateMany(
+      { clientEmail: user.email, clientUser: null },
+      {
+        $set: {
+          clientUser: user._id,
+        },
+      },
+      { new: true }
+    );
+    const noUser = await NoUser.findOneAndDelete({ email: user.email });
+    return "success";
   } catch (err) {
     throw err;
   }

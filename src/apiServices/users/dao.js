@@ -3,11 +3,7 @@ import Holiday from "../holidays/model.js";
 import Booking from "../bookings/model.js";
 import Schedule from "../schedules/model.js";
 import Jimp from "jimp";
-import extractReferencePaths from "../../helpers/extractReferencePaths.js";
-import { normalizeObjectIdReferencesForController } from "../../helpers/controllers/normalizeRefValueForController.js";
 import mongoJsonToPlain from "../../helpers/mongoJsonToPlain.js";
-const USER_REF_PATHS = extractReferencePaths(User.schema);
-console.log("los paths", USER_REF_PATHS);
 import { n64tobuffer } from "../../utils/externalFiles.js";
 import { AwsUploadFile } from "../../services/aws_s3.js";
 import { procesarNombre } from "../../utils/data.js";
@@ -132,12 +128,6 @@ export const changePassword = async (data, user) => {
 //Actualizar data de un usuario por ID
 export const updateOne = async (data, userId) => {
   global.logger.info("*** UPDATE USER DAO ***");
-  // Limpiar JSON con $oid/$date
-  // let userObj = mongoJsonToPlain(req.body);
-  // Normaliza referencias (convierte strings a ObjectId)
-  // userObj = normalizeObjectIdReferencesForController(userObj, USER_REF_PATHS);
-  // console.log("user limpio", userObj.workerData.services);
-  // return res.send(userObj);
   try {
     // let { user } = userObj;
     let newUser = await User.findOneAndUpdate(
@@ -162,12 +152,7 @@ export const updateOne = async (data, userId) => {
         model: "Subservice", // Modelo de "SubServices"
         match: { isActive: true }, // Solo selecciona los subservicios activos
       })
-      .populate({
-        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
-        select: "name imgUrl ",
-        model: "Service", // Modelo de "Service"
-        match: { isActive: true }, // Solo selecciona los servicios activos
-      })
+
       .exec();
 
     return newUser;

@@ -6,12 +6,14 @@ import Holiday from "../holidays/model.js";
 import Booking from "../bookings/model.js";
 import envar from "../../config/envar.js";
 import { sendEmailTemplate } from "../../services/aws_ses.js";
+import NoUser from "../../apiServices/nousers/model.js";
 import { createError } from "../../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../../middleware/auth.js";
 import { procesarNombre } from "../../utils/data.js";
 import { createCustomerId } from "../../services/stripe.js";
 import { resendEmail } from "../../services/resend.js";
 import { createStripeCustomer } from "../../services/stripe.js";
+import { setAllBookings } from "../bookings/dao.js";
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
@@ -52,14 +54,21 @@ export const registerEmail = async (data) => {
     user.email = theEmail;
     user.username = Math.random().toString(36).substring(2, 12);
 
-    const dataStripe = {
-      email: theEmail,
-      userId: user._id,
-      name: user.personalData.name + " " + user.personalData.name.last,
-    };
-    user.language ? (dataStripe.language = user.language) : "";
-    const customerId = await createStripeCustomer(dataStripe, true);
-    user.stripe.customerId = customerId;
+    const noUser = await NoUser.findOne({ email: email });
+    if (noUser) {
+      user.paymentData.stripe.customer = noUser.paymentData.stripe.customer;
+      user.phone = noUser.phone;
+    } else {
+      //stripe customer
+      const dataStripe = {
+        email: theEmail,
+        userId: user._id,
+        name: user.personalData.name + " " + user.personalData.name.last,
+      };
+      user.language ? (dataStripe.language = user.language) : "";
+      const customerId = await createStripeCustomer(dataStripe, true);
+      user.stripe.customerId = customerId;
+    }
 
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
@@ -156,7 +165,7 @@ export const loginGoogle = async (data) => {
     var user = await User.findOne({ email: email }).exec();
     let newValue = false;
     if (!user) {
-      console.log("nuevo");
+      console.log("nuevo usuario");
       newValue = true;
       user = new User();
       user.email = email;
@@ -167,29 +176,36 @@ export const loginGoogle = async (data) => {
       !user.type ? (user.type = "personal") : "";
       user.username = Math.random().toString(36).substring(2, 12);
     }
-    console.log("existe");
     !user.img.imgUrl ? (user.img.imgUrl = image) : "";
     user.lastLogin = Date.now();
     user.lastLoginType = "google";
     user.isActive = true;
     user.isValidate = true;
 
-    //stripe customer
-    const dataStripe = {
-      email: user.email,
-      userId: user._id,
-      name: user.personalData.name + " " + user.personalData.name.last,
-    };
-    user.phone ? (dataStripe.phone = user.phone) : "";
-    user.language ? dataStripe.language : "";
-    const customerId = await createStripeCustomer(dataStripe, true);
-    user.paymentData.stripe.customer = customerId;
+    const noUser = await NoUser.findOne({ email: email });
+    if (noUser) {
+      user.paymentData.stripe.customer = noUser.paymentData.stripe.customer;
+      user.phone = noUser.phone;
+    } else {
+      //stripe customer
+      const dataStripe = {
+        email: user.email,
+        userId: user._id,
+        name: user.personalData.name + " " + user.personalData.name.last,
+      };
+      user.phone ? (dataStripe.phone = user.phone) : "";
+      user.language ? dataStripe.language : "";
+      const customerId = await createStripeCustomer(dataStripe, true);
+      user.paymentData.stripe.customer = customerId;
+    }
 
     if (newValue) {
       await user.save();
       const newUser = await User.findOne({ email: user.email }).select(
         "about email type img language personalData type username workerData _id security.hasPassword"
       );
+      await setAllBookings(user);
+
       let userToCreateToken = {
         _id: newUser._id,
         username: newUser.username,
@@ -197,7 +213,6 @@ export const loginGoogle = async (data) => {
       let userRefresh = {
         _id: newUser._id,
       };
-      await createCustomerId(newUser._id);
       return {
         msg: "login success",
         access_token: accessTokenGen(userToCreateToken, true),
@@ -217,7 +232,6 @@ export const loginGoogle = async (data) => {
         username: newUser.username,
         type: newUser.type,
       };
-      await createCustomerId(newUser._id);
       return {
         msg: "login success",
         access_token: accessTokenGen(userToCreateToken, true),

@@ -17,12 +17,10 @@ const excludeFolders = [""]; // ← agrega aquí las que quieras excluir
 
 const folders = fs.readdirSync(baseDir);
 
+let hasError = false;
+
 for (const folder of folders) {
-  // Saltar carpetas excluidas
-  if (excludeFolders.includes(folder)) {
-    console.log(`⚠️  Ruta excluida: /${folder}`);
-    continue;
-  }
+  if (excludeFolders.includes(folder)) continue;
 
   const routePath = path.join(baseDir, folder, "routes.js");
 
@@ -33,12 +31,16 @@ for (const folder of folders) {
 
       if (route) {
         routes.use(`/${folder}`, route);
-        console.log(`✅ Ruta registrada: /${folder}`);
       }
     } catch (err) {
-      console.error(`❌ Error en /${folder}:`, err.message);
+      hasError = true;
+      console.error(`❌ Error al cargar /${folder}:`, err.message);
     }
   }
+}
+
+if (!hasError) {
+  console.log("✅ Todas las rutas fueron cargadas correctamente.");
 }
 
 export default routes;
