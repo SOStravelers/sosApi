@@ -66,7 +66,8 @@ export const createBooking = async (data, user) => {
     const newData = {
       clientUserId: clientUser?._id ? clientUser._id : null,
       clientEmail: data.clientData.email, //data.
-      startTime: data.startTime.isoTime,
+      clientData: data.clientData,
+      startTime: data.startTime,
       subserviceId: subservice._id,
       subserviceData: {
         name: subservice.name,
@@ -87,11 +88,14 @@ export const createBooking = async (data, user) => {
     const currency = await Currency.findOne({ code: data.currency });
     newData.currency = currency._id;
 
-    const percentage = 10;
+    const percentage = 0.1;
+    const netAmount = data.amount / (1 + percentage);
+    const taxes = netAmount * percentage;
+
     newData.price = {
-      netAmount: (data.amount * (100 - percentage)) / 100,
-      taxes: (data.amount * (percentage / 100)).toFixed(2),
-      percentage: percentage,
+      netAmount: netAmount.toFixed(2),
+      taxes: taxes.toFixed(2),
+      percentage: percentage * 100,
       grossAmount: data.amount,
     };
 

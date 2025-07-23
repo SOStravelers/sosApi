@@ -8,6 +8,7 @@ const bookingSchema = new Schema(
     workerUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     clientUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
+    clientData: { type: Object },
     clientEmail: { type: String },
     clientPhone: { type: String },
     imgUrl: { type: String },
@@ -38,7 +39,8 @@ const bookingSchema = new Schema(
     },
     idKey: { type: String },
     startTime: {
-      stringData: { type: String },
+      formatedDate: { type: String },
+      formatedTime: { type: String },
       isoTime: { type: Date },
     },
     endTime: {
