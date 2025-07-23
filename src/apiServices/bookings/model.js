@@ -33,6 +33,7 @@ const bookingSchema = new Schema(
     price: {
       netAmount: { type: Number },
       taxes: { type: Number },
+      percentage: { type: Number },
       grossAmount: { type: Number },
     },
     idKey: { type: String },

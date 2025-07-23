@@ -33,6 +33,10 @@ const populate = [
     path: "clientUserId",
     select: "personalData img, email",
   },
+  {
+    path: "currency",
+    select: "name code ",
+  },
 ];
 const optionsCurrency = ["usd", "brl", "eur"];
 const optionsLanguage = ["es", "en", "pt", "fr", "de"];
@@ -85,8 +89,9 @@ export const createBooking = async (data, user) => {
 
     const percentage = 10;
     newData.price = {
-      netAmount: (data.amount * percentage) / 100,
-      taxes: percentage / 100,
+      netAmount: (data.amount * (100 - percentage)) / 100,
+      taxes: (data.amount * (percentage / 100)).toFixed(2),
+      percentage: percentage,
       grossAmount: data.amount,
     };
 
