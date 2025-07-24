@@ -69,4 +69,35 @@ router.get(
   ),
   BOOKING_CONTROLLERS.getByToken
 );
+
+router.get(
+  "/list/client/month/",
+  validateParams(
+    [
+      {
+        param_key: "timeZone",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "isoTime",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "language",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "range",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  isAuth,
+  BOOKING_CONTROLLERS.getBookingsByRange
+);
 export default router;

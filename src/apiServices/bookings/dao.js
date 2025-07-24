@@ -10,6 +10,7 @@ import * as NOTIFICATION_DAO from "../notifications/dao.js";
 import * as SENDEMAIL_SERVICE from "../../services/emails/personal.js";
 import { createTokenSimple } from "../../middleware/auth.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
+import { DateTime } from "luxon";
 
 const populate = [
   {
@@ -215,6 +216,77 @@ export const getByToken = async (id) => {
 
     return booking;
   } catch (err) {
+    throw err;
+  }
+};
+
+export const getBookingsByRange = async (
+  {
+    isoTime,
+    timeZone,
+    range = "month",
+    month, // { year: 2025, month: 7 }
+    status, // puede ser string o array
+  },
+  user = null
+) => {
+  try {
+    if (!isoTime || !timeZone) {
+      throw new Error("Faltan isoTime o timeZone");
+    }
+
+    // Determinar la fecha base
+    let userDate;
+    if (range === "month" && month?.year && month?.month) {
+      userDate = DateTime.fromObject(
+        { year: month.year, month: month.month, day: 1 },
+        { zone: timeZone }
+      );
+    } else {
+      userDate = DateTime.fromISO(isoTime, { zone: timeZone });
+    }
+
+    // Rango de fechas
+    let start, end;
+    switch (range) {
+      case "day":
+        start = userDate.startOf("day").toUTC().toISO();
+        end = userDate.endOf("day").toUTC().toISO();
+        break;
+      case "week":
+        start = userDate.startOf("week").toUTC().toISO();
+        end = userDate.endOf("week").toUTC().toISO();
+        break;
+      case "month":
+      default:
+        start = userDate.startOf("month").toUTC().toISO();
+        end = userDate.endOf("month").toUTC().toISO();
+        break;
+    }
+
+    // Construir query
+    const query = {
+      "startTime.isoTime": { $gte: start, $lte: end },
+    };
+
+    if (user?._id) {
+      query.clientUserId = user._id;
+    }
+
+    if (status) {
+      if (Array.isArray(status)) {
+        query.status = { $in: status };
+      } else {
+        query.status = status;
+      }
+    }
+
+    console.log("Bookings query:", query);
+
+    const bookings = await Booking.find(query);
+    return bookings;
+  } catch (err) {
+    console.error("Error en getBookingsPorRango:", err);
     throw err;
   }
 };

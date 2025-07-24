@@ -30,3 +30,18 @@ export const getByToken = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getBookingsByRange = async (req, res, next) => {
+  try {
+    const data = req.query;
+    const user = req.user;
+    const response = await BOOKING_DAO.getBookingsByRange(data, user);
+    if (response) {
+      res.status(200).json(response);
+    } else {
+      throw err;
+    }
+  } catch (err) {
+    next(err);
+  }
+};
