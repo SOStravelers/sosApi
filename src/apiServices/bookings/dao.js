@@ -226,7 +226,8 @@ export const getBookingsByRange = async (
     timeZone,
     range = "month",
     month, // { year: 2025, month: 7 }
-    status, // puede ser string o array
+    day, // { year: 2025, month: 7, day: 29 }
+    status,
   },
   user = null
 ) => {
@@ -237,7 +238,13 @@ export const getBookingsByRange = async (
 
     // Determinar la fecha base
     let userDate;
-    if (range === "month" && month?.year && month?.month) {
+
+    if (range === "day" && day?.year && day?.month && day?.day) {
+      userDate = DateTime.fromObject(
+        { year: day.year, month: day.month, day: day.day },
+        { zone: timeZone }
+      );
+    } else if (range === "month" && month?.year && month?.month) {
       userDate = DateTime.fromObject(
         { year: month.year, month: month.month, day: 1 },
         { zone: timeZone }
@@ -274,11 +281,7 @@ export const getBookingsByRange = async (
     }
 
     if (status) {
-      if (Array.isArray(status)) {
-        query.status = { $in: status };
-      } else {
-        query.status = status;
-      }
+      query.status = Array.isArray(status) ? { $in: status } : status;
     }
 
     console.log("Bookings query:", query);
@@ -286,7 +289,7 @@ export const getBookingsByRange = async (
     const bookings = await Booking.find(query);
     return bookings;
   } catch (err) {
-    console.error("Error en getBookingsPorRango:", err);
+    console.error("Error en getBookingsByRange:", err);
     throw err;
   }
 };

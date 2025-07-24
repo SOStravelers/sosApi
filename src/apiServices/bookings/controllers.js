@@ -35,6 +35,7 @@ export const getBookingsByRange = async (req, res, next) => {
   try {
     const data = req.query;
     const user = req.user;
+    console.log("data", data);
     const response = await BOOKING_DAO.getBookingsByRange(data, user);
     if (response) {
       res.status(200).json(response);

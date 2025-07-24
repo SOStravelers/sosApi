@@ -71,7 +71,7 @@ router.get(
 );
 
 router.get(
-  "/list/client/month/",
+  "/list/client",
   validateParams(
     [
       {
