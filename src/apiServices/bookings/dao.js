@@ -82,6 +82,7 @@ export const createBooking = async (data, user) => {
       duration: subservice.duration,
       country: subservice.country,
       typeService: subservice.typeService,
+      country: subservice.country,
     };
 
     if (!optionsCurrency.includes(data.currency))
@@ -221,14 +222,7 @@ export const getByToken = async (id) => {
 };
 
 export const getBookingsByRange = async (
-  {
-    isoTime,
-    timeZone,
-    range = "month",
-    month, // { year: 2025, month: 7 }
-    day, // { year: 2025, month: 7, day: 29 }
-    status,
-  },
+  { isoTime, timeZone, range = "month", month, day, start, end, status },
   user = null
 ) => {
   try {
@@ -236,7 +230,6 @@ export const getBookingsByRange = async (
       throw new Error("Faltan isoTime o timeZone");
     }
 
-    // Determinar la fecha base
     let userDate;
 
     if (range === "day" && day?.year && day?.month && day?.day) {
@@ -253,43 +246,132 @@ export const getBookingsByRange = async (
       userDate = DateTime.fromISO(isoTime, { zone: timeZone });
     }
 
-    // Rango de fechas
-    let start, end;
-    switch (range) {
-      case "day":
-        start = userDate.startOf("day").toUTC().toISO();
-        end = userDate.endOf("day").toUTC().toISO();
-        break;
-      case "week":
-        start = userDate.startOf("week").toUTC().toISO();
-        end = userDate.endOf("week").toUTC().toISO();
-        break;
-      case "month":
-      default:
-        start = userDate.startOf("month").toUTC().toISO();
-        end = userDate.endOf("month").toUTC().toISO();
-        break;
+    let startDate, endDate;
+
+    if (range === "custom" && start && end) {
+      startDate = DateTime.fromISO(start).toFormat("yyyy-MM-dd'T'HH:mm:ss");
+      endDate = DateTime.fromISO(end).toFormat("yyyy-MM-dd'T'HH:mm:ss");
+    } else {
+      switch (range) {
+        case "day":
+          startDate = userDate.startOf("day").toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          endDate = userDate.endOf("day").toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          break;
+        case "week":
+          startDate = userDate
+            .startOf("week")
+            .toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          endDate = userDate.endOf("week").toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          break;
+        case "month":
+        default:
+          startDate = userDate
+            .startOf("month")
+            .toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          endDate = userDate.endOf("month").toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          break;
+      }
     }
 
-    // Construir query
-    const query = {
-      "startTime.isoTime": { $gte: start, $lte: end },
-    };
+    const pipeline = [];
 
-    if (user?._id) {
-      query.clientUserId = user._id;
-    }
+    // Si country es un ObjectId referenciado, haz lookup
+    pipeline.push({
+      $lookup: {
+        from: "countries", // Asegúrate de que este sea el nombre real de la colección
+        localField: "country",
+        foreignField: "_id",
+        as: "countryData",
+      },
+    });
 
-    if (status) {
-      query.status = Array.isArray(status) ? { $in: status } : status;
-    }
+    pipeline.push({
+      $unwind: "$countryData",
+    });
 
-    console.log("Bookings query:", query);
+    // Crear el campo con hora local del booking
+    pipeline.push({
+      $addFields: {
+        localStartTime: {
+          $dateToString: {
+            date: "$startTime.isoTime",
+            timezone: "$countryData.timeZone",
+            format: "%Y-%m-%dT%H:%M:%S",
+          },
+        },
+      },
+    });
 
-    const bookings = await Booking.find(query);
+    // Filtrar por hora local del booking dentro del rango deseado
+    pipeline.push({
+      $match: {
+        localStartTime: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+        ...(user?._id && { clientUserId: user._id }),
+        ...(status && {
+          status: Array.isArray(status) ? { $in: status } : status,
+        }),
+      },
+    });
+
+    const bookings = await Booking.aggregate(pipeline);
     return bookings;
   } catch (err) {
-    console.error("Error en getBookingsByRange:", err);
+    console.error("Error en getBookingsByRange (AGGREGATE):", err);
+    throw err;
+  }
+};
+
+export const getNextBooking = async (user = null) => {
+  try {
+    const nowUtc = DateTime.utc().toFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    const pipeline = [
+      {
+        $lookup: {
+          from: "countries",
+          localField: "country",
+          foreignField: "_id",
+          as: "countryData",
+        },
+      },
+      {
+        $unwind: "$countryData",
+      },
+      {
+        $addFields: {
+          localStartTime: {
+            $dateToString: {
+              date: "$startTime.isoTime",
+              timezone: "$countryData.timeZone",
+              format: "%Y-%m-%dT%H:%M:%S",
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          localStartTime: { $gte: nowUtc },
+          ...(user?._id && { clientUserId: user._id }),
+          status: "confirmed",
+        },
+      },
+      {
+        $sort: {
+          localStartTime: 1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ];
+
+    const result = await Booking.aggregate(pipeline);
+    return result[0] || null;
+  } catch (err) {
+    console.error("Error en getNextBooking:", err);
     throw err;
   }
 };

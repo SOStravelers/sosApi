@@ -13,7 +13,7 @@ const bookingSchema = new Schema(
     clientPhone: { type: String },
     imgUrl: { type: String },
     videoUrl: { type: String },
-    country: { type: String },
+    country: { type: Schema.Types.ObjectId },
     eventData: { type: Object },
     tourData: { type: Object },
     categories: { type: Array },

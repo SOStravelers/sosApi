@@ -100,4 +100,11 @@ router.get(
   isAuth,
   BOOKING_CONTROLLERS.getBookingsByRange
 );
+
+router.get(
+  "/next/client",
+
+  isAuth,
+  BOOKING_CONTROLLERS.getNextBooking
+);
 export default router;

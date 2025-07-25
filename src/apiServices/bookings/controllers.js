@@ -36,7 +36,22 @@ export const getBookingsByRange = async (req, res, next) => {
     const data = req.query;
     const user = req.user;
     console.log("data", data);
+    console.log("user", user);
     const response = await BOOKING_DAO.getBookingsByRange(data, user);
+    if (response) {
+      res.status(200).json(response);
+    } else {
+      throw err;
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getNextBooking = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const response = await BOOKING_DAO.getNextBooking();
     if (response) {
       res.status(200).json(response);
     } else {
