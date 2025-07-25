@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 import mongoosePaginate from "mongoose-paginate-v2";
 import paginateConfig from "../../config/paginate.js";
-
+import uniqueValidator from "mongoose-unique-validator";
 const bookingSchema = new Schema(
   {
     workerUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -38,6 +38,7 @@ const bookingSchema = new Schema(
       grossAmount: { type: Number },
     },
     idKey: { type: String },
+    purchaseOrder: { type: String, unique: true },
     startTime: {
       formatedDate: { type: String },
       formatedTime: { type: String },
@@ -69,7 +70,10 @@ const bookingSchema = new Schema(
   },
   { timestamps: true }
 );
-
+//Validate unique value message
+bookingSchema.plugin(uniqueValidator, {
+  message: "This {PATH} is already in use.",
+});
 bookingSchema.plugin(mongoosePaginate);
 mongoosePaginate.paginate.options = paginateConfig;
 const Booking = mongoose.model("Booking", bookingSchema);

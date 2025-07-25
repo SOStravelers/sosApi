@@ -11,6 +11,8 @@ import * as SENDEMAIL_SERVICE from "../../services/emails/personal.js";
 import { createTokenSimple } from "../../middleware/auth.js";
 import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 import { DateTime } from "luxon";
+import { generarCodigoUnicoOrdenCompra } from "../../helpers/bookings/ids.js";
+import { formatRangeFromISO } from "../../utils/time.js";
 
 const populate = [
   {
@@ -46,7 +48,7 @@ export const createBooking = async (data, user) => {
   logger.info("*** CREATE NEW BOOKING DAO ***");
   try {
     const subservice = await Subservice.findById(data.subservice).populate(
-      "service"
+      "service country"
     );
     console.log;
     if (!subservice) throw createError(404, "Subservice not found");
@@ -145,16 +147,15 @@ export const createBooking = async (data, user) => {
     // Asignar el nuevo idKey al booking
     booking.idKey = newIdKey;
 
+    const orderPurchase = await generarCodigoUnicoOrdenCompra();
+    booking.orderPurchase = orderPurchase;
+
     const newBooking = await booking.save();
 
     const theBooking = await Booking.findOne({ _id: newBooking._id })
       .populate(populate)
       .exec();
     console.log("el booking creado", theBooking._id);
-    //creando notificaciones:
-
-    const emailData = clientUser?.email || data.clientData.email;
-    // sendEmailPaymentConfirmation(emailData);
 
     if (data.intentType == "payment") {
       STRIPE_SERVICE.addIdBookingtoPI(
@@ -169,21 +170,30 @@ export const createBooking = async (data, user) => {
       if (!optionsLanguage.includes(data.language))
         throw createError(400, "Invalid language");
     }
+    const token = createTokenSimple({ id: theBooking._id.toString() });
 
-    if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
-      SENDEMAIL_SERVICE.resendConfirmPersonal(
-        {
-          imgUrl: subservice.imgUrl,
-          email: data.clientData.email,
-          nameClient: data.clientData.name,
-          subserviceName: subservice.name[data.language],
-          serviceName: subservice.service.name[data.language],
-        },
-        data.language
-      );
-    }
+    const timeService = formatRangeFromISO({
+      isoTime: data.startTime.isoTime,
+      language: data.language,
+      timeZone: subservice.country.timeZone,
+      duration: subservice.duration,
+    });
 
-    return createTokenSimple({ id: theBooking._id.toString() });
+    SENDEMAIL_SERVICE.resendConfirmPersonal(
+      {
+        imgUrl: subservice.imgUrl,
+        email: data.clientData.email,
+        nameClient: data.clientData.name,
+        subserviceName: subservice.name[data.language],
+        serviceName: subservice.service.name[data.language],
+        numberOrder: orderPurchase,
+        startService: timeService.start,
+        endService: timeService.end,
+        bookingLink: process.env.URL_FRONTEND + "/bookingLink/" + token,
+      },
+      data.language
+    );
+    return token;
   } catch (err) {
     throw err;
   }

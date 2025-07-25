@@ -1,6 +1,6 @@
 const languageData = {
   global: {
-    orderNumber: {
+    textNumber: {
       es: "Número de pedido",
       en: "Order number",
       pt: "Número do pedido",

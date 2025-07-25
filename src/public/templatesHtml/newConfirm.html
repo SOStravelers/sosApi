@@ -71,6 +71,11 @@
             margin: 10px 0;
         }
 
+        .btn-container {
+            display: flex;
+            justify-content: center;
+        }
+
         .btn {
             background-color: #102c36;
             color: white;
@@ -80,9 +85,12 @@
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
-            display: block;
-            margin: 20px auto;
+            display: inline-block;
+            /* ✅ no ocupa todo el ancho */
             text-align: center;
+            text-decoration: none;
+            /* ✅ quita subrayado */
+            /* ✅ espacio arriba y abajo */
         }
 
         .card {
@@ -187,41 +195,41 @@
 
 <body>
     <div class="divImg">
-
         <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/email/logoBlanco.png" alt="Sympla" class="logo"
             width="60" />
         <h1>SOS Travelers</h1>
     </div>
     <div class="container">
-        <p class="pedido">{{orderNumber}}: 2S30S98V4DH</p>
-        <h2> {{nameClient}}, {{title}}</h2>
+        <p class="pedido">{{textNumber}}: {{numberOrder}}</p>
+        <h2>{{nameClient}}, {{title}}</h2>
         <p>{{subtitle}}</p>
-        <button class="btn">{{mainButton}}</button>
+        <div class="btn-container">
+            <a href="{{bookingLink}}" class="btn">{{mainButton}}</a>
+        </div>
+
 
         <div class="card">
-
-
             <!-- <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/subservices/chilenoql.webp" -->
-            <img src={{imgUrl}} alt="eventImg" />
+            <img src="{{imgUrl}}" alt="eventImg" />
             <div class="card-content">
-                <h3>{{subserviceName}} - {{serviceName}} </h3>
+                <h3>{{subserviceName}} - {{serviceName}}</h3>
                 <div class="section">
                     <div class="section-title">
-                        <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/email/calendar.png" alt="Data">
+                        <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/email/calendar.png" alt="Data" />
                         <span>{{dataLabel}}</span>
                     </div>
-                    <p>{{startLabel}} Julho 17, 2025, 22h</p>
-                    <p>{{endLabel}} Julho 18, 2025, 05h</p>
+                    <p>{{startLabel}}: {{startService}}</p>
+                    <p>{{endLabel}}: {{endService}}</p>
                 </div>
                 <div class="section">
                     <div class="section-title">
-                        <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/email/pin.png" alt="Local">
+                        <img src="https://sosappfiles.s3.us-east-1.amazonaws.com/icons/email/pin.png" alt="Local" />
                         <span>{{locationLabel}}</span>
                     </div>
-                    <p>Tau, Rio de Janeiro, RJ</p>
+                    <p>Rio de Janeiro, RJ</p>
                 </div>
                 <div class="links">
-                    <a href="#">{{calendarButton}}</a>
+                    <!-- <a href="#">{{calendarButton}}</a> -->
                     <a href="#">{{mapButton}}</a>
                 </div>
             </div>
