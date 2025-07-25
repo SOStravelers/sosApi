@@ -15,6 +15,7 @@ import User from "../users/model.js";
 const validatePriceTour = async (price, tourData, selectedData, currency) => {
   logger.info("*** VALIDATE PRICE TOUR STRIPE PAYMENT DAO ***");
   try {
+    console.log("precioss", price, selectedData, tourData);
     const totalAdult =
       selectedData?.amountAdults * tourData?.adultPrice[currency] || 0;
     const totalChildren =
@@ -123,7 +124,7 @@ const validateCreateBooking = async (subservice, data) => {
     if (subservice.haveLimitTime) {
       const canBook = isBeforeHoursThreshold(
         data.isoTime,
-        subservice.timeUntilCancel
+        subservice.timeLimitBook
       );
       if (!canBook) throw createError(400, "Invalid isoTime");
     }
@@ -167,7 +168,7 @@ export const paymentIntentStripe = async (data, user) => {
     console.log("el tipo de servicio", subservice.typeService);
     if (subservice.typeService == "tour") {
       const validate = await validatePriceTour(
-        data.amountService,
+        data.amount,
         subservice.tourData,
         data.selectedData,
         data.currency
@@ -196,11 +197,15 @@ export const paymentIntentStripe = async (data, user) => {
     } else if (subservice.withTicket) {
       throw createError(400, "Invalid type service");
     } else {
-      const hasCancel = isBeforeHoursThreshold(
-        service.startTime.isoTime,
-        service.timeUntilCancel
-      );
-      hasCancel ? (chargeValidate = true) : (chargeValidate = false);
+      if (subservice.canCancel) {
+        const hasCancel = isBeforeHoursThreshold(
+          data.isoTime,
+          subservice.timeUntilCancel
+        );
+        hasCancel ? (chargeValidate = true) : (chargeValidate = false);
+      } else {
+        chargeValidate = false;
+      }
     }
     //---------------------------------------------------
     //----------------ENVIO A STRIPE---------------------
