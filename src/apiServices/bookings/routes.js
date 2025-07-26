@@ -5,6 +5,7 @@ import * as BOOKING_CONTROLLERS from "./controllers.js";
 
 const router = Router();
 
+//Crear booking sin usuario logueado
 router.post(
   "/noAuth/create",
   validateParams(
@@ -29,6 +30,7 @@ router.post(
   ),
   BOOKING_CONTROLLERS.createBooking
 );
+//Crear booking usuario logueado
 router.post(
   "/create",
   validateParams(
@@ -54,9 +56,9 @@ router.post(
   isAuth,
   BOOKING_CONTROLLERS.createBooking
 );
-
+//Obtiene info del booking por token para mostrar post compra
 router.get(
-  "/getdata/",
+  "/purchase/data",
   validateParams(
     [
       {
@@ -69,7 +71,38 @@ router.get(
   ),
   BOOKING_CONTROLLERS.getByToken
 );
-
+//Obtienes info de id,foto y name del booking por token
+router.get(
+  "/dataLink/",
+  validateParams(
+    [
+      {
+        param_key: "token",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  BOOKING_CONTROLLERS.getByTokenMin
+);
+//Obtienes toda la info booking por usuario registrado
+router.get(
+  "/mybooking/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  isAuth,
+  BOOKING_CONTROLLERS.getMyBooking
+);
+//Obtiene todos los booking de un usuario con multiples filtros
 router.get(
   "/list/client",
   validateParams(
@@ -100,11 +133,6 @@ router.get(
   isAuth,
   BOOKING_CONTROLLERS.getBookingsByRange
 );
-
-router.get(
-  "/next/client",
-
-  isAuth,
-  BOOKING_CONTROLLERS.getNextBooking
-);
+//Obtienes info del proximo booking en fecha mas cercana
+router.get("/next/client", isAuth, BOOKING_CONTROLLERS.getNextBooking);
 export default router;

@@ -198,7 +198,7 @@ export const createBooking = async (data, user) => {
     throw err;
   }
 };
-
+//Funcion importante que permite asignar todos los booking a un nuevo usuario registrado
 export const setAllBookings = async (user) => {
   logger.info("*** SET ALL BOOKING DAO ***");
   try {
@@ -217,9 +217,9 @@ export const setAllBookings = async (user) => {
     throw err;
   }
 };
-
+//Obtiene info del booking por token para mostrar post compra
 export const getByToken = async (id) => {
-  logger.info("*** SET ALL BOOKING DAO ***");
+  logger.info("*** GET ALL DATA BOOKING DAO ***");
   try {
     const booking = await Booking.findOne({ _id: id })
       .populate(populate)
@@ -230,7 +230,34 @@ export const getByToken = async (id) => {
     throw err;
   }
 };
+//Obtienes info de id,foto y name del booking por token
+export const getByTokenMin = async (id) => {
+  logger.info("*** SET MIN DATA BOOKING DAO ***");
+  try {
+    const booking = await Booking.findOne({ _id: id })
+      .select("imgUrl name")
+      .exec();
 
+    return booking;
+  } catch (err) {
+    throw err;
+  }
+};
+//Obtienes toda la info booking por usuario registrado
+export const getMyBooking = async (id, user) => {
+  logger.info("*** GET USER BOOKING DAO ***");
+  try {
+    console.log("la idd", id);
+    const booking = await Booking.findById(id).populate(populate).exec();
+    console.log("userBooking", booking.clientUserId);
+    if (booking.clientUserId._id.toString() != user._id.toString())
+      throw createError(401, "Unauthorized");
+    return booking;
+  } catch (err) {
+    throw err;
+  }
+};
+//Obtiene todos los booking de un usuario con multiples filtros
 export const getBookingsByRange = async (
   { isoTime, timeZone, range = "month", month, day, start, end, status },
   user = null
@@ -333,7 +360,7 @@ export const getBookingsByRange = async (
     throw err;
   }
 };
-
+//Obtienes info del proximo booking en fecha mas cercana
 export const getNextBooking = async (user = null) => {
   try {
     const nowUtc = DateTime.utc().toFormat("yyyy-MM-dd'T'HH:mm:ss");
