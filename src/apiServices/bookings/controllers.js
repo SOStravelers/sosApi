@@ -93,5 +93,3 @@ export const getNextBooking = async (req, res, next) => {
     next(err);
   }
 };
-
-//http://localhost:3000/booking-link/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODRmMjBkYzZkZWY4NWI3ZThhZDkxMSIsImlhdCI6MTc1MzU0MzE4MX0.Y0rSJ1zXDT2Kf3FANDTeQPvtooPtiz-egZ7fjSQCb08

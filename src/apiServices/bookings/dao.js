@@ -189,7 +189,12 @@ export const createBooking = async (data, user) => {
         numberOrder: orderPurchase,
         startService: timeService.start,
         endService: timeService.end,
-        bookingLink: process.env.URL_FRONTEND + "/bookingLink/" + token,
+        bookingLink:
+          process.env.URL_FRONTEND +
+          "/booking-link/" +
+          token +
+          "?lang=" +
+          data.language,
       },
       data.language
     );
