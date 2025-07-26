@@ -263,6 +263,7 @@ export const getMyBooking = async (id, user) => {
   }
 };
 //Obtiene todos los booking de un usuario con multiples filtros
+
 export const getBookingsByRange = async (
   { isoTime, timeZone, range = "month", month, day, start, end, status },
   user = null
@@ -317,10 +318,9 @@ export const getBookingsByRange = async (
 
     const pipeline = [];
 
-    // Si country es un ObjectId referenciado, haz lookup
     pipeline.push({
       $lookup: {
-        from: "countries", // Asegúrate de que este sea el nombre real de la colección
+        from: "countries",
         localField: "country",
         foreignField: "_id",
         as: "countryData",
@@ -331,7 +331,6 @@ export const getBookingsByRange = async (
       $unwind: "$countryData",
     });
 
-    // Crear el campo con hora local del booking
     pipeline.push({
       $addFields: {
         localStartTime: {
@@ -344,7 +343,13 @@ export const getBookingsByRange = async (
       },
     });
 
-    // Filtrar por hora local del booking dentro del rango deseado
+    const statusFilter =
+      status !== undefined
+        ? Array.isArray(status)
+          ? { $in: status }
+          : status
+        : { $in: ["confirmed", "requested"] };
+
     pipeline.push({
       $match: {
         localStartTime: {
@@ -352,12 +357,11 @@ export const getBookingsByRange = async (
           $lte: endDate,
         },
         ...(user?._id && { clientUserId: user._id }),
-        ...(status && {
-          status: Array.isArray(status) ? { $in: status } : status,
-        }),
+        status: statusFilter,
       },
     });
-    console.log("el agregate", pipeline);
+
+    console.log("el aggregate", JSON.stringify(pipeline, null, 2));
     const bookings = await Booking.aggregate(pipeline);
     return bookings;
   } catch (err) {
@@ -365,8 +369,12 @@ export const getBookingsByRange = async (
     throw err;
   }
 };
+
 //Obtienes info del proximo booking en fecha mas cercana
 export const getNextBooking = async (user = null) => {
+  logger.info("*** NEXT BOOKING DAO ***");
+  console.log("user", user);
+
   try {
     const nowUtc = DateTime.utc().toFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -397,7 +405,7 @@ export const getNextBooking = async (user = null) => {
         $match: {
           localStartTime: { $gte: nowUtc },
           ...(user?._id && { clientUserId: user._id }),
-          status: "confirmed",
+          status: { $in: ["confirmed", "requested"] },
         },
       },
       {
@@ -410,7 +418,11 @@ export const getNextBooking = async (user = null) => {
       },
     ];
 
+    console.log("pipeline", JSON.stringify(pipeline, null, 2));
+
     const result = await Booking.aggregate(pipeline);
+    console.log("resultadosss", result);
+
     return result[0] || null;
   } catch (err) {
     console.error("Error en getNextBooking:", err);
