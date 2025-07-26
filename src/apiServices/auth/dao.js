@@ -159,87 +159,86 @@ export const loginEmail = async (data) => {
 //login y registro por google
 export const loginGoogle = async (data) => {
   logger.info("** LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN **");
+
   try {
     let { email, name, image } = data;
     email = email.toLowerCase().trim();
-    var user = await User.findOne({ email: email }).exec();
-    let newValue = false;
-    if (!user) {
-      console.log("nuevo usuario");
-      newValue = true;
-      user = new User();
-      user.email = email;
-      var partes = name.split(" ");
-      var names = [partes[0], partes.slice(1).join(" ")];
-      user.personalData.name.first = names[0];
-      user.personalData.name.last = names[1];
-      !user.type ? (user.type = "personal") : "";
-      user.username = Math.random().toString(36).substring(2, 12);
-    }
-    !user.img.imgUrl ? (user.img.imgUrl = image) : "";
-    user.lastLogin = Date.now();
-    user.lastLoginType = "google";
-    user.isActive = true;
-    user.isValidate = true;
 
-    const noUser = await NoUser.findOne({ email: email });
+    const partes = name.split(" ");
+    const names = [partes[0], partes.slice(1).join(" ")];
+    const username = Math.random().toString(36).substring(2, 12);
+
+    const update = {
+      $set: {
+        lastLogin: Date.now(),
+        lastLoginType: "google",
+        isActive: true,
+        isValidate: true,
+      },
+      $setOnInsert: {
+        email,
+        username,
+        type: "personal",
+        "personalData.name.first": names[0],
+        "personalData.name.last": names[1],
+        "img.imgUrl": image,
+      },
+    };
+
+    const options = {
+      new: true,
+      upsert: true,
+    };
+
+    let user = await User.findOneAndUpdate({ email }, update, options);
+
+    // Verificar si el usuario vino de NoUser
+    const noUser = await NoUser.findOne({ email });
     if (noUser) {
       user.paymentData.stripe.customer = noUser.paymentData.stripe.customer;
       user.phone = noUser.phone;
-    } else {
-      //stripe customer
+    }
+
+    // Si no tiene customer de Stripe, lo creamos
+    if (!user.paymentData?.stripe?.customer) {
       const dataStripe = {
         email: user.email,
         userId: user._id,
-        name: user.personalData.name + " " + user.personalData.name.last,
+        name: `${user.personalData.name.first} ${user.personalData.name.last}`,
       };
-      user.phone ? (dataStripe.phone = user.phone) : "";
-      user.language ? dataStripe.language : "";
+      if (user.phone) dataStripe.phone = user.phone;
+      if (user.language) dataStripe.language = user.language;
+
       const customerId = await createStripeCustomer(dataStripe, true);
       user.paymentData.stripe.customer = customerId;
     }
 
-    if (newValue) {
-      await user.save();
-      const newUser = await User.findOne({ email: user.email }).select(
-        "about email type img language personalData type username workerData _id security.hasPassword"
-      );
-      await setAllBookings(user);
+    // Guardamos si hubo algún cambio nuevo
+    await user.save();
 
-      let userToCreateToken = {
-        _id: newUser._id,
-        username: newUser.username,
-      };
-      let userRefresh = {
-        _id: newUser._id,
-      };
-      return {
-        msg: "login success",
-        access_token: accessTokenGen(userToCreateToken, true),
-        refresh_token: refreshTokenGen(userRefresh),
-        user: newUser,
-      };
-    } else {
-      let newUser = await User.findByIdAndUpdate(user._id, user, {
-        new: true,
-      }).select(
-        "about email img language personalData username type workerData _id security.hasPassword"
-      );
-      delete newUser.password;
-      // USER (TO CREATE TOKEN)
-      let userToCreateToken = {
-        _id: newUser._id,
-        username: newUser.username,
-        type: newUser.type,
-      };
-      return {
-        msg: "login success",
-        access_token: accessTokenGen(userToCreateToken, true),
-        refresh_token: refreshTokenGen(userToCreateToken),
-        user: newUser,
-      };
-    }
+    // Obtener usuario actualizado con solo los campos requeridos
+    const newUser = await User.findById(user._id).select(
+      "about email img language personalData username type workerData _id security.hasPassword"
+    );
+
+    // Setea reservas si es nuevo (opcional)
+    await setAllBookings(newUser);
+
+    // Tokens
+    const userToCreateToken = {
+      _id: newUser._id,
+      username: newUser.username,
+      type: newUser.type,
+    };
+
+    return {
+      msg: "login success",
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userToCreateToken),
+      user: newUser,
+    };
   } catch (err) {
+    logger.error(err);
     throw err;
   }
 };

@@ -357,7 +357,7 @@ export const getBookingsByRange = async (
         }),
       },
     });
-
+    console.log("el agregate", pipeline);
     const bookings = await Booking.aggregate(pipeline);
     return bookings;
   } catch (err) {

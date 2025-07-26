@@ -6,11 +6,7 @@ export const createBooking = async (req, res, next) => {
   try {
     const data = req.body;
     const response = await BOOKING_DAO.createBooking(data);
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -22,11 +18,7 @@ export const getByToken = async (req, res, next) => {
     const decodedData = decodeTokenSimple(token);
     const data = decodedData.id;
     const response = await BOOKING_DAO.getByToken(data);
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -38,11 +30,7 @@ export const getByTokenMin = async (req, res, next) => {
     const decodedData = decodeTokenSimple(token);
     const data = decodedData.id;
     const response = await BOOKING_DAO.getByTokenMin(data);
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -53,11 +41,7 @@ export const getMyBooking = async (req, res, next) => {
     const user = req.user;
     const idBooking = req.params.id;
     const response = await BOOKING_DAO.getMyBooking(idBooking, user);
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -67,14 +51,8 @@ export const getBookingsByRange = async (req, res, next) => {
   try {
     const data = req.query;
     const user = req.user;
-    console.log("data", data);
-    console.log("user", user);
     const response = await BOOKING_DAO.getBookingsByRange(data, user);
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -83,12 +61,8 @@ export const getBookingsByRange = async (req, res, next) => {
 export const getNextBooking = async (req, res, next) => {
   try {
     const user = req.user;
-    const response = await BOOKING_DAO.getNextBooking();
-    if (response) {
-      res.status(200).json(response);
-    } else {
-      throw err;
-    }
+    const response = await BOOKING_DAO.getNextBooking(user);
+    res.status(200).json(response);
   } catch (err) {
     next(err);
   }
