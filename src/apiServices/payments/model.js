@@ -10,7 +10,7 @@ const paymentSchema = new Schema(
     status: {
       type: String,
       default: "pending",
-      enum: ["unpaid", "paid", "canceled", "refunded"],
+      enum: ["unpaid", "paid", "refunded"],
     },
     clientEmail: { type: String },
     paymentMethod: {

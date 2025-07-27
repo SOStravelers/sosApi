@@ -503,10 +503,11 @@ export const getProductCategoriesAndProducts = async (subserviceId, date) => {
 
 ///
 ////
+//-----------------------------------------------
 
 // controllers/subservice.js
-export const getAllByService = async (req, res, next) => {
-  logger.info("*** GET ALL SUBSERVICES (small) BY SERVICE ---");
+export const getAllByService = async () => {
+  logger.info("*** GET ALL SUBSERVICES (small) BY SERVICE ***");
   try {
     const data = await Subservice.aggregate([
       /* 1) convertir el id-texto al tipo ObjectId para el $lookup */
@@ -551,10 +552,31 @@ export const getAllByService = async (req, res, next) => {
       /* 5) ordenar por nombre en español (opcional) */
       { $sort: { "service.name.es": 1 } },
     ]);
-
-    res.status(200).json(data);
+    return data;
   } catch (err) {
-    next(err);
+    throw err;
+  }
+};
+
+// Actualizar status isActive de un subservicio
+export const changeStatus = async (data, id) => {
+  logger.info("*** UPDATE STATUS SUBSERVICE DAO ***");
+  try {
+    const subservice = await Subservice.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        isActive: data.isActive,
+      },
+      {
+        new: true,
+      }
+    ).exec();
+    if (!subservice) throw createError(404, "subService not found");
+    return subservice;
+  } catch (err) {
+    throw err;
   }
 };
 
@@ -629,28 +651,7 @@ export const updateOne = async (req, res, next) => {
     next(err);
   }
 };
-// Actualizar status isActive de un subservicio
-export const changeStatus = async (req, res, next) => {
-  global.logger.info("---UPDATE STATUS SUBSERVICE---");
-  try {
-    let data = req.body;
-    const subservice = await Subservice.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      {
-        isActive: data.isActive,
-      },
-      {
-        new: true,
-      }
-    ).exec();
-    if (!subservice) throw createError(404, "subService not found");
-    res.status(200).json(subservice);
-  } catch (err) {
-    next(err);
-  }
-};
+
 //Activar o desactivar multiples usuarios
 export const activateMany = async (req, res, next) => {
   global.logger.info("---ACTIVATE/DESACTIVATE MANY SUBSERVICES---");

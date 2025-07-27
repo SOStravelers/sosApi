@@ -134,61 +134,6 @@ const userSchema = new Schema(
         },
       ],
     },
-    businessData: {
-      isActive: { type: Boolean, default: false },
-      category: {
-        type: String,
-        enum: ["category1", "category2", "category3"],
-        default: "category1",
-      },
-      details: {
-        en: {
-          type: String,
-          default: "",
-        },
-        es: {
-          type: String,
-          default: "",
-        },
-        fr: {
-          type: String,
-          default: "",
-        },
-        pt: {
-          type: String,
-          default: "",
-        },
-      },
-      location: {
-        _id: false,
-        country: { type: String },
-        city: { type: String },
-        url: { type: String },
-      },
-      type: {
-        type: String,
-        enum: ["hotel", "hostel", "other"],
-      },
-      name: { type: String },
-      owner: {
-        name: {
-          first: {
-            type: String,
-          },
-          last: {
-            type: String,
-          },
-        },
-      },
-      services: [
-        {
-          _id: false,
-          service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-          isActive: { type: Boolean, default: true },
-          schedule: { type: mongoose.Schema.Types.ObjectId, ref: "Schedule" },
-        },
-      ],
-    },
     paymentData: {
       stripe: {
         customer: { type: String },

@@ -190,32 +190,5 @@ router.get(
   ),
   getByEmail
 );
-//obtener todos los subservicios agrupados por servicios
-router.get("/all/byService", getAllByService);
 
-//actualizar isActive en un sub-servicio:
-router.put(
-  "/changeStatus/one/:id",
-  validateParams(
-    [
-      {
-        param_key: "id",
-        required: true,
-        type: "string",
-      },
-    ],
-    "params"
-  ),
-  validateParams(
-    [
-      {
-        param_key: "isActive",
-        required: true,
-        type: "boolean",
-      },
-    ],
-    "body"
-  ),
-  changeStatus
-);
 export default router;

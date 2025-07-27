@@ -133,6 +133,36 @@ router.get(
   isAuth,
   BOOKING_CONTROLLERS.getBookingsByRange
 );
+
+router.get(
+  "/list/admin-user",
+  validateParams(
+    [
+      {
+        param_key: "timeZone",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "isoTime",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "language",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "range",
+        required: true,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  BOOKING_CONTROLLERS.getBookingsByRange
+);
 //Obtienes info del proximo booking en fecha mas cercana
 router.get("/next/client", isAuth, BOOKING_CONTROLLERS.getNextBooking);
 export default router;

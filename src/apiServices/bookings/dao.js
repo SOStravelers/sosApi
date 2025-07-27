@@ -13,6 +13,7 @@ import { sendEmailPaymentConfirmation } from "../../services/aws_ses.js";
 import { DateTime } from "luxon";
 import { generarCodigoUnicoOrdenCompra } from "../../helpers/bookings/ids.js";
 import { formatRangeFromISO } from "../../utils/time.js";
+import mongoose from "mongoose";
 
 const populate = [
   {
@@ -85,7 +86,11 @@ export const createBooking = async (data, user) => {
       country: subservice.country,
       typeService: subservice.typeService,
       country: subservice.country,
+      canCancel: subservice.canCancel,
     };
+    subservice.canCancel && subservice.timeUntilCancel
+      ? (newData.timeUntilCancel = subservice.timeUntilCancel)
+      : null;
 
     if (!optionsCurrency.includes(data.currency))
       throw createError(400, "Invalid currency");
@@ -265,7 +270,18 @@ export const getMyBooking = async (id, user) => {
 //Obtiene todos los booking de un usuario con multiples filtros
 
 export const getBookingsByRange = async (
-  { isoTime, timeZone, range = "month", month, day, start, end, status },
+  {
+    isoTime,
+    timeZone,
+    range = "month",
+    month,
+    day,
+    start,
+    end,
+    status,
+    typeRequest,
+    service, // <-- nuevo campo
+  },
   user = null
 ) => {
   try {
@@ -316,33 +332,6 @@ export const getBookingsByRange = async (
       }
     }
 
-    const pipeline = [];
-
-    pipeline.push({
-      $lookup: {
-        from: "countries",
-        localField: "country",
-        foreignField: "_id",
-        as: "countryData",
-      },
-    });
-
-    pipeline.push({
-      $unwind: "$countryData",
-    });
-
-    pipeline.push({
-      $addFields: {
-        localStartTime: {
-          $dateToString: {
-            date: "$startTime.isoTime",
-            timezone: "$countryData.timeZone",
-            format: "%Y-%m-%dT%H:%M:%S",
-          },
-        },
-      },
-    });
-
     const statusFilter =
       status !== undefined
         ? Array.isArray(status)
@@ -350,20 +339,130 @@ export const getBookingsByRange = async (
           : status
         : { $in: ["confirmed", "requested"] };
 
-    pipeline.push({
-      $match: {
-        localStartTime: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-        ...(user?._id && { clientUserId: user._id }),
-        status: statusFilter,
-      },
-    });
+    const matchConditions = {
+      localStartTime: { $gte: startDate, $lte: endDate },
+      ...(user?._id && { clientUserId: user._id }),
+      status: statusFilter,
+    };
 
-    console.log("el aggregate", JSON.stringify(pipeline, null, 2));
-    const bookings = await Booking.aggregate(pipeline);
-    return bookings;
+    // Validar que service es un ObjectId válido
+    if (service && mongoose.Types.ObjectId.isValid(service)) {
+      matchConditions.serviceId = new mongoose.Types.ObjectId(service);
+    }
+
+    const basePipeline = [
+      {
+        $lookup: {
+          from: "countries",
+          localField: "country",
+          foreignField: "_id",
+          as: "countryData",
+        },
+      },
+      { $unwind: "$countryData" },
+      {
+        $addFields: {
+          localStartTime: {
+            $dateToString: {
+              date: "$startTime.isoTime",
+              timezone: "$countryData.timeZone",
+              format: "%Y-%m-%dT%H:%M:%S",
+            },
+          },
+        },
+      },
+      {
+        $match: matchConditions,
+      },
+    ];
+
+    if (typeRequest !== "admin") {
+      return await Booking.aggregate(basePipeline);
+    }
+
+    const adminLookups = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "clientUserId",
+          foreignField: "_id",
+          as: "clientUser",
+        },
+      },
+      {
+        $unwind: {
+          path: "$clientUser",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "services",
+          localField: "serviceId",
+          foreignField: "_id",
+          as: "service",
+        },
+      },
+      {
+        $unwind: {
+          path: "$service",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "subservices",
+          localField: "subserviceId",
+          foreignField: "_id",
+          as: "subservice",
+        },
+      },
+      {
+        $unwind: {
+          path: "$subservice",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "currencies",
+          localField: "currency",
+          foreignField: "_id",
+          as: "currencyData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$currencyData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "workerUser",
+          foreignField: "_id",
+          as: "workerUser",
+        },
+      },
+      {
+        $unwind: {
+          path: "$workerUser",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "services",
+          localField: "workerUser.workerData.services.id",
+          foreignField: "_id",
+          as: "workerUserServices",
+        },
+      },
+    ];
+
+    const fullPipeline = [...basePipeline, ...adminLookups];
+    return await Booking.aggregate(fullPipeline);
   } catch (err) {
     console.error("Error en getBookingsByRange (AGGREGATE):", err);
     throw err;
@@ -420,7 +519,7 @@ export const getNextBooking = async (user = null) => {
 
     console.log("pipeline", JSON.stringify(pipeline, null, 2));
 
-    const result = await Booking.aggregate(pipeline);
+    const result = await Booking.aggregate(pipeline).populate(populate);
     console.log("resultadosss", result);
 
     return result[0] || null;
