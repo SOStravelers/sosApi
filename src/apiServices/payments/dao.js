@@ -7,6 +7,7 @@ import { createError } from "../../config/error.js";
 import Subservice from "../subservices/model.js";
 import NoUser from "../nousers/model.js";
 import User from "../users/model.js";
+import { isBeforeHoursThreshold } from "../../utils/time.js";
 
 //-----------------
 //------STRIPE-----
@@ -84,34 +85,6 @@ const opciones = ["usd", "brl", "eur"];
 //---------------
 //-----FUNCIONES
 //---------------
-
-export function isBeforeHoursThreshold(
-  dateString,
-  hoursBefore,
-  language = "pt"
-) {
-  const targetDate = new Date(dateString);
-
-  if (isNaN(targetDate.getTime())) {
-    console.error("❌ Fecha inválida:", dateString);
-    return {
-      isBefore: false,
-      cancelTime: {
-        isoTime: null,
-        stringData: "",
-      },
-    };
-  }
-
-  // Calcular la fecha límite
-  const thresholdDate = new Date(
-    targetDate.getTime() - hoursBefore * 60 * 60 * 1000
-  );
-
-  const now = new Date(); // ya es en UTC
-
-  return now < thresholdDate;
-}
 
 const validateCreateBooking = async (subservice, data) => {
   logger.info("*** VALIDATE CREATE BOOKING STRIPE PAYMENT DAO ***");
@@ -335,6 +308,63 @@ export const createCheckoutLink = async (data) => {
     throw err;
   }
 };
+//
+export const capturePaymentBooking = async (idBooking) => {
+  logger.info("*** CAPTURE PAYMENT BOOKING STRIPE PAYMENT DAO ***");
+  try {
+    const booking = await Booking.findById(idBooking).populate(
+      "currency provider"
+    );
+    1;
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.paymentStatus != "unpaid")
+      throw createError(400, "Invalid payment status");
+    const timeUntilCancel = booking.timeUntilCancel || 0;
+    if (!isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
+      throw createError(400, "Invalid time");
+    let customerId = null;
+    if (booking.clientUserId) {
+      const clientUser = await User.findById(booking.clientUserId);
+      if (!clientUser) throw createError(404, "Client user not found");
+      customerId = clientUser.paymentData.stripe.customer;
+    } else {
+      const noUser = await NoUser.findOne({ email: booking.clientEmail });
+      if (!noUser) throw createError(404, "No user not found");
+      customerId = noUser.paymentData.stripe.customer;
+    }
+    if (!customerId) throw createError(404, "Customer not found");
+    let connectAccountId = null;
+    if (booking.provider) {
+      connectAccountId =
+        booking?.provider?.paymentData?.stripe?.connectAccountId;
+    }
+    const data = {
+      customer: customerId,
+      price: booking.price.grossAmount,
+      currency: booking.currency.code,
+      connectAccountId: connectAccountId,
+      percentage: 6,
+    };
+    const intent = await STRIPE_SERVICE.createDirectPaymentIntent(data);
+    booking.paymentStatus = "paid";
+    booking.save();
+
+    return "sucess";
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const creteDirectPaymentStripe = async (data) => {
+  logger.info("*** GET PAYMENT INTENT BY ID STRIPE PAYMENT DAO ***");
+  try {
+    const link = await STRIPE_SERVICE.createDirectPaymentIntent(data);
+    return link;
+  } catch (err) {
+    throw err;
+  }
+};
+
 //---------------
 
 export const transferPayments = async (data, user) => {
@@ -412,16 +442,6 @@ export const getPaymentIntentById = async (id) => {
 };
 
 //-----------------
-
-export const creteDirectPaymentStripe = async (data) => {
-  logger.info("*** GET PAYMENT INTENT BY ID STRIPE PAYMENT DAO ***");
-  try {
-    const link = await STRIPE_SERVICE.createDirectPaymentIntent(data);
-    return link;
-  } catch (err) {
-    throw err;
-  }
-};
 
 //-----------------
 //------PAYPAL-----

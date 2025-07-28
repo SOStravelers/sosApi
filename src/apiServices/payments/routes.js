@@ -156,6 +156,21 @@ router.post(
   ),
   PAYMENT_CONTROLLERS.createCheckoutLink
 );
+router.get(
+  "/stripe/chargeBooking/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  PAYMENT_CONTROLLERS.capturePaymentBooking
+);
+
 //--------
 router.get(
   "/stripe/capture/:id",

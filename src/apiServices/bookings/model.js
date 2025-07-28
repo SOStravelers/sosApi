@@ -6,6 +6,7 @@ import uniqueValidator from "mongoose-unique-validator";
 const bookingSchema = new Schema(
   {
     workerUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    provider: { type: mongoose.Schema.Types.ObjectId, ref: "Provider" },
     clientUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
     clientData: { type: Object },
@@ -51,6 +52,7 @@ const bookingSchema = new Schema(
     duration: { type: Number },
     title: { type: String, default: "new Event" },
     payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
+
     canceledData: {
       canceledBy: { type: String, ref: "User" },
       canceledAtUTC: { type: Date },
@@ -62,6 +64,11 @@ const bookingSchema = new Schema(
       type: String,
       default: "requested",
       enum: ["requested", "confirmed", "canceled", "completed"],
+    },
+    paymentStatus: {
+      type: String,
+      default: "requested",
+      enum: ["unpaid", "paid", "refund", "canceled"],
     },
     observations: Array({
       creator: { type: String, ref: "User" },

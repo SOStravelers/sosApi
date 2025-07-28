@@ -165,4 +165,66 @@ router.get(
 );
 //Obtienes info del proximo booking en fecha mas cercana
 router.get("/next/client", isAuth, BOOKING_CONTROLLERS.getNextBooking);
+
+//Confirm booking
+router.put(
+  "/confirm/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  BOOKING_CONTROLLERS.confirmBooking
+);
+//Complete booking
+router.put(
+  "/complete/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  BOOKING_CONTROLLERS.completeBooking
+);
+//Cancel booking
+router.put(
+  "/cancel/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  BOOKING_CONTROLLERS.cancelBooking
+);
+//Cancel booking user
+router.put(
+  "/cancel/id/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  isAuth,
+  BOOKING_CONTROLLERS.cancelBookingUser
+);
 export default router;

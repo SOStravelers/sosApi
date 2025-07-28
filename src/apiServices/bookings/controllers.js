@@ -67,3 +67,44 @@ export const getNextBooking = async (req, res, next) => {
     next(err);
   }
 };
+//Confirmar booking
+export const confirmBooking = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const response = await BOOKING_DAO.confirmBooking(id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+//Completar booking
+export const completeBooking = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const response = await BOOKING_DAO.confirmBooking(id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+//Cancelar booking
+export const cancelBooking = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const response = await BOOKING_DAO.cancelBooking(id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+//Cancelar booking del usuario
+export const cancelBookingUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const user = req.user;
+    const response = await BOOKING_DAO.cancelBookingUser(id, user);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};

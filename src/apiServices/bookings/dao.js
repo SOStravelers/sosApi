@@ -14,6 +14,7 @@ import { DateTime } from "luxon";
 import { generarCodigoUnicoOrdenCompra } from "../../helpers/bookings/ids.js";
 import { formatRangeFromISO } from "../../utils/time.js";
 import mongoose from "mongoose";
+import { isBeforeHoursThreshold } from "../../utils/time.js";
 
 const populate = [
   {
@@ -87,6 +88,7 @@ export const createBooking = async (data, user) => {
       typeService: subservice.typeService,
       country: subservice.country,
       canCancel: subservice.canCancel,
+      paymentStatus: "unpaid",
     };
     subservice.canCancel && subservice.timeUntilCancel
       ? (newData.timeUntilCancel = subservice.timeUntilCancel)
@@ -123,6 +125,8 @@ export const createBooking = async (data, user) => {
     if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
       //partidos de futbol
       newData.status = "confirmed";
+    } else {
+      newData.status = "requested";
     }
 
     let booking = new Booking(newData);
@@ -468,7 +472,6 @@ export const getBookingsByRange = async (
     throw err;
   }
 };
-
 //Obtienes info del proximo booking en fecha mas cercana
 export const getNextBooking = async (user = null) => {
   logger.info("*** NEXT BOOKING DAO ***");
@@ -525,6 +528,73 @@ export const getNextBooking = async (user = null) => {
     return result[0] || null;
   } catch (err) {
     console.error("Error en getNextBooking:", err);
+    throw err;
+  }
+};
+//Confirmar booking
+export const confirmBooking = async (id) => {
+  logger.info("*** CONFIRM BOOKING DAO ***");
+  try {
+    const booking = await Booking.findById(id);
+    if (!booking) throw createError(404, "Booking not found");
+    if (!booking.status !== "requested")
+      throw createError(400, "Invalid status");
+    booking.status = "confirmed";
+    booking.save();
+    return booking;
+  } catch (err) {
+    throw err;
+  }
+};
+//Completar booking
+export const completeBooking = async (id) => {
+  logger.info("*** COMPLETE BOOKING DAO ***");
+  try {
+    const booking = await Booking.findById(id);
+    if (!booking) throw createError(404, "Booking not found");
+    if (!booking.status !== "confirmed")
+      throw createError(400, "Invalid status");
+    booking.status = "confirmed";
+    booking.save();
+    return booking;
+  } catch (err) {
+    throw err;
+  }
+};
+
+//Cancelar booking
+export const cancelBooking = async (id) => {
+  logger.info("*** CANCEL BOOKING DAO ***");
+  try {
+    const booking = await Booking.findById(id);
+    if (!booking) throw createError(404, "Booking not found");
+    console.log("paymentstatus", booking.paymentStatus);
+    if (booking.paymentStatus != "unpaid")
+      throw createError(400, "Invalid payment status");
+    booking.status = "canceled";
+    booking.save();
+    return booking;
+  } catch (err) {
+    throw err;
+  }
+};
+//Cancelar booking del usuario
+export const cancelBookingUser = async (id, user) => {
+  logger.info("*** CANCEL USER BOOKING DAO ***");
+  try {
+    const booking = await Booking.findById(id);
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.paymentStatus != "unpaid")
+      throw createError(400, "Invalid payment status");
+    if (booking.clientUserId != user._id)
+      throw createError(401, "Unauthorized");
+    const timeUntilCancel = booking.timeUntilCancel || 0;
+    if (!isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
+      throw createError(400, "Invalid time");
+    booking.status = "cancelled";
+    booking.save();
+    return booking;
+  } catch (err) {
     throw err;
   }
 };
