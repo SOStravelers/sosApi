@@ -142,6 +142,21 @@ router.post(
 
 //--------------SETTINGS---------------------
 
+//obtener todos los subservicios por servicio
+router.get(
+  "/byService/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  SERVICE_CONTROLLERS.getByService
+);
 //obtener todos los subservicios agrupados por servicios
 router.get("/all/byService", SERVICE_CONTROLLERS.getAllByService);
 
@@ -169,6 +184,37 @@ router.put(
     "body"
   ),
   SERVICE_CONTROLLERS.changeStatus
+);
+
+//actualizar data de productos de servivicios
+router.put(
+  "/productData/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "categories",
+        required: true,
+        type: "array",
+      },
+      {
+        param_key: "eventData",
+        required: true,
+        type: "object",
+      },
+    ],
+    "body"
+  ),
+  SERVICE_CONTROLLERS.updateProductData
 );
 
 export default router;

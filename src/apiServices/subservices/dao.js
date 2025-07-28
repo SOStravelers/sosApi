@@ -1,6 +1,6 @@
 import Subservice from "./model.js";
 import Product from "../products/model.js";
-import Category from "../items/model.js";
+import Category from "../categories/model.js";
 import mongoose from "mongoose";
 import User from "../users/model.js";
 import sharp from "sharp";
@@ -594,25 +594,13 @@ export const create = async (req, res, next) => {
   }
 };
 //obtener los subservicios por servicio
-export const getByService = async (req, res, next) => {
-  global.logger.info("---GET SUBSERVICES BY SERVICE---");
+export const getByService = async (id) => {
+  logger.info("*** GET SUBSERVICES BY SERVICE ***");
   try {
-    let options = {
-      // populate,
-      select:
-        "name price duration imgUrl details multiple shortDescription goChat isoTime",
-      page: Number(req.query.page) || 1,
-      limit: Number(req.query.limit) || 50,
-      sort: { updatedAt: -1 },
-    };
-    let query = {};
-    query.isActive = true;
-    query.service = req.query.id;
-
-    const subservices = await Subservice.paginate(query, options);
-    res.status(200).json(subservices);
+    const subservices = await Subservice.find({ service: id });
+    return subservices;
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
 
@@ -649,6 +637,26 @@ export const updateOne = async (req, res, next) => {
     res.status(200).json(subservice);
   } catch (err) {
     next(err);
+  }
+};
+
+//Actualizar data de un subservicio
+export const updateProductData = async (id, data) => {
+  global.logger.info("*** UPDATE PRODUCT DATA SUBSERVICE ***");
+  try {
+    const subservice = await Subservice.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      data,
+      {
+        new: true,
+      }
+    ).exec();
+    if (!subservice) throw createError(404, "subService not found");
+    return subservice;
+  } catch (err) {
+    throw err;
   }
 };
 

@@ -88,6 +88,7 @@ export const createBooking = async (data, user) => {
       typeService: subservice.typeService,
       country: subservice.country,
       canCancel: subservice.canCancel,
+      timeUntilCancel: subservice.timeUntilCancel,
       paymentStatus: "unpaid",
     };
     subservice.canCancel && subservice.timeUntilCancel

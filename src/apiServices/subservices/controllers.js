@@ -92,6 +92,17 @@ export const uploadAssets = async (req, res, next) => {
 //------------------------SETTINGS----------------------------
 
 //Obtienes todos los servicios con subservicios anidados
+export const getByService = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const response = await SUBSERVICE_DAO.getByService(id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//Obtienes todos los servicios con subservicios anidados
 export const getAllByService = async (req, res, next) => {
   try {
     const response = await SUBSERVICE_DAO.getAllByService();
@@ -107,6 +118,18 @@ export const changeStatus = async (req, res, next) => {
     const id = req.params.id;
 
     const response = await SUBSERVICE_DAO.changeStatus(data, id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateProductData = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    delete body._id;
+    const response = await SUBSERVICE_DAO.updateProductData(id, body);
     res.status(200).json(response);
   } catch (err) {
     next(err);

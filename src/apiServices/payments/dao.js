@@ -90,17 +90,24 @@ const validateCreateBooking = async (subservice, data) => {
   logger.info("*** VALIDATE CREATE BOOKING STRIPE PAYMENT DAO ***");
   try {
     //Valida que no sea un fecha del pasado
-    const isoTime = data.isoTime;
+    let isoTime = null;
+    if (
+      subservice.hasEvent &&
+      subservice?.eventData.available &&
+      subservice?.eventData.isoTime
+    ) {
+      isoTime = subservice?.eventData.isoTime;
+    } else {
+      isoTime = data.isoTime;
+    }
     const isPast = new Date(isoTime) < new Date();
     if (isPast) throw createError(400, "Invalid isoTime");
     //Existe limite maximo para hacer el booking
-    if (subservice.haveLimitTime) {
-      const canBook = isBeforeHoursThreshold(
-        data.isoTime,
-        subservice.timeLimitBook
-      );
-      if (!canBook) throw createError(400, "Invalid isoTime");
-    }
+    const canBook = isBeforeHoursThreshold(
+      data.isoTime,
+      subservice.timeLimitBook
+    );
+    if (!canBook) throw createError(400, "Invalid isoTime");
   } catch (err) {
     err;
   }
@@ -133,7 +140,9 @@ export const paymentIntentStripe = async (data, user) => {
       .lean();
     if (!subservice) throw createError(404, "Subservice not found");
     //---------------Validaciones------------------------
-    validateCreateBooking(subservice, data);
+    if (subservice.haveLimitTime) {
+      validateCreateBooking(subservice, data);
+    }
     //---------------------------------------------------
     //---Analizar si data del precio no fue adulterada---
     //---------------------------------------------------

@@ -70,6 +70,9 @@ const bookingSchema = new Schema(
       default: "requested",
       enum: ["unpaid", "paid", "refund", "canceled"],
     },
+    canCancel: { type: Boolean },
+    timeUntilCancel: { type: Number },
+
     observations: Array({
       creator: { type: String, ref: "User" },
       observation: Array({ type: String, default: null }),
