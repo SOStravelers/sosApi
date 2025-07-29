@@ -43,6 +43,8 @@ const userSchema = new Schema(
       enum: ["personal", "business", "worker"],
     },
     phone: { type: String },
+    phoneCode: { type: String },
+    phoneCountry: { type: String },
     img: {
       imgUrl: { type: String, default: "" },
       coverImg: { type: String, default: "" },
@@ -106,33 +108,6 @@ const userSchema = new Schema(
       nationality: { type: String },
       country: { type: String },
       idNumber: { type: String },
-    },
-    workerData: {
-      isMyServicesOk: { type: Boolean, default: false },
-      isAboutmeOk: { type: Boolean, default: false },
-      isMySchedulesOk: { type: Boolean, default: false },
-      isMyWorkplacesOk: { type: Boolean, default: true },
-      isActive: { type: Boolean, default: false },
-      phone: { type: String },
-      languages: {
-        main: {
-          type: String,
-          default: "EN",
-          enum: ["EN", "ES", "FR", "BR"],
-        },
-        secondary: { type: Array },
-      },
-      services: [
-        {
-          id: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-          _id: false,
-          subServices: Array({
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Subservice",
-          }),
-          gallery: { type: Array },
-        },
-      ],
     },
     paymentData: {
       stripe: {

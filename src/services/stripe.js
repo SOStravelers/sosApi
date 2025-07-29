@@ -197,6 +197,9 @@ export const createPaymentIntent = async (
     if (methods && methods.data && user) {
       user.paymentData.stripe.methodIdDefault = methods?.data[0]?.id || null;
       user.paymentData.stripe.methods = methods.data;
+      user.phone = data?.clientData?.phone;
+      user.phoneCode = data?.clientData?.phoneCode;
+      user.phoneCountry = data?.clientData?.phoneCountry;
       await user.save();
     }
     //Se manda respuesta

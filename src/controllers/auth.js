@@ -1279,7 +1279,7 @@ export const gettokenUser = async (req, res, next) => {
   console.log("email", req.params.email);
   try {
     const user = await User.findOne({ email: req.params.email }).select(
-      " email img _id  username type"
+      " email img _id  username type phone personalData phoneCode phoneCountry"
     );
     if (!user) {
       throw createError(404, "User not found");

@@ -39,7 +39,7 @@ const bookingSchema = new Schema(
       grossAmount: { type: Number },
     },
     idKey: { type: String },
-    purchaseOrder: { type: String, unique: true },
+    purchaseOrder: { type: String, unique: true, sparse: true },
     startTime: {
       formatedDate: { type: String },
       formatedTime: { type: String },

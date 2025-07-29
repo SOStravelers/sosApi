@@ -139,7 +139,8 @@ export const paymentIntentStripe = async (data, user) => {
       .populate("categories.products.product", "name")
       .lean();
     if (!subservice) throw createError(404, "Subservice not found");
-    //---------------Validaciones------------------------
+    //---------------Validaciones------------------------o
+    //valida hora maxima para agendar un servicio antes del inici
     if (subservice.haveLimitTime) {
       validateCreateBooking(subservice, data);
     }

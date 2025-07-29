@@ -157,8 +157,8 @@ export const createBooking = async (data, user) => {
     // Asignar el nuevo idKey al booking
     booking.idKey = newIdKey;
 
-    const orderPurchase = await generarCodigoUnicoOrdenCompra();
-    booking.orderPurchase = orderPurchase;
+    const purchaseOrderNumber = await generarCodigoUnicoOrdenCompra();
+    booking.purchaseOrder = purchaseOrderNumber;
 
     const newBooking = await booking.save();
 
@@ -196,7 +196,7 @@ export const createBooking = async (data, user) => {
         nameClient: data.clientData.name,
         subserviceName: subservice.name[data.language],
         serviceName: subservice.service.name[data.language],
-        numberOrder: orderPurchase,
+        numberOrder: purchaseOrderNumber,
         startService: timeService.start,
         endService: timeService.end,
         bookingLink:

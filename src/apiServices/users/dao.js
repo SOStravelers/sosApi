@@ -45,18 +45,9 @@ export const findUserToken = async (user) => {
   logger.info("*** FIND USER TOKEN USER DAO ***");
   try {
     const userId = user._id;
-    const userFinded = await User.findOne({ _id: userId })
-      .select(
-        "type isActive username businessData email rating img personalData security workerData.isActive workerData.isMyServicesOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk workerData.isAboutmeOk"
-      )
-      .populate({
-        path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
-        model: "Service", // Modelo de "Service"
-      })
-      .populate({
-        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
-        model: "Service", // Modelo de "Service"
-      });
+    const userFinded = await User.findOne({ _id: userId }).select(
+      "type isActive username  email rating img personalData security phone phoneCode phoneCountry"
+    );
 
     if (!userFinded) {
       throw createError(404, "User not found");
