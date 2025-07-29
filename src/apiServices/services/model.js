@@ -32,6 +32,7 @@ const serviceSchema = new Schema(
     archived: { type: Boolean, default: false },
     details: { type: String },
     imgUrl: { type: String },
+    auxImg: { type: String },
     icon: { type: String },
     creator: { type: String, ref: "User" },
     updated: {
