@@ -196,22 +196,76 @@ export const uploadAssets = async (id, files, body) => {
   }
 };
 
+export function getRefPriceData(doc, currency = "usd") {
+  let refPrice = null;
+
+  if (doc.typeService === "tour") {
+    refPrice = doc.tourData?.adultPrice || null;
+  } else if (doc.typeService === "product") {
+    const defaultCategory = doc.categories?.find(
+      (c) => c.default && Array.isArray(c.products) && c.products.length > 0
+    );
+    const defaultProduct = defaultCategory?.products?.find(
+      (p) => p.default && p.price
+    );
+
+    if (defaultProduct) {
+      refPrice = defaultProduct.price;
+    }
+  }
+
+  const reducedDoc = {
+    _id: doc._id,
+    name: doc.name,
+    imgUrl: doc.imgUrl,
+    duration: doc.duration,
+    videoUrl: doc.videoUrl,
+    rate: doc.rate,
+    rateCount: doc.rateCount,
+    gallery: doc.gallery,
+    service: { name: doc.service?.name },
+    chipData: doc.chipData,
+    refPrice,
+    order: doc.order,
+  };
+
+  if (doc.typeService === "tour") {
+    reducedDoc.tourData = { adultPrice: refPrice };
+  } else if (doc.typeService === "product") {
+    reducedDoc.category = {
+      type: doc.categories?.find((c) => c.default)?.type,
+      default: true,
+      products: [
+        {
+          price: refPrice,
+          default: true,
+        },
+      ],
+    };
+  }
+
+  return reducedDoc;
+}
+
 //Obtener all services con VIDEOS
+
 export const getWithVideos = async () => {
   logger.info("*** GET WITH VIDEOS SUBSERVICE DAO ***");
   try {
-    const subservices = await Subservice.find({
+    const docs = await Subservice.find({
       isActive: true,
       videoUrl: { $exists: true, $ne: null },
-    });
-    // .populate({
-    //   path: "currency",
-    // });
-    return subservices;
+    })
+      .populate({ path: "service", select: "name" })
+      .lean();
+
+    const reducedList = docs.map((doc) => getRefPriceData(doc, "usd")); // o cualquier moneda actual
+    return reducedList;
   } catch (err) {
     throw err;
   }
 };
+
 //Obtener all services con paginate
 
 export const getAll = async (data) => {
@@ -230,6 +284,7 @@ export const getAll = async (data) => {
     limit = parseInt(limit);
 
     const query = { isActive: true };
+
     if (keyword && typeof keyword === "string" && keyword.trim() !== "") {
       const segments = buildKeywordSegments(keyword);
       query["$or"] = [];
@@ -240,6 +295,7 @@ export const getAll = async (data) => {
         }
       }
     }
+
     if (service) query.service = service;
 
     const allDocs = await Subservice.find(query)
@@ -253,83 +309,26 @@ export const getAll = async (data) => {
 
     const groupedByOrder = new Map();
     const withoutOrder = [];
-    const allReducedDocs = [];
 
     for (const doc of allDocs) {
-      let match = false;
-      let refPrice = null;
-      let price = null;
+      const reducedDoc = getRefPriceData(doc, currency);
+      const price = reducedDoc?.refPrice?.[currency];
 
-      if (doc.typeService === "tour") {
-        price = doc.tourData?.adultPrice?.[currency];
-        const priceMatch =
-          !applyPriceFilter ||
-          (price !== undefined &&
-            (minPrice === undefined || price >= minPrice) &&
-            (maxPrice === undefined || price <= maxPrice));
-        if (priceMatch) {
-          match = true;
-          refPrice = doc.tourData?.adultPrice;
-        }
-      } else if (doc.typeService === "product") {
-        const defaultCategory = doc.categories?.find(
-          (c) => c.default && Array.isArray(c.products) && c.products.length > 0
-        );
-        const defaultProduct = defaultCategory?.products?.find(
-          (p) => p.default && p.price
-        );
-
-        if (defaultCategory && defaultProduct) {
-          price = defaultProduct.price?.[currency];
-          const priceMatch =
-            !applyPriceFilter ||
-            (price !== undefined &&
-              (minPrice === undefined || price >= minPrice) &&
-              (maxPrice === undefined || price <= maxPrice));
-          if (priceMatch) {
-            match = true;
-            refPrice = defaultProduct.price;
-          }
+      if (applyPriceFilter) {
+        if (
+          price === undefined ||
+          (minPrice !== undefined && price < minPrice) ||
+          (maxPrice !== undefined && price > maxPrice)
+        ) {
+          continue;
         }
       }
 
-      if (!match && applyPriceFilter) continue;
-
-      const reducedDoc = {
-        _id: doc._id,
-        name: doc.name,
-        imgUrl: doc.imgUrl,
-        duration: doc.duration,
-        videoUrl: doc.videoUrl,
-        rate: doc.rate,
-        rateCount: doc.rateCount,
-        gallery: doc.gallery,
-        service: { name: doc.service?.name },
-        chipData: doc.chipData,
-        refPrice,
-        order: doc.order,
-      };
-
-      if (doc.typeService === "tour") {
-        reducedDoc.tourData = { adultPrice: refPrice };
-      } else if (doc.typeService === "product") {
-        reducedDoc.category = {
-          type: doc.categories?.find((c) => c.default)?.type,
-          default: true,
-          products: [
-            {
-              price: refPrice,
-              default: true,
-            },
-          ],
-        };
-      }
-
-      allReducedDocs.push(reducedDoc);
-
-      if (doc.order !== undefined) {
-        if (!groupedByOrder.has(doc.order)) groupedByOrder.set(doc.order, []);
-        groupedByOrder.get(doc.order).push(reducedDoc);
+      if (reducedDoc.order !== undefined) {
+        if (!groupedByOrder.has(reducedDoc.order)) {
+          groupedByOrder.set(reducedDoc.order, []);
+        }
+        groupedByOrder.get(reducedDoc.order).push(reducedDoc);
       } else {
         withoutOrder.push(reducedDoc);
       }
@@ -339,11 +338,9 @@ export const getAll = async (data) => {
     let finalList = [];
     const orders = Array.from(groupedByOrder.keys()).sort((a, b) => a - b);
     for (const order of orders) {
-      const levelItems = groupedByOrder.get(order);
-      finalList = finalList.concat(shuffleArray(levelItems));
+      finalList = finalList.concat(shuffleArray(groupedByOrder.get(order)));
     }
 
-    // Agregar los sin orden (solo una vez)
     finalList = finalList.concat(shuffleArray(withoutOrder));
 
     // Aplicar paginación real
