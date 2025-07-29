@@ -223,7 +223,7 @@ export const getAll = async (data) => {
       currency,
       service,
       page = 1,
-      limit = 12,
+      limit = 20,
     } = data;
 
     page = parseInt(page);
@@ -253,7 +253,7 @@ export const getAll = async (data) => {
 
     const groupedByOrder = new Map();
     const withoutOrder = [];
-    let allReducedDocs = [];
+    const allReducedDocs = [];
 
     for (const doc of allDocs) {
       let match = false;
@@ -335,6 +335,7 @@ export const getAll = async (data) => {
       }
     }
 
+    // Mezclar y unir todos los resultados ordenados
     let finalList = [];
     const orders = Array.from(groupedByOrder.keys()).sort((a, b) => a - b);
     for (const order of orders) {
@@ -342,17 +343,10 @@ export const getAll = async (data) => {
       finalList = finalList.concat(shuffleArray(levelItems));
     }
 
-    if (page === 1) {
-      finalList = finalList.concat(shuffleArray(withoutOrder));
-    } else {
-      // Excluir los que ya fueron mostrados por "order" en página 1
-      const shownIds = new Set(finalList.map((d) => d._id.toString()));
-      const remaining = shuffleArray(
-        allReducedDocs.filter((doc) => !shownIds.has(doc._id.toString()))
-      );
-      finalList = remaining;
-    }
+    // Agregar los sin orden (solo una vez)
+    finalList = finalList.concat(shuffleArray(withoutOrder));
 
+    // Aplicar paginación real
     const startIndex = (page - 1) * limit;
     const paginatedDocs = finalList.slice(startIndex, startIndex + limit);
 
@@ -362,6 +356,7 @@ export const getAll = async (data) => {
       limit,
       page,
       totalPages: Math.ceil(finalList.length / limit),
+      hasNextPage: page < Math.ceil(finalList.length / limit),
     };
   } catch (err) {
     throw err;
