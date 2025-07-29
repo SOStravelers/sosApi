@@ -72,6 +72,20 @@ export const getRecommendedSubservice = async (req, res, next) => {
   }
 };
 
+//------------------------SETTINGS----------------------------
+
+//Obtienes todos los servicios con subservicios anidados
+
+export const create = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const response = await SUBSERVICE_DAO.create(data);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const uploadAssets = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -89,9 +103,6 @@ export const uploadAssets = async (req, res, next) => {
   }
 };
 
-//------------------------SETTINGS----------------------------
-
-//Obtienes todos los servicios con subservicios anidados
 export const getByService = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -118,6 +129,18 @@ export const changeStatus = async (req, res, next) => {
     const id = req.params.id;
 
     const response = await SUBSERVICE_DAO.changeStatus(data, id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateOne = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    delete body._id;
+    const response = await SUBSERVICE_DAO.updateOne(id, body);
     res.status(200).json(response);
   } catch (err) {
     next(err);

@@ -31,6 +31,27 @@ const upload = multer({
   },
 });
 
+//Create subService
+router.post(
+  "/",
+  validateParams(
+    [
+      {
+        param_key: "name",
+        required: true,
+        type: "object",
+      },
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  SERVICE_CONTROLLERS.create
+);
+
 //Get all services
 router.get(
   "/getAll/paginate",
@@ -184,6 +205,23 @@ router.put(
     "body"
   ),
   SERVICE_CONTROLLERS.changeStatus
+);
+
+//actualizar data de productos de servivicios
+router.put(
+  "/allData/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+
+  SERVICE_CONTROLLERS.updateOne
 );
 
 //actualizar data de productos de servivicios

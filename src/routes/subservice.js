@@ -60,26 +60,7 @@ router.post(
   ]),
   uploadAssets
 );
-//Create subService
-router.post(
-  "/",
-  validateParams(
-    [
-      {
-        param_key: "name",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "service",
-        required: true,
-        type: "string",
-      },
-    ],
-    "body"
-  ),
-  create
-);
+
 //Get subServices by Service
 router.get(
   "/byService",

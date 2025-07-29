@@ -211,6 +211,8 @@ const subserviceSchema = new Schema(
     haveLimitTime: { type: Boolean, default: false },
     timeLimitBook: { type: Number },
     withTicket: { type: Boolean, default: false },
+    order: { type: Number },
+
     typeService: {
       type: String,
       enum: ["tour", "event", "product"],

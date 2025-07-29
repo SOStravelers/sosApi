@@ -39,6 +39,18 @@ function extractKeyFromUrl(url) {
   }
 }
 
+export const create = async (data) => {
+  logger.info("*** CREATE NEW SUBSERVICE DAO ***");
+  try {
+    let subservice = new Subservice(data);
+    subservice.isActive = false;
+    const newsubService = await subservice.save();
+    return newsubService;
+  } catch (err) {
+    throw err;
+  }
+};
+
 //subir y eliminar galeria de fotos, imgurl, videoUrl
 
 export const uploadAssets = async (id, files, body) => {
@@ -217,7 +229,7 @@ export const getAll = async (data) => {
     page = parseInt(page);
     limit = parseInt(limit);
 
-    const query = { isActive: true }; // ← no filtramos por archived
+    const query = { isActive: true };
     if (keyword && typeof keyword === "string" && keyword.trim() !== "") {
       const segments = buildKeywordSegments(keyword);
       query["$or"] = [];
@@ -230,27 +242,58 @@ export const getAll = async (data) => {
     }
     if (service) query.service = service;
 
-    const options = {
-      populate: [{ path: "service", select: "name" }],
-      page,
-      limit,
-      lean: true,
-      sort: { createdAt: -1 },
-    };
-
-    const result = await Subservice.paginate(query, options);
-    const docs = result.docs;
-
-    const filteredResults = [];
+    const allDocs = await Subservice.find(query)
+      .populate({ path: "service", select: "name" })
+      .lean();
 
     const applyPriceFilter = currency || minPrice || maxPrice;
     if (currency) currency = currency.toLowerCase();
     if (minPrice) minPrice = parseFloat(minPrice);
     if (maxPrice) maxPrice = parseFloat(maxPrice);
 
-    for (const doc of docs) {
+    const groupedByOrder = new Map();
+    const withoutOrder = [];
+    let allReducedDocs = [];
+
+    for (const doc of allDocs) {
       let match = false;
       let refPrice = null;
+      let price = null;
+
+      if (doc.typeService === "tour") {
+        price = doc.tourData?.adultPrice?.[currency];
+        const priceMatch =
+          !applyPriceFilter ||
+          (price !== undefined &&
+            (minPrice === undefined || price >= minPrice) &&
+            (maxPrice === undefined || price <= maxPrice));
+        if (priceMatch) {
+          match = true;
+          refPrice = doc.tourData?.adultPrice;
+        }
+      } else if (doc.typeService === "product") {
+        const defaultCategory = doc.categories?.find(
+          (c) => c.default && Array.isArray(c.products) && c.products.length > 0
+        );
+        const defaultProduct = defaultCategory?.products?.find(
+          (p) => p.default && p.price
+        );
+
+        if (defaultCategory && defaultProduct) {
+          price = defaultProduct.price?.[currency];
+          const priceMatch =
+            !applyPriceFilter ||
+            (price !== undefined &&
+              (minPrice === undefined || price >= minPrice) &&
+              (maxPrice === undefined || price <= maxPrice));
+          if (priceMatch) {
+            match = true;
+            refPrice = defaultProduct.price;
+          }
+        }
+      }
+
+      if (!match && applyPriceFilter) continue;
 
       const reducedDoc = {
         _id: doc._id,
@@ -263,87 +306,76 @@ export const getAll = async (data) => {
         gallery: doc.gallery,
         service: { name: doc.service?.name },
         chipData: doc.chipData,
+        refPrice,
+        order: doc.order,
       };
 
-      // ---- TOUR ----
       if (doc.typeService === "tour") {
-        const price = doc.tourData?.adultPrice?.[currency];
-
-        const priceMatch =
-          !applyPriceFilter ||
-          (price !== undefined &&
-            (minPrice === undefined || price >= minPrice) &&
-            (maxPrice === undefined || price <= maxPrice));
-
-        if (priceMatch) {
-          match = true;
-          refPrice = doc?.tourData?.adultPrice || null;
-          reducedDoc.tourData = {
-            adultPrice: doc?.tourData?.adultPrice || null,
-          };
-        }
-      }
-
-      // ---- PRODUCT ----
-      if (doc.typeService === "product") {
-        const defaultCategory = doc.categories?.find(
-          (c) =>
-            c.default === true &&
-            Array.isArray(c.products) &&
-            c.products.length > 0
-        );
-
-        const defaultProduct = defaultCategory?.products?.find(
-          (p) => p.default === true && p.price
-        );
-
-        if (defaultCategory && defaultProduct) {
-          const price = defaultProduct.price?.[currency];
-
-          const priceMatch =
-            !applyPriceFilter ||
-            (price !== undefined &&
-              (minPrice === undefined || price >= minPrice) &&
-              (maxPrice === undefined || price <= maxPrice));
-
-          if (priceMatch) {
-            match = true;
-            refPrice = defaultProduct.price;
-            reducedDoc.category = {
-              type: defaultCategory.type,
+        reducedDoc.tourData = { adultPrice: refPrice };
+      } else if (doc.typeService === "product") {
+        reducedDoc.category = {
+          type: doc.categories?.find((c) => c.default)?.type,
+          default: true,
+          products: [
+            {
+              price: refPrice,
               default: true,
-              products: [
-                {
-                  price: defaultProduct.price,
-                  default: true,
-                },
-              ],
-            };
-          }
-        }
+            },
+          ],
+        };
       }
 
-      if (match || !applyPriceFilter) {
-        reducedDoc.refPrice = refPrice;
-        filteredResults.push(reducedDoc);
+      allReducedDocs.push(reducedDoc);
+
+      if (doc.order !== undefined) {
+        if (!groupedByOrder.has(doc.order)) groupedByOrder.set(doc.order, []);
+        groupedByOrder.get(doc.order).push(reducedDoc);
+      } else {
+        withoutOrder.push(reducedDoc);
       }
     }
 
-    const totalFiltered = filteredResults.length;
+    let finalList = [];
+    const orders = Array.from(groupedByOrder.keys()).sort((a, b) => a - b);
+    for (const order of orders) {
+      const levelItems = groupedByOrder.get(order);
+      finalList = finalList.concat(shuffleArray(levelItems));
+    }
+
+    if (page === 1) {
+      finalList = finalList.concat(shuffleArray(withoutOrder));
+    } else {
+      // Excluir los que ya fueron mostrados por "order" en página 1
+      const shownIds = new Set(finalList.map((d) => d._id.toString()));
+      const remaining = shuffleArray(
+        allReducedDocs.filter((doc) => !shownIds.has(doc._id.toString()))
+      );
+      finalList = remaining;
+    }
+
     const startIndex = (page - 1) * limit;
-    const paginatedDocs = filteredResults.slice(startIndex, startIndex + limit);
+    const paginatedDocs = finalList.slice(startIndex, startIndex + limit);
 
     return {
       docs: paginatedDocs,
-      totalDocs: totalFiltered,
+      totalDocs: finalList.length,
       limit,
       page,
-      totalPages: Math.ceil(totalFiltered / limit),
+      totalPages: Math.ceil(finalList.length / limit),
     };
   } catch (err) {
     throw err;
   }
 };
+
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 //Obtener subService por id
 export const getById = async (id) => {
@@ -501,6 +533,57 @@ export const getProductCategoriesAndProducts = async (subserviceId, date) => {
   }
 };
 
+//Actualizar data de un subservicio
+export const updateOne = async (id, data) => {
+  logger.info("*** UPDATE SUBSERVICE DAO ***");
+  try {
+    const subservice = await Subservice.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      data,
+      {
+        new: true,
+      }
+    ).exec();
+    if (!subservice) throw createError(404, "subService not found");
+    return subservice;
+  } catch (err) {
+    throw err;
+  }
+};
+
+//Actualizar data de un subservicio
+export const updateProductData = async (id, data) => {
+  global.logger.info("*** UPDATE PRODUCT DATA SUBSERVICE ***");
+  try {
+    const updateFields = {};
+
+    if ("eventData" in data) {
+      updateFields.eventData = data.eventData;
+      updateFields.tourData = null;
+      updateFields.hasEvent = true;
+    }
+
+    if ("categories" in data) {
+      updateFields.categories = data.categories;
+    }
+
+    updateFields.typeService = "product";
+    const subservice = await Subservice.findOneAndUpdate(
+      { _id: id },
+      updateFields,
+      { new: true }
+    ).exec();
+
+    if (!subservice) throw createError(404, "subService not found");
+
+    return subservice;
+  } catch (err) {
+    throw err;
+  }
+};
+
 ///
 ////
 //-----------------------------------------------
@@ -580,19 +663,6 @@ export const changeStatus = async (data, id) => {
   }
 };
 
-//Crear subServicio
-export const create = async (req, res, next) => {
-  global.logger.info("---CREATE NEW SUBSERVICE---", req.body);
-  try {
-    let subservice = new Subservice(req.body);
-    subservice.name = req.body.name.toLowerCase();
-    subservice.creator = req.body.user;
-    const newsubService = await subservice.save();
-    res.json(newsubService);
-  } catch (err) {
-    next(err);
-  }
-};
 //obtener los subservicios por servicio
 export const getByService = async (id) => {
   logger.info("*** GET SUBSERVICES BY SERVICE ***");
@@ -618,47 +688,6 @@ const buildKeywordSegments = (text = "") => {
 };
 
 //Obtener todos los subservicios agrupados por servicios:
-
-//Actualizar data de un subservicio
-export const updateOne = async (req, res, next) => {
-  global.logger.info("---UPDATE SUBSERVICE---");
-  try {
-    let data = req.body;
-    const subservice = await Subservice.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      data,
-      {
-        new: true,
-      }
-    ).exec();
-    if (!subservice) throw createError(404, "subService not found");
-    res.status(200).json(subservice);
-  } catch (err) {
-    next(err);
-  }
-};
-
-//Actualizar data de un subservicio
-export const updateProductData = async (id, data) => {
-  global.logger.info("*** UPDATE PRODUCT DATA SUBSERVICE ***");
-  try {
-    const subservice = await Subservice.findOneAndUpdate(
-      {
-        _id: id,
-      },
-      data,
-      {
-        new: true,
-      }
-    ).exec();
-    if (!subservice) throw createError(404, "subService not found");
-    return subservice;
-  } catch (err) {
-    throw err;
-  }
-};
 
 //Activar o desactivar multiples usuarios
 export const activateMany = async (req, res, next) => {
