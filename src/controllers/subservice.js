@@ -187,18 +187,7 @@ export const uploadAssets = async (req, res, next) => {
 };
 
 //Crear subServicio
-export const create = async (req, res, next) => {
-  global.logger.info("---CREATE NEW SUBSERVICE---", req.body);
-  try {
-    let subservice = new Subservice(req.body);
-    subservice.name = req.body.name.toLowerCase();
-    subservice.creator = req.body.user;
-    const newsubService = await subservice.save();
-    res.json(newsubService);
-  } catch (err) {
-    next(err);
-  }
-};
+
 //obtener los subservicios por servicio
 export const getByService = async (req, res, next) => {
   global.logger.info("---GET SUBSERVICES BY SERVICE---");
