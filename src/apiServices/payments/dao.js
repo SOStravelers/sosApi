@@ -323,15 +323,16 @@ export const capturePaymentBooking = async (idBooking) => {
   logger.info("*** CAPTURE PAYMENT BOOKING STRIPE PAYMENT DAO ***");
   try {
     const booking = await Booking.findById(idBooking).populate(
-      "currency provider"
+      "currency provider country"
     );
-    1;
+    console.log("wenas", booking);
     if (!booking) throw createError(404, "Booking not found");
     if (booking.paymentStatus != "unpaid")
       throw createError(400, "Invalid payment status");
     const timeUntilCancel = booking.timeUntilCancel || 0;
-    if (!isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
-      throw createError(400, "Invalid time");
+    console.log("timeUntilCancel", timeUntilCancel, booking.startTime.isoTime);
+    if (isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
+      throw createError(400, "cannot capture yet");
     let customerId = null;
     if (booking.clientUserId) {
       const clientUser = await User.findById(booking.clientUserId);

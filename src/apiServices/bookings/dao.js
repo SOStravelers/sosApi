@@ -18,15 +18,6 @@ import { isBeforeHoursThreshold } from "../../utils/time.js";
 
 const populate = [
   {
-    path: "workerUser",
-    select: "workerData personalData img email",
-    populate: {
-      path: "workerData.services.id", //details
-      select: "name",
-      model: "Service", // Asegúrate de que este es el nombre correcto de tu modelo de servicio
-    },
-  },
-  {
     path: "serviceId",
     select: "name isActive coverImg",
   },
@@ -40,7 +31,7 @@ const populate = [
   },
   {
     path: "currency",
-    select: "name code ",
+    select: "name code timeZone",
   },
 ];
 const optionsCurrency = ["usd", "brl", "eur"];
@@ -52,7 +43,6 @@ export const createBooking = async (data, user) => {
     const subservice = await Subservice.findById(data.subservice).populate(
       "service country"
     );
-    console.log;
     if (!subservice) throw createError(404, "Subservice not found");
     console.log("idUser", data.clientId);
 
@@ -86,7 +76,6 @@ export const createBooking = async (data, user) => {
       duration: subservice.duration,
       country: subservice.country,
       typeService: subservice.typeService,
-      country: subservice.country,
       canCancel: subservice.canCancel,
       timeUntilCancel: subservice.timeUntilCancel,
       paymentStatus: "unpaid",
@@ -165,7 +154,6 @@ export const createBooking = async (data, user) => {
     const theBooking = await Booking.findOne({ _id: newBooking._id })
       .populate(populate)
       .exec();
-    console.log("el booking creado", theBooking._id);
 
     if (data.intentType == "payment") {
       STRIPE_SERVICE.addIdBookingtoPI(
@@ -181,7 +169,7 @@ export const createBooking = async (data, user) => {
         throw createError(400, "Invalid language");
     }
     const token = createTokenSimple({ id: theBooking._id.toString() });
-
+    console.log("subservice", subservice.country);
     const timeService = formatRangeFromISO({
       isoTime: data.startTime.isoTime,
       language: data.language,
@@ -538,8 +526,8 @@ export const confirmBooking = async (id) => {
   try {
     const booking = await Booking.findById(id);
     if (!booking) throw createError(404, "Booking not found");
-    if (!booking.status !== "requested")
-      throw createError(400, "Invalid status");
+    console.log("el booking", booking.status);
+    if (booking.status != "requested") throw createError(400, "Invalid status");
     booking.status = "confirmed";
     booking.save();
     return booking;
