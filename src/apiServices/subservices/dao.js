@@ -417,14 +417,26 @@ export const getById = async (id) => {
 };
 
 //Obtener all services con paginate segun varias metricas
-export const getRecommendedSubservice = async () => {
-  logger.info("*** GET RECOMENDED SUBSERVICES DAO ***");
+export const getRecommendedSubservice = async (id = null) => {
+  logger.info("*** GET RECOMMENDED SUBSERVICES DAO ***");
+  console.log("la id", id);
   try {
-    const subservices = await Subservice.aggregate([
-      { $match: { recommended: true } },
-      { $sample: { size: 7 } },
+    const matchStage = {
+      order: { $in: [1, 2] },
+      isActive: true,
+    };
+
+    if (id) {
+      matchStage._id = { $ne: new mongoose.Types.ObjectId(id) };
+    }
+
+    const docs = await Subservice.aggregate([
+      { $match: matchStage },
+      { $sample: { size: 6 } },
     ]);
-    return subservices;
+
+    const reduced = docs.map((doc) => getRefPriceData(doc, "usd"));
+    return reduced;
   } catch (err) {
     throw err;
   }

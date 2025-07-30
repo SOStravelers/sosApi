@@ -61,7 +61,9 @@ export const getById = async (req, res, next) => {
 
 export const getRecommendedSubservice = async (req, res, next) => {
   try {
-    const response = await SUBSERVICE_DAO.getRecommendedSubservice();
+    console.log("la query", req.query);
+    const id = req.query.subservice;
+    const response = await SUBSERVICE_DAO.getRecommendedSubservice(id);
     if (response) {
       res.status(200).json(response);
     } else {

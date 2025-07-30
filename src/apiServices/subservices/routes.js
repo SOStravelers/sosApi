@@ -143,7 +143,20 @@ router.get(
   SERVICE_CONTROLLERS.getById
 );
 //Get recomendados
-router.get("/get/recommended", SERVICE_CONTROLLERS.getRecommendedSubservice);
+router.get(
+  "/get/recommended",
+  validateParams(
+    [
+      {
+        param_key: "subservice",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  SERVICE_CONTROLLERS.getRecommendedSubservice
+);
 
 //para subir galeria de fotos y videos
 router.post(
