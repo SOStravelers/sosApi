@@ -253,6 +253,24 @@ const subserviceSchema = new Schema(
         ],
       },
     ],
+    chipData: {
+      es: {
+        type: String,
+      },
+      en: {
+        type: String,
+      },
+      pt: {
+        type: String,
+      },
+      fr: {
+        type: String,
+      },
+      de: {
+        type: String,
+      },
+    },
+    provider: { type: mongoose.Schema.Types.ObjectId, ref: "Provider" },
   },
   { timestamps: true }
 );

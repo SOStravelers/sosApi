@@ -5,8 +5,7 @@ import paginateConfig from "../../config/paginate.js";
 import uniqueValidator from "mongoose-unique-validator";
 const bookingSchema = new Schema(
   {
-    workerUser: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    provider: { type: mongoose.Schema.Types.ObjectId, ref: "Provider" },
+    providerId: { type: mongoose.Schema.Types.ObjectId, ref: "Provider" },
     clientUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     currency: { type: mongoose.Schema.Types.ObjectId, ref: "Currency" },
     clientData: { type: Object },

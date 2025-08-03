@@ -1,10 +1,16 @@
 import { createError } from "../../config/error.js";
 import Provider from "./model.js";
-
+import sharp from "sharp";
+import { AwsUploadFile } from "../../services/aws_s3.js";
+import { isValidImage } from "../../config/uploadTypes.js";
 // Crear proveedor
 export const createProvider = async (data, files) => {
   logger.info("*** CREATE PROVIDER DAO ***");
   try {
+    const findProvider = await Provider.findOne({ email: data.email });
+
+    if (findProvider) throw createError(400, "Email already exists");
+
     if (files.imgUrl) {
       const img = files.imgUrl[0];
       if (!isValidImage(img.mimetype)) {
@@ -12,17 +18,14 @@ export const createProvider = async (data, files) => {
       }
 
       const buf = await sharp(img.buffer)
-        .resize({ width: 800 })
-        .jpeg({ quality: 80 })
+        .resize({ width: 800, withoutEnlargement: true })
+        .jpeg({ quality: 70 })
         .toBuffer();
 
-      const key = `providers/${id}/img.jpg`;
+      const key = `providers/${data.email}/img.jpg`;
       const { url } = await AwsUploadFile({ fileName: key, buffer: buf });
-      uploadedKeys.push(key);
       data.imgUrl = url;
     }
-    const findProvider = await Provider.findOne({ email: data.email });
-    if (findProvider) throw createError(400, "Email already exists");
 
     let provider = new Provider(data);
     provider.isActive = true;
@@ -81,13 +84,12 @@ export const updateImgProvider = async (id, files) => {
       }
 
       const buf = await sharp(img.buffer)
-        .resize({ width: 800 })
-        .jpeg({ quality: 80 })
+        .resize({ width: 800, withoutEnlargement: true })
+        .jpeg({ quality: 70 })
         .toBuffer();
 
       const key = `providers/${id}/img.jpg`;
       const { url } = await AwsUploadFile({ fileName: key, buffer: buf });
-      uploadedKeys.push(key);
       imgUrl = url;
     }
     if (!imgUrl) throw createError(404, "Image not found");

@@ -2,6 +2,7 @@ import * as PROVIDERS_DAO from "./dao.js";
 
 export const createProvider = async (req, res, next) => {
   try {
+    console.log("pasa");
     const files = req.files || {};
     const data = req.body;
     const response = await PROVIDERS_DAO.createProvider(data, files);

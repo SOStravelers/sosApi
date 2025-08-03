@@ -25,43 +25,19 @@ const upload = multer({
 
 //Crear Proveedor
 router.post(
-  "/",
+  "/create",
+  upload.fields([{ name: "imgUrl", maxCount: 1 }]),
   validateParams(
     [
-      {
-        param_key: "name",
-        required: true,
-        type: "object",
-      },
-      {
-        param_key: "email",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "phoneCode",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "phone",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "phoneCountry",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "user",
-        required: false,
-        type: "string",
-      },
+      { param_key: "name", required: true, type: "string" },
+      { param_key: "email", required: true, type: "string" },
+      { param_key: "phoneCode", required: true, type: "string" },
+      { param_key: "phone", required: true, type: "string" },
+      { param_key: "phoneCountry", required: true, type: "string" },
+      { param_key: "user", required: false, type: "string" },
     ],
     "body"
   ),
-  upload.fields([{ name: "imgUrl", maxCount: 1 }]),
   PROVIDER_CONTROLLERS.createProvider
 );
 //Actualizar data del proveedor

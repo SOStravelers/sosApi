@@ -1,6 +1,7 @@
 import Subservice from "./model.js";
 import Product from "../products/model.js";
 import Category from "../categories/model.js";
+import Provider from "../providers/model.js";
 import mongoose from "mongoose";
 import User from "../users/model.js";
 import sharp from "sharp";
@@ -15,12 +16,12 @@ import extractReferencePaths from "../../helpers/extractReferencePaths.js";
 const USER_REF_PATHS = extractReferencePaths(Subservice.schema);
 import { normalizeObjectIdReferencesForController } from "../../helpers/controllers/normalizeRefValueForController.js";
 import mongoJsonToPlain from "../../helpers/mongoJsonToPlain.js";
-import Jimp from "jimp";
 import envar from "../../config/envar.js";
 import { populate } from "dotenv";
 import Favorite from "../favorites/model.js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
+import path from "path";
 dayjs.extend(utc);
 //hola
 
@@ -98,8 +99,8 @@ export const uploadAssets = async (id, files, body) => {
       }
 
       const buf = await sharp(img.buffer)
-        .resize({ width: 800 })
-        .jpeg({ quality: 80 })
+        .resize({ width: 800, withoutEnlargement: true })
+        .jpeg({ quality: 70 })
         .toBuffer();
 
       const key = `subservices/${id}/img.jpg`;
@@ -137,7 +138,7 @@ export const uploadAssets = async (id, files, body) => {
         }
 
         const buf = await sharp(file.buffer)
-          .resize({ width: 800 })
+          .resize({ width: 800, withoutEnlargement: true })
           .jpeg({ quality: 70 })
           .toBuffer();
 
@@ -559,7 +560,7 @@ export const updateOne = async (id, data) => {
 
 //Actualizar data de un subservicio
 export const updateProductData = async (id, data) => {
-  global.logger.info("*** UPDATE PRODUCT DATA SUBSERVICE ***");
+  logger.info("*** UPDATE PRODUCT DATA SUBSERVICE ***");
   try {
     const updateFields = {};
 
@@ -583,6 +584,53 @@ export const updateProductData = async (id, data) => {
     if (!subservice) throw createError(404, "subService not found");
 
     return subservice;
+  } catch (err) {
+    throw err;
+  }
+};
+
+//Actualizar data de un subservicio
+export const addProviderbySubservice = async (data) => {
+  logger.info("*** ADD PROVIDER ONE SUBSERVICE ***");
+  try {
+    if (!data.providerId && !data.providerEmail)
+      throw createError(404, "missing providerId or providerEmail");
+    let findProvider;
+    if (data.providerId) {
+      findProvider = await Provider.findById(data.providerId);
+    } else if (data.providerEmail) {
+      findProvider = await Provider.findOne({ email: data.providerEmail });
+    }
+    if (!findProvider) throw createError(404, "Provider not found");
+    const updatedSubservice = await Subservice.findOneAndUpdate(
+      { _id: data.subserviceId },
+      { provider: findProvider._id },
+      { new: true }
+    ).exec();
+    return updatedSubservice;
+  } catch (err) {
+    throw err;
+  }
+};
+//Actualizar data de todos los subservivios por servicio
+export const addProviderbyService = async (data) => {
+  logger.info("*** ADD PROVIDER ALL SUBSERVICE BY SERVICE ***");
+  try {
+    if (!data.providerId && !data.providerEmail)
+      throw createError(404, "missing providerId or providerEmail");
+    let findProvider;
+    if (data.providerId) {
+      findProvider = await Provider.findById(data.providerId);
+    } else if (data.providerEmail) {
+      findProvider = await Provider.findOne({ email: data.providerEmail });
+    }
+    if (!findProvider) throw createError(404, "Provider not found");
+    const updatedSubservices = await Subservice.updateMany(
+      { service: data.serviceId },
+      { provider: findProvider._id },
+      { new: true }
+    ).exec();
+    return updatedSubservices;
   } catch (err) {
     throw err;
   }

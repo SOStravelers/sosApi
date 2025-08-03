@@ -15,6 +15,7 @@ import { generarCodigoUnicoOrdenCompra } from "../../helpers/bookings/ids.js";
 import { formatRangeFromISO } from "../../utils/time.js";
 import mongoose from "mongoose";
 import { isBeforeHoursThreshold } from "../../utils/time.js";
+import path from "path";
 
 const populate = [
   {
@@ -32,6 +33,9 @@ const populate = [
   {
     path: "currency",
     select: "name code timeZone",
+  },
+  {
+    path: "providerId",
   },
 ];
 const optionsCurrency = ["usd", "brl", "eur"];
@@ -118,6 +122,9 @@ export const createBooking = async (data, user) => {
     } else {
       newData.status = "requested";
     }
+    subservice.provider
+      ? (newData.providerId = subservice.provider)
+      : (newData.providerId = "688f788e1a76f55812780b2a"); //si no hay se setea la de sos Travel
 
     let booking = new Booking(newData);
 

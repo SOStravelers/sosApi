@@ -160,3 +160,21 @@ export const updateProductData = async (req, res, next) => {
     next(err);
   }
 };
+export const addProviderbySubservice = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const response = await SUBSERVICE_DAO.addProviderbySubservice(data);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+export const addProviderbyService = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const response = await SUBSERVICE_DAO.addProviderbyService(data);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};

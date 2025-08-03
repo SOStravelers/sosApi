@@ -268,4 +268,57 @@ router.put(
   SERVICE_CONTROLLERS.updateProductData
 );
 
+//añadir proveedor a un subservicio
+router.put(
+  "/add/provider/subservice",
+  validateParams(
+    [
+      {
+        param_key: "subserviceId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "providerId",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "providerEmail",
+        required: false,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+
+  SERVICE_CONTROLLERS.addProviderbySubservice
+);
+//añadir proveedor a todos los subservicios de un servicio
+router.put(
+  "/add/provider/service",
+  validateParams(
+    [
+      {
+        param_key: "serviceId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "providerId",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "providerEmail",
+        required: false,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+
+  SERVICE_CONTROLLERS.addProviderbyService
+);
+
 export default router;
