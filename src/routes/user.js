@@ -29,7 +29,6 @@ import {
   contacts,
   updateOneBusiness,
   getWokersByBusiness,
-  findUserToken,
   findWorkerMainFlow,
   getServicesBusiness,
   getServicesWorker,
@@ -86,9 +85,6 @@ router.get(
   ),
   getWokersByBusiness
 );
-
-//get user con token
-router.get("/findUserToken", findUserToken);
 
 //set worker
 router.get(

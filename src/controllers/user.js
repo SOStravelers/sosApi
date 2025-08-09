@@ -39,29 +39,6 @@ export const getWokersByBusiness = async (req, res, next) => {
   });
 };
 
-//Encontrar usuario por el token
-export const findUserToken = async (req, res, next) => {
-  global.logger.info("---FIND USER TOKEN---");
-  const userId = req.user._id.toString();
-  const user = await User.findOne({ _id: userId })
-    .select(
-      "type isActive username businessData email rating img personalData security workerData.isActive workerData.isMyServicesOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk workerData.isAboutmeOk"
-    )
-    .populate({
-      path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
-      model: "Service", // Modelo de "Service"
-    })
-    .populate({
-      path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
-      model: "Service", // Modelo de "Service"
-    });
-
-  if (!user) {
-    throw createError(404, "User not found");
-  }
-  res.status(200).json(user);
-};
-
 //Obtener usuarios con paginate por tipos y activados
 export const getUsers = async (req, res, next) => {
   global.logger.info("---GET USERS---");

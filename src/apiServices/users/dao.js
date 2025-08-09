@@ -49,6 +49,8 @@ export const findUserToken = async (user) => {
       "type isActive username  email rating img personalData security phone phoneCode phoneCountry"
     );
 
+    console.log("wena", userFinded.personalData);
+
     if (!userFinded) {
       throw createError(404, "User not found");
     }
@@ -156,7 +158,7 @@ export const updateDataUser = async (data, user) => {
   global.logger.info("*** UPDATE DATA USER DAO ***");
   try {
     let body = data;
-    let newUser = await User.findByIdAndUpdate(user._id.toString(), body, {
+    let newUser = await User.findByIdAndUpdate(user._id, body, {
       new: true,
     })
       .populate({
@@ -180,7 +182,64 @@ export const updateDataUser = async (data, user) => {
       .exec();
     return newUser;
   } catch (err) {
-    next(err);
+    throw err;
+  }
+};
+
+export const updateInfoUser = async (data, user) => {
+  logger.info("*** UPDATE INFO USER DAO ***");
+  try {
+    // Campos permitidos (ajustados a tu schema)
+    // - Nombre: subcampos dentro de personalData.name
+    // - Teléfono: campos a nivel raíz del usuario (según tu comentario)
+    const allowedNameFields = ["first", "last", "nickName"];
+    const allowedRootFields = ["phone", "phoneCode", "phoneCountry"];
+
+    // Construiremos $set con dot notation
+    const updates = {};
+
+    // 1) personalData.name.{first,last,nickName}
+    if (
+      data?.personalData?.name &&
+      typeof data.personalData.name === "object"
+    ) {
+      for (const k of allowedNameFields) {
+        if (Object.prototype.hasOwnProperty.call(data.personalData.name, k)) {
+          const value = data.personalData.name[k];
+          if (value === null || value === "") {
+            throw createError(400, `Missing data: personalData.name.${k}`);
+          }
+          updates[`personalData.name.${k}`] = value;
+        }
+      }
+    }
+
+    // 2) Campos raíz: phone, phoneCode, phoneCountry
+    for (const k of allowedRootFields) {
+      if (Object.prototype.hasOwnProperty.call(data, k)) {
+        const value = data[k];
+        if (value === null || value === "") {
+          throw createError(400, `Missing data: ${k}`);
+        }
+        updates[k] = value;
+      }
+    }
+
+    // Si no llegó nada válido para actualizar
+    if (Object.keys(updates).length === 0) {
+      throw createError(400, "No valid fields to update");
+    }
+
+    // Actualiza SOLO las keys enviadas, no reemplaza subdocumentos enteros
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id.toString(),
+      { $set: updates },
+      { new: true }
+    ).exec();
+
+    return updatedUser;
+  } catch (err) {
+    throw err;
   }
 };
 

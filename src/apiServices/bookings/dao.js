@@ -280,7 +280,7 @@ export const getBookingsByRange = async (
     end,
     status,
     typeRequest,
-    service, // <-- nuevo campo
+    service,
   },
   user = null
 ) => {
@@ -308,26 +308,22 @@ export const getBookingsByRange = async (
     let startDate, endDate;
 
     if (range === "custom" && start && end) {
-      startDate = DateTime.fromISO(start).toFormat("yyyy-MM-dd'T'HH:mm:ss");
-      endDate = DateTime.fromISO(end).toFormat("yyyy-MM-dd'T'HH:mm:ss");
+      startDate = DateTime.fromISO(start).toJSDate();
+      endDate = DateTime.fromISO(end).toJSDate();
     } else {
       switch (range) {
         case "day":
-          startDate = userDate.startOf("day").toFormat("yyyy-MM-dd'T'HH:mm:ss");
-          endDate = userDate.endOf("day").toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          startDate = userDate.startOf("day").toJSDate();
+          endDate = userDate.endOf("day").toJSDate();
           break;
         case "week":
-          startDate = userDate
-            .startOf("week")
-            .toFormat("yyyy-MM-dd'T'HH:mm:ss");
-          endDate = userDate.endOf("week").toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          startDate = userDate.toJSDate();
+          endDate = userDate.plus({ days: 7 }).toJSDate();
           break;
         case "month":
         default:
-          startDate = userDate
-            .startOf("month")
-            .toFormat("yyyy-MM-dd'T'HH:mm:ss");
-          endDate = userDate.endOf("month").toFormat("yyyy-MM-dd'T'HH:mm:ss");
+          startDate = userDate.startOf("month").toJSDate();
+          endDate = userDate.endOf("month").toJSDate();
           break;
       }
     }
@@ -340,37 +336,19 @@ export const getBookingsByRange = async (
         : { $in: ["confirmed", "requested"] };
 
     const matchConditions = {
-      localStartTime: { $gte: startDate, $lte: endDate },
+      "startTime.isoTime": {
+        $gte: startDate,
+        $lte: endDate,
+      },
       ...(user?._id && { clientUserId: user._id }),
       status: statusFilter,
     };
 
-    // Validar que service es un ObjectId válido
     if (service && mongoose.Types.ObjectId.isValid(service)) {
       matchConditions.serviceId = new mongoose.Types.ObjectId(service);
     }
 
     const basePipeline = [
-      {
-        $lookup: {
-          from: "countries",
-          localField: "country",
-          foreignField: "_id",
-          as: "countryData",
-        },
-      },
-      { $unwind: "$countryData" },
-      {
-        $addFields: {
-          localStartTime: {
-            $dateToString: {
-              date: "$startTime.isoTime",
-              timezone: "$countryData.timeZone",
-              format: "%Y-%m-%dT%H:%M:%S",
-            },
-          },
-        },
-      },
       {
         $match: matchConditions,
       },
@@ -468,65 +446,81 @@ export const getBookingsByRange = async (
     throw err;
   }
 };
+
 //Obtienes info del proximo booking en fecha mas cercana
+
 export const getNextBooking = async (user = null) => {
-  logger.info("*** NEXT BOOKING DAO ***");
-  console.log("user", user);
-
   try {
-    const nowUtc = DateTime.utc().toFormat("yyyy-MM-dd'T'HH:mm:ss");
-
     const pipeline = [
       {
-        $lookup: {
-          from: "countries",
-          localField: "country",
-          foreignField: "_id",
-          as: "countryData",
-        },
-      },
-      {
-        $unwind: "$countryData",
-      },
-      {
-        $addFields: {
-          localStartTime: {
-            $dateToString: {
-              date: "$startTime.isoTime",
-              timezone: "$countryData.timeZone",
-              format: "%Y-%m-%dT%H:%M:%S",
-            },
-          },
-        },
-      },
-      {
         $match: {
-          localStartTime: { $gte: nowUtc },
+          "startTime.isoTime": { $gte: new Date() },
           ...(user?._id && { clientUserId: user._id }),
           status: { $in: ["confirmed", "requested"] },
         },
       },
       {
-        $sort: {
-          localStartTime: 1,
+        $lookup: {
+          from: "providers",
+          localField: "providerId",
+          foreignField: "_id",
+          as: "providerId",
         },
       },
+      { $unwind: "$providerId" },
+
       {
-        $limit: 1,
+        $lookup: {
+          from: "services",
+          localField: "serviceId",
+          foreignField: "_id",
+          as: "serviceId",
+        },
       },
+      { $unwind: "$serviceId" },
+
+      {
+        $lookup: {
+          from: "subservices",
+          localField: "subserviceId",
+          foreignField: "_id",
+          as: "subserviceId",
+        },
+      },
+      { $unwind: "$subserviceId" },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "clientUserId",
+          foreignField: "_id",
+          as: "clientUserId",
+        },
+      },
+      { $unwind: "$clientUserId" },
+
+      {
+        $lookup: {
+          from: "currencies",
+          localField: "currency",
+          foreignField: "_id",
+          as: "currency",
+        },
+      },
+      { $unwind: "$currency" },
+
+      { $sort: { "startTime.isoTime": 1 } },
+      { $limit: 1 },
     ];
 
-    console.log("pipeline", JSON.stringify(pipeline, null, 2));
-
-    const result = await Booking.aggregate(pipeline).populate(populate);
-    console.log("resultadosss", result);
-
+    const result = await Booking.aggregate(pipeline);
     return result[0] || null;
   } catch (err) {
     console.error("Error en getNextBooking:", err);
     throw err;
   }
 };
+
 //Confirmar booking
 export const confirmBooking = async (id) => {
   logger.info("*** CONFIRM BOOKING DAO ***");

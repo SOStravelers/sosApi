@@ -86,3 +86,18 @@ export const updateDataUser = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateInfoUser = async (req, res, next) => {
+  const data = req.body;
+  const user = req.user;
+  try {
+    const response = await USER_DAO.updateInfoUser(data, user);
+    if (response) {
+      res.status(200).json(response);
+    } else {
+      throw err;
+    }
+  } catch (err) {
+    next(err);
+  }
+};
