@@ -16,7 +16,7 @@ import { isBeforeHoursThreshold } from "../../utils/time.js";
 const validatePriceTour = async (price, tourData, selectedData, currency) => {
   logger.info("*** VALIDATE PRICE TOUR STRIPE PAYMENT DAO ***");
   try {
-    console.log("precioss", price, selectedData, tourData);
+    console.log("precioss", price);
     const totalAdult =
       selectedData?.amountAdults * tourData?.adultPrice[currency] || 0;
     const totalChildren =
@@ -96,9 +96,11 @@ const validateCreateBooking = async (subservice, data) => {
       subservice?.eventData.available &&
       subservice?.eventData.isoTime
     ) {
+      //caso con eventos
       isoTime = subservice?.eventData.isoTime;
     } else {
-      isoTime = data.isoTime;
+      //caso con calendario
+      isoTime = data?.startTime?.isoTime;
     }
     console.log("isoTime", isoTime);
     console.log("limitBook", subservice.timeLimitBook);
@@ -116,6 +118,15 @@ const validateCreateBooking = async (subservice, data) => {
     }
   } catch (err) {
     throw err;
+  }
+};
+
+const checkStatusCharge = async (subservice) => {
+  logger.info("*** CHECK STATUS CHARGE STRIPE PAYMENT DAO ***");
+  if (subservice.withTicket) {
+    throw createError(400, "Invalid type service");
+  } else {
+    return true;
   }
 };
 
@@ -182,23 +193,9 @@ export const paymentIntentStripe = async (data, user) => {
     }
     //---------------------------------------------------
     //--Analiza si hay que solo hacer validacion de tarjeta o cobro---------
-    //---------------------------------------------------
-    let chargeValidate = false;
-    if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
-      chargeValidate = true;
-    } else if (subservice.withTicket) {
-      throw createError(400, "Invalid type service");
-    } else {
-      if (subservice.canCancel) {
-        const hasCancel = isBeforeHoursThreshold(
-          data.isoTime,
-          subservice.timeUntilCancel
-        );
-        hasCancel ? (chargeValidate = true) : (chargeValidate = false);
-      } else {
-        chargeValidate = false;
-      }
-    }
+    // si es false, genera payment intent si es true, genera validacion de tarjeta
+    const chargeValidate = checkStatusCharge(subservice);
+
     //---------------------------------------------------
     //----------------ENVIO A STRIPE---------------------
     //---------------------------------------------------
@@ -209,9 +206,10 @@ export const paymentIntentStripe = async (data, user) => {
       chargeValidate
     );
     //---------------------------------------------------
-    //-----SI HUBO PAGO SE GUARDA EL PAGO EN LA BD--------
+    //-----SI HUBO PAYMENT INTENT EXITOSO SE GUARDA EL PAGO EN LA BD--------
     //---------------------------------------------------
     if (paymentIntent.typeIntent == "payment") {
+      console.log(paymentIntent);
       const status = amountPaid == amount ? "paid" : "unpaid";
       const dataPayment = {
         paymentMethod: "stripe",

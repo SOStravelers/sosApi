@@ -135,6 +135,7 @@ export const createPaymentIntent = async (
 ) => {
   logger.verbose(">>> CREATE PAYMENT INTENT STRIPE <<<");
   try {
+    console.log("data", data);
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
@@ -169,10 +170,12 @@ export const createPaymentIntent = async (
     console.log("id encontrada", savedCustomerId);
     const customer = savedCustomerId;
     dataToSent.customer = customer;
-    dataToSent.language = data.language || "en";
+    dataToSent.metadata.language = data.language || "en";
     //Se analiza si hacer cargo a la tarjeta o solo validar
     let response = null;
+    console.log("justo antes");
     if (chargeValidate) {
+      console.log("caso 1");
       const setupIntent = await stripe.setupIntents.create({
         customer: customer,
       });
@@ -182,6 +185,8 @@ export const createPaymentIntent = async (
         typeIntent: "setup",
       };
     } else {
+      console.log("caso 2");
+      console.log("data to Sent", dataToSent);
       const paymentIntent = await stripe.paymentIntents.create(dataToSent);
       response = {
         intent: paymentIntent,
@@ -189,6 +194,7 @@ export const createPaymentIntent = async (
         typeIntent: "payment",
       };
     }
+    console.log("hizo el payment");
     //Se guarda la info de tarjetas en el usuario
     const methods = await stripe.paymentMethods.list({
       customer: customer,
