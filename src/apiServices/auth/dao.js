@@ -72,7 +72,7 @@ export const registerEmail = async (data) => {
 
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
-      "about email type img language personalData type username workerData _id security.hasPassword"
+      "about email type img language personalData type username phone phoneCode phoneCountry _id security.hasPassword"
     );
     console.log("el item", newUser);
     let userToCreateToken = {
@@ -136,7 +136,7 @@ export const loginEmail = async (data) => {
       },
       { new: true }
     ).select(
-      "about email img type language  personalData username workerData _id security.hasPassword"
+      "about email img type language phone phoneCode phoneCountry  personalData username workerData _id security.hasPassword"
     );
     delete updatedUser.password;
     let userToCreateToken = {
@@ -218,7 +218,7 @@ export const loginGoogle = async (data) => {
 
     // Obtener usuario actualizado con solo los campos requeridos
     const newUser = await User.findById(user._id).select(
-      "about email img language personalData username type workerData _id security.hasPassword"
+      "about email img language personalData username phone phoneCode phoneCountry type _id security.hasPassword"
     );
 
     // Setea reservas si es nuevo (opcional)
