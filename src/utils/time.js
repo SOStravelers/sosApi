@@ -143,13 +143,7 @@ export function isBeforeHoursThreshold(
 
   if (isNaN(targetDate.getTime())) {
     console.error("❌ Fecha inválida:", dateString);
-    return {
-      isBefore: false,
-      cancelTime: {
-        isoTime: null,
-        stringData: "",
-      },
-    };
+    return false;
   }
 
   // Calcular la fecha límite

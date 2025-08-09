@@ -87,7 +87,7 @@ const opciones = ["usd", "brl", "eur"];
 //---------------
 
 const validateCreateBooking = async (subservice, data) => {
-  logger.info("*** VALIDATE CREATE BOOKING STRIPE PAYMENT DAO ***");
+  logger.info("*** VALIDATE TIME LIMIT BOOKING STRIPE PAYMENT DAO ***");
   try {
     //Valida que no sea un fecha del pasado
     let isoTime = null;
@@ -100,16 +100,22 @@ const validateCreateBooking = async (subservice, data) => {
     } else {
       isoTime = data.isoTime;
     }
+    console.log("isoTime", isoTime);
+    console.log("limitBook", subservice.timeLimitBook);
     const isPast = new Date(isoTime) < new Date();
-    if (isPast) throw createError(400, "Invalid isoTime");
+    console.log("is Past", isPast);
+    if (isPast) throw createError(400, "Exceded time limit");
     //Existe limite maximo para hacer el booking
-    const canBook = isBeforeHoursThreshold(
-      data.isoTime,
+    const isBeforeLimitBook = isBeforeHoursThreshold(
+      isoTime,
       subservice.timeLimitBook
     );
-    if (!canBook) throw createError(400, "Invalid isoTime");
+    console.log("canBook", isBeforeLimitBook);
+    if (!isBeforeLimitBook) {
+      throw createError(400, "Time Limit exceded");
+    }
   } catch (err) {
-    err;
+    throw err;
   }
 };
 
@@ -142,7 +148,7 @@ export const paymentIntentStripe = async (data, user) => {
     //---------------Validaciones------------------------o
     //valida hora maxima para agendar un servicio antes del inici
     if (subservice.haveLimitTime) {
-      validateCreateBooking(subservice, data);
+      await validateCreateBooking(subservice, data);
     }
     //---------------------------------------------------
     //---Analizar si data del precio no fue adulterada---
@@ -158,6 +164,9 @@ export const paymentIntentStripe = async (data, user) => {
       );
       if (!validate) throw createError(400, "Invalid price");
     } else if (subservice.typeService == "product") {
+      if (!subservice.eventData.available)
+        throw createError(400, "Event is not available");
+
       if (data.selectedData.length == 0)
         throw createError(400, "Invalid price");
 
