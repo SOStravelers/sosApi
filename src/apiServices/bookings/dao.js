@@ -562,6 +562,7 @@ export const cancelBooking = async (id) => {
     if (booking.paymentStatus != "unpaid")
       throw createError(400, "Invalid payment status");
     booking.status = "canceled";
+    booking.canceledBy = "admin";
     booking.save();
     return booking;
   } catch (err) {
@@ -569,7 +570,7 @@ export const cancelBooking = async (id) => {
   }
 };
 //Cancelar booking del usuario
-export const cancelBookingUser = async (id, user) => {
+export const cancelBookingUser = async (id) => {
   logger.info("*** CANCEL USER BOOKING DAO ***");
   try {
     const booking = await Booking.findById(id);
@@ -581,7 +582,26 @@ export const cancelBookingUser = async (id, user) => {
     const timeUntilCancel = booking.timeUntilCancel || 0;
     if (!isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
       throw createError(400, "Invalid time");
-    booking.status = "cancelled";
+    booking.status = "canceled";
+    booking.canceledBy = "user";
+    booking.save();
+    return booking;
+  } catch (err) {
+    throw err;
+  }
+};
+export const cancelBookingToken = async (id) => {
+  logger.info("*** CANCEL USER BOOKING TOKEN DAO ***");
+  try {
+    const booking = await Booking.findById(id);
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.paymentStatus != "unpaid")
+      throw createError(400, "Cannot cancel booking paid");
+    const timeUntilCancel = booking.timeUntilCancel || 0;
+    if (!isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
+      throw createError(400, "Cannot cancel this booking");
+    booking.status = "canceled";
+    booking.canceledBy = "user";
     booking.save();
     return booking;
   } catch (err) {

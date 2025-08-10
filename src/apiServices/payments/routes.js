@@ -171,6 +171,39 @@ router.get(
   PAYMENT_CONTROLLERS.capturePaymentBooking
 );
 
+//cancela por usuario el booking
+router.get(
+  "/stripe/cancel/:id",
+  isAuth,
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  PAYMENT_CONTROLLERS.cancelPaymentIntentStripe
+);
+
+//cancela por admin el booking
+router.get(
+  "/stripe/cancel/admin/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  PAYMENT_CONTROLLERS.cancelPaymentIntentStripe
+);
+
 //--------
 router.get(
   "/stripe/capture/:id",
@@ -240,20 +273,7 @@ router.put(
   ),
   PAYMENT_CONTROLLERS.updatedPaymentIntentStripe
 );
-router.get(
-  "/stripe/cancel/:id",
-  validateParams(
-    [
-      {
-        param_key: "id",
-        required: true,
-        type: "string",
-      },
-    ],
-    "params"
-  ),
-  PAYMENT_CONTROLLERS.cancelPaymentIntentStripe
-);
+
 router.put(
   "/stripe/refund",
   validateParams(

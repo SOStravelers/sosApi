@@ -196,9 +196,9 @@ router.put(
   ),
   BOOKING_CONTROLLERS.completeBooking
 );
-//Cancel booking
+//Cancel booking admin
 router.put(
-  "/cancel/:id",
+  "/cancel/admin/:id",
   validateParams(
     [
       {
@@ -211,7 +211,7 @@ router.put(
   ),
   BOOKING_CONTROLLERS.cancelBooking
 );
-//Cancel booking user
+//Cancel booking user token
 router.put(
   "/cancel/id/:id",
   validateParams(
@@ -224,7 +224,6 @@ router.put(
     ],
     "params"
   ),
-  isAuth,
-  BOOKING_CONTROLLERS.cancelBookingUser
+  BOOKING_CONTROLLERS.cancelBookingToken
 );
 export default router;
