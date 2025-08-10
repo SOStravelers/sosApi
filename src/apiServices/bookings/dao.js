@@ -230,7 +230,6 @@ export const setAllBookings = async (user) => {
 //Obtiene info del booking por token para mostrar post compra
 export const getByToken = async (id) => {
   logger.info("*** GET ALL DATA BOOKING DAO ***");
-  s;
   try {
     const booking = await Booking.findOne({ _id: id })
       .populate(populate)

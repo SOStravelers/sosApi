@@ -9,9 +9,9 @@ import NoUser from "../nousers/model.js";
 import User from "../users/model.js";
 import { isBeforeHoursThreshold } from "../../utils/time.js";
 
-//-----------------
-//------STRIPE-----
-//-----------------
+//---------------
+//-----FUNCIONES
+//---------------
 
 const validatePriceTour = async (price, tourData, selectedData, currency) => {
   logger.info("*** VALIDATE PRICE TOUR STRIPE PAYMENT DAO ***");
@@ -82,10 +82,6 @@ const validatePriceProduct = async (
 
 const opciones = ["usd", "brl", "eur"];
 
-//---------------
-//-----FUNCIONES
-//---------------
-
 const validateCreateBooking = async (subservice, data) => {
   logger.info("*** VALIDATE TIME LIMIT BOOKING STRIPE PAYMENT DAO ***");
   try {
@@ -130,6 +126,9 @@ const checkStatusCharge = async (subservice) => {
   }
 };
 
+//-----------------
+//------STRIPE-----
+//-----------------
 //Crear payment Intent tradicional
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
