@@ -284,21 +284,41 @@ export const getBookingsByRange = async (
   },
   user = null
 ) => {
+  logger.info("*** GET BOOKINGS BY RANGE DAO ***");
   try {
     if (!isoTime || !timeZone) {
       throw new Error("Faltan isoTime o timeZone");
     }
 
+    // 🔹 ACEPTAR JSON STRING DESDE req.query SIN CAMBIAR TUS RUTAS/CONTROLADOR
+    const safeParse = (v) => {
+      if (v == null) return v;
+      if (typeof v !== "string") return v;
+      try {
+        return JSON.parse(v);
+      } catch {
+        return v;
+      }
+    };
+    const monthObj = safeParse(month);
+    const dayObj = safeParse(day);
+    const statusArr =
+      status === undefined
+        ? undefined
+        : Array.isArray(status)
+        ? status
+        : [status];
+
     let userDate;
 
-    if (range === "day" && day?.year && day?.month && day?.day) {
+    if (range === "day" && dayObj?.year && dayObj?.month && dayObj?.day) {
       userDate = DateTime.fromObject(
-        { year: day.year, month: day.month, day: day.day },
+        { year: dayObj.year, month: dayObj.month, day: dayObj.day },
         { zone: timeZone }
       );
-    } else if (range === "month" && month?.year && month?.month) {
+    } else if (range === "month" && monthObj?.year && monthObj?.month) {
       userDate = DateTime.fromObject(
-        { year: month.year, month: month.month, day: 1 },
+        { year: monthObj.year, month: monthObj.month, day: 1 },
         { zone: timeZone }
       );
     } else {
@@ -308,8 +328,8 @@ export const getBookingsByRange = async (
     let startDate, endDate;
 
     if (range === "custom" && start && end) {
-      startDate = DateTime.fromISO(start).toJSDate();
-      endDate = DateTime.fromISO(end).toJSDate();
+      startDate = DateTime.fromISO(start, { zone: timeZone }).toJSDate();
+      endDate = DateTime.fromISO(end, { zone: timeZone }).toJSDate();
     } else {
       switch (range) {
         case "day":
@@ -317,8 +337,8 @@ export const getBookingsByRange = async (
           endDate = userDate.endOf("day").toJSDate();
           break;
         case "week":
-          startDate = userDate.toJSDate();
-          endDate = userDate.plus({ days: 7 }).toJSDate();
+          startDate = userDate.startOf("day").toJSDate();
+          endDate = userDate.plus({ days: 7 }).endOf("day").toJSDate();
           break;
         case "month":
         default:
@@ -329,17 +349,12 @@ export const getBookingsByRange = async (
     }
 
     const statusFilter =
-      status !== undefined
-        ? Array.isArray(status)
-          ? { $in: status }
-          : status
+      statusArr !== undefined
+        ? { $in: statusArr }
         : { $in: ["confirmed", "requested"] };
 
     const matchConditions = {
-      "startTime.isoTime": {
-        $gte: startDate,
-        $lte: endDate,
-      },
+      "startTime.isoTime": { $gte: startDate, $lte: endDate },
       ...(user?._id && { clientUserId: user._id }),
       status: statusFilter,
     };
@@ -347,12 +362,8 @@ export const getBookingsByRange = async (
     if (service && mongoose.Types.ObjectId.isValid(service)) {
       matchConditions.serviceId = new mongoose.Types.ObjectId(service);
     }
-
-    const basePipeline = [
-      {
-        $match: matchConditions,
-      },
-    ];
+    console.log("el match conditions", matchConditions);
+    const basePipeline = [{ $match: matchConditions }];
 
     if (typeRequest !== "admin") {
       return await Booking.aggregate(basePipeline);
@@ -367,12 +378,7 @@ export const getBookingsByRange = async (
           as: "clientUser",
         },
       },
-      {
-        $unwind: {
-          path: "$clientUser",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+      { $unwind: { path: "$clientUser", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "services",
@@ -381,12 +387,7 @@ export const getBookingsByRange = async (
           as: "service",
         },
       },
-      {
-        $unwind: {
-          path: "$service",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+      { $unwind: { path: "$service", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "subservices",
@@ -395,12 +396,7 @@ export const getBookingsByRange = async (
           as: "subservice",
         },
       },
-      {
-        $unwind: {
-          path: "$subservice",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+      { $unwind: { path: "$subservice", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "currencies",
@@ -409,12 +405,7 @@ export const getBookingsByRange = async (
           as: "currencyData",
         },
       },
-      {
-        $unwind: {
-          path: "$currencyData",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+      { $unwind: { path: "$currencyData", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "users",
@@ -423,12 +414,7 @@ export const getBookingsByRange = async (
           as: "workerUser",
         },
       },
-      {
-        $unwind: {
-          path: "$workerUser",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+      { $unwind: { path: "$workerUser", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "services",
