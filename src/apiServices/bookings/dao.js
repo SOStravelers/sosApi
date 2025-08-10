@@ -230,6 +230,7 @@ export const setAllBookings = async (user) => {
 //Obtiene info del booking por token para mostrar post compra
 export const getByToken = async (id) => {
   logger.info("*** GET ALL DATA BOOKING DAO ***");
+  s;
   try {
     const booking = await Booking.findOne({ _id: id })
       .populate(populate)
@@ -257,9 +258,7 @@ export const getByTokenMin = async (id) => {
 export const getMyBooking = async (id, user) => {
   logger.info("*** GET USER BOOKING DAO ***");
   try {
-    console.log("la idd", id);
     const booking = await Booking.findById(id).populate(populate).exec();
-    console.log("userBooking", booking.clientUserId);
     if (booking.clientUserId._id.toString() != user._id.toString())
       throw createError(401, "Unauthorized");
     return booking;
@@ -268,7 +267,6 @@ export const getMyBooking = async (id, user) => {
   }
 };
 //Obtiene todos los booking de un usuario con multiples filtros
-
 export const getBookingsByRange = async (
   {
     isoTime,
@@ -432,7 +430,7 @@ export const getBookingsByRange = async (
     throw err;
   }
 };
-//Historial del usuario
+//Historial de bookings del usuario
 export const getBookingHistory = async (
   { isoTime, timeZone, language, page = "1", limit = "10" },
   user = null
@@ -476,14 +474,6 @@ export const getBookingHistory = async (
       },
       { $unwind: { path: "$service", preserveNullAndEmptyArrays: true } },
 
-      {
-        $lookup: {
-          from: "users",
-          localField: "workerUser",
-          foreignField: "_id",
-          as: "workerUser",
-        },
-      },
       { $unwind: { path: "$workerUser", preserveNullAndEmptyArrays: true } },
 
       {
@@ -495,6 +485,16 @@ export const getBookingHistory = async (
         },
       },
       { $unwind: { path: "$currencyData", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "countries",
+          localField: "country",
+          foreignField: "_id",
+          as: "countryData",
+        },
+      },
+      { $unwind: { path: "$countryData", preserveNullAndEmptyArrays: true } },
     ];
 
     const result = await Booking.aggregate(pipeline);
@@ -504,9 +504,7 @@ export const getBookingHistory = async (
     throw err;
   }
 };
-
 //Obtienes info del proximo booking en fecha mas cercana
-
 export const getNextBooking = async (user = null) => {
   try {
     const pipeline = [
@@ -578,8 +576,7 @@ export const getNextBooking = async (user = null) => {
     throw err;
   }
 };
-
-//Confirmar booking
+//Confirmar booking by admin
 export const confirmBooking = async (id) => {
   logger.info("*** CONFIRM BOOKING DAO ***");
   try {
@@ -594,7 +591,7 @@ export const confirmBooking = async (id) => {
     throw err;
   }
 };
-//Completar booking
+//Completar booking by admin
 export const completeBooking = async (id) => {
   logger.info("*** COMPLETE BOOKING DAO ***");
   try {
@@ -609,7 +606,6 @@ export const completeBooking = async (id) => {
     throw err;
   }
 };
-
 //Cancelar booking
 export const cancelBooking = async (id) => {
   logger.info("*** CANCEL BOOKING DAO ***");
@@ -621,27 +617,6 @@ export const cancelBooking = async (id) => {
       throw createError(400, "Invalid payment status");
     booking.status = "canceled";
     booking.canceledBy = "admin";
-    booking.save();
-    return booking;
-  } catch (err) {
-    throw err;
-  }
-};
-//Cancelar booking del usuario
-export const cancelBookingUser = async (id) => {
-  logger.info("*** CANCEL USER BOOKING DAO ***");
-  try {
-    const booking = await Booking.findById(id);
-    if (!booking) throw createError(404, "Booking not found");
-    if (booking.paymentStatus != "unpaid")
-      throw createError(400, "Invalid payment status");
-    if (booking.clientUserId != user._id)
-      throw createError(401, "Unauthorized");
-    const timeUntilCancel = booking.timeUntilCancel || 0;
-    if (!isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
-      throw createError(400, "Invalid time");
-    booking.status = "canceled";
-    booking.canceledBy = "user";
     booking.save();
     return booking;
   } catch (err) {
@@ -671,6 +646,7 @@ export const cancelBookingToken = async (id) => {
 export const cancelBookingId = async (id, user) => {
   logger.info("*** CANCEL USER BOOKING ID USER DAO ***");
   try {
+    x;
     const booking = await Booking.findById(id);
     if (!booking) throw createError(404, "Booking not found");
     console.log("wena", booking.clientUserId, user._id);

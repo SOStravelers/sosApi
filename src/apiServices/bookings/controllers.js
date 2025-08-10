@@ -1,4 +1,5 @@
 import * as BOOKING_DAO from "./dao.js";
+import * as BOOKING_DTO from "./dto.js";
 import { decodeTokenSimple } from "../../middleware/auth.js";
 
 //Crear booking
@@ -52,7 +53,8 @@ export const getBookingsByRange = async (req, res, next) => {
     const data = req.query;
     const user = req.user;
     const response = await BOOKING_DAO.getBookingsByRange(data, user);
-    res.status(200).json(response);
+    const filterResponse = await BOOKING_DTO.filterBookingList(response);
+    res.status(200).json(filterResponse);
   } catch (err) {
     next(err);
   }
@@ -63,7 +65,8 @@ export const getBookingHistory = async (req, res, next) => {
     const data = req.query;
     const user = req.user;
     const response = await BOOKING_DAO.getBookingHistory(data, user);
-    res.status(200).json(response);
+    const filterResponse = await BOOKING_DTO.filterBookingList(response);
+    res.status(200).json(filterResponse);
   } catch (err) {
     next(err);
   }
@@ -73,7 +76,8 @@ export const getNextBooking = async (req, res, next) => {
   try {
     const user = req.user;
     const response = await BOOKING_DAO.getNextBooking(user);
-    res.status(200).json(response);
+    const filterResponse = await BOOKING_DTO.bookingFilterSimple(response);
+    res.status(200).json(filterResponse);
   } catch (err) {
     next(err);
   }
