@@ -645,7 +645,6 @@ export const cancelBookingToken = async (id) => {
 export const cancelBookingId = async (id, user) => {
   logger.info("*** CANCEL USER BOOKING ID USER DAO ***");
   try {
-    x;
     const booking = await Booking.findById(id);
     if (!booking) throw createError(404, "Booking not found");
     console.log("wena", booking.clientUserId, user._id);
