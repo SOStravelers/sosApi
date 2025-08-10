@@ -648,11 +648,35 @@ export const cancelBookingUser = async (id) => {
     throw err;
   }
 };
+//Cancela booking user por token
 export const cancelBookingToken = async (id) => {
   logger.info("*** CANCEL USER BOOKING TOKEN DAO ***");
   try {
     const booking = await Booking.findById(id);
     if (!booking) throw createError(404, "Booking not found");
+    if (booking.paymentStatus != "unpaid")
+      throw createError(400, "Cannot cancel booking paid");
+    const timeUntilCancel = booking.timeUntilCancel || 0;
+    if (!isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
+      throw createError(400, "Cannot cancel this booking");
+    booking.status = "canceled";
+    booking.canceledBy = "user";
+    booking.save();
+    return booking;
+  } catch (err) {
+    throw err;
+  }
+};
+//Cancela booking user por id de booking
+export const cancelBookingId = async (id, user) => {
+  logger.info("*** CANCEL USER BOOKING ID USER DAO ***");
+  try {
+    const booking = await Booking.findById(id);
+    if (!booking) throw createError(404, "Booking not found");
+    console.log("wena", booking.clientUserId, user._id);
+    if (!booking.clientUserId.equals(user._id)) {
+      throw createError(401, "Unauthorized");
+    }
     if (booking.paymentStatus != "unpaid")
       throw createError(400, "Cannot cancel booking paid");
     const timeUntilCancel = booking.timeUntilCancel || 0;

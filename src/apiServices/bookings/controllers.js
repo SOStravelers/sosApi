@@ -108,12 +108,23 @@ export const cancelBooking = async (req, res, next) => {
     next(err);
   }
 };
-//Cancelar booking del usuario
+//Cancelar booking del usuario por token
 export const cancelBookingToken = async (req, res, next) => {
   try {
     const decodedData = decodeTokenSimple(req.params.id);
     const idBooking = decodedData.id;
     const response = await BOOKING_DAO.cancelBookingToken(idBooking);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+//Cancelar booking del usuario por id booking
+export const cancelBookingId = async (req, res, next) => {
+  try {
+    const idBooking = req.params.id;
+    const user = req.user;
+    const response = await BOOKING_DAO.cancelBookingId(idBooking, user);
     res.status(200).json(response);
   } catch (err) {
     next(err);

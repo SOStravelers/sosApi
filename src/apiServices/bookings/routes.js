@@ -242,4 +242,20 @@ router.put(
   ),
   BOOKING_CONTROLLERS.cancelBookingToken
 );
+//Cancel booking user id booking
+router.put(
+  "/cancel/booking/:id",
+  isAuth,
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  BOOKING_CONTROLLERS.cancelBookingId
+);
 export default router;
