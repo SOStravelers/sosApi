@@ -57,6 +57,17 @@ export const getBookingsByRange = async (req, res, next) => {
     next(err);
   }
 };
+//Historial del usuario
+export const getBookingHistory = async (req, res, next) => {
+  try {
+    const data = req.query;
+    const user = req.user;
+    const response = await BOOKING_DAO.getBookingHistory(data, user);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
 //Obtienes info del proximo booking en fecha mas cercana
 export const getNextBooking = async (req, res, next) => {
   try {

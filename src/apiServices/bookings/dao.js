@@ -432,6 +432,78 @@ export const getBookingsByRange = async (
     throw err;
   }
 };
+//Historial del usuario
+export const getBookingHistory = async (
+  { isoTime, timeZone, language, page = "1", limit = "10" },
+  user = null
+) => {
+  logger.info("*** GET BOOKING HISTORY DAO ***");
+  try {
+    if (!isoTime || !timeZone) throw new Error("Faltan isoTime o timeZone");
+    if (!user?._id) throw new Error("Usuario no autenticado");
+
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const lim = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100);
+    const skip = (pageNum - 1) * lim;
+
+    const match = { clientUserId: new mongoose.Types.ObjectId(user._id) };
+
+    const pipeline = [
+      { $match: match },
+      // Orden estable: fecha DESC y _id DESC como tie-breaker
+      { $sort: { "startTime.isoTime": -1, _id: -1 } },
+      { $skip: skip },
+      { $limit: lim },
+
+      // Lookups que tu EventCard suele usar:
+      {
+        $lookup: {
+          from: "subservices",
+          localField: "subserviceId",
+          foreignField: "_id",
+          as: "subservice",
+        },
+      },
+      { $unwind: { path: "$subservice", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "services",
+          localField: "serviceId",
+          foreignField: "_id",
+          as: "service",
+        },
+      },
+      { $unwind: { path: "$service", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "workerUser",
+          foreignField: "_id",
+          as: "workerUser",
+        },
+      },
+      { $unwind: { path: "$workerUser", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "currencies",
+          localField: "currency",
+          foreignField: "_id",
+          as: "currencyData",
+        },
+      },
+      { $unwind: { path: "$currencyData", preserveNullAndEmptyArrays: true } },
+    ];
+
+    const result = await Booking.aggregate(pipeline);
+    return result; // el front usa length < limit para cortar el scroll
+  } catch (err) {
+    console.error("Error en getBookingHistory (AGGREGATE):", err);
+    throw err;
+  }
+};
 
 //Obtienes info del proximo booking en fecha mas cercana
 

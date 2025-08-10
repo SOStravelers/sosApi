@@ -135,6 +135,22 @@ router.get(
 );
 
 router.get(
+  "/client/history",
+  validateParams(
+    [
+      { param_key: "timeZone", required: true, type: "string" },
+      { param_key: "isoTime", required: true, type: "string" },
+      { param_key: "language", required: true, type: "string" },
+      { param_key: "page", required: false, type: "string" },
+      { param_key: "limit", required: false, type: "string" },
+    ],
+    "query"
+  ),
+  isAuth,
+  BOOKING_CONTROLLERS.getBookingHistory
+);
+
+router.get(
   "/list/admin-user",
   validateParams(
     [
