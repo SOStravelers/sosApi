@@ -212,16 +212,16 @@ export const createBooking = async (data, user) => {
 export const setAllBookings = async (user) => {
   logger.info("*** SET ALL BOOKING DAO ***");
   try {
-    const bookings = await Booking.updateMany(
+    await Booking.updateMany(
       { clientEmail: user.email, clientUser: null },
       {
         $set: {
-          clientUser: user._id,
+          clientUserId: user._id,
         },
       },
       { new: true }
     );
-    const noUser = await NoUser.findOneAndDelete({ email: user.email });
+    await NoUser.findOneAndDelete({ email: user.email });
     return "success";
   } catch (err) {
     throw err;
