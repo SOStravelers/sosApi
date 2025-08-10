@@ -270,6 +270,7 @@ export const getWithVideos = async () => {
 //Obtener all services con paginate
 
 export const getAll = async (data) => {
+  logger.info("*** GET ALL SUBSERVICES DAO ***");
   try {
     let {
       keyword,
@@ -299,6 +300,7 @@ export const getAll = async (data) => {
 
     if (service) query.service = service;
 
+    console.log("la query", query);
     const allDocs = await Subservice.find(query)
       .populate({ path: "service", select: "name" })
       .lean();
