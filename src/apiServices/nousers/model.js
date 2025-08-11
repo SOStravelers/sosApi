@@ -19,7 +19,7 @@ const noUserSchema = new Schema(
     },
     phone: { type: String },
     country: { type: mongoose.Schema.Types.ObjectId, ref: "Country" },
-    payment: {
+    paymentData: {
       stripe: {
         customer: { type: String },
       },

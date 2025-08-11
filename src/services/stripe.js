@@ -135,6 +135,7 @@ export const createPaymentIntent = async (
 ) => {
   logger.verbose(">>> CREATE PAYMENT INTENT STRIPE <<<");
   try {
+    console.log("data", data);
     if (!envar().STRIPE_SECRET_KEY) {
       throw new Error("MISSING_API_CREDENTIALS");
     }
@@ -169,10 +170,12 @@ export const createPaymentIntent = async (
     console.log("id encontrada", savedCustomerId);
     const customer = savedCustomerId;
     dataToSent.customer = customer;
-    dataToSent.language = data.language || "en";
+    dataToSent.metadata.language = data.language || "en";
     //Se analiza si hacer cargo a la tarjeta o solo validar
     let response = null;
+    console.log("justo antes");
     if (chargeValidate) {
+      console.log("caso 1");
       const setupIntent = await stripe.setupIntents.create({
         customer: customer,
       });
@@ -182,6 +185,8 @@ export const createPaymentIntent = async (
         typeIntent: "setup",
       };
     } else {
+      console.log("caso 2");
+      console.log("data to Sent", dataToSent);
       const paymentIntent = await stripe.paymentIntents.create(dataToSent);
       response = {
         intent: paymentIntent,
@@ -189,6 +194,7 @@ export const createPaymentIntent = async (
         typeIntent: "payment",
       };
     }
+    console.log("hizo el payment");
     //Se guarda la info de tarjetas en el usuario
     const methods = await stripe.paymentMethods.list({
       customer: customer,
@@ -197,6 +203,9 @@ export const createPaymentIntent = async (
     if (methods && methods.data && user) {
       user.paymentData.stripe.methodIdDefault = methods?.data[0]?.id || null;
       user.paymentData.stripe.methods = methods.data;
+      user.phone = data?.clientData?.phone;
+      user.phoneCode = data?.clientData?.phoneCode;
+      user.phoneCountry = data?.clientData?.phoneCountry;
       await user.save();
     }
     //Se manda respuesta
@@ -682,8 +691,8 @@ export const addIdBookingtoPI = async (PI, idBooking, bookingNumber) => {
 };
 
 export const createDirectPaymentIntent = async (data) => {
-  logger.info("---CREATE DIRECT PAYMENT INTENT STRIPE ---");
-
+  logger.verbose(">>> CREATE DIRECT PAYMENT INTENT STRIPE <<<");
+  console.log("la data", data);
   try {
     let paymentMethodId;
 
@@ -705,15 +714,31 @@ export const createDirectPaymentIntent = async (data) => {
       paymentMethodId = methods.data[0].id;
     }
 
-    // 3. Crear nuevo PaymentIntent con ese método
-    const intent = await stripe.paymentIntents.create({
+    const toSet = {
       amount: data.price * 100,
-      currency: data.currency || "usd",
+      currency: data.currency,
       customer: data.customer,
       payment_method: paymentMethodId,
       off_session: true,
       confirm: true,
-    });
+    };
+    if (data.connectAccountId) {
+      toSet.transfer_data = {
+        destination: connectAccountId,
+      };
+      toSet.application_fee_amount = Math.floor(
+        (data.price * 100 * data.percentage) / 100
+      );
+    }
+    toSet.transfer_data = {
+      destination: "acct_1R15zD09YKLirZNL",
+    };
+    toSet.application_fee_amount = Math.floor(
+      (data.price * 100 * data.percentage) / 100
+    );
+    console.log("el objeto", toSet);
+    // 3. Crear nuevo PaymentIntent con ese método
+    const intent = await stripe.paymentIntents.create(toSet);
 
     return intent;
   } catch (error) {

@@ -8,7 +8,7 @@ export const businessSchedule = async (data) => {
 
   // Fechas en UTC
   const startDate = moment.utc().startOf("day").toDate();
-  const endDate = moment.utc().add(15, "days").endOf("day").toDate();
+  const endDate = moment.utc().add(240, "days").endOf("day").toDate();
 
   console.log(
     "SubService:",
@@ -38,8 +38,6 @@ export const businessSchedule = async (data) => {
       });
       currentDate.add(1, "day");
     }
-
-    console.log("Days in Range:", daysInRange);
 
     const responseMap = {};
 

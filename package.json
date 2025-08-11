@@ -1,5 +1,5 @@
 {
-  "name": "barberapi1.2",
+  "name": "sosapp",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -30,6 +30,7 @@
     "handlebars": "^4.7.8",
     "jimp": "^0.22.12",
     "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.7.1",
     "moment-timezone": "^0.5.43",
     "mongoose": "^6.3.4",
     "mongoose-paginate": "^5.0.3",
@@ -47,7 +48,7 @@
     "stripe": "^13.6.0",
     "uuid": "^9.0.0",
     "web-push": "^3.6.7",
-    "whatsapp-web.js": "^1.26.0",
+    "whatsapp-web.js": "^1.31.0",
     "winston": "^3.11.0",
     "wwebjs-mongo": "^1.1.0"
   },

@@ -43,6 +43,8 @@ const userSchema = new Schema(
       enum: ["personal", "business", "worker"],
     },
     phone: { type: String },
+    phoneCode: { type: String },
+    phoneCountry: { type: String },
     img: {
       imgUrl: { type: String, default: "" },
       coverImg: { type: String, default: "" },
@@ -106,88 +108,6 @@ const userSchema = new Schema(
       nationality: { type: String },
       country: { type: String },
       idNumber: { type: String },
-    },
-    workerData: {
-      isMyServicesOk: { type: Boolean, default: false },
-      isAboutmeOk: { type: Boolean, default: false },
-      isMySchedulesOk: { type: Boolean, default: false },
-      isMyWorkplacesOk: { type: Boolean, default: true },
-      isActive: { type: Boolean, default: false },
-      phone: { type: String },
-      languages: {
-        main: {
-          type: String,
-          default: "EN",
-          enum: ["EN", "ES", "FR", "BR"],
-        },
-        secondary: { type: Array },
-      },
-      services: [
-        {
-          id: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-          _id: false,
-          subServices: Array({
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Subservice",
-          }),
-          gallery: { type: Array },
-        },
-      ],
-    },
-    businessData: {
-      isActive: { type: Boolean, default: false },
-      category: {
-        type: String,
-        enum: ["category1", "category2", "category3"],
-        default: "category1",
-      },
-      details: {
-        en: {
-          type: String,
-          default: "",
-        },
-        es: {
-          type: String,
-          default: "",
-        },
-        fr: {
-          type: String,
-          default: "",
-        },
-        pt: {
-          type: String,
-          default: "",
-        },
-      },
-      location: {
-        _id: false,
-        country: { type: String },
-        city: { type: String },
-        url: { type: String },
-      },
-      type: {
-        type: String,
-        enum: ["hotel", "hostel", "other"],
-      },
-      name: { type: String },
-      owner: {
-        name: {
-          first: {
-            type: String,
-          },
-          last: {
-            type: String,
-          },
-        },
-      },
-      services: [
-        {
-          _id: false,
-          service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-          isActive: { type: Boolean, default: true },
-          schedule: { type: mongoose.Schema.Types.ObjectId, ref: "Schedule" },
-        },
-      ],
     },
     paymentData: {
       stripe: {

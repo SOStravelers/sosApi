@@ -60,26 +60,7 @@ router.post(
   ]),
   uploadAssets
 );
-//Create subService
-router.post(
-  "/",
-  validateParams(
-    [
-      {
-        param_key: "name",
-        required: true,
-        type: "string",
-      },
-      {
-        param_key: "service",
-        required: true,
-        type: "string",
-      },
-    ],
-    "body"
-  ),
-  create
-);
+
 //Get subServices by Service
 router.get(
   "/byService",
@@ -190,32 +171,5 @@ router.get(
   ),
   getByEmail
 );
-//obtener todos los subservicios agrupados por servicios
-router.get("/all/byService", getAllByService);
 
-//actualizar isActive en un sub-servicio:
-router.put(
-  "/changeStatus/one/:id",
-  validateParams(
-    [
-      {
-        param_key: "id",
-        required: true,
-        type: "string",
-      },
-    ],
-    "params"
-  ),
-  validateParams(
-    [
-      {
-        param_key: "isActive",
-        required: true,
-        type: "boolean",
-      },
-    ],
-    "body"
-  ),
-  changeStatus
-);
 export default router;

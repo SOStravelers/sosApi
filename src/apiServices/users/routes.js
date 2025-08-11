@@ -89,4 +89,7 @@ router.put(
 //Actualizar un usuario por id
 router.put("/data/user", isAuth, USER_CONTROLLERS.updateDataUser);
 
+//Actualizar un usuario por id
+router.put("/info/user", isAuth, USER_CONTROLLERS.updateInfoUser);
+
 export default router;

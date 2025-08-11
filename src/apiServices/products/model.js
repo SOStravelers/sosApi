@@ -6,11 +6,29 @@ import paginateConfig from "../../config/paginate.js";
 
 const ProductSchema = new Schema(
   {
-    item: { type: mongoose.Schema.Types.ObjectId, ref: "Item" },
-    subservice: { type: mongoose.Schema.Types.ObjectId, ref: "Subservice" },
-    order: { type: Number },
-    name: { type: String },
-    default: { type: Boolean, default: false },
+    categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
+    name: {
+      en: {
+        type: String,
+        default: "",
+      },
+      es: {
+        type: String,
+        default: "",
+      },
+      fr: {
+        type: String,
+        default: "",
+      },
+      pt: {
+        type: String,
+        default: "",
+      },
+      de: {
+        type: String,
+        default: "",
+      },
+    },
     imgUrl: { type: String },
     isActive: { type: Boolean, default: true },
     hasQuantity: { type: Boolean, default: false },

@@ -1,6 +1,7 @@
 import Subservice from "./model.js";
 import Product from "../products/model.js";
-import Category from "../items/model.js";
+import Category from "../categories/model.js";
+import Provider from "../providers/model.js";
 import mongoose from "mongoose";
 import User from "../users/model.js";
 import sharp from "sharp";
@@ -15,12 +16,12 @@ import extractReferencePaths from "../../helpers/extractReferencePaths.js";
 const USER_REF_PATHS = extractReferencePaths(Subservice.schema);
 import { normalizeObjectIdReferencesForController } from "../../helpers/controllers/normalizeRefValueForController.js";
 import mongoJsonToPlain from "../../helpers/mongoJsonToPlain.js";
-import Jimp from "jimp";
 import envar from "../../config/envar.js";
 import { populate } from "dotenv";
 import Favorite from "../favorites/model.js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
+import path from "path";
 dayjs.extend(utc);
 //hola
 
@@ -38,6 +39,18 @@ function extractKeyFromUrl(url) {
     return url;
   }
 }
+
+export const create = async (data) => {
+  logger.info("*** CREATE NEW SUBSERVICE DAO ***");
+  try {
+    let subservice = new Subservice(data);
+    subservice.isActive = false;
+    const newsubService = await subservice.save();
+    return newsubService;
+  } catch (err) {
+    throw err;
+  }
+};
 
 //subir y eliminar galeria de fotos, imgurl, videoUrl
 
@@ -86,8 +99,8 @@ export const uploadAssets = async (id, files, body) => {
       }
 
       const buf = await sharp(img.buffer)
-        .resize({ width: 800 })
-        .jpeg({ quality: 80 })
+        .resize({ width: 800, withoutEnlargement: true })
+        .jpeg({ quality: 70 })
         .toBuffer();
 
       const key = `subservices/${id}/img.jpg`;
@@ -125,7 +138,7 @@ export const uploadAssets = async (id, files, body) => {
         }
 
         const buf = await sharp(file.buffer)
-          .resize({ width: 800 })
+          .resize({ width: 800, withoutEnlargement: true })
           .jpeg({ quality: 70 })
           .toBuffer();
 
@@ -184,25 +197,80 @@ export const uploadAssets = async (id, files, body) => {
   }
 };
 
+export function getRefPriceData(doc, currency = "usd") {
+  let refPrice = null;
+
+  if (doc.typeService === "tour") {
+    refPrice = doc.tourData?.adultPrice || null;
+  } else if (doc.typeService === "product") {
+    const defaultCategory = doc.categories?.find(
+      (c) => c.default && Array.isArray(c.products) && c.products.length > 0
+    );
+    const defaultProduct = defaultCategory?.products?.find(
+      (p) => p.default && p.price
+    );
+
+    if (defaultProduct) {
+      refPrice = defaultProduct.price;
+    }
+  }
+
+  const reducedDoc = {
+    _id: doc._id,
+    name: doc.name,
+    imgUrl: doc.imgUrl,
+    duration: doc.duration,
+    videoUrl: doc.videoUrl,
+    rate: doc.rate,
+    rateCount: doc.rateCount,
+    gallery: doc.gallery,
+    service: { name: doc.service?.name },
+    chipData: doc.chipData,
+    refPrice,
+    order: doc.order,
+  };
+
+  if (doc.typeService === "tour") {
+    reducedDoc.tourData = { adultPrice: refPrice };
+  } else if (doc.typeService === "product") {
+    reducedDoc.category = {
+      type: doc.categories?.find((c) => c.default)?.type,
+      default: true,
+      products: [
+        {
+          price: refPrice,
+          default: true,
+        },
+      ],
+    };
+  }
+
+  return reducedDoc;
+}
+
 //Obtener all services con VIDEOS
+
 export const getWithVideos = async () => {
   logger.info("*** GET WITH VIDEOS SUBSERVICE DAO ***");
   try {
-    const subservices = await Subservice.find({
+    const docs = await Subservice.find({
       isActive: true,
       videoUrl: { $exists: true, $ne: null },
-    });
-    // .populate({
-    //   path: "currency",
-    // });
-    return subservices;
+    })
+      .populate({ path: "service", select: "name" })
+      .lean();
+
+    const reducedList = docs.map((doc) => getRefPriceData(doc, "usd")); // o cualquier moneda actual
+    return reducedList;
   } catch (err) {
     throw err;
   }
 };
+
 //Obtener all services con paginate
 
 export const getAll = async (data) => {
+  logger.info("*** GET ALL SUBSERVICES DAO ***");
   try {
     let {
       keyword,
@@ -211,13 +279,14 @@ export const getAll = async (data) => {
       currency,
       service,
       page = 1,
-      limit = 12,
+      limit = 20,
     } = data;
 
     page = parseInt(page);
     limit = parseInt(limit);
 
-    const query = { isActive: true }; // ← no filtramos por archived
+    const query = { isActive: true };
+
     if (keyword && typeof keyword === "string" && keyword.trim() !== "") {
       const segments = buildKeywordSegments(keyword);
       query["$or"] = [];
@@ -228,122 +297,80 @@ export const getAll = async (data) => {
         }
       }
     }
+
     if (service) query.service = service;
 
-    const options = {
-      populate: [{ path: "service", select: "name" }],
-      page,
-      limit,
-      lean: true,
-      sort: { createdAt: -1 },
-    };
-
-    const result = await Subservice.paginate(query, options);
-    const docs = result.docs;
-
-    const filteredResults = [];
+    console.log("la query", query);
+    const allDocs = await Subservice.find(query)
+      .populate({ path: "service", select: "name" })
+      .lean();
 
     const applyPriceFilter = currency || minPrice || maxPrice;
     if (currency) currency = currency.toLowerCase();
     if (minPrice) minPrice = parseFloat(minPrice);
     if (maxPrice) maxPrice = parseFloat(maxPrice);
 
-    for (const doc of docs) {
-      let match = false;
-      let refPrice = null;
+    const groupedByOrder = new Map();
+    const withoutOrder = [];
 
-      const reducedDoc = {
-        _id: doc._id,
-        name: doc.name,
-        imgUrl: doc.imgUrl,
-        duration: doc.duration,
-        videoUrl: doc.videoUrl,
-        rate: doc.rate,
-        rateCount: doc.rateCount,
-        gallery: doc.gallery,
-        service: { name: doc.service?.name },
-        chipData: doc.chipData,
-      };
+    for (const doc of allDocs) {
+      const reducedDoc = getRefPriceData(doc, currency);
+      const price = reducedDoc?.refPrice?.[currency];
 
-      // ---- TOUR ----
-      if (doc.typeService === "tour") {
-        const price = doc.tourData?.adultPrice?.[currency];
-
-        const priceMatch =
-          !applyPriceFilter ||
-          (price !== undefined &&
-            (minPrice === undefined || price >= minPrice) &&
-            (maxPrice === undefined || price <= maxPrice));
-
-        if (priceMatch) {
-          match = true;
-          refPrice = doc?.tourData?.adultPrice || null;
-          reducedDoc.tourData = {
-            adultPrice: doc?.tourData?.adultPrice || null,
-          };
+      if (applyPriceFilter) {
+        if (
+          price === undefined ||
+          (minPrice !== undefined && price < minPrice) ||
+          (maxPrice !== undefined && price > maxPrice)
+        ) {
+          continue;
         }
       }
 
-      // ---- PRODUCT ----
-      if (doc.typeService === "product") {
-        const defaultCategory = doc.categories?.find(
-          (c) =>
-            c.default === true &&
-            Array.isArray(c.products) &&
-            c.products.length > 0
-        );
-
-        const defaultProduct = defaultCategory?.products?.find(
-          (p) => p.default === true && p.price
-        );
-
-        if (defaultCategory && defaultProduct) {
-          const price = defaultProduct.price?.[currency];
-
-          const priceMatch =
-            !applyPriceFilter ||
-            (price !== undefined &&
-              (minPrice === undefined || price >= minPrice) &&
-              (maxPrice === undefined || price <= maxPrice));
-
-          if (priceMatch) {
-            match = true;
-            refPrice = defaultProduct.price;
-            reducedDoc.category = {
-              type: defaultCategory.type,
-              default: true,
-              products: [
-                {
-                  price: defaultProduct.price,
-                  default: true,
-                },
-              ],
-            };
-          }
+      if (reducedDoc.order !== undefined) {
+        if (!groupedByOrder.has(reducedDoc.order)) {
+          groupedByOrder.set(reducedDoc.order, []);
         }
-      }
-
-      if (match || !applyPriceFilter) {
-        reducedDoc.refPrice = refPrice;
-        filteredResults.push(reducedDoc);
+        groupedByOrder.get(reducedDoc.order).push(reducedDoc);
+      } else {
+        withoutOrder.push(reducedDoc);
       }
     }
 
-    const totalFiltered = filteredResults.length;
+    // Mezclar y unir todos los resultados ordenados
+    let finalList = [];
+    const orders = Array.from(groupedByOrder.keys()).sort((a, b) => a - b);
+    for (const order of orders) {
+      finalList = finalList.concat(shuffleArray(groupedByOrder.get(order)));
+    }
+
+    finalList = finalList.concat(shuffleArray(withoutOrder));
+
+    // Aplicar paginación real
     const startIndex = (page - 1) * limit;
-    const paginatedDocs = filteredResults.slice(startIndex, startIndex + limit);
+    const paginatedDocs = finalList.slice(startIndex, startIndex + limit);
 
     return {
       docs: paginatedDocs,
-      totalDocs: totalFiltered,
+      totalDocs: finalList.length,
       limit,
       page,
-      totalPages: Math.ceil(totalFiltered / limit),
+      totalPages: Math.ceil(finalList.length / limit),
+      hasNextPage: page < Math.ceil(finalList.length / limit),
     };
   } catch (err) {
     throw err;
   }
 };
+
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 //Obtener subService por id
 export const getById = async (id) => {
@@ -393,14 +420,26 @@ export const getById = async (id) => {
 };
 
 //Obtener all services con paginate segun varias metricas
-export const getRecommendedSubservice = async () => {
-  logger.info("*** GET RECOMENDED SUBSERVICES DAO ***");
+export const getRecommendedSubservice = async (id = null) => {
+  logger.info("*** GET RECOMMENDED SUBSERVICES DAO ***");
+  console.log("la id", id);
   try {
-    const subservices = await Subservice.aggregate([
-      { $match: { recommended: true } },
-      { $sample: { size: 7 } },
+    const matchStage = {
+      order: { $in: [1, 2] },
+      isActive: true,
+    };
+
+    if (id) {
+      matchStage._id = { $ne: new mongoose.Types.ObjectId(id) };
+    }
+
+    const docs = await Subservice.aggregate([
+      { $match: matchStage },
+      { $sample: { size: 6 } },
     ]);
-    return subservices;
+
+    const reduced = docs.map((doc) => getRefPriceData(doc, "usd"));
+    return reduced;
   } catch (err) {
     throw err;
   }
@@ -501,12 +540,111 @@ export const getProductCategoriesAndProducts = async (subserviceId, date) => {
   }
 };
 
+//Actualizar data de un subservicio
+export const updateOne = async (id, data) => {
+  logger.info("*** UPDATE SUBSERVICE DAO ***");
+  try {
+    const subservice = await Subservice.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      data,
+      {
+        new: true,
+      }
+    ).exec();
+    if (!subservice) throw createError(404, "subService not found");
+    return subservice;
+  } catch (err) {
+    throw err;
+  }
+};
+
+//Actualizar data de un subservicio
+export const updateProductData = async (id, data) => {
+  logger.info("*** UPDATE PRODUCT DATA SUBSERVICE ***");
+  try {
+    const updateFields = {};
+
+    if ("eventData" in data) {
+      updateFields.eventData = data.eventData;
+      updateFields.tourData = null;
+      updateFields.hasEvent = true;
+    }
+
+    if ("categories" in data) {
+      updateFields.categories = data.categories;
+    }
+
+    updateFields.typeService = "product";
+    const subservice = await Subservice.findOneAndUpdate(
+      { _id: id },
+      updateFields,
+      { new: true }
+    ).exec();
+
+    if (!subservice) throw createError(404, "subService not found");
+
+    return subservice;
+  } catch (err) {
+    throw err;
+  }
+};
+
+//Actualizar data de un subservicio
+export const addProviderbySubservice = async (data) => {
+  logger.info("*** ADD PROVIDER ONE SUBSERVICE ***");
+  try {
+    if (!data.providerId && !data.providerEmail)
+      throw createError(404, "missing providerId or providerEmail");
+    let findProvider;
+    if (data.providerId) {
+      findProvider = await Provider.findById(data.providerId);
+    } else if (data.providerEmail) {
+      findProvider = await Provider.findOne({ email: data.providerEmail });
+    }
+    if (!findProvider) throw createError(404, "Provider not found");
+    const updatedSubservice = await Subservice.findOneAndUpdate(
+      { _id: data.subserviceId },
+      { provider: findProvider._id },
+      { new: true }
+    ).exec();
+    return updatedSubservice;
+  } catch (err) {
+    throw err;
+  }
+};
+//Actualizar data de todos los subservivios por servicio
+export const addProviderbyService = async (data) => {
+  logger.info("*** ADD PROVIDER ALL SUBSERVICE BY SERVICE ***");
+  try {
+    if (!data.providerId && !data.providerEmail)
+      throw createError(404, "missing providerId or providerEmail");
+    let findProvider;
+    if (data.providerId) {
+      findProvider = await Provider.findById(data.providerId);
+    } else if (data.providerEmail) {
+      findProvider = await Provider.findOne({ email: data.providerEmail });
+    }
+    if (!findProvider) throw createError(404, "Provider not found");
+    const updatedSubservices = await Subservice.updateMany(
+      { service: data.serviceId },
+      { provider: findProvider._id },
+      { new: true }
+    ).exec();
+    return updatedSubservices;
+  } catch (err) {
+    throw err;
+  }
+};
+
 ///
 ////
+//-----------------------------------------------
 
 // controllers/subservice.js
-export const getAllByService = async (req, res, next) => {
-  logger.info("*** GET ALL SUBSERVICES (small) BY SERVICE ---");
+export const getAllByService = async () => {
+  logger.info("*** GET ALL SUBSERVICES (small) BY SERVICE ***");
   try {
     const data = await Subservice.aggregate([
       /* 1) convertir el id-texto al tipo ObjectId para el $lookup */
@@ -551,46 +689,42 @@ export const getAllByService = async (req, res, next) => {
       /* 5) ordenar por nombre en español (opcional) */
       { $sort: { "service.name.es": 1 } },
     ]);
-
-    res.status(200).json(data);
+    return data;
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
 
-//Crear subServicio
-export const create = async (req, res, next) => {
-  global.logger.info("---CREATE NEW SUBSERVICE---", req.body);
+// Actualizar status isActive de un subservicio
+export const changeStatus = async (data, id) => {
+  logger.info("*** UPDATE STATUS SUBSERVICE DAO ***");
   try {
-    let subservice = new Subservice(req.body);
-    subservice.name = req.body.name.toLowerCase();
-    subservice.creator = req.body.user;
-    const newsubService = await subservice.save();
-    res.json(newsubService);
+    const subservice = await Subservice.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        isActive: data.isActive,
+      },
+      {
+        new: true,
+      }
+    ).exec();
+    if (!subservice) throw createError(404, "subService not found");
+    return subservice;
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
+
 //obtener los subservicios por servicio
-export const getByService = async (req, res, next) => {
-  global.logger.info("---GET SUBSERVICES BY SERVICE---");
+export const getByService = async (id) => {
+  logger.info("*** GET SUBSERVICES BY SERVICE ***");
   try {
-    let options = {
-      // populate,
-      select:
-        "name price duration imgUrl details multiple shortDescription goChat isoTime",
-      page: Number(req.query.page) || 1,
-      limit: Number(req.query.limit) || 50,
-      sort: { updatedAt: -1 },
-    };
-    let query = {};
-    query.isActive = true;
-    query.service = req.query.id;
-
-    const subservices = await Subservice.paginate(query, options);
-    res.status(200).json(subservices);
+    const subservices = await Subservice.find({ service: id });
+    return subservices;
   } catch (err) {
-    next(err);
+    throw err;
   }
 };
 
@@ -609,48 +743,6 @@ const buildKeywordSegments = (text = "") => {
 
 //Obtener todos los subservicios agrupados por servicios:
 
-//Actualizar data de un subservicio
-export const updateOne = async (req, res, next) => {
-  global.logger.info("---UPDATE SUBSERVICE---");
-  try {
-    let data = req.body;
-    const subservice = await Subservice.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      data,
-      {
-        new: true,
-      }
-    ).exec();
-    if (!subservice) throw createError(404, "subService not found");
-    res.status(200).json(subservice);
-  } catch (err) {
-    next(err);
-  }
-};
-// Actualizar status isActive de un subservicio
-export const changeStatus = async (req, res, next) => {
-  global.logger.info("---UPDATE STATUS SUBSERVICE---");
-  try {
-    let data = req.body;
-    const subservice = await Subservice.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      {
-        isActive: data.isActive,
-      },
-      {
-        new: true,
-      }
-    ).exec();
-    if (!subservice) throw createError(404, "subService not found");
-    res.status(200).json(subservice);
-  } catch (err) {
-    next(err);
-  }
-};
 //Activar o desactivar multiples usuarios
 export const activateMany = async (req, res, next) => {
   global.logger.info("---ACTIVATE/DESACTIVATE MANY SUBSERVICES---");

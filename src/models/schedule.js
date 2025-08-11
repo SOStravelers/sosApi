@@ -43,8 +43,6 @@ const scheduleSchema = new Schema(
       },
     ],
     creator: { type: String, ref: "User" },
-
-    details: { type: String },
   },
   { timestamps: true }
 );

@@ -31,6 +31,27 @@ const upload = multer({
   },
 });
 
+//Create subService
+router.post(
+  "/",
+  validateParams(
+    [
+      {
+        param_key: "name",
+        required: true,
+        type: "object",
+      },
+      {
+        param_key: "service",
+        required: true,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+  SERVICE_CONTROLLERS.create
+);
+
 //Get all services
 router.get(
   "/getAll/paginate",
@@ -122,7 +143,20 @@ router.get(
   SERVICE_CONTROLLERS.getById
 );
 //Get recomendados
-router.get("/get/recommended", SERVICE_CONTROLLERS.getRecommendedSubservice);
+router.get(
+  "/get/recommended",
+  validateParams(
+    [
+      {
+        param_key: "subservice",
+        required: false,
+        type: "string",
+      },
+    ],
+    "query"
+  ),
+  SERVICE_CONTROLLERS.getRecommendedSubservice
+);
 
 //para subir galeria de fotos y videos
 router.post(
@@ -138,6 +172,153 @@ router.post(
     { name: "galleryVideos", maxCount: 3 },
   ]),
   SERVICE_CONTROLLERS.uploadAssets
+);
+
+//--------------SETTINGS---------------------
+
+//obtener todos los subservicios por servicio
+router.get(
+  "/byService/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  SERVICE_CONTROLLERS.getByService
+);
+//obtener todos los subservicios agrupados por servicios
+router.get("/all/byService", SERVICE_CONTROLLERS.getAllByService);
+
+//actualizar isActive en un sub-servicio:
+router.put(
+  "/changeStatus/one/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "isActive",
+        required: true,
+        type: "boolean",
+      },
+    ],
+    "body"
+  ),
+  SERVICE_CONTROLLERS.changeStatus
+);
+
+//actualizar data de productos de servivicios
+router.put(
+  "/allData/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+
+  SERVICE_CONTROLLERS.updateOne
+);
+
+//actualizar data de productos de servivicios
+router.put(
+  "/productData/:id",
+  validateParams(
+    [
+      {
+        param_key: "id",
+        required: true,
+        type: "string",
+      },
+    ],
+    "params"
+  ),
+  validateParams(
+    [
+      {
+        param_key: "categories",
+        required: true,
+        type: "array",
+      },
+      {
+        param_key: "eventData",
+        required: true,
+        type: "object",
+      },
+    ],
+    "body"
+  ),
+  SERVICE_CONTROLLERS.updateProductData
+);
+
+//añadir proveedor a un subservicio
+router.put(
+  "/add/provider/subservice",
+  validateParams(
+    [
+      {
+        param_key: "subserviceId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "providerId",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "providerEmail",
+        required: false,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+
+  SERVICE_CONTROLLERS.addProviderbySubservice
+);
+//añadir proveedor a todos los subservicios de un servicio
+router.put(
+  "/add/provider/service",
+  validateParams(
+    [
+      {
+        param_key: "serviceId",
+        required: true,
+        type: "string",
+      },
+      {
+        param_key: "providerId",
+        required: false,
+        type: "string",
+      },
+      {
+        param_key: "providerEmail",
+        required: false,
+        type: "string",
+      },
+    ],
+    "body"
+  ),
+
+  SERVICE_CONTROLLERS.addProviderbyService
 );
 
 export default router;

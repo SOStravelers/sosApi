@@ -7,14 +7,16 @@ import { createError } from "../../config/error.js";
 import Subservice from "../subservices/model.js";
 import NoUser from "../nousers/model.js";
 import User from "../users/model.js";
+import { isBeforeHoursThreshold } from "../../utils/time.js";
 
-//-----------------
-//------STRIPE-----
-//-----------------
+//---------------
+//-----FUNCIONES
+//---------------
 
 const validatePriceTour = async (price, tourData, selectedData, currency) => {
   logger.info("*** VALIDATE PRICE TOUR STRIPE PAYMENT DAO ***");
   try {
+    console.log("precioss", price);
     const totalAdult =
       selectedData?.amountAdults * tourData?.adultPrice[currency] || 0;
     const totalChildren =
@@ -80,58 +82,53 @@ const validatePriceProduct = async (
 
 const opciones = ["usd", "brl", "eur"];
 
-//---------------
-//-----FUNCIONES
-//---------------
-
-export function isBeforeHoursThreshold(
-  dateString,
-  hoursBefore,
-  language = "pt"
-) {
-  const targetDate = new Date(dateString);
-
-  if (isNaN(targetDate.getTime())) {
-    console.error("❌ Fecha inválida:", dateString);
-    return {
-      isBefore: false,
-      cancelTime: {
-        isoTime: null,
-        stringData: "",
-      },
-    };
-  }
-
-  // Calcular la fecha límite
-  const thresholdDate = new Date(
-    targetDate.getTime() - hoursBefore * 60 * 60 * 1000
-  );
-
-  const now = new Date(); // ya es en UTC
-
-  return now < thresholdDate;
-}
-
 const validateCreateBooking = async (subservice, data) => {
-  logger.info("*** VALIDATE CREATE BOOKING STRIPE PAYMENT DAO ***");
+  logger.info("*** VALIDATE TIME LIMIT BOOKING STRIPE PAYMENT DAO ***");
   try {
     //Valida que no sea un fecha del pasado
-    const isoTime = data.isoTime;
+    let isoTime = null;
+    if (
+      subservice.hasEvent &&
+      subservice?.eventData.available &&
+      subservice?.eventData.isoTime
+    ) {
+      //caso con eventos
+      isoTime = subservice?.eventData.isoTime;
+    } else {
+      //caso con calendario
+      isoTime = data?.startTime?.isoTime;
+    }
+    console.log("isoTime", isoTime);
+    console.log("limitBook", subservice.timeLimitBook);
     const isPast = new Date(isoTime) < new Date();
-    if (isPast) throw createError(400, "Invalid isoTime");
+    console.log("is Past", isPast);
+    if (isPast) throw createError(400, "Exceded time limit");
     //Existe limite maximo para hacer el booking
-    if (subservice.haveLimitTime) {
-      const canBook = isBeforeHoursThreshold(
-        data.isoTime,
-        subservice.timeUntilCancel
-      );
-      if (!canBook) throw createError(400, "Invalid isoTime");
+    const isBeforeLimitBook = isBeforeHoursThreshold(
+      isoTime,
+      subservice.timeLimitBook
+    );
+    console.log("canBook", isBeforeLimitBook);
+    if (!isBeforeLimitBook) {
+      throw createError(400, "Time Limit exceded");
     }
   } catch (err) {
-    err;
+    throw err;
   }
 };
 
+const checkStatusCharge = async (subservice) => {
+  logger.info("*** CHECK STATUS CHARGE STRIPE PAYMENT DAO ***");
+  if (subservice.withTicket) {
+    throw createError(400, "Invalid type service");
+  } else {
+    return true;
+  }
+};
+
+//-----------------
+//------STRIPE-----
+//-----------------
 //Crear payment Intent tradicional
 export const paymentIntentStripe = async (data, user) => {
   logger.info("*** CREATE PAYMENT INTENT STRIPE PAYMENT DAO ***");
@@ -158,8 +155,11 @@ export const paymentIntentStripe = async (data, user) => {
       .populate("categories.products.product", "name")
       .lean();
     if (!subservice) throw createError(404, "Subservice not found");
-    //---------------Validaciones------------------------
-    validateCreateBooking(subservice, data);
+    //---------------Validaciones------------------------o
+    //valida hora maxima para agendar un servicio antes del inici
+    if (subservice.haveLimitTime) {
+      await validateCreateBooking(subservice, data);
+    }
     //---------------------------------------------------
     //---Analizar si data del precio no fue adulterada---
     //---------------------------------------------------
@@ -167,13 +167,16 @@ export const paymentIntentStripe = async (data, user) => {
     console.log("el tipo de servicio", subservice.typeService);
     if (subservice.typeService == "tour") {
       const validate = await validatePriceTour(
-        data.amountService,
+        data.amount,
         subservice.tourData,
         data.selectedData,
         data.currency
       );
       if (!validate) throw createError(400, "Invalid price");
     } else if (subservice.typeService == "product") {
+      if (!subservice.eventData.available)
+        throw createError(400, "Event is not available");
+
       if (data.selectedData.length == 0)
         throw createError(400, "Invalid price");
 
@@ -189,19 +192,9 @@ export const paymentIntentStripe = async (data, user) => {
     }
     //---------------------------------------------------
     //--Analiza si hay que solo hacer validacion de tarjeta o cobro---------
-    //---------------------------------------------------
-    let chargeValidate = false;
-    if (subservice.service._id.toString() == "67c11c4917c3a7a2c353cb1b") {
-      chargeValidate = true;
-    } else if (subservice.withTicket) {
-      throw createError(400, "Invalid type service");
-    } else {
-      const hasCancel = isBeforeHoursThreshold(
-        service.startTime.isoTime,
-        service.timeUntilCancel
-      );
-      hasCancel ? (chargeValidate = true) : (chargeValidate = false);
-    }
+    // si es false, genera payment intent si es true, genera validacion de tarjeta
+    const chargeValidate = checkStatusCharge(subservice);
+
     //---------------------------------------------------
     //----------------ENVIO A STRIPE---------------------
     //---------------------------------------------------
@@ -212,9 +205,10 @@ export const paymentIntentStripe = async (data, user) => {
       chargeValidate
     );
     //---------------------------------------------------
-    //-----SI HUBO PAGO SE GUARDA EL PAGO EN LA BD--------
+    //-----SI HUBO PAYMENT INTENT EXITOSO SE GUARDA EL PAGO EN LA BD--------
     //---------------------------------------------------
     if (paymentIntent.typeIntent == "payment") {
+      console.log(paymentIntent);
       const status = amountPaid == amount ? "paid" : "unpaid";
       const dataPayment = {
         paymentMethod: "stripe",
@@ -249,7 +243,7 @@ export const paymentIntentStripe = async (data, user) => {
             first: firstName,
             last: lastName,
           },
-          payment: {
+          paymentData: {
             stripe: {
               customer: paymentIntent.customer,
             },
@@ -330,6 +324,64 @@ export const createCheckoutLink = async (data) => {
     throw err;
   }
 };
+//
+export const capturePaymentBooking = async (idBooking) => {
+  logger.info("*** CAPTURE PAYMENT BOOKING STRIPE PAYMENT DAO ***");
+  try {
+    const booking = await Booking.findById(idBooking).populate(
+      "currency provider country"
+    );
+    console.log("wenas", booking);
+    if (!booking) throw createError(404, "Booking not found");
+    if (booking.paymentStatus != "unpaid")
+      throw createError(400, "Invalid payment status");
+    const timeUntilCancel = booking.timeUntilCancel || 0;
+    console.log("timeUntilCancel", timeUntilCancel, booking.startTime.isoTime);
+    if (isBeforeHoursThreshold(booking.startTime.isoTime, timeUntilCancel))
+      throw createError(400, "cannot capture yet");
+    let customerId = null;
+    if (booking.clientUserId) {
+      const clientUser = await User.findById(booking.clientUserId);
+      if (!clientUser) throw createError(404, "Client user not found");
+      customerId = clientUser.paymentData.stripe.customer;
+    } else {
+      const noUser = await NoUser.findOne({ email: booking.clientEmail });
+      if (!noUser) throw createError(404, "No user not found");
+      customerId = noUser.paymentData.stripe.customer;
+    }
+    if (!customerId) throw createError(404, "Customer not found");
+    let connectAccountId = null;
+    if (booking.provider) {
+      connectAccountId =
+        booking?.provider?.paymentData?.stripe?.connectAccountId;
+    }
+    const data = {
+      customer: customerId,
+      price: booking.price.grossAmount,
+      currency: booking.currency.code,
+      connectAccountId: connectAccountId,
+      percentage: 6,
+    };
+    const intent = await STRIPE_SERVICE.createDirectPaymentIntent(data);
+    booking.paymentStatus = "paid";
+    booking.save();
+
+    return "sucess";
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const creteDirectPaymentStripe = async (data) => {
+  logger.info("*** GET PAYMENT INTENT BY ID STRIPE PAYMENT DAO ***");
+  try {
+    const link = await STRIPE_SERVICE.createDirectPaymentIntent(data);
+    return link;
+  } catch (err) {
+    throw err;
+  }
+};
+
 //---------------
 
 export const transferPayments = async (data, user) => {
@@ -407,16 +459,6 @@ export const getPaymentIntentById = async (id) => {
 };
 
 //-----------------
-
-export const creteDirectPaymentStripe = async (data) => {
-  logger.info("*** GET PAYMENT INTENT BY ID STRIPE PAYMENT DAO ***");
-  try {
-    const link = await STRIPE_SERVICE.createDirectPaymentIntent(data);
-    return link;
-  } catch (err) {
-    throw err;
-  }
-};
 
 //-----------------
 //------PAYPAL-----

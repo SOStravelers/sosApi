@@ -57,3 +57,12 @@ export const updateAllItem = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getAllCategoriesWithProducts = async (req, res, next) => {
+  try {
+    const response = await ITEM_DAO.getAllCategoriesWithProducts();
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};

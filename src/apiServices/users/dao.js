@@ -3,11 +3,7 @@ import Holiday from "../holidays/model.js";
 import Booking from "../bookings/model.js";
 import Schedule from "../schedules/model.js";
 import Jimp from "jimp";
-import extractReferencePaths from "../../helpers/extractReferencePaths.js";
-import { normalizeObjectIdReferencesForController } from "../../helpers/controllers/normalizeRefValueForController.js";
 import mongoJsonToPlain from "../../helpers/mongoJsonToPlain.js";
-const USER_REF_PATHS = extractReferencePaths(User.schema);
-console.log("los paths", USER_REF_PATHS);
 import { n64tobuffer } from "../../utils/externalFiles.js";
 import { AwsUploadFile } from "../../services/aws_s3.js";
 import { procesarNombre } from "../../utils/data.js";
@@ -49,18 +45,11 @@ export const findUserToken = async (user) => {
   logger.info("*** FIND USER TOKEN USER DAO ***");
   try {
     const userId = user._id;
-    const userFinded = await User.findOne({ _id: userId })
-      .select(
-        "type isActive username businessData email rating img personalData security workerData.isActive workerData.isMyServicesOk workerData.isMySchedulesOk workerData.isMyWorkplacesOk workerData.isAboutmeOk"
-      )
-      .populate({
-        path: "workerData.services.id", // Poblar el campo "id" dentro de "services"
-        model: "Service", // Modelo de "Service"
-      })
-      .populate({
-        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
-        model: "Service", // Modelo de "Service"
-      });
+    const userFinded = await User.findOne({ _id: userId }).select(
+      "type isActive username  email rating img personalData security phone phoneCode phoneCountry"
+    );
+
+    console.log("wena", userFinded.personalData);
 
     if (!userFinded) {
       throw createError(404, "User not found");
@@ -132,12 +121,6 @@ export const changePassword = async (data, user) => {
 //Actualizar data de un usuario por ID
 export const updateOne = async (data, userId) => {
   global.logger.info("*** UPDATE USER DAO ***");
-  // Limpiar JSON con $oid/$date
-  // let userObj = mongoJsonToPlain(req.body);
-  // Normaliza referencias (convierte strings a ObjectId)
-  // userObj = normalizeObjectIdReferencesForController(userObj, USER_REF_PATHS);
-  // console.log("user limpio", userObj.workerData.services);
-  // return res.send(userObj);
   try {
     // let { user } = userObj;
     let newUser = await User.findOneAndUpdate(
@@ -162,12 +145,7 @@ export const updateOne = async (data, userId) => {
         model: "Subservice", // Modelo de "SubServices"
         match: { isActive: true }, // Solo selecciona los subservicios activos
       })
-      .populate({
-        path: "businessData.services.service", // Poblar el campo "id" dentro de "services"
-        select: "name imgUrl ",
-        model: "Service", // Modelo de "Service"
-        match: { isActive: true }, // Solo selecciona los servicios activos
-      })
+
       .exec();
 
     return newUser;
@@ -180,7 +158,7 @@ export const updateDataUser = async (data, user) => {
   global.logger.info("*** UPDATE DATA USER DAO ***");
   try {
     let body = data;
-    let newUser = await User.findByIdAndUpdate(user._id.toString(), body, {
+    let newUser = await User.findByIdAndUpdate(user._id, body, {
       new: true,
     })
       .populate({
@@ -204,7 +182,64 @@ export const updateDataUser = async (data, user) => {
       .exec();
     return newUser;
   } catch (err) {
-    next(err);
+    throw err;
+  }
+};
+
+export const updateInfoUser = async (data, user) => {
+  logger.info("*** UPDATE INFO USER DAO ***");
+  try {
+    // Campos permitidos (ajustados a tu schema)
+    // - Nombre: subcampos dentro de personalData.name
+    // - Teléfono: campos a nivel raíz del usuario (según tu comentario)
+    const allowedNameFields = ["first", "last", "nickName"];
+    const allowedRootFields = ["phone", "phoneCode", "phoneCountry"];
+
+    // Construiremos $set con dot notation
+    const updates = {};
+
+    // 1) personalData.name.{first,last,nickName}
+    if (
+      data?.personalData?.name &&
+      typeof data.personalData.name === "object"
+    ) {
+      for (const k of allowedNameFields) {
+        if (Object.prototype.hasOwnProperty.call(data.personalData.name, k)) {
+          const value = data.personalData.name[k];
+          if (value === null || value === "") {
+            throw createError(400, `Missing data: personalData.name.${k}`);
+          }
+          updates[`personalData.name.${k}`] = value;
+        }
+      }
+    }
+
+    // 2) Campos raíz: phone, phoneCode, phoneCountry
+    for (const k of allowedRootFields) {
+      if (Object.prototype.hasOwnProperty.call(data, k)) {
+        const value = data[k];
+        if (value === null || value === "") {
+          throw createError(400, `Missing data: ${k}`);
+        }
+        updates[k] = value;
+      }
+    }
+
+    // Si no llegó nada válido para actualizar
+    if (Object.keys(updates).length === 0) {
+      throw createError(400, "No valid fields to update");
+    }
+
+    // Actualiza SOLO las keys enviadas, no reemplaza subdocumentos enteros
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id.toString(),
+      { $set: updates },
+      { new: true }
+    ).exec();
+
+    return updatedUser;
+  } catch (err) {
+    throw err;
   }
 };
 

@@ -187,18 +187,7 @@ export const uploadAssets = async (req, res, next) => {
 };
 
 //Crear subServicio
-export const create = async (req, res, next) => {
-  global.logger.info("---CREATE NEW SUBSERVICE---", req.body);
-  try {
-    let subservice = new Subservice(req.body);
-    subservice.name = req.body.name.toLowerCase();
-    subservice.creator = req.body.user;
-    const newsubService = await subservice.save();
-    res.json(newsubService);
-  } catch (err) {
-    next(err);
-  }
-};
+
 //obtener los subservicios por servicio
 export const getByService = async (req, res, next) => {
   global.logger.info("---GET SUBSERVICES BY SERVICE---");
@@ -235,61 +224,6 @@ const buildKeywordSegments = (text = "") => {
   return out;
 };
 
-//Obtener todos los subservicios agrupados por servicios:
-// controllers/subservice.js
-export const getAllByService = async (req, res, next) => {
-  global.logger.info("--- GET ALL SUBSERVICES (small) BY SERVICE ---");
-  try {
-    const data = await Subservice.aggregate([
-      /* 1) convertir el id-texto al tipo ObjectId para el $lookup */
-      { $addFields: { serviceObjId: { $toObjectId: "$service" } } },
-
-      /* 2) unir con la colección services */
-      {
-        $lookup: {
-          from: "services",
-          localField: "serviceObjId",
-          foreignField: "_id",
-          as: "service",
-        },
-      },
-      { $unwind: "$service" },
-
-      /* 3) proyectar SOLO los campos que nos interesan */
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          isActive: 1,
-          service: {
-            _id: "$service._id",
-            name: "$service.name",
-            isActive: "$service.isActive",
-          },
-        },
-      },
-
-      /* 4) agrupar subservicios bajo cada servicio */
-      {
-        $group: {
-          _id: "$service._id",
-          service: { $first: "$service" },
-          subservices: {
-            $push: { _id: "$_id", name: "$name", isActive: "$isActive" },
-          },
-        },
-      },
-
-      /* 5) ordenar por nombre en español (opcional) */
-      { $sort: { "service.name.es": 1 } },
-    ]);
-
-    res.status(200).json(data);
-  } catch (err) {
-    next(err);
-  }
-};
-
 //Obtener all services con paginate segun varias metricas
 export const getRecommendedSubservice = async (req, res, next) => {
   global.logger.info("---GET SUBSERVICES RECOMENDED---");
@@ -323,28 +257,7 @@ export const updateOne = async (req, res, next) => {
     next(err);
   }
 };
-// Actualizar status isActive de un subservicio
-export const changeStatus = async (req, res, next) => {
-  global.logger.info("---UPDATE STATUS SUBSERVICE---");
-  try {
-    let data = req.body;
-    const subservice = await Subservice.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      {
-        isActive: data.isActive,
-      },
-      {
-        new: true,
-      }
-    ).exec();
-    if (!subservice) throw createError(404, "subService not found");
-    res.status(200).json(subservice);
-  } catch (err) {
-    next(err);
-  }
-};
+
 //Activar o desactivar multiples usuarios
 export const activateMany = async (req, res, next) => {
   global.logger.info("---ACTIVATE/DESACTIVATE MANY SUBSERVICES---");

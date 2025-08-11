@@ -42,6 +42,17 @@ export const createCheckoutLink = async (req, res, next) => {
   }
 };
 
+//Crear payment Intent booking
+export const capturePaymentBooking = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const response = await PAYMENT_DAO.capturePaymentBooking(id);
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const transferPayments = async (req, res, next) => {
   try {
     const user = req.user;

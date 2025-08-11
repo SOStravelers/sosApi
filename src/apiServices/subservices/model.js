@@ -181,7 +181,8 @@ const subserviceSchema = new Schema(
           default: "",
         },
       },
-      date: { type: Date },
+      available: { type: Boolean, default: true },
+      isoTime: { type: Date },
     },
     service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
     isActive: { type: Boolean, default: true },
@@ -210,6 +211,8 @@ const subserviceSchema = new Schema(
     haveLimitTime: { type: Boolean, default: false },
     timeLimitBook: { type: Number },
     withTicket: { type: Boolean, default: false },
+    order: { type: Number },
+
     typeService: {
       type: String,
       enum: ["tour", "event", "product"],
@@ -250,6 +253,24 @@ const subserviceSchema = new Schema(
         ],
       },
     ],
+    chipData: {
+      es: {
+        type: String,
+      },
+      en: {
+        type: String,
+      },
+      pt: {
+        type: String,
+      },
+      fr: {
+        type: String,
+      },
+      de: {
+        type: String,
+      },
+    },
+    provider: { type: mongoose.Schema.Types.ObjectId, ref: "Provider" },
   },
   { timestamps: true }
 );

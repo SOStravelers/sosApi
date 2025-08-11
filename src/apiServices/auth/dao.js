@@ -6,12 +6,14 @@ import Holiday from "../holidays/model.js";
 import Booking from "../bookings/model.js";
 import envar from "../../config/envar.js";
 import { sendEmailTemplate } from "../../services/aws_ses.js";
+import NoUser from "../../apiServices/nousers/model.js";
 import { createError } from "../../config/error.js";
 import { refreshTokenGen, accessTokenGen } from "../../middleware/auth.js";
 import { procesarNombre } from "../../utils/data.js";
 import { createCustomerId } from "../../services/stripe.js";
 import { resendEmail } from "../../services/resend.js";
 import { createStripeCustomer } from "../../services/stripe.js";
+import { setAllBookings } from "../bookings/dao.js";
 import {
   generarNumero4Digitos,
   generarCodigoAleatorio,
@@ -52,18 +54,25 @@ export const registerEmail = async (data) => {
     user.email = theEmail;
     user.username = Math.random().toString(36).substring(2, 12);
 
-    const dataStripe = {
-      email: theEmail,
-      userId: user._id,
-      name: user.personalData.name + " " + user.personalData.name.last,
-    };
-    user.language ? (dataStripe.language = user.language) : "";
-    const customerId = await createStripeCustomer(dataStripe, true);
-    user.stripe.customerId = customerId;
+    const noUser = await NoUser.findOne({ email: email });
+    if (noUser) {
+      user.paymentData.stripe.customer = noUser.paymentData.stripe.customer;
+      user.phone = noUser.phone;
+    } else {
+      //stripe customer
+      const dataStripe = {
+        email: theEmail,
+        userId: user._id,
+        name: user.personalData.name + " " + user.personalData.name.last,
+      };
+      user.language ? (dataStripe.language = user.language) : "";
+      const customerId = await createStripeCustomer(dataStripe, true);
+      user.stripe.customerId = customerId;
+    }
 
     await user.save();
     const newUser = await User.findOne({ email: user.email }).select(
-      "about email type img language personalData type username workerData _id security.hasPassword"
+      "about email type img language personalData type username phone phoneCode phoneCountry _id security.hasPassword"
     );
     console.log("el item", newUser);
     let userToCreateToken = {
@@ -127,7 +136,7 @@ export const loginEmail = async (data) => {
       },
       { new: true }
     ).select(
-      "about email img type language  personalData username workerData _id security.hasPassword"
+      "about email img type language phone phoneCode phoneCountry  personalData username workerData _id security.hasPassword"
     );
     delete updatedUser.password;
     let userToCreateToken = {
@@ -150,82 +159,86 @@ export const loginEmail = async (data) => {
 //login y registro por google
 export const loginGoogle = async (data) => {
   logger.info("** LOGIN/REGISTER USER BY GOOGLE AND REFRESH TOKEN **");
+
   try {
     let { email, name, image } = data;
     email = email.toLowerCase().trim();
-    var user = await User.findOne({ email: email }).exec();
-    let newValue = false;
-    if (!user) {
-      console.log("nuevo");
-      newValue = true;
-      user = new User();
-      user.email = email;
-      var partes = name.split(" ");
-      var names = [partes[0], partes.slice(1).join(" ")];
-      user.personalData.name.first = names[0];
-      user.personalData.name.last = names[1];
-      !user.type ? (user.type = "personal") : "";
-      user.username = Math.random().toString(36).substring(2, 12);
-    }
-    console.log("existe");
-    !user.img.imgUrl ? (user.img.imgUrl = image) : "";
-    user.lastLogin = Date.now();
-    user.lastLoginType = "google";
-    user.isActive = true;
-    user.isValidate = true;
 
-    //stripe customer
-    const dataStripe = {
-      email: user.email,
-      userId: user._id,
-      name: user.personalData.name + " " + user.personalData.name.last,
+    const partes = name.split(" ");
+    const names = [partes[0], partes.slice(1).join(" ")];
+    const username = Math.random().toString(36).substring(2, 12);
+
+    const update = {
+      $set: {
+        lastLogin: Date.now(),
+        lastLoginType: "google",
+        isActive: true,
+        isValidate: true,
+      },
+      $setOnInsert: {
+        email,
+        username,
+        type: "personal",
+        "personalData.name.first": names[0],
+        "personalData.name.last": names[1],
+        "img.imgUrl": image,
+      },
     };
-    user.phone ? (dataStripe.phone = user.phone) : "";
-    user.language ? dataStripe.language : "";
-    const customerId = await createStripeCustomer(dataStripe, true);
-    user.paymentData.stripe.customer = customerId;
 
-    if (newValue) {
-      await user.save();
-      const newUser = await User.findOne({ email: user.email }).select(
-        "about email type img language personalData type username workerData _id security.hasPassword"
-      );
-      let userToCreateToken = {
-        _id: newUser._id,
-        username: newUser.username,
-      };
-      let userRefresh = {
-        _id: newUser._id,
-      };
-      await createCustomerId(newUser._id);
-      return {
-        msg: "login success",
-        access_token: accessTokenGen(userToCreateToken, true),
-        refresh_token: refreshTokenGen(userRefresh),
-        user: newUser,
-      };
-    } else {
-      let newUser = await User.findByIdAndUpdate(user._id, user, {
-        new: true,
-      }).select(
-        "about email img language personalData username type workerData _id security.hasPassword"
-      );
-      delete newUser.password;
-      // USER (TO CREATE TOKEN)
-      let userToCreateToken = {
-        _id: newUser._id,
-        username: newUser.username,
-        type: newUser.type,
-      };
-      await createCustomerId(newUser._id);
-      return {
-        msg: "login success",
-        access_token: accessTokenGen(userToCreateToken, true),
-        refresh_token: refreshTokenGen(userToCreateToken),
-        user: newUser,
-      };
+    const options = {
+      new: true,
+      upsert: true,
+    };
+
+    let user = await User.findOneAndUpdate({ email }, update, options);
+
+    // Verificar si el usuario vino de NoUser
+    const noUser = await NoUser.findOne({ email });
+    if (noUser) {
+      user.paymentData.stripe.customer = noUser.paymentData.stripe.customer;
+      user.phone = noUser.phone;
     }
+
+    // Si no tiene customer de Stripe, lo creamos
+    if (!user.paymentData?.stripe?.customer) {
+      const dataStripe = {
+        email: user.email,
+        userId: user._id,
+        name: `${user.personalData.name.first} ${user.personalData.name.last}`,
+      };
+      if (user.phone) dataStripe.phone = user.phone;
+      if (user.language) dataStripe.language = user.language;
+
+      const customerId = await createStripeCustomer(dataStripe, true);
+      user.paymentData.stripe.customer = customerId;
+    }
+
+    // Guardamos si hubo algún cambio nuevo
+    await user.save();
+
+    // Obtener usuario actualizado con solo los campos requeridos
+    const newUser = await User.findById(user._id).select(
+      "about email img language personalData username phone phoneCode phoneCountry type _id security.hasPassword"
+    );
+
+    // Setea reservas si es nuevo (opcional)
+    await setAllBookings(newUser);
+
+    // Tokens
+    const userToCreateToken = {
+      _id: newUser._id,
+      username: newUser.username,
+      type: newUser.type,
+    };
+
+    return {
+      msg: "login success",
+      access_token: accessTokenGen(userToCreateToken, true),
+      refresh_token: refreshTokenGen(userToCreateToken),
+      user: newUser,
+    };
   } catch (err) {
+    logger.error(err);
     throw err;
   }
 };

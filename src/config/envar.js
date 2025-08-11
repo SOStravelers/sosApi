@@ -9,6 +9,7 @@ export default function envar() {
   dbs.set("production", process.env.DB_PROD);
   return {
     SECRET: process.env.SECRET,
+    SECRET_EMAIL: process.env.SECRET,
     //Base de datos
     DB_PASS: process.env.DB_PASS,
     DB_USER: process.env.DB_USER,

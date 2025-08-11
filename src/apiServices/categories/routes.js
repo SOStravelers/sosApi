@@ -19,28 +19,5 @@ router.post(
   ITEM_CONTROLLERS.createItemsAndProducts
 );
 //GET ITEMS WITH PRODUCTS IN A SUBSERVICE
-router.get(
-  "/get/byService/:id",
-  validateParams(
-    [
-      {
-        param_key: "id",
-        required: true,
-        type: "string",
-      },
-    ],
-    "params"
-  ),
-  validateParams(
-    [
-      {
-        param_key: "date",
-        required: false,
-        type: "string",
-      },
-    ],
-    "query"
-  ),
-  ITEM_CONTROLLERS.getAllItemBySubservice
-);
+router.get("/all/products/all", ITEM_CONTROLLERS.getAllCategoriesWithProducts);
 export default router;
