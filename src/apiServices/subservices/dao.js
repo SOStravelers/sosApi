@@ -312,7 +312,7 @@ export const getAll = async (data) => {
 
     const groupedByOrder = new Map();
     const withoutOrder = [];
-
+    //minicambio
     for (const doc of allDocs) {
       const reducedDoc = getRefPriceData(doc, currency);
       const price = reducedDoc?.refPrice?.[currency];
