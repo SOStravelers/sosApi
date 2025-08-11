@@ -125,7 +125,7 @@ router.post(
         type: "string",
       },
       {
-        param_key: "amountService",
+        param_key: "amount",
         required: true,
         type: "number",
       },

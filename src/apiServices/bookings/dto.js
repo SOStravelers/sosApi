@@ -11,6 +11,9 @@ export const bookingFilterSimple = async (data) => {
       status: data.status,
       paymentStatus: data.paymentStatus,
       subserviceData: data.subserviceData,
+      clientData: data.clientData,
+      purchaseOrder: data.purchaseOrder,
+      createdAt: data.createdAt,
     };
     return bookings;
   } catch (err) {
